@@ -1,0 +1,20 @@
+{
+  "$schema": "./manifest.schema.json",
+  "note": "Source URLs are Higgsfield generation results. Run `npm run media:fetch` (or the media workflow on GitHub Actions) to download, optimise and write public/media. Raw downloads go to media-src/ which is git-ignored.",
+  "assets": [
+    {
+      "id": "m1-drone-master-a",
+      "kind": "image",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260917_220830_6a83f653-08d0-4931-9292-e17addc41bb8.png",
+      "widths": [640, 1280, 2048],
+      "placement": "review candidate: drone master still, variant A"
+    },
+    {
+      "id": "m1-drone-master-b",
+      "kind": "image",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260917_220830_3c2fec2f-48e6-467e-a2b4-7547b2a9af7e.png",
+      "widths": [640, 1280, 2048],
+      "placement": "review candidate: drone master still, variant B"
+    }
+  ]
+}
