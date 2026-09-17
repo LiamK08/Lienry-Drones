@@ -6,15 +6,68 @@
       "id": "m1-drone-master-a",
       "kind": "image",
       "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260917_220830_6a83f653-08d0-4931-9292-e17addc41bb8.png",
-      "widths": [640, 1280, 2048],
+      "widths": [
+        640,
+        1280,
+        2048
+      ],
       "placement": "review candidate: drone master still, variant A"
     },
     {
       "id": "m1-drone-master-b",
       "kind": "image",
       "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260917_220830_3c2fec2f-48e6-467e-a2b4-7547b2a9af7e.png",
-      "widths": [640, 1280, 2048],
+      "widths": [
+        640,
+        1280,
+        2048
+      ],
       "placement": "review candidate: drone master still, variant B"
+    },
+    {
+      "id": "m1-drone-master",
+      "kind": "image",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260917_220830_6a83f653-08d0-4931-9292-e17addc41bb8.png",
+      "widths": [
+        640,
+        1280,
+        2048
+      ],
+      "placement": "Drone master used on the site (variant A until Liam chooses; switch the url to variant B to change it)"
+    },
+    {
+      "id": "m2-capsule-master",
+      "kind": "image",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260917_224341_3553080d-35cd-4878-a11f-ea12f610f5cb.png",
+      "widths": [
+        640,
+        1280,
+        2048
+      ],
+      "placement": "Two systems (Commercial), Commercial pilot block, Platform Dock row"
+    },
+    {
+      "id": "m3-pod-master",
+      "kind": "image",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260917_224342_4876ab70-2682-483a-831c-aeae638b4348.png",
+      "widths": [
+        640,
+        1280,
+        2048
+      ],
+      "placement": "Two systems (Home), closing CTA, Homes CTA"
+    },
+    {
+      "id": "h0-hero-still",
+      "kind": "image",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260917_224341_f8c02e20-0a9e-4ceb-8e32-b90ac003cd9a.png",
+      "widths": [
+        768,
+        1280,
+        1920,
+        2560
+      ],
+      "placement": "Home hero poster, Platform hero"
     }
   ]
 }
