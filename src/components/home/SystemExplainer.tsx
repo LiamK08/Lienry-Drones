@@ -22,7 +22,7 @@ function TabList({ active, onSelect, idBase }: { active: number; onSelect: (i: n
     refs.current[j]?.focus();
   };
   return (
-    <div role="tablist" aria-label="Parts of the Lienry system" aria-orientation="vertical" className="flex gap-2 overflow-x-auto no-scrollbar md:flex-col md:gap-1">
+    <div role="tablist" aria-label="Parts of the Lienry system" aria-orientation="vertical" className="flex w-full max-w-full gap-2 overflow-x-auto no-scrollbar md:flex-col md:gap-1">
       {tabs.map((t, i) => {
         const selected = i === active;
         return (
@@ -52,11 +52,11 @@ function TabList({ active, onSelect, idBase }: { active: number; onSelect: (i: n
   );
 }
 
-function Panel({ active, idBase }: { active: number; idBase: string }) {
+function Panel({ active, idBase, pinned }: { active: number; idBase: string; pinned: boolean }) {
   const reduce = useReducedMotion();
   const t = tabs[active];
   return (
-    <div className="grid gap-6">
+    <div className="grid gap-5">
       <div className="relative">
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
@@ -66,7 +66,7 @@ function Panel({ active, idBase }: { active: number; idBase: string }) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.32, ease: instrument }}
           >
-            <Picture id={t.imageId} alt={`${t.tab}: ${t.title}`} aspect="4/3" sizes="(min-width: 768px) 55vw, 100vw" />
+            <Picture id={t.imageId} alt={`${t.tab}: ${t.title}`} aspect={pinned ? "16/10" : "4/3"} sizes="(min-width: 768px) 55vw, 100vw" className={pinned ? "max-h-[52svh] w-full" : ""} />
           </motion.div>
         </AnimatePresence>
         <span className="readout absolute right-3 top-3 z-10 rounded-chip bg-raised/90 px-2 py-1 text-[0.6875rem] uppercase tracking-[0.08em] text-ink">
@@ -83,7 +83,7 @@ function Panel({ active, idBase }: { active: number; idBase: string }) {
           className="max-w-prose"
         >
           <h3 className="text-h3">{tab.title}</h3>
-          <p className="mt-3 text-body text-muted">{tab.body}</p>
+          <p className="mt-2 text-body text-muted">{tab.body}</p>
         </div>
       ))}
     </div>
@@ -122,10 +122,10 @@ export function SystemExplainer() {
 
   return (
     <section id="system" aria-labelledby="system-heading" className="bg-plaster">
-      <div ref={ref} className={pinned ? "relative" : ""} style={pinned ? { height: `calc(${tabs.length} * 100svh)` } : undefined}>
-        <div className={`page-x mx-auto max-w-grid ${pinned ? "sticky top-0 flex h-[100svh] items-center py-[var(--nav-h)]" : "section-y"}`}>
-          <div className="grid w-full gap-10 md:grid-cols-12 md:gap-8">
-            <div className="md:col-span-5">
+      <div ref={ref} className={pinned ? "relative" : ""} style={pinned ? { height: `calc(100svh + ${tabs.length} * 72svh)` } : undefined}>
+        <div className={`page-x mx-auto max-w-grid ${pinned ? "sticky top-0 flex h-[100svh] items-center overflow-hidden pb-6 pt-[calc(var(--nav-h)+1rem)]" : "section-y"}`}>
+          <div className="grid w-full min-w-0 gap-10 md:grid-cols-12 md:gap-8">
+            <div className="min-w-0 md:col-span-5">
               <Eyebrow className="mb-4">{systemExplainer.eyebrow}</Eyebrow>
               <h2 id="system-heading" className="text-h2">
                 {systemExplainer.headline}
@@ -135,8 +135,8 @@ export function SystemExplainer() {
                 <TabList active={active} onSelect={select} idBase={idBase} />
               </div>
             </div>
-            <div className="md:col-span-7">
-              <Panel active={active} idBase={idBase} />
+            <div className="min-w-0 md:col-span-7">
+              <Panel active={active} idBase={idBase} pinned={pinned} />
             </div>
           </div>
         </div>

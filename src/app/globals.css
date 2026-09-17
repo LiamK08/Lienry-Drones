@@ -84,6 +84,7 @@
   }
 
   html {
+    overflow-x: clip;
     scroll-behavior: auto;
     -webkit-text-size-adjust: 100%;
     text-rendering: optimizeLegibility;

@@ -55,9 +55,11 @@ export function Nav() {
           })}
         </ul>
         <div className="flex items-center gap-3">
-          <Button href="/register-interest" onDark={dark} className="hidden md:inline-flex">
-            Register interest
-          </Button>
+          <div className="hidden md:block">
+            <Button href="/register-interest" onDark={dark}>
+              Register interest
+            </Button>
+          </div>
           <button
             type="button"
             className="inline-flex h-11 w-11 items-center justify-center rounded-button md:hidden"

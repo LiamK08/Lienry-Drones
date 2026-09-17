@@ -118,8 +118,8 @@ export function LandlordStory() {
   const beat = beats[active];
   return (
     <section id="story" aria-labelledby="story-heading" className="bg-plaster">
-      <div ref={ref} className="relative" style={{ height: `calc(${beats.length} * 100svh)` }}>
-        <div className="page-x sticky top-0 mx-auto flex h-[100svh] max-w-grid items-center py-[var(--nav-h)]">
+      <div ref={ref} className="relative" style={{ height: `calc(100svh + ${beats.length} * 72svh)` }}>
+        <div className="page-x sticky top-0 mx-auto flex h-[100svh] max-w-grid items-center overflow-hidden pb-6 pt-[calc(var(--nav-h)+1rem)]">
           <div className="grid w-full grid-cols-12 items-center gap-8">
             <div className="col-span-4">
               <Eyebrow className="mb-4">{landlordStory.eyebrow}</Eyebrow>
@@ -140,7 +140,7 @@ export function LandlordStory() {
             <div className="col-span-5">
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div key={beat.imageId} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.4, ease: instrument }}>
-                  <Picture id={beat.imageId} alt={beat.title} aspect="4/5" sizes="40vw" />
+                  <Picture id={beat.imageId} alt={beat.title} aspect="4/5" sizes="40vw" className="max-h-[72svh] w-full" />
                 </motion.div>
               </AnimatePresence>
             </div>
