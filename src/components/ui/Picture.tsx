@@ -38,8 +38,9 @@ export function Picture({
       <div
         className={`relative isolate overflow-hidden bg-sunken ${rounded} ${className}`}
         style={style}
-        role="img"
-        aria-label={alt}
+        role={alt ? "img" : undefined}
+        aria-label={alt || undefined}
+        aria-hidden={alt ? undefined : true}
         data-media-placeholder={id}
       >
         <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_20%_0%,#fbf9f4_0%,#e9e3d8_45%,#cfd9dc_100%)]" />

@@ -42,11 +42,11 @@ export function PlacesCarousel() {
       <Container>
         <Reveal className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <SectionHeading id="places-heading" eyebrow={places.eyebrow} headline={places.headline} />
-          <div className="flex items-center gap-2" aria-hidden="true">
-            <button type="button" onClick={() => scrollTo(Math.max(0, active - 1))} className="inline-flex h-11 w-11 items-center justify-center rounded-button border border-border-strong text-ink hover:bg-raised" tabIndex={-1}>
+          <div className="flex items-center gap-2">
+            <button type="button" aria-label="Previous card" onClick={() => scrollTo(Math.max(0, active - 1))} className="inline-flex h-11 w-11 items-center justify-center rounded-button border border-border-strong text-ink hover:bg-raised">
               <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M13.5 8h-10M7.5 3.5 3 8l4.5 4.5" /></svg>
             </button>
-            <button type="button" onClick={() => scrollTo(Math.min(places.cards.length - 1, active + 1))} className="inline-flex h-11 w-11 items-center justify-center rounded-button border border-border-strong text-ink hover:bg-raised" tabIndex={-1}>
+            <button type="button" aria-label="Next card" onClick={() => scrollTo(Math.min(places.cards.length - 1, active + 1))} className="inline-flex h-11 w-11 items-center justify-center rounded-button border border-border-strong text-ink hover:bg-raised">
               <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M2.5 8h10M8.5 3.5 13 8l-4.5 4.5" /></svg>
             </button>
           </div>
@@ -64,7 +64,7 @@ export function PlacesCarousel() {
           {places.cards.map((card, i) => (
             <li
               key={card.id}
-              className={`w-[72vw] shrink-0 snap-start sm:w-[46vw] md:w-[30vw] lg:w-[22rem] transition-opacity duration-300 ${i === active ? "opacity-100" : "opacity-90"}`}
+              className="w-[72vw] shrink-0 snap-start sm:w-[46vw] md:w-[30vw] lg:w-[22rem]"
               aria-current={i === active ? "true" : undefined}
             >
               <article className="flex h-full flex-col">
@@ -78,9 +78,16 @@ export function PlacesCarousel() {
             </li>
           ))}
         </ul>
-        <Container className="mt-6 flex items-center gap-2" aria-hidden="true">
+        <Container className="mt-6 flex items-center gap-2">
           {places.cards.map((c, i) => (
-            <button key={c.id} type="button" tabIndex={-1} onClick={() => scrollTo(i)} className={`h-1 rounded-full transition-all duration-300 ${i === active ? "w-8 bg-glass" : "w-3 bg-border-strong/50"}`} />
+            <button
+              key={c.id}
+              type="button"
+              aria-label={`Go to ${c.title}`}
+              aria-current={i === active ? "true" : undefined}
+              onClick={() => scrollTo(i)}
+              className={`h-1 rounded-full transition-all duration-300 ${i === active ? "w-8 bg-glass" : "w-3 bg-border-strong/50"}`}
+            />
           ))}
         </Container>
       </div>

@@ -127,7 +127,7 @@ export function LandlordStory() {
               <p className="mt-4 text-body text-muted">{landlordStory.intro}</p>
               <ol className="mt-8 space-y-4 border-l border-hairline pl-5">
                 {beats.map((b, i) => (
-                  <li key={b.title} className={`transition-opacity duration-300 ${i === active ? "opacity-100" : "opacity-40"}`} aria-current={i === active ? "step" : undefined}>
+                  <li key={b.title} className={`transition-colors duration-300 ${i === active ? "text-ink" : "text-muted"}`} aria-current={i === active ? "step" : undefined}>
                     <h3 className="font-sans text-[1.0625rem] font-medium">{b.title}</h3>
                     {i === active ? <p className="mt-1 text-small text-muted">{b.body}</p> : null}
                   </li>
