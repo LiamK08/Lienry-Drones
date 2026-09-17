@@ -21,3 +21,6 @@ docs/research/legora/
 
 # raw media downloads (optimised copies live in public/media)
 media-src/
+
+# typescript incremental build info
+*.tsbuildinfo
