@@ -328,6 +328,13 @@
         1200
       ],
       "placement": "Landlord story beat 4"
+    },
+    {
+      "id": "h1-hero-film",
+      "kind": "video",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005102_b22cace8-724c-433f-8cc0-379d3a51010b.mp4",
+      "height": 1080,
+      "placement": "Home hero film (MiniMax H3, 8 s, seamless loop from the approved hero still)"
     }
   ]
 }
