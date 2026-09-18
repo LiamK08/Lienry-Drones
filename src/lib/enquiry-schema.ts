@@ -20,10 +20,15 @@ export const propertyTypes = [
   "Other",
 ] as const;
 
+export const propertyCounts = ["1", "2 to 5", "6 to 20", "More than 20"] as const;
+
 export const enquirySchema = z.object({
   type: z.enum(enquiryTypes),
   name: z.string().trim().min(2, "Please enter your name.").max(120),
   email: z.string().trim().email("Please enter a valid email address.").max(200),
+  organisation: z.string().trim().max(160).optional().or(z.literal("")),
+  propertyCount: z.enum(propertyCounts).optional().or(z.literal("")),
+  updates: z.boolean().optional(),
   phone: z
     .string()
     .trim()

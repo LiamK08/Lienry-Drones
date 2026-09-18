@@ -23,6 +23,20 @@ export const platformPage = {
   },
 };
 
+export const platformFaq = {
+  eyebrow: "Questions",
+  headline: "What people ask first.",
+  items: [
+    { q: "Which surfaces does it clean?", a: "Glass, solar panels, walls, roofing and driveways. During a clean the drone identifies each material and adjusts its pressure to suit, and you can change the setting in the app." },
+    { q: "How tall a building can it work on?", a: "Buildings under 70 metres. On a commercial building the drone lives in a weatherproof capsule on the roof with its water tether fed from above; on a house or a solar farm it works from a waterproof ground pod." },
+    { q: "Where does the water come from?", a: "From the tether. It is fed from above on the roof system and from the ground pod on the home system, so the drone never carries water. A hose-free model is an idea we are exploring for some sites, not a product." },
+    { q: "How does it decide when to clean?", a: "On a commercial building it re-scans every two days and decides whether a clean is needed. You can change the interval in settings, and you can start a clean yourself from the app or the desktop software at any time." },
+    { q: "Does anyone need to be there?", a: "No. Setup is done once. After that the system runs from the dock, and you can start or watch a clean from anywhere." },
+    { q: "Is Lienry operating yet?", a: "Not yet. Lienry Drones is at concept stage in Sydney, raising a pre-seed round and preparing a pilot program for commercial buildings. We do not claim any approvals, customers or results, and we will only ever publish figures we can stand behind." },
+    { q: "What does it cost?", a: "We are not publishing prices before the pilot program. Pilot buildings will see them first. The aim is a cheaper long-term alternative to outsourced commercial window cleaning." },
+  ],
+};
+
 export const commercialPage = {
   eyebrow: "Commercial system",
   headline: "Window cleaning that lives on the roof.",
@@ -129,6 +143,15 @@ export const companyPage = {
       { title: "Raising pre-seed", body: "We are raising a pre-seed round to build and pilot the system." },
       { title: "Pilot program", body: "A small number of commercial buildings under 70 metres in Sydney, first." },
       { title: "Sydney, Australia", body: "Designed for Australian buildings, weather and property owners." },
+    ],
+  },
+  values: {
+    eyebrow: "How we work",
+    headline: "Three rules we build by.",
+    items: [
+      { title: "Honest by default", body: "We only say what we can stand behind. No invented customers, results or approvals, and every statistic on this site is cited to its source." },
+      { title: "Safe by design", body: "The tether, the obstacle-avoidance camera, the onboard surface checks and the weatherproof dock are the design, not add-ons. Safety is not left to supervision." },
+      { title: "Built for owners", body: "Every decision is measured against one question: does this make a property easier to own? If it does not, it does not ship." },
     ],
   },
   exploring: {

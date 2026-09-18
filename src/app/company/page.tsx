@@ -48,6 +48,7 @@ export default function CompanyPage() {
         </Container>
       </Section>
       <Tiles id="where" eyebrow={c.where.eyebrow} headline={c.where.headline} items={c.where.items} columns={4} />
+      <Tiles id="values" eyebrow={c.values.eyebrow} headline={c.values.headline} items={c.values.items} tone="plaster" />
       <Section id="exploring" ariaLabelledby="exploring-heading">
         <Container>
           <div className="grid gap-8 md:grid-cols-12">

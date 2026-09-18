@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
-import { platformPage } from "@/content/pages";
+import { platformFaq, platformPage } from "@/content/pages";
 import { PageHero } from "@/components/blocks/PageHero";
 import { AlternatingRows, CtaBlock, SpecTable } from "@/components/blocks/Blocks";
+import { Faq } from "@/components/blocks/Faq";
+import { FilmBand } from "@/components/home/FilmBand";
 import { Button } from "@/components/ui/Button";
 
 export const metadata: Metadata = {
@@ -23,7 +25,9 @@ export default function PlatformPage() {
       </PageHero>
       <div className="h-[var(--section-y)]" aria-hidden="true" />
       <AlternatingRows id="parts" rows={platformPage.parts} />
+      <FilmBand videoId="h1-hero-film" stillId="h0-hero-still" eyebrow="See it work" headline="Water, light and nobody on site." body="The drone finishes a glass wash at first light. This is the whole idea in eight seconds." cta={{ label: "Register interest", href: "/register-interest" }} />
       <SpecTable id="specs" eyebrow={platformPage.specs.eyebrow} headline={platformPage.specs.headline} rows={platformPage.specs.rows} />
+      <Faq id="faq" eyebrow={platformFaq.eyebrow} headline={platformFaq.headline} items={platformFaq.items} />
       <CtaBlock id="platform-cta" eyebrow="Pre-launch" headline="Be part of the first buildings." body="Register interest for your property, or book a conversation about the commercial pilot program." cta={{ label: "Register interest", href: "/register-interest" }} secondary={{ label: "Book a pilot", href: "/register-interest?type=commercial" }} />
     </>
   );

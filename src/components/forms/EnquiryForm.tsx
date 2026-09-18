@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { useId, useState } from "react";
-import { enquirySchema, enquiryTypes, enquiryTypeLabels, propertyTypes, type EnquiryType } from "@/lib/enquiry-schema";
+import { enquirySchema, enquiryTypes, enquiryTypeLabels, propertyCounts, propertyTypes, type EnquiryType } from "@/lib/enquiry-schema";
 import { registerPage } from "@/content/pages";
 import { Button } from "@/components/ui/Button";
 
@@ -23,7 +23,7 @@ export function EnquiryForm() {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
     const raw = Object.fromEntries(form.entries());
-    const parsed = enquirySchema.safeParse({ ...raw, type });
+    const parsed = enquirySchema.safeParse({ ...raw, type, updates: form.get("updates") === "on" });
     if (!parsed.success) {
       const next: Errors = {};
       for (const issue of parsed.error.issues) next[String(issue.path[0])] = issue.message;
@@ -90,6 +90,12 @@ export function EnquiryForm() {
           <input id={`${id}-phone`} name="phone" type="tel" autoComplete="tel" className={inputCls} />
         </div>
         <div>
+          <label htmlFor={`${id}-organisation`} className="text-small font-medium">
+            {type === "investor" ? "Fund or firm" : type === "commercial" ? "Company or strata" : "Organisation"} <span className="text-muted">(optional)</span>
+          </label>
+          <input id={`${id}-organisation`} name="organisation" autoComplete="organization" className={inputCls} />
+        </div>
+        <div>
           <label htmlFor={`${id}-propertyType`} className="text-small font-medium">
             Property type
           </label>
@@ -102,7 +108,20 @@ export function EnquiryForm() {
             ))}
           </select>
         </div>
-        <div className="sm:col-span-2">
+        <div>
+          <label htmlFor={`${id}-propertyCount`} className="text-small font-medium">
+            {type === "investor" ? "Properties you would like to see it on" : "How many properties"}
+          </label>
+          <select id={`${id}-propertyCount`} name="propertyCount" className={inputCls} defaultValue="">
+            <option value="">Choose one</option>
+            {propertyCounts.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
           <label htmlFor={`${id}-location`} className="text-small font-medium">
             Suburb or city
           </label>
@@ -119,6 +138,11 @@ export function EnquiryForm() {
           <input id={`${id}-company`} name="company" tabIndex={-1} autoComplete="off" />
         </div>
       </div>
+
+      <label className="flex items-start gap-3 text-small text-muted">
+        <input type="checkbox" name="updates" className="mt-1 h-4 w-4 accent-[#0f6a7c]" />
+        <span>Keep me posted as the pilot program takes shape. No marketing lists, and you can stop any time.</span>
+      </label>
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
         <Button type="submit" size="lg" disabled={status === "sending"} aria-busy={status === "sending"}>
