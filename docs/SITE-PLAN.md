@@ -183,6 +183,8 @@ Models, chosen from the connector's catalogue:
 
 Every shot uses the approved master stills as image references, carries the imagery direction above in its prompt, and is logged in `docs/MEDIA.md` with prompt, model, file path and placement. Stills are made before videos; only stills that pass review are animated.
 
+Production note (18 September 2026): the account is on Higgsfield's starter plan, which gates Nano Banana Pro at 4K and Kling 3.0 pro to the Plus plan. The masters and every derived still were made with Seedream 4.5 instead (1 credit each), and the films with MiniMax H3 (first and last frame from the approved still, so each loops seamlessly) and Kling 3.0 Turbo. The final list of what was made is in `docs/MEDIA.md`.
+
 | ID | Purpose | Placement | Aspect | Length | Model | Credits | Draft prompt |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | M1 | Drone master still | Reference for every shot; Platform "Drone" row | 3:2 | still | Nano Banana Pro 2K, 2 variants | 4 | Compact autonomous exterior-cleaning quadcopter, matte pale-grey composite body, slate accents, four shrouded rotors, slim front spray arm, thin translucent water tether from the underside, two small sensor lenses, hovering before a clean glass curtain wall at first light, thin sheet of water on the glass, soft diffused light, 85mm, photoreal, no text, no logos, no people |
