@@ -65,6 +65,25 @@ All prompts end with the house style clause: first light, soft diffused morning 
 
 The site uses `h1-hero-film` for the home hero and `c2-commercial-clip` for the film band. To switch the hero to the Kling clip, rename the ids in `scripts/media/manifest.json` and run the media fetch again.
 
+## Film review (Higgsfield video analysis, 18 September 2026)
+
+Both films the site uses were run through Higgsfield's video analysis so the product read could be checked from this session, where the CDN is blocked.
+
+| Film | Analysis job | What the analysis saw | Verdict |
+| --- | --- | --- | --- |
+| h1-hero-film | d1659de5 (prefix) | A grey and white drone hovering side-on to an office building's glass facade, tether rising above it and hose below, a fan of water spraying across the glass; steady camera with a slight push-in; golden-hour light. | Reads as the product: drone, tether, water on glass, nobody on site. The analysis counted six rotors where the master has four, so the rotor detail is soft at 2K; acceptable at hero scale behind the headline. The grade is warmer than the first-light stills. A cooler regrade is a follow-up if the hero should match the stills exactly. |
+| c2-commercial-clip | 16da67fc (prefix) | A white quadcopter inside a circular guard rising from a light-grey rooftop capsule with its lid open, a white tether to the capsule, fine mist, low warm sun, a tall glass building behind. | Reads as the commercial system: capsule, tether, drone lifting off with nobody on the roof. The analysis called the building a skyscraper; the framing keeps it generic and the copy states the 70-metre limit, so no change. Same warm grade as above. |
+
+## How the files reach the site
+
+`scripts/media/fetch.mjs` downloads every manifest entry, writes the optimised files into `public/media` and keeps a copy of the raw downloads and the finished output in `.next/cache/lienry-media`. It runs in three places:
+
+1. `npm run media:fetch` on any machine with open internet, after which `public/media` can be committed.
+2. `prebuild` (soft mode) before every `next build`, so a Vercel deploy downloads and encodes the set on its first build and restores it from the build cache on later builds. Video encoding uses `ffmpeg-static`, which is a dev dependency, so the build must install dev dependencies (Vercel's default).
+3. The "Fetch and optimise media" GitHub Actions workflow, which commits the result back to the branch, once Actions is enabled for the repository.
+
+This session cannot reach the CDN, so `public/media/index.json` in the repository is empty and the screenshots in `docs/screenshots` show the labelled placeholders where the renders will sit. The pipeline itself was exercised end to end in the Higgsfield sandbox on 18 September 2026 (see the note at the end of this file).
+
 ## Site asset ids the components expect
 
 `h0-hero-still`, `h1-hero-film` (video), `m1-drone-master`, `m2-capsule-master`, `m3-pod-master`, `s1-dock`, `s2-tether`, `s4-scan`, `s5-software`, `s5-software-clip` (video, optional), `s6-automation`, `p1-tower`, `p2-apartments`, `p3-house`, `p4-rental`, `p5-solar-farm`, `y1-story-before`, `y2-story-panels`, `y3-story-driveway`, `y5-story-done`, `f1-tether`, `f2-camera`, `f3-surface`, `f4-dock`, `c1-commercial-hero`, `c2-commercial-clip` (video, optional), `ho1-homes-hero`, `so1-solar-hero`, `so2-solar-closeup`, `co1-company`.

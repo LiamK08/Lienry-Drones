@@ -148,3 +148,51 @@ Lienry's take: design the mobile layouts first for the hero, explainer and carou
 - Pages: home, product, portal, customers, about at 1440 and 390.
 - Per page and viewport: two hero frames (t=0 and t=3s), 18 to 22 scroll frames in mid and settled pairs, one full-page screenshot, one `data.json` with computed styles.
 - Stored under `docs/research/legora/<page>_<viewport>/` (git-ignored). Contact sheets for the comparison pass in the quality check will be saved as `docs/screenshots/legora-*.png` only if they contain no Legora imagery; otherwise they stay out of the repo.
+- Second pass (18 September 2026): security, book-a-demo, careers, agent, monitors, lists, tax, roi, newsroom, blog, playbooks, campaign and word at 1440, with security, book-a-demo, careers, agent and tax at 390 as well. One full-page screenshot and one `data.json` per page and viewport, stored in the sandbox under `legora2/<page>/<viewport>/` and not transferred, for the reason given in section 1. Section 9 holds what they showed.
+
+## 9. The rest of Legora's site (second pass)
+
+Thirteen more pages were captured with the same extraction as section 1: headings with sizes and widths, section bands with backgrounds, buttons, forms, numerals, images and videos. The figures below come from the extracted `data.json` files. The tax solutions page loaded but its extraction returned no usable digest, so it is not described.
+
+### 9.1 Security (7,606px)
+
+Measured: a 900px dark hero (`#0D1016`) with a 13px eyebrow, a 48px H1 at 440px and a "Go to trustcenter" pill; a second dark band, "Certified & compliant", with four 120px certification tiles captioned in 13px; three alternating rows with 32px H2s at 640px (storage, security, ownership) over 15px sub-heads and 13px body; a centred 33.7px customer quote at 840px; an FAQ with a 32px H2 at 720px (y=5,239); a closing "Serious about security?" block beside a 503px image.
+
+Lienry's take: the FAQ pattern is now on the Platform page as "What people ask first.", seven questions answered from the product facts in a native `details` accordion, including "Is Lienry operating yet?" and "What does it cost?" answered honestly. No certification tiles, trust centre or quote: Lienry holds no certifications or approvals, and the FAQ says so.
+
+### 9.2 Book a demo (1,670px)
+
+Measured: the shortest page on the site. A 32px H1 and a 32px sub-heading at 560px on the left; on the right a form with first name, last name, email, company, primary location, organisation type (four options), number of lawyers and a marketing consent tick, then a 13px privacy line; below it a strip of 104x60 client logos, then the 900px footer. The whole form sits above the fold at 1440.
+
+Lienry's take: Register interest already had the "I am a" radios. This pass added the equivalents of the qualifying fields, company or strata, property type and how many properties (1, 2 to 5, 6 to 20, more than 20), plus an opt-in "keep me updated" tick and the privacy line. No logo strip, because there are no customers to show.
+
+### 9.3 Careers (22,127px)
+
+Measured: a 13px "Work at Legora" line marked up as an H1, a 48px H1 at 800px, a 600px image band, a 32px mission H2 at 386px; three values as 15px H3s in one row at 417px each, followed by a 32px H2 paragraph on how they combine; three 457x343 people-story videos (loop, click to play); department accordions listing roles; a five-step application process numbered 01 to 05 at 15px; a 33.7px in-office quote.
+
+Lienry's take: the values trio became "Three rules we build by." on the Company page (Honest by default, Safe by design, Built for owners), each written from how the site was actually made. No careers page: two founders and no open roles, and the brief rules out anything that implies a larger company than exists.
+
+### 9.4 Product pages: Agent (7,889px), Monitors (6,655px), Word Add-in (6,977px), Lists (8,648px)
+
+Measured: two hero types. Agent and Lists open with a "PRODUCT / name" breadcrumb eyebrow and a 67.5px H1 at 860px. Monitors and Word open with a 56px H2 at 486px and no H1; Word puts a 666x833 portrait product video beside it (autoplay, plays once). Agent runs a 1,392x812 autoplay loop with a "Play full video" control straight under the hero. Every product page then follows the same order: a 41px H3 outcome statement at 680 to 720px, three or four feature rows with 33.7px H4s at 400px in 676px rows, a 30 to 33.7px customer quote, and one shared demo block at 402px. Lists uses the "Own every task. Every fact. Every deadline." headline shape.
+
+Lienry's take: the alternating rows were already the rhythm of Platform, Commercial and Homes and Rentals. This pass added a film beat to the Platform page ("See it work", the hero film as a muted loop with its still as poster), so the product page, like Legora's, moves and does not only show stills; Commercial keeps its capsule film band. No quotes, and section 7 already rules out the "Every X. Every Y." structure.
+
+### 9.5 ROI report (15,541px) and Newsroom (4,925px)
+
+Measured: the report landing page opens with the report title and an analyst credit, a 1,440x810 full-bleed autoplay loop, then a 3,844px editorial column with 24px sample counts, 16px percentage rows, one 128px numeral, two 72px numerals, two 689x387 inline loops and a second full-bleed loop, with "Download the report" as the call to action. The newsroom is a dated headline list and a band of eight 80px counters under "From our founding to our funding".
+
+Lienry's take: the large numeral treatment shaped the home page counters and the statistics blocks on Solar and Homes and Rentals, which carry only cited third-party figures (IEA PVPS, UNSW, Joule, the Clean Energy Regulator and the ABS). No report, survey or company numbers of our own, and no newsroom or press kit before there is news.
+
+### 9.6 Blog (6,741px), Playbooks (5,517px) and the campaign page (14,518px)
+
+Measured: the blog is a 48px H1, a featured post with a 32px H2, a row of filter chips, 24px H3 cards at 366px (three across) then 437px (two across), and an email subscribe form with a consent tick. Playbooks is a landing page: a 56px H1 at 451px, a 40px H2 with three 24px H3 benefits at 459px, an 837px near-black (`#0A0A0A`) demo band holding a 919x517 loop, a "Features" grid of 24px H3s at 382px and a 56px closing H2 at 893px. The sponsorship campaign page has no headings at all, seventeen images and a 36px split-digit season counter.
+
+Lienry's take: no blog, so the enquiry form's "keep me updated" tick is the pre-launch equivalent of the subscribe form. The dark demo band confirms the home page film band as the one dark break in a light page; the Platform film band stays light so the effect is not repeated. No campaign or sponsorship pages.
+
+### 9.7 What this pass changed on the Lienry site
+
+- Platform: the FAQ accordion and the "See it work" film band.
+- Register interest: company or strata, property type, how many properties, the consent tick.
+- Company: the "Three rules we build by." trio.
+- Left out on purpose: certification tiles, trust centre, logo strips, quotes, careers, newsroom, press kit, blog, report downloads and campaign pages. Each of them would imply customers, staff or news that Lienry does not have yet.
