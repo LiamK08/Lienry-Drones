@@ -68,6 +68,266 @@
         2560
       ],
       "placement": "Home hero poster, Platform hero"
+    },
+    {
+      "id": "s1-dock",
+      "kind": "image",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005014_cc7adca5-0bab-490d-b45b-96936618432e.png",
+      "widths": [
+        640,
+        1280,
+        1920
+      ],
+      "placement": "Home explainer Dock tab, Platform Dock row"
+    },
+    {
+      "id": "s2-tether",
+      "kind": "image",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005014_2eda620e-529f-4c0a-80f3-ecbe6f0b875d.png",
+      "widths": [
+        640,
+        1280,
+        1920
+      ],
+      "placement": "Home explainer Tether tab, Platform Tether row"
+    },
+    {
+      "id": "s4-scan",
+      "kind": "image",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005014_0020e81f-1b1b-4161-9b02-d48634674058.png",
+      "widths": [
+        640,
+        1280,
+        1920
+      ],
+      "placement": "Home explainer Scan tab, Platform Scan row"
+    },
+    {
+      "id": "s5-software",
+      "kind": "image",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005014_4247ae21-e9e1-4b3f-94b8-3e10648d7ffd.png",
+      "widths": [
+        640,
+        1280,
+        1920
+      ],
+      "placement": "Home explainer Software tab, Platform Software row"
+    },
+    {
+      "id": "s6-automation",
+      "kind": "image",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005014_0c20148e-7208-4bb7-ab3b-3aec5f8f15fd.png",
+      "widths": [
+        640,
+        1280,
+        1920
+      ],
+      "placement": "Home explainer Automation tab, Platform Automation row"
+    },
+    {
+      "id": "p1-tower",
+      "kind": "image",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005014_74444578-348c-46e9-b534-6ace98980884.png",
+      "widths": [
+        480,
+        800,
+        1200
+      ],
+      "placement": "Places carousel: commercial towers"
+    },
+    {
+      "id": "p3-house",
+      "kind": "image",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005014_49788a3e-76d1-40a4-9ac4-6a0992d296d5.png",
+      "widths": [
+        480,
+        800,
+        1200
+      ],
+      "placement": "Places carousel: homes"
+    },
+    {
+      "id": "p4-rental",
+      "kind": "image",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005014_5448168e-38ba-499f-a5c1-d7c09ea82a54.png",
+      "widths": [
+        480,
+        800,
+        1200
+      ],
+      "placement": "Places carousel: rental properties"
+    },
+    {
+      "id": "p5-solar-farm",
+      "kind": "image",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005014_2ceb5820-573b-4f9f-a651-695ffc3ea115.png",
+      "widths": [
+        480,
+        800,
+        1200
+      ],
+      "placement": "Places carousel: solar farms"
+    },
+    {
+      "id": "c1-commercial-hero",
+      "kind": "image",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005014_28f608d7-2fc8-42ae-b271-bf67c41b2112.png",
+      "widths": [
+        768,
+        1280,
+        1920,
+        2560
+      ],
+      "placement": "Commercial page hero, home film band poster, source frame for the commercial clip"
+    },
+    {
+      "id": "ho1-homes-hero",
+      "kind": "image",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005014_3ee17cf3-b245-4b9d-b071-91082d345f1f.png",
+      "widths": [
+        768,
+        1280,
+        1920,
+        2560
+      ],
+      "placement": "Homes and Rentals hero"
+    },
+    {
+      "id": "p2-apartments",
+      "kind": "image",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005238_dc6aa152-f57c-4f33-a0c4-51809dfd4b85.png",
+      "widths": [
+        480,
+        800,
+        1200
+      ],
+      "placement": "Places carousel: apartment buildings"
+    },
+    {
+      "id": "y1-story-before",
+      "kind": "image",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005237_7dd6c0cf-9400-477d-a3f2-04fb5babed15.png",
+      "widths": [
+        480,
+        800,
+        1200
+      ],
+      "placement": "Landlord story beats 1 and 2"
+    },
+    {
+      "id": "y2-story-panels",
+      "kind": "image",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005238_4f39881d-33fa-429a-8149-b728c810fa18.png",
+      "widths": [
+        480,
+        800,
+        1200
+      ],
+      "placement": "Landlord story beat 3"
+    },
+    {
+      "id": "y5-story-done",
+      "kind": "image",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005237_3976b34c-c9f6-487a-a06c-cdff124815f0.png",
+      "widths": [
+        480,
+        800,
+        1200
+      ],
+      "placement": "Landlord story beat 5"
+    },
+    {
+      "id": "f1-tether",
+      "kind": "image",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005238_fc3876f2-8f89-422b-b870-af4b46c75548.png",
+      "widths": [
+        400,
+        800
+      ],
+      "placement": "Safety by design: tether"
+    },
+    {
+      "id": "f2-camera",
+      "kind": "image",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005238_ae903b99-d394-402b-8e1f-5266e758a185.png",
+      "widths": [
+        400,
+        800
+      ],
+      "placement": "Safety by design: obstacle-avoidance camera"
+    },
+    {
+      "id": "f3-surface",
+      "kind": "image",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005237_8a785562-6c97-4aa1-9bd6-8c78eae9aa74.png",
+      "widths": [
+        400,
+        800
+      ],
+      "placement": "Safety by design: onboard surface checks"
+    },
+    {
+      "id": "f4-dock",
+      "kind": "image",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005238_465627b1-853d-4237-8188-1b7d927fdf26.png",
+      "widths": [
+        400,
+        800
+      ],
+      "placement": "Safety by design: weatherproof dock"
+    },
+    {
+      "id": "so1-solar-hero",
+      "kind": "image",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005237_4e9fe8ee-8a57-465e-944f-1c6b8caaf86b.png",
+      "widths": [
+        768,
+        1280,
+        1920,
+        2560
+      ],
+      "placement": "Solar page hero"
+    },
+    {
+      "id": "so2-solar-closeup",
+      "kind": "image",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005238_ff987c59-686d-462f-bf88-71f13976e393.png",
+      "widths": [
+        640,
+        1280,
+        1920
+      ],
+      "placement": "Solar page rooftop section"
+    },
+    {
+      "id": "co1-company",
+      "kind": "image",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005237_4cb567a5-7823-44ed-b068-74acafada749.png",
+      "widths": [
+        768,
+        1280,
+        1920,
+        2560
+      ],
+      "placement": "Company page"
+    },
+    {
+      "id": "h1-hero-film-kling",
+      "kind": "video",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005105_4b08e06a-d4ca-4e22-92a2-ea993a2bab2b.mp4",
+      "height": 1080,
+      "placement": "Alternative hero film (Kling 3.0 Turbo, 5 s, no loop frame). Rename to h1-hero-film to use it."
+    },
+    {
+      "id": "y3-story-driveway",
+      "kind": "image",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005352_de6d60a7-0dcb-44c1-b208-6d1150979178.png",
+      "widths": [
+        480,
+        800,
+        1200
+      ],
+      "placement": "Landlord story beat 4"
     }
   ]
 }

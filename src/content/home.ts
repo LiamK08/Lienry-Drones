@@ -136,6 +136,15 @@ export const places = {
   ],
 };
 
+export const filmBand = {
+  videoId: "c2-commercial-clip",
+  stillId: "c1-commercial-hero",
+  eyebrow: "Every two days",
+  headline: "The building checks itself.",
+  body: "On a commercial building the drone re-scans every two days and decides whether a clean is needed. Nobody books it. Nobody attends it.",
+  cta: { label: "The commercial system", href: "/commercial" },
+};
+
 export const landlordStory = {
   eyebrow: "How it feels",
   headline: "Between tenants, from another country.",

@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
+import { preload } from "react-dom";
 import { hero } from "@/content/home";
 import { getImage, getVideo, largest, srcSet } from "@/lib/media";
 import { Button, ArrowRight } from "@/components/ui/Button";
@@ -29,6 +30,8 @@ function HeroMedia() {
   }, [reduce]);
 
   const posterSrc = poster ? largest(hero.posterId, "webp") : video ? `/media/${hero.videoId}-poster.webp` : null;
+  if (posterSrc) preload(posterSrc, { as: "image", fetchPriority: "high" });
+  const saveData = typeof navigator !== "undefined" && (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
 
   return (
     <div className="absolute inset-0 -z-10 overflow-hidden bg-ink" aria-hidden="true">
@@ -42,7 +45,7 @@ function HeroMedia() {
           <div className="absolute inset-0 bg-[linear-gradient(105deg,transparent_0%,rgba(255,255,255,0.06)_35%,transparent_36%,transparent_60%,rgba(255,255,255,0.05)_78%,transparent_79%)]" />
         </div>
       )}
-      {video && !reduce ? (
+      {video && !reduce && !saveData ? (
         <video
           ref={ref}
           className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-[1200ms] ${ready ? "opacity-100" : "opacity-0"}`}

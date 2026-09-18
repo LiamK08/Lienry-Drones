@@ -4,6 +4,8 @@ import { SystemExplainer } from "@/components/home/SystemExplainer";
 import { BuildingModel } from "@/components/home/BuildingModel";
 import { TwoSystems } from "@/components/home/TwoSystems";
 import { PlacesCarousel } from "@/components/home/PlacesCarousel";
+import { FilmBand } from "@/components/home/FilmBand";
+import { filmBand } from "@/content/home";
 import { LandlordStory } from "@/components/home/LandlordStory";
 import { Counters } from "@/components/home/Counters";
 import { VisionLetter } from "@/components/home/VisionLetter";
@@ -19,6 +21,7 @@ export default function HomePage() {
       <BuildingModel />
       <TwoSystems />
       <PlacesCarousel />
+      <FilmBand {...filmBand} />
       <LandlordStory />
       <Counters />
       <VisionLetter />

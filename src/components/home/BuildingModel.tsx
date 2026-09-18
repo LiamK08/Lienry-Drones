@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useMotionValueEvent, useScroll, useSpring } from "motion/react";
+import { useInView, useMotionValueEvent, useScroll, useSpring } from "motion/react";
 import { useRef, useState } from "react";
 import { useCanRender3d } from "@/lib/hooks";
 import { buildingSection } from "@/content/home";
@@ -47,6 +47,7 @@ export function BuildingModel() {
   const progress = useSpring(scrollYProgress, { stiffness: 60, damping: 20, mass: 0.6 });
   const [p, setP] = useState(0);
   useMotionValueEvent(progress, "change", (v) => setP(v));
+  const near = useInView(ref, { margin: "600px 0px 600px 0px" });
 
   return (
     <Section id="software-view" ariaLabelledby="software-heading" tone="raised" className="border-y border-hairline">
@@ -80,7 +81,7 @@ export function BuildingModel() {
               <div className="absolute inset-0 bg-[linear-gradient(#dcd5c8_1px,transparent_1px),linear-gradient(90deg,#dcd5c8_1px,transparent_1px)] bg-[size:40px_40px] opacity-40" aria-hidden="true" />
               {can3d ? (
                 <div className="absolute inset-0" aria-hidden="true">
-                  <BuildingScene progress={progress} />
+                  {near ? <BuildingScene progress={progress} /> : null}
                 </div>
               ) : video ? (
                 <video className="absolute inset-0 h-full w-full object-cover" autoPlay muted loop playsInline poster={`/media/${buildingSection.videoId}-poster.jpg`}>
