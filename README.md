@@ -35,7 +35,7 @@ Copy `.env.example` to `.env.local` if you want enquiries forwarded to a webhook
 
 AI visuals are generated with Higgsfield, logged in `docs/MEDIA.md`, and listed with their result URLs in `scripts/media/manifest.json`. `npm run media:fetch` downloads them into `media-src/` (git-ignored), then writes AVIF and WebP images at several widths, compressed MP4 and WebM video under 4 MB with a poster, and `public/media/index.json`, which the site reads to decide what to render. Any asset id that is not in the index shows a labelled placeholder, so the site never breaks while renders are pending.
 
-The same script runs on GitHub Actions ("Fetch and optimise media" in the Actions tab) and commits the result back to the branch, which is useful when the machine running the build cannot reach the Higgsfield CDN.
+The same script runs in two other places. On GitHub Actions ("Fetch and optimise media" in the Actions tab) it commits the result back to the branch. As a `prebuild` step it runs in soft mode before every `next build`, so a host with open internet (Vercel, Netlify) downloads and optimises anything still missing at build time, while a machine that cannot reach the CDN keeps the placeholders and still builds. Video compression needs ffmpeg: `ffmpeg-static` is a dev dependency, and a system ffmpeg works too.
 
 ## Quality checks
 

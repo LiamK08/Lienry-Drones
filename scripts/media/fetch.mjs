@@ -22,6 +22,9 @@ const VIDEO_BUDGET_BYTES = 4 * 1024 * 1024;
 const args = process.argv.slice(2);
 const only = (args.find((a) => a.startsWith("--only="))?.split("=")[1] ?? "").split(",").filter(Boolean);
 const force = args.includes("--force");
+// --soft: never fail the process (used as a prebuild step on hosts with open internet;
+// on machines that cannot reach the CDN the site simply keeps its placeholders).
+const soft = args.includes("--soft");
 
 mkdirSync(SRC_DIR, { recursive: true });
 mkdirSync(OUT_DIR, { recursive: true });
@@ -91,15 +94,20 @@ for (const asset of manifest.assets) {
   const ext = asset.kind === "video" ? "mp4" : path.extname(new URL(asset.url).pathname).slice(1) || "png";
   const src = path.join(SRC_DIR, `${asset.id}.${ext}`);
   console.log(`fetch ${asset.id}`);
-  await download(asset.url, src);
-  if (asset.kind === "video") {
-    ffmpeg ??= await ffmpegPath();
-    results[asset.id] = { kind: "video", ...(await processVideo(asset, src, ffmpeg)) };
-  } else {
-    results[asset.id] = { kind: "image", ...(await processImage(asset, src)) };
+  try {
+    await download(asset.url, src);
+    if (asset.kind === "video") {
+      ffmpeg ??= await ffmpegPath();
+      results[asset.id] = { kind: "video", ...(await processVideo(asset, src, ffmpeg)) };
+    } else {
+      results[asset.id] = { kind: "image", ...(await processImage(asset, src)) };
+    }
+    results[asset.id].placement = asset.placement;
+    console.log(`done ${asset.id}`);
+  } catch (err) {
+    if (!soft) throw err;
+    console.warn(`skip ${asset.id}: ${err.message ?? err}`);
   }
-  results[asset.id].placement = asset.placement;
-  console.log(`done ${asset.id}`);
 }
 writeFileSync(path.join(OUT_DIR, "index.json"), JSON.stringify(results, null, 2));
 console.log(`wrote ${path.relative(ROOT, path.join(OUT_DIR, "index.json"))}`);
