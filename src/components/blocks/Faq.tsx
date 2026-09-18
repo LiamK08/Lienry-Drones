@@ -13,7 +13,7 @@ export function Faq({ id, eyebrow, headline, items, tone = "plaster" }: { id: st
             <SectionHeading id={`${id}-heading`} eyebrow={eyebrow} headline={headline} />
           </Reveal>
           <Reveal className="md:col-span-7 md:col-start-6" delay={0.08}>
-            <dl className="divide-y divide-hairline border-y border-hairline">
+            <div className="divide-y divide-hairline border-y border-hairline">
               {items.map((item) => (
                 <details key={item.q} className="group py-1">
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-4 text-left font-sans text-h4 font-medium [&::-webkit-details-marker]:hidden">
@@ -26,7 +26,7 @@ export function Faq({ id, eyebrow, headline, items, tone = "plaster" }: { id: st
                   <p className="max-w-prose pb-5 text-body text-muted">{item.a}</p>
                 </details>
               ))}
-            </dl>
+            </div>
           </Reveal>
         </div>
       </Container>
