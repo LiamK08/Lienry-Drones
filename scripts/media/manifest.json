@@ -335,6 +335,13 @@
       "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005102_b22cace8-724c-433f-8cc0-379d3a51010b.mp4",
       "height": 1080,
       "placement": "Home hero film (MiniMax H3, 8 s, seamless loop from the approved hero still)"
+    },
+    {
+      "id": "c2-commercial-clip",
+      "kind": "video",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005349_f6f4a8de-b246-4391-a423-f47a062f36df.mp4",
+      "height": 1080,
+      "placement": "Home film band and Commercial page hero (MiniMax H3, 8 s, seamless loop from the capsule still)"
     }
   ]
 }
