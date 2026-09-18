@@ -43,7 +43,7 @@ The same script runs in two other places. As a `prebuild` step it runs in soft m
 
 ## Brand
 
-The mark is three building silhouettes with the flight arc cut through them, supplied by Liam and traced into a vector. `public/brand/lienry-mark.svg` is the master (ink on transparent, 529 x 785 box); `src/components/ui/Wordmark.tsx` inlines the same three paths so the mark fills with the current text colour on light and dark surfaces. `scripts/icons.mjs` renders the Apple touch icon and the 512px tile from it, `scripts/og.mjs` renders the Open Graph image, and `src/app/icon.svg` is the favicon. The original file sits in `docs/brand/lienry-mark-source.png`.
+The mark is three building silhouettes with the flight arc cut through them, supplied by Liam and traced into a vector. `public/brand/lienry-mark.svg` is the master (ink on transparent, 529 x 785 box); `src/components/ui/Wordmark.tsx` inlines the same three paths so the mark fills with the current text colour on light and dark surfaces. `scripts/icons.mjs` renders the Apple touch icon and the 512px tile from it, `scripts/og.mjs` renders the Open Graph image, and `src/app/icon.svg` is the favicon: the mark alone on a transparent background, ink on light browser themes and plaster on dark ones. The original file sits in `docs/brand/lienry-mark-source.png`.
 
 ## Honesty rules baked in
 
