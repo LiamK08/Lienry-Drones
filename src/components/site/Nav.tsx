@@ -30,13 +30,18 @@ export function Nav() {
   }, [open]);
 
   const dark = overHero && !open;
-  const surface = scrolled && !overHero ? "bg-raised/85 backdrop-blur-md border-b border-hairline" : "bg-transparent border-b border-transparent";
+  // With the menu open the bar takes the panel's plaster so the wordmark never sits on the hero film.
+  const surface = open
+    ? "bg-plaster border-b border-hairline"
+    : scrolled && !overHero
+      ? "bg-raised/85 backdrop-blur-md border-b border-hairline"
+      : "bg-transparent border-b border-transparent";
 
   return (
     <header className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${surface} ${dark ? "text-plaster on-dark" : "text-ink"}`}>
       <nav aria-label="Primary" className="page-x mx-auto flex h-[var(--nav-h)] max-w-grid items-center justify-between gap-6">
         <Link href="/" className="rounded-sm" aria-label="Lienry Drones home">
-          <Wordmark />
+          <Wordmark animate />
         </Link>
         <ul className="hidden items-center gap-7 md:flex">
           {nav.map((item) => {

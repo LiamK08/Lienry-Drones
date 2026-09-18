@@ -194,6 +194,23 @@
     color: var(--color-muted-on-dark);
   }
 
+  /* The three blocks of the mark rise into place once, in step with the hero reveal. */
+  @keyframes mark-rise {
+    from {
+      opacity: 0;
+      transform: translateY(12%);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .mark-rise {
+    transform-box: fill-box;
+    animation: mark-rise 640ms var(--ease-settle) both;
+  }
+
   .readout {
     font-family: var(--font-mono);
     font-weight: 500;

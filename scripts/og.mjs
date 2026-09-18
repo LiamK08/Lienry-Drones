@@ -7,6 +7,8 @@ let chromium;
 try { ({ chromium } = require("playwright")); } catch { ({ chromium } = require("/opt/node22/lib/node_modules/playwright")); }
 const root = path.resolve(".");
 const font = (pkg, file) => `file://${path.join(root, "node_modules/@fontsource-variable", pkg, "files", file)}`;
+const markPath = readFileSync(path.join(root, "public/brand/lienry-mark.svg"), "utf8").match(/ d="([^"]+)"/)[1];
+const mark = (cls) => `<svg class="${cls}" viewBox="0 0 529 785" fill="currentColor"><path d="${markPath}"/></svg>`;
 const html = `<!doctype html><html><head><meta charset="utf-8"><style>
 @font-face{font-family:"Newsreader";src:url("${font("newsreader","newsreader-latin-opsz-normal.woff2")}") format("woff2");font-weight:200 800}
 @font-face{font-family:"Hanken";src:url("${font("hanken-grotesk","hanken-grotesk-latin-wght-normal.woff2")}") format("woff2");font-weight:100 900}
@@ -19,11 +21,12 @@ html,body{margin:0}body{width:1200px;height:630px;background:#f3efe7;color:#1c1a
 h1{position:absolute;left:72px;top:282px;margin:0;font-family:Newsreader;font-weight:300;font-size:92px;line-height:1.02;letter-spacing:-.015em;width:900px}
 p{position:absolute;left:72px;top:520px;margin:0;font-size:22px;color:#5e584f;width:820px;line-height:1.4}
 .line{position:absolute;left:72px;right:72px;top:236px;height:1px;background:#dcd5c8}
-.mark{width:40px;height:40px;border:2px solid #1c1a17;border-radius:10px;position:relative}
-.mark:after{content:"";position:absolute;left:9px;right:9px;top:24px;height:2px;background:#0f6a7c;border-radius:2px}
+.mark{height:40px;width:auto;display:block}
+.big{position:absolute;right:56px;top:96px;height:560px;width:auto;color:#0f6a7c;opacity:.09}
 .water{position:absolute;right:0;bottom:0;width:520px;height:630px;background:linear-gradient(105deg,rgba(15,106,124,0) 0%,rgba(15,106,124,.06) 45%,rgba(15,106,124,0) 46%,rgba(15,106,124,0) 62%,rgba(15,106,124,.05) 80%,rgba(15,106,124,0) 81%)}
 </style></head><body><div class="bg"></div><div class="water"></div>
-<div class="wm"><div class="mark"></div>Lienry<span>Drones</span></div>
+${mark("big")}
+<div class="wm">${mark("mark")}Lienry<span>Drones</span></div>
 <div class="line"></div>
 <div class="eyebrow">Resident exterior cleaning · Sydney · Pre-launch</div>
 <h1>Clean exteriors.<br>Nobody on site.</h1>
