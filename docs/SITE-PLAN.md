@@ -33,6 +33,10 @@ Navigation: Platform, Commercial, Homes and Rentals, Solar, Company, and one Reg
 
 Original identity, not derived from Legora's palette, typeface or button language. Built from what a Lienry clean looks like: warm morning light on render and sandstone, a film of water running down glass, a building that nobody is attending.
 
+### Mark
+
+The mark is Liam's: three building silhouettes rising to a centre peak, with the flight arc cut through them from the ground to the top of the tallest block. It is traced into a vector (`public/brand/lienry-mark.svg`) and inlined in the wordmark, where it fills with the current text colour: ink on plaster, plaster on the dark hero and footer. In the nav it sits 26px tall beside "Lienry Drones", rising into place once on load in step with the hero headline. The favicon, Apple icon, Open Graph image and JSON-LD logo all come from the same paths. No other icon or glyph stands in for the brand.
+
 ### Palette
 
 | Token | Hex | Role |
