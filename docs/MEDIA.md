@@ -82,10 +82,22 @@ Both films the site uses were run through Higgsfield's video analysis so the pro
 2. `prebuild` (soft mode) before every `next build`, so a Vercel deploy downloads and encodes the set on its first build and restores it from the build cache on later builds. Video encoding uses `ffmpeg-static`, which is a dev dependency, so the build must install dev dependencies (Vercel's default).
 3. The "Fetch and optimise media" GitHub Actions workflow, which commits the result back to the branch, once Actions is enabled for the repository.
 
-This session cannot reach the CDN, so `public/media/index.json` in the repository is empty and the screenshots in `docs/screenshots` show the labelled placeholders where the renders will sit. The pipeline itself was exercised end to end in the Higgsfield sandbox on 18 September 2026 (see the note at the end of this file).
+This session cannot reach the CDN, so `public/media/index.json` in the repository is empty and the screenshots in `docs/screenshots` show the labelled placeholders where the renders will sit. The pipeline itself was exercised end to end in the Higgsfield sandbox on 18 September 2026 (see "Pipeline verification" below).
 
 ## Site asset ids the components expect
 
 `h0-hero-still`, `h1-hero-film` (video), `m1-drone-master`, `m2-capsule-master`, `m3-pod-master`, `s1-dock`, `s2-tether`, `s4-scan`, `s5-software`, `s5-software-clip` (video, optional), `s6-automation`, `p1-tower`, `p2-apartments`, `p3-house`, `p4-rental`, `p5-solar-farm`, `y1-story-before`, `y2-story-panels`, `y3-story-driveway`, `y5-story-done`, `f1-tether`, `f2-camera`, `f3-surface`, `f4-dock`, `c1-commercial-hero`, `c2-commercial-clip` (video, optional), `ho1-homes-hero`, `so1-solar-hero`, `so2-solar-closeup`, `co1-company`.
 
 Until an id exists in `public/media/index.json` the site shows a labelled placeholder panel in its place.
+
+## Pipeline verification (Higgsfield sandbox, 18 September 2026)
+
+The fetch script was run against the live CDN in the Higgsfield sandbox with the hero still and both films, then run twice more to prove the cache.
+
+| Asset | Output | Size |
+| --- | --- | --- |
+| h0-hero-still | AVIF and WebP at 768, 1280, 1920 and 2560 | 19 KB to 134 KB per file |
+| h1-hero-film | MP4 (H.264, 1080p) / WebM (VP9) / poster | 2.83 MB / 1.43 MB / 93 KB |
+| c2-commercial-clip | MP4 / WebM / poster | 2.81 MB / 0.58 MB / 79 KB |
+
+Three assets took 56 seconds of wall time on the sandbox. A second run kept every file, and a run after deleting `public/media` restored all of it from `.next/cache/lienry-media` without downloading or encoding again. Both MP4 files sit under the 4 MB budget.

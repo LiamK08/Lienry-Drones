@@ -19,7 +19,7 @@ next-env.d.ts
 # third-party research captures (kept out of the public repo)
 docs/research/legora/
 
-# raw media downloads (optimised copies live in public/media)
+# raw media downloads from older runs (the pipeline now caches under .next/cache)
 media-src/
 
 # typescript incremental build info
