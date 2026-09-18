@@ -1,44 +1,34 @@
 {
   "$schema": "./manifest.schema.json",
-  "note": "Source URLs are Higgsfield generation results. Run `npm run media:fetch` (or the media workflow on GitHub Actions) to download, optimise and write public/media. Raw downloads go to media-src/ which is git-ignored.",
+  "note": "Source URLs are Higgsfield generation results made from the approved design sheet of 18 September 2026 (see docs/MEDIA.md for the references and prompts). Run `npm run media:fetch` (or the media workflow on GitHub Actions) to download, optimise and write public/media. Prompts and references are logged in docs/MEDIA.md.",
   "assets": [
     {
-      "id": "m1-drone-master-a",
+      "id": "h0-hero-still",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260917_220830_6a83f653-08d0-4931-9292-e17addc41bb8.png",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090605_6a0673d6-ac1f-40f6-9127-8cc5e0bf3b50.png",
       "widths": [
-        640,
+        768,
         1280,
-        2048
+        1920,
+        2560
       ],
-      "placement": "review candidate: drone master still, variant A"
-    },
-    {
-      "id": "m1-drone-master-b",
-      "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260917_220830_3c2fec2f-48e6-467e-a2b4-7547b2a9af7e.png",
-      "widths": [
-        640,
-        1280,
-        2048
-      ],
-      "placement": "review candidate: drone master still, variant B"
+      "placement": "Home hero poster, Platform hero, first and last frame of the hero film"
     },
     {
       "id": "m1-drone-master",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260917_220830_6a83f653-08d0-4931-9292-e17addc41bb8.png",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090350_2bb59c62-2397-4ab0-9e09-b630f0086b36.png",
       "widths": [
         640,
         1280,
         2048
       ],
-      "placement": "Drone master used on the site (variant A until Liam chooses; switch the url to variant B to change it)"
+      "placement": "Explainer Drone tab, Platform Drone row"
     },
     {
       "id": "m2-capsule-master",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260917_224341_3553080d-35cd-4878-a11f-ea12f610f5cb.png",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090350_46e7dba7-5990-4f08-babc-4c197ff5de77.png",
       "widths": [
         640,
         1280,
@@ -49,7 +39,7 @@
     {
       "id": "m3-pod-master",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260917_224342_4876ab70-2682-483a-831c-aeae638b4348.png",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090350_b4ef94d8-2b0d-4678-b8e0-0b6620ce7c9a.png",
       "widths": [
         640,
         1280,
@@ -58,76 +48,64 @@
       "placement": "Two systems (Home), closing CTA, Homes CTA"
     },
     {
-      "id": "h0-hero-still",
-      "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260917_224341_f8c02e20-0a9e-4ceb-8e32-b90ac003cd9a.png",
-      "widths": [
-        768,
-        1280,
-        1920,
-        2560
-      ],
-      "placement": "Home hero poster, Platform hero"
-    },
-    {
       "id": "s1-dock",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005014_cc7adca5-0bab-490d-b45b-96936618432e.png",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_092029_de895bd9-185f-46e0-96ec-09dd9df04739.png",
       "widths": [
         640,
         1280,
         1920
       ],
-      "placement": "Home explainer Dock tab, Platform Dock row"
+      "placement": "Explainer Dock tab, Platform Dock row"
     },
     {
       "id": "s2-tether",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005014_2eda620e-529f-4c0a-80f3-ecbe6f0b875d.png",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090350_d7e0073a-c89d-4708-a235-ba2032a3d16d.png",
       "widths": [
         640,
         1280,
         1920
       ],
-      "placement": "Home explainer Tether tab, Platform Tether row"
+      "placement": "Explainer Tether tab, Platform Tether row"
     },
     {
       "id": "s4-scan",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005014_0020e81f-1b1b-4161-9b02-d48634674058.png",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_091722_cdbeb491-a6c1-48e5-a025-555b7713072d.png",
       "widths": [
         640,
         1280,
         1920
       ],
-      "placement": "Home explainer Scan tab, Platform Scan row"
+      "placement": "Explainer Scan tab, Platform Scan row"
     },
     {
       "id": "s5-software",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005014_4247ae21-e9e1-4b3f-94b8-3e10648d7ffd.png",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090739_677280bd-fb72-48b7-8680-13fe2cf5f81b.png",
       "widths": [
         640,
         1280,
         1920
       ],
-      "placement": "Home explainer Software tab, Platform Software row"
+      "placement": "Explainer Software tab, Platform Software row"
     },
     {
       "id": "s6-automation",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005014_0c20148e-7208-4bb7-ab3b-3aec5f8f15fd.png",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090605_d19b788e-8372-4eb1-bbbb-052f2d7ab3ce.png",
       "widths": [
         640,
         1280,
         1920
       ],
-      "placement": "Home explainer Automation tab, Platform Automation row"
+      "placement": "Explainer Automation tab, Platform Automation row"
     },
     {
       "id": "p1-tower",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005014_74444578-348c-46e9-b534-6ace98980884.png",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_092635_a8ea2517-f4e2-49c4-941c-a4fcd900010c.png",
       "widths": [
         480,
         800,
@@ -136,9 +114,20 @@
       "placement": "Places carousel: commercial towers"
     },
     {
+      "id": "p2-apartments",
+      "kind": "image",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_091722_413c0863-0239-4b19-a34f-89ae7bbf29ff.png",
+      "widths": [
+        480,
+        800,
+        1200
+      ],
+      "placement": "Places carousel: apartment buildings"
+    },
+    {
       "id": "p3-house",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005014_49788a3e-76d1-40a4-9ac4-6a0992d296d5.png",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090350_3521fdcb-450b-46c5-91fa-6b4c1a4e237b.png",
       "widths": [
         480,
         800,
@@ -149,7 +138,7 @@
     {
       "id": "p4-rental",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005014_5448168e-38ba-499f-a5c1-d7c09ea82a54.png",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_091722_ceb7456c-141c-4984-920f-0dea2a2c5d32.png",
       "widths": [
         480,
         800,
@@ -160,7 +149,7 @@
     {
       "id": "p5-solar-farm",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005014_2ceb5820-573b-4f9f-a651-695ffc3ea115.png",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090605_76f91d2b-7730-498e-abce-db189c87ace8.png",
       "widths": [
         480,
         800,
@@ -169,44 +158,9 @@
       "placement": "Places carousel: solar farms"
     },
     {
-      "id": "c1-commercial-hero",
-      "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005014_28f608d7-2fc8-42ae-b271-bf67c41b2112.png",
-      "widths": [
-        768,
-        1280,
-        1920,
-        2560
-      ],
-      "placement": "Commercial page hero, home film band poster, source frame for the commercial clip"
-    },
-    {
-      "id": "ho1-homes-hero",
-      "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005014_3ee17cf3-b245-4b9d-b071-91082d345f1f.png",
-      "widths": [
-        768,
-        1280,
-        1920,
-        2560
-      ],
-      "placement": "Homes and Rentals hero"
-    },
-    {
-      "id": "p2-apartments",
-      "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005238_dc6aa152-f57c-4f33-a0c4-51809dfd4b85.png",
-      "widths": [
-        480,
-        800,
-        1200
-      ],
-      "placement": "Places carousel: apartment buildings"
-    },
-    {
       "id": "y1-story-before",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005237_7dd6c0cf-9400-477d-a3f2-04fb5babed15.png",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090605_62c6eb53-a837-4605-abe1-861972636c6e.png",
       "widths": [
         480,
         800,
@@ -217,7 +171,7 @@
     {
       "id": "y2-story-panels",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005238_4f39881d-33fa-429a-8149-b728c810fa18.png",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090605_d5c7c910-9acf-4a71-a025-188f981e5c6e.png",
       "widths": [
         480,
         800,
@@ -226,9 +180,20 @@
       "placement": "Landlord story beat 3"
     },
     {
+      "id": "y3-story-driveway",
+      "kind": "image",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090605_6d066e57-b9f5-42ad-bc10-45be0e79b867.png",
+      "widths": [
+        480,
+        800,
+        1200
+      ],
+      "placement": "Landlord story beat 4"
+    },
+    {
       "id": "y5-story-done",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005237_3976b34c-c9f6-487a-a06c-cdff124815f0.png",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_092635_191ec774-ea01-4dee-b9b4-c00ccb5b4ed7.png",
       "widths": [
         480,
         800,
@@ -239,7 +204,7 @@
     {
       "id": "f1-tether",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005238_fc3876f2-8f89-422b-b870-af4b46c75548.png",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090605_4ddbecc8-d67d-4949-9167-3d7622ee3f8a.png",
       "widths": [
         400,
         800
@@ -249,7 +214,7 @@
     {
       "id": "f2-camera",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005238_ae903b99-d394-402b-8e1f-5266e758a185.png",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090944_5e82974c-c42d-4db7-b7ac-c47089821f5d.png",
       "widths": [
         400,
         800
@@ -259,7 +224,7 @@
     {
       "id": "f3-surface",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005237_8a785562-6c97-4aa1-9bd6-8c78eae9aa74.png",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090739_7099fcbe-da1c-4d97-9cce-eec158424d63.png",
       "widths": [
         400,
         800
@@ -269,7 +234,7 @@
     {
       "id": "f4-dock",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005238_465627b1-853d-4237-8188-1b7d927fdf26.png",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090739_8a45b2ea-b3ad-4ca6-89c1-c9b545a95064.png",
       "widths": [
         400,
         800
@@ -277,32 +242,56 @@
       "placement": "Safety by design: weatherproof dock"
     },
     {
-      "id": "so1-solar-hero",
+      "id": "c1-commercial-hero",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005237_4e9fe8ee-8a57-465e-944f-1c6b8caaf86b.png",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090925_8796da8d-562f-47c2-9c48-6c858f35cf9f.png",
       "widths": [
         768,
         1280,
         1920,
         2560
       ],
-      "placement": "Solar page hero"
+      "placement": "Commercial hero, film band poster, first and last frame of the commercial clip"
+    },
+    {
+      "id": "ho1-homes-hero",
+      "kind": "image",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090739_ff8f347b-022d-4bee-af76-d605e1050ede.png",
+      "widths": [
+        768,
+        1280,
+        1920,
+        2560
+      ],
+      "placement": "Homes and Rentals hero"
+    },
+    {
+      "id": "so1-solar-hero",
+      "kind": "image",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090739_7d8db1ea-4cfb-41fb-b58f-fe286ea36cdc.png",
+      "widths": [
+        768,
+        1280,
+        1920,
+        2560
+      ],
+      "placement": "Solar hero"
     },
     {
       "id": "so2-solar-closeup",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005238_ff987c59-686d-462f-bf88-71f13976e393.png",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090926_225fe37a-0988-4cd1-abe8-9b988c4e1b71.png",
       "widths": [
         640,
         1280,
         1920
       ],
-      "placement": "Solar page rooftop section"
+      "placement": "Solar rooftop section"
     },
     {
       "id": "co1-company",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005237_4cb567a5-7823-44ed-b068-74acafada749.png",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_092030_2a8f4edf-53e4-46a0-86ce-df677a79b409.png",
       "widths": [
         768,
         1280,
@@ -312,36 +301,20 @@
       "placement": "Company page"
     },
     {
-      "id": "h1-hero-film-kling",
-      "kind": "video",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005105_4b08e06a-d4ca-4e22-92a2-ea993a2bab2b.mp4",
-      "height": 1080,
-      "placement": "Alternative hero film (Kling 3.0 Turbo, 5 s, no loop frame). Rename to h1-hero-film to use it."
-    },
-    {
-      "id": "y3-story-driveway",
-      "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005352_de6d60a7-0dcb-44c1-b208-6d1150979178.png",
-      "widths": [
-        480,
-        800,
-        1200
-      ],
-      "placement": "Landlord story beat 4"
-    },
-    {
       "id": "h1-hero-film",
       "kind": "video",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005102_b22cace8-724c-433f-8cc0-379d3a51010b.mp4",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_092015_a83c481d-8ce0-41d0-8472-251e408404e3.mp4",
       "height": 1080,
-      "placement": "Home hero film (MiniMax H3, 8 s, seamless loop from the approved hero still)"
+      "duration": 8,
+      "placement": "Home hero film"
     },
     {
       "id": "c2-commercial-clip",
       "kind": "video",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_005349_f6f4a8de-b246-4391-a423-f47a062f36df.mp4",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_092015_257ae3d1-c319-4cd4-bf28-0afc0ec19a55.mp4",
       "height": 1080,
-      "placement": "Home film band and Commercial page hero (MiniMax H3, 8 s, seamless loop from the capsule still)"
+      "duration": 8,
+      "placement": "Home film band, Commercial hero"
     }
   ]
 }

@@ -10,11 +10,17 @@
 // Raw downloads and finished output are cached in .next/cache/lienry-media (override with
 // LIENRY_MEDIA_CACHE). Vercel keeps .next/cache between builds, so the prebuild step only
 // downloads and encodes each asset once; later builds restore it from the cache.
+//
+// Every index entry records the source URL it was made from. An entry is only reused while
+// the manifest still points at that URL, so swapping a generation (same id, new URL) refetches
+// and re-encodes the asset instead of restoring the old files from the cache. Files in
+// public/media that no current entry lists are deleted at the end of a run.
 
-import { cpSync, createWriteStream, existsSync, mkdirSync, readFileSync, renameSync, statSync, writeFileSync } from "node:fs";
+import { cpSync, createWriteStream, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { pipeline } from "node:stream/promises";
 import { Readable } from "node:stream";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import path from "node:path";
 import sharp from "sharp";
 
@@ -46,9 +52,34 @@ function readIndex(file) {
   }
 }
 
-// An index entry is usable when every file it lists exists in the given directory.
-function complete(entry, dir) {
-  return Array.isArray(entry?.files) && entry.files.length > 0 && entry.files.every((f) => existsSync(path.join(dir, f)));
+// An index entry is usable when it was made from the manifest's current source URL and every
+// file it lists exists in the given directory. Entries without a recorded source predate this
+// check and are treated as stale.
+function complete(entry, dir, asset) {
+  return (
+    entry?.source === asset.url &&
+    Array.isArray(entry?.files) &&
+    entry.files.length > 0 &&
+    entry.files.every((f) => existsSync(path.join(dir, f)))
+  );
+}
+
+// Short fingerprint of a source URL, used to name raw downloads so a new generation under an
+// existing id never reuses the previous download.
+function sourceKey(url) {
+  return createHash("sha1").update(url).digest("hex").slice(0, 10);
+}
+
+// Remove files in a directory that no current index entry lists (index.json stays).
+function prune(dir, entries) {
+  const keep = new Set(["index.json"]);
+  for (const entry of entries) for (const f of entry.files ?? []) keep.add(f);
+  for (const f of readdirSync(dir)) {
+    if (!keep.has(f) && statSync(path.join(dir, f)).isFile()) {
+      rmSync(path.join(dir, f));
+      console.log(`prune ${path.relative(ROOT, path.join(dir, f))}`);
+    }
+  }
 }
 
 async function ffmpegPath() {
@@ -133,12 +164,12 @@ for (const asset of manifest.assets) {
     continue;
   }
   if (!force) {
-    if (complete(published[asset.id], OUT_DIR)) {
+    if (complete(published[asset.id], OUT_DIR, asset)) {
       results[asset.id] = published[asset.id];
       console.log(`keep ${asset.id}`);
       continue;
     }
-    if (complete(cached[asset.id], CACHE_OUT)) {
+    if (complete(cached[asset.id], CACHE_OUT, asset)) {
       for (const f of cached[asset.id].files) cpSync(path.join(CACHE_OUT, f), path.join(OUT_DIR, f));
       results[asset.id] = cached[asset.id];
       console.log(`restore ${asset.id} (from cache)`);
@@ -146,7 +177,7 @@ for (const asset of manifest.assets) {
     }
   }
   const ext = asset.kind === "video" ? "mp4" : path.extname(new URL(asset.url).pathname).slice(1) || "png";
-  const src = path.join(SRC_DIR, `${asset.id}.${ext}`);
+  const src = path.join(SRC_DIR, `${asset.id}-${sourceKey(asset.url)}.${ext}`);
   console.log(`fetch ${asset.id}`);
   try {
     await download(asset.url, src);
@@ -156,6 +187,7 @@ for (const asset of manifest.assets) {
     } else {
       results[asset.id] = { kind: "image", ...(await processImage(asset, src)) };
     }
+    results[asset.id].source = asset.url;
     results[asset.id].placement = asset.placement;
     console.log(`done ${asset.id}`);
   } catch (err) {
@@ -166,13 +198,18 @@ for (const asset of manifest.assets) {
 }
 
 writeFileSync(path.join(OUT_DIR, "index.json"), `${JSON.stringify(results, null, 2)}\n`);
-// Refresh the cache with everything that is now in public/media.
+// Refresh the cache with everything that is now in public/media, then drop files that no
+// current entry lists from both places so retired generations do not linger.
 for (const entry of Object.values(results)) {
   for (const f of entry.files ?? []) {
     const src = path.join(OUT_DIR, f);
     const dst = path.join(CACHE_OUT, f);
-    if (existsSync(src) && (!existsSync(dst) || force)) cpSync(src, dst);
+    if (existsSync(src)) cpSync(src, dst);
   }
 }
 writeFileSync(path.join(CACHE_OUT, "index.json"), `${JSON.stringify(results, null, 2)}\n`);
+if (!only.length) {
+  prune(OUT_DIR, Object.values(results));
+  prune(CACHE_OUT, Object.values(results));
+}
 console.log(`wrote ${path.relative(ROOT, path.join(OUT_DIR, "index.json"))}: ${Object.keys(results).length} assets ready, ${skipped} skipped`);
