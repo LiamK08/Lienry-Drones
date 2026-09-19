@@ -76,19 +76,6 @@ export const systemExplainer = {
   ],
 };
 
-export const buildingSection = {
-  eyebrow: "Software view",
-  headline: "The software sees the whole building.",
-  body: "Every clean starts from the scan. The model shows what the desktop software tracks: the scan sweep, live wash progress, and the areas where debris has built up.",
-  legend: [
-    { key: "scanned", label: "Scanned" },
-    { key: "washed", label: "Washed" },
-    { key: "debris", label: "Debris build-up" },
-  ],
-  note: "Model is illustrative. The software renders the real building from its scan.",
-  videoId: "s5-software-clip",
-};
-
 export const twoSystems = {
   eyebrow: "Two systems",
   headline: "One platform, two ways to live on a property.",

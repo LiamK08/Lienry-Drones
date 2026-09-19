@@ -134,3 +134,7 @@ Until an id exists in `public/media/index.json` the site shows a labelled placeh
 ## Retired
 
 The 17 September review candidates `m1-drone-master-a` and `m1-drone-master-b` and the Kling 3.0 Turbo alternative `h1-hero-film-kling` are no longer in the manifest. The design sheet replaced the candidate pair as the approval gate, and the Kling clip showed the old drone.
+
+## Software view
+
+The home page software view is rendered in code, not generated: a React Three Fiber model of a 12-storey block inside a mock of the desktop window. The commercial hexacopter in it is built from primitives to the design above (charcoal base, off-white shell with a gasket seam, six guarded rotors with the accent lip, sensor bar, scanner, spray bar over the pad, standoff rollers, rear tether port, skids, status light). A Higgsfield or Meshy GLB was not commissioned: the account had 8 credits left when the section was rebuilt, which does not cover a model and a matching film, and a generated mesh could not be inspected from this environment. The film tile beside the window reuses the hero film (`h1-hero-film`) until a dedicated clip of the same facade being washed is generated. `public/video/software-view-{wide,tall}.{mp4,webm}` are recordings of the model made with `scripts/record-software-view.mjs`, kept under 3 MB each, and are not part of the media pipeline.

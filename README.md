@@ -41,7 +41,7 @@ The same script runs in two other places. As a `prebuild` step it runs in soft m
 
 `npm run screenshots` captures every route at 1440 and 390 wide into `docs/screenshots` (start the site on port 3011 first). Accessibility was checked with axe-core at both widths; motion respects `prefers-reduced-motion`; the 3D building falls back to an SVG or video on phones and low-power devices.
 
-Two more scripts back the header, shape and scrolling work: `npm run shots:set -- docs/screenshots/after` captures every route at 1440 and 390 (top of page and full page) into a folder, and `npm run perf:scroll` scrolls the home page with real wheel events and reports frame rate, frames over 50 ms, long tasks and the hottest script functions. `node scripts/compare-shots.mjs before after out` builds side-by-side sheets from two capture folders.
+`node scripts/record-software-view.mjs` records the software view with Playwright, one stepped frame at a time (`?capture=wide` and `?capture=tall` put the page on a hand-driven clock), and encodes the 12 s loops in `public/video` with ffmpeg for phones and reduced motion. Two more scripts back the header, shape and scrolling work: `npm run shots:set -- docs/screenshots/after` captures every route at 1440 and 390 (top of page and full page) into a folder, and `npm run perf:scroll` scrolls the home page with real wheel events and reports frame rate, frames over 50 ms, long tasks and the hottest script functions. `node scripts/compare-shots.mjs before after out` builds side-by-side sheets from two capture folders.
 
 ## Brand
 

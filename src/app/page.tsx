@@ -1,7 +1,7 @@
 import { Hero } from "@/components/home/Hero";
 import { PropertyStrip } from "@/components/home/PropertyStrip";
 import { SystemExplainer } from "@/components/home/SystemExplainer";
-import { BuildingModel } from "@/components/home/BuildingModel";
+import { SoftwareView } from "@/components/home/SoftwareView";
 import { TwoSystems } from "@/components/home/TwoSystems";
 import { PlacesCarousel } from "@/components/home/PlacesCarousel";
 import { FilmBand } from "@/components/home/FilmBand";
@@ -18,7 +18,7 @@ export default function HomePage() {
       <Hero />
       <PropertyStrip />
       <SystemExplainer />
-      <BuildingModel />
+      <SoftwareView />
       <TwoSystems />
       <PlacesCarousel />
       <FilmBand {...filmBand} />
