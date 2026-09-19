@@ -35,48 +35,51 @@ Original identity, not derived from Legora's palette, typeface or button languag
 
 ### Mark
 
-The mark is Liam's: three building silhouettes rising to a centre peak, with the flight arc cut through them from the ground to the top of the tallest block. It is traced into a vector (`public/brand/lienry-mark.svg`) and inlined in the wordmark, where it fills with the current text colour: ink on plaster, plaster on the dark hero and footer. In the nav it sits 26px tall beside "Lienry Drones", rising into place once on load in step with the hero headline. The favicon, Apple icon, Open Graph image and JSON-LD logo all come from the same paths. No other icon or glyph stands in for the brand.
+The mark is Liam's: three building silhouettes rising to a centre peak, with the flight arc cut through them from the ground to the top of the tallest block. It is traced into a vector (`public/brand/lienry-mark.svg`) and inlined as an SVG that fills with the current text colour: ink on plaster, white on the dark hero, plaster on the footer. In the header it stands alone, 28px tall and centred, as the link home, rising into place once on load in step with the hero headline; the name "Lienry Drones" stays in the browser tab title and the footer. The favicons (16, 32, 180, 192, 512 and the web manifest), Open Graph image and JSON-LD logo all come from the same path. No other icon or glyph stands in for the brand.
 
 ### Palette
 
 | Token | Hex | Role |
 | --- | --- | --- |
-| `--plaster` | `#F3EFE7` | Page background, warm off-white like sunlit render, with a 3% monochrome grain |
-| `--raised` | `#FBF9F4` | Cards, nav bar (82% with blur), inputs, device frames |
+| `--plaster` | `#F3EFE7` | Page background, warm off-white like sunlit render, flat with no grain |
+| `--raised` | `#FBF9F4` | Cards, inputs, device frames |
 | `--sunken` | `#E9E3D8` | Founder letter band, table stripes, inactive tab wells, footer upper zone |
 | `--ink` | `#1C1A17` | Primary text and the dark bands (safety, footer base). Warm basalt, not blue-black |
 | `--ink-muted` | `#5E584F` | Secondary text, captions (6.1:1 on plaster). On dark bands `#A9A197` |
 | `--glass` | `#0F6A7C` | The one accent, wet glass reflecting morning sky: primary buttons, links, focus rings, active tabs, the drawn tether line. Hover `#0D6072` |
-| `--glass-tint` | `#DCEDF0` | Pale accent surface: the "clean" state in the 3D model, selected chips, media overlays |
 | `--glass-on-dark` | `#8ED4E0` | Accent on dark bands: links, progress, button fill with ink label |
 | `--water` | `#187566` | Success and water flow: clean complete, tether flowing, healthy dock |
 | `--debris` | `#B9721C` | Warning: built-up debris shading in the 3D model, "clean needed" flags. Text uses `#8A5210` |
 | `--hairline` | `#DCD5C8` | Decorative 1px rules and grid lines |
-| `--border-strong` | `#857D70` | Functional borders: inputs, chips, secondary buttons (3.6:1 on plaster) |
+| `--border-strong` | `#857D70` | Functional borders: inputs, device frames, placeholder outlines (3.6:1 on plaster) |
 
 Contrast: ink on plaster 15.1:1, muted on plaster 6.1:1, glass on plaster 5.4:1 as text, plaster on glass 5.4:1, glass-on-dark on ink 10.5:1. All text pairs meet WCAG AA; debris is used for fills and 24px+ text only.
 
 ### Type
 
-- Display: Newsreader Variable (opsz + wght), weights 300 and 400. Light optical-size serif for headlines: the calm of architectural editorial, credible to owners, managers and investors.
-- Body and UI: Hanken Grotesk Variable, weights 400 and 500.
-- Readouts and labels: Geist Mono Variable, 500 for eyebrows and settings values (every 2 days, 70 m), 300 for large numerals with tabular figures.
-- All three self-hosted from Fontsource (`@fontsource-variable/newsreader`, `@fontsource-variable/hanken-grotesk`, `@fontsource-variable/geist-mono`), latin subset, `font-display: swap` with size-adjusted fallbacks so nothing shifts.
+Two families, self-hosted from Fontsource (`@fontsource/instrument-serif`, `@fontsource-variable/inter`) through `next/font/local` with `font-display: swap`, size-adjusted fallbacks and a preload for the two regular files used above the fold. Nothing else is loaded.
 
-Scale (1440 to 390, set with `clamp()` so there is one scale): display 76/80px to 40/44px, -0.015em; H1 60/64 to 36/40; H2 44/50 to 30/36; H3 32/38 to 24/30; H4 (Hanken 500) 22/28 to 19/26; lead 20/30 to 18/28; body 17/26 to 16/26, measure 60 to 68ch; small 15/22; caption 13/18; eyebrow Geist Mono 12/16 +0.08em uppercase; stat numeral Geist Mono 300, 88/88 to 56/56, tabular.
+- Headings: Instrument Serif, weight 400 only, sentence case, never all caps. Line height 1.05 on the display size rising to 1.15 on H3; letter spacing -0.02em throughout.
+- Body, navigation, buttons and labels: Inter with `font-optical-sizing: auto`, weights 400 and 500. Body line height 1.55, no letter spacing, a measure capped at 68 characters.
+- Small labels: Inter 500, 12px, uppercase, 0.12em. The only uppercase on the site: figure captions ("Concept render"), the software window's section labels, step numbers and footer column heads.
+- Numerals in the counters and the software window: Inter with tabular figures so nothing jumps while a value animates; the big statistics run at weight 300.
+
+Scale, one `clamp()` per step from 390 to 1440 wide: display 64 to 96px; H1 44 to 64; H2 32 to 44; H3 24 to 28; lead 18 to 20; body 17 to 18; small 14; label 12; statistic numerals 56 to 96. There is no step between H3 and body: every heading element on the site, down to a card title or an FAQ question, sits on H3 in Instrument Serif. Everything is left aligned except the home hero, which centres its headline low in the frame.
+
+The measure is 68 characters and the token that carries it is `45ch`. CSS `ch` is the advance of the digit zero, which Inter renders at 0.65em with optical sizing on, while a character of this site's prose averages about 0.47em, so `68ch` would set 91 characters a line. 45ch was found by counting the glyphs on every rendered line of every text run on the site at 390 and 1440, and brings the longest line anywhere to 66.
 
 ### Surfaces, shape and layout
 
-- Radius: one token, 4px, on every button, card, input, image and container (`rounded-hard`). `rounded-full` is reserved for real circles. No pills, chips, badges or uppercase labels anywhere: a heading gets a short rule above it, and any small supporting text is plain sentence-case sans in the caption size. No tinted backgrounds, glows, blurred blobs or drop shadows; hairline borders and flat section colours only.
-- Buttons 44px tall (52px in the hero), 20px horizontal padding, Hanken 500. Primary: glass fill, plaster label, 1px inner top highlight as a glass edge. Secondary: 1px strong border, ink label. Tertiary: text with a drawn water-line underline. On dark: glass-on-dark fill with ink label.
-- Surfaces are flat: cards separate by a tone step and a hairline, never a drop shadow. The sticky nav is the one exception, with a 1px hairline under it once the page has scrolled.
-- 12-column grid, 24px gutters, page margins 40px at 1280+, 20px at 390. Containers 1280px (grid), 1120px (alternating rows), 880px (statements, founder letter), 700px (prose), 640px (forms). Spacing scale 4, 8, 12, 16, 24, 32, 48, 64, 96, 128, 160. Section padding 128px desktop, 80px mobile.
+- Radius: one token, 4px, on every button, card, input, image and container (`rounded-hard`); there is no full radius token, so nothing can become a pill. No chips or badges: a heading gets a short rule above it, supporting text is plain sentence-case sans, and the one uppercase style is the 12px label described above. No tinted backgrounds, glows, blurred blobs, text shadows, gradient text or drop shadows; hairline borders and flat section colours only.
+- Buttons: 30px tall in the header (13px Inter 500 label, a small arrow), 44px on pages, 48px in the hero, 4px radius. Primary is a solid ink fill with white text; over the hero film it carries a 60% white hairline so its edge holds 3:1 against the scrimmed frame. Secondary: 1px ink border, ink label. Tertiary: text with a drawn water-line underline.
+- Surfaces are flat: cards separate by a tone step and a hairline, never a drop shadow. The header is a 72px bar: nav links pinned hard left (13px, 30px apart), the mark centred, Register interest hard right. Over the home hero it is transparent, white on the film's own scrim; past 80px it becomes a solid plaster bar with a hairline and ink links. On phones the mark stays centred, a hamburger sits on the right and the menu fills the screen.
+- 12-column grid, 24px gutters, page margins 40px at 1280+, 20px at 390. Containers 1280px (grid), 1120px (alternating rows), 880px (statements, founder letter), 68 characters (prose), 640px (forms). The narrow columns sit against the left edge of the 1280px rail rather than centring in the viewport. Spacing scale 4, 8, 12, 16, 24, 32, 48, 64, 96, 128, 160. Section padding 128px desktop, 80px mobile.
 
 ### Motion rules
 
 - Water and light move; buildings do not. Layout elements settle once and never drift, parallax or float. Continuous motion is reserved for water, the tether line, scan lines and the drone in footage.
 - Reveals: opacity 0 to 1 and y 12px to 0, 640ms, `cubic-bezier(0.22, 1, 0.36, 1)`, once, staggered 60ms across at most six siblings.
-- State changes (tabs, chips, accordions): 240 to 320ms, `cubic-bezier(0.4, 0, 0.2, 1)`.
+- State changes (layer toggles, accordions, carousel dots): 240 to 320ms, `cubic-bezier(0.4, 0, 0.2, 1)`. The header is the one exception: its background crossfades over 300ms while the text colour steps once at 70ms, so the links never cross their own background.
 - Scroll-linked sequences (system explainer, landlord story, 3D scan sweep): transform and clip-path only, mapped to scroll progress through a spring, linear underneath.
 - Counters: 1200ms, once, tabular figures so nothing shifts.
 - Scale never exceeds 1.03 on content; hover never scales. No speed ramps, no HUD, no whoosh.
@@ -142,7 +145,7 @@ Candidates that were found but not verified against their primary source in this
 | 5 | Two systems | Two portrait cards (M2 and M3 stills), three-line spec lists, links to the system pages | Reveal, stagger |
 | 6 | Places it works | Horizontal card carousel of five tall portraits (P1 to P5), drag, arrow keys, dots | Transform-driven track, 320ms ease |
 | 7 | Landlord story | Scroll-through list of five beats with a sticky phone frame and still from lg up; each beat carries its own still below lg | IntersectionObserver picks the active beat; app states and stills crossfade with opacity only |
-| 8 | Counters | Five true-fact counters in Geist Mono 300 | Count up once over 1200ms |
+| 8 | Counters | Five true-fact counters in Inter 300, tabular figures | Count up once over 1200ms |
 | 9 | Vision letter | Sunken band, letter from Liam Kennedy, photo placeholder, co-founder card | Reveal |
 | 10 | Safety by design | Dark band, four columns with small stills (F1 to F4), pre-launch statement | Reveal, stagger |
 | 11 | Closing CTA | One sentence, M3 still, three buttons | Reveal |

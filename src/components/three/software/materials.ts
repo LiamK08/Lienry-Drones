@@ -9,7 +9,6 @@ export const PALETTE = {
   muted: "#5e584f",
   glass: "#0f6a7c",
   glassDeep: "#0d6072",
-  glassTint: "#dcedf0",
   glassOnDark: "#8ed4e0",
   water: "#187566",
   debris: "#b9721c",

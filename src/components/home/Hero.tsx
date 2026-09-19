@@ -53,64 +53,62 @@ function HeroMedia() {
       ) : null}
       {/* A quarter-strength ink veil over the whole film keeps every frame below the text. */}
       <div className="absolute inset-0 bg-ink/25" />
-      {/* Header scrim: 72% black held through the bar, then fading out by 180px. Measured against the brightest
-          frame of the hero film, this keeps plaster nav links above 4.5:1 and the wordmark above 3:1. */}
-      <div className="absolute inset-x-0 top-0 h-[180px] bg-[linear-gradient(to_bottom,rgba(0,0,0,0.72)_0px,rgba(0,0,0,0.72)_64px,rgba(0,0,0,0.45)_110px,rgba(0,0,0,0)_180px)]" />
+      {/* Header scrim: 50% black held through the 72px bar, gone by 220px. Measured against the brightest
+          frame of the hero film (see docs/DESIGN-RESEARCH.md), white links stay above 4.5:1 and the
+          button's hairline and the mark above 3:1 on every pixel behind them. */}
+      <div className="absolute inset-x-0 top-0 h-[220px] bg-[linear-gradient(to_bottom,rgba(0,0,0,0.5)_0px,rgba(0,0,0,0.5)_72px,rgba(0,0,0,0.26)_140px,rgba(0,0,0,0)_220px)]" />
       {/* Headline scrim. */}
       <div className="absolute inset-x-0 bottom-0 h-[70%] bg-[linear-gradient(to_top,rgba(28,26,23,0.92)_0%,rgba(28,26,23,0.55)_45%,transparent_100%)]" />
     </div>
   );
 }
 
+/** The one centred composition on the site: headline low in the frame, one line, one action. */
 export function Hero() {
   const reduce = useReducedMotion();
   const words = hero.headline.split(" ");
   return (
-    <section className="on-dark relative isolate flex min-h-[100svh] flex-col justify-end text-plaster" aria-labelledby="hero-heading">
+    <section className="on-dark relative isolate flex min-h-[100svh] flex-col justify-end text-white" aria-labelledby="hero-heading">
       <HeroMedia />
-      <div className="page-x mx-auto w-full max-w-grid pb-14 pt-[calc(var(--nav-h)+3rem)] md:pb-20">
-        <div className="grid gap-8 md:grid-cols-12">
-          <div className="md:col-span-8 lg:col-span-7">
-            <h1 id="hero-heading" className="text-display">
-              {words.map((w, i) => (
-                <Fragment key={`${w}-${i}`}>
-                  <motion.span
-                    className="inline-block will-change-transform"
-                    initial={reduce ? false : { opacity: 0, y: 18 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.9, ease: settle, delay: 0.35 + i * 0.07 }}
-                  >
-                    {w}
-                  </motion.span>
-                  {/* The space lives outside the inline-block so it is never trimmed. */}
-                  {i < words.length - 1 ? " " : null}
-                </Fragment>
-              ))}
-            </h1>
-            <motion.p
-              className="mt-6 max-w-[46ch] text-lead text-plaster"
-              initial={reduce ? false : { opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: settle, delay: 0.75 }}
-            >
-              {hero.support}
-            </motion.p>
-            <motion.div
-              className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-6"
-              initial={reduce ? false : { opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: settle, delay: 0.9 }}
-            >
-              <Button href={hero.primary.href} size="lg" onDark>
-                {hero.primary.label}
-              </Button>
-              <a href={hero.secondary.href} className="text-[0.9375rem] font-medium text-plaster underline decoration-1 underline-offset-[6px] hover:decoration-2">
-                {hero.secondary.label}
-              </a>
-            </motion.div>
-          </div>
-        </div>
-        <p className="mt-12 text-caption text-plaster/70">Concept render</p>
+      <div className="page-x mx-auto flex w-full max-w-grid flex-col items-center pb-16 pt-[calc(var(--nav-h)+3rem)] text-center md:pb-24">
+        <h1 id="hero-heading" className="max-w-[16ch] text-display">
+          {words.map((w, i) => (
+            <Fragment key={`${w}-${i}`}>
+              <motion.span
+                className="inline-block will-change-transform"
+                initial={reduce ? false : { opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.9, ease: settle, delay: 0.35 + i * 0.07 }}
+              >
+                {w}
+              </motion.span>
+              {/* The space lives outside the inline-block so it is never trimmed. */}
+              {i < words.length - 1 ? " " : null}
+            </Fragment>
+          ))}
+        </h1>
+        <motion.p
+          className="mx-auto mt-6 max-w-[44ch] text-lead text-white/90"
+          initial={reduce ? false : { opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: settle, delay: 0.75 }}
+        >
+          {hero.support}
+        </motion.p>
+        <motion.div
+          className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center sm:gap-6"
+          initial={reduce ? false : { opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: settle, delay: 0.9 }}
+        >
+          <Button href={hero.primary.href} size="lg" onDark arrow>
+            {hero.primary.label}
+          </Button>
+          <a href={hero.secondary.href} className="text-small font-medium text-white underline decoration-1 underline-offset-[6px] hover:decoration-2">
+            {hero.secondary.label}
+          </a>
+        </motion.div>
+        <p className="label mt-14 text-white/60">Concept render</p>
       </div>
     </section>
   );

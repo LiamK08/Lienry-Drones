@@ -6,7 +6,7 @@ export function OrganizationJsonLd() {
     "@type": "Organization",
     name: brand.name,
     url: siteUrl,
-    logo: `${siteUrl}/brand/lienry-mark-512.png`,
+    logo: `${siteUrl}/icon-512.png`,
     description: brand.description,
     address: { "@type": "PostalAddress", addressLocality: "Sydney", addressRegion: "NSW", addressCountry: "AU" },
     founder: { "@type": "Person", name: "Liam Kennedy", jobTitle: "Founder and CEO" },

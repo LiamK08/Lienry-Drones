@@ -18,7 +18,7 @@ export default function RegisterInterestPage() {
           <Rule className="mb-6" />
           <h1 className="text-h1">{registerPage.headline}</h1>
           <p className="mt-5 max-w-prose text-lead text-muted">{registerPage.lead}</p>
-          <dl className="mt-10 space-y-4 border-t border-hairline pt-6 text-small">
+          <dl className="mt-10 max-w-prose space-y-4 border-t border-hairline pt-6 text-small">
             <div>
               <dt className="text-small font-medium text-ink">Homes and rentals</dt>
               <dd className="mt-1 text-muted">Register interest and we will be in touch as the home system takes shape.</dd>

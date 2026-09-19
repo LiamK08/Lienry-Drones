@@ -16,7 +16,7 @@ export function Faq({ id, eyebrow, headline, items, tone = "plaster" }: { id: st
             <div className="divide-y divide-hairline border-y border-hairline">
               {items.map((item) => (
                 <details key={item.q} className="group py-1">
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-4 text-left font-sans text-h4 font-medium [&::-webkit-details-marker]:hidden">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-4 text-left font-display text-h3 [&::-webkit-details-marker]:hidden">
                     <span>{item.q}</span>
                     <span className="relative h-5 w-5 shrink-0 text-glass" aria-hidden="true">
                       <span className="absolute left-0 top-1/2 h-px w-5 -translate-y-1/2 bg-current" />

@@ -41,8 +41,8 @@ function PlayIcon({ playing }: { playing: boolean }) {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="border-t border-hairline py-2.5">
-      <dt className="text-caption text-muted">{label}</dt>
-      <dd className="readout mt-0.5 text-small text-ink">{value}</dd>
+      <dt className="label text-muted">{label}</dt>
+      <dd className="readout mt-1 text-small text-ink">{value}</dd>
     </div>
   );
 }
@@ -197,17 +197,17 @@ export function SoftwareView() {
 
         <div ref={nearRef} className="mt-10 md:mt-14">
           <div className="overflow-hidden rounded-hard border border-hairline bg-plaster text-ink" role="group" aria-label={`${project.app}, demo window`}>
-            <div className="flex h-10 items-center justify-between border-b border-hairline px-3 text-caption">
+            <div className="flex h-10 items-center justify-between border-b border-hairline px-3 text-small">
               <div className="flex min-w-0 items-center gap-3">
                 <span className="whitespace-nowrap font-medium text-ink">{project.app}</span>
                 <span className="hidden truncate text-muted sm:inline">{project.name}</span>
               </div>
               <div className="flex shrink-0 items-center gap-4">
-                <span className="flex items-center gap-2 whitespace-nowrap text-ink">
+                <span className="label flex items-center gap-2 whitespace-nowrap text-ink">
                   <span className="h-1.5 w-1.5 bg-water" aria-hidden="true" />
                   Live
                 </span>
-                <span className="whitespace-nowrap border border-hairline px-1.5 py-0.5 text-muted">Demo data</span>
+                <span className="label whitespace-nowrap border border-hairline px-1.5 py-1 text-muted">Demo data</span>
               </div>
             </div>
 
@@ -234,7 +234,7 @@ export function SoftwareView() {
 
             <div className={capture === "tall" ? "grid" : "grid md:grid-cols-[13.5rem_minmax(0,1fr)_15rem]"}>
               <aside className={capture === "tall" ? "hidden" : "hidden border-r border-hairline md:block"}>
-                <p className="px-3 pb-2 pt-3 text-caption text-muted">Zones</p>
+                <p className="label px-3 pb-2 pt-3 text-muted">Zones</p>
                 <ul>
                   {zones.map((z) => (
                     <li key={z.id}>
@@ -299,7 +299,7 @@ export function SoftwareView() {
               </div>
 
               <aside className={capture === "tall" ? "hidden" : "border-t border-hairline md:border-l md:border-t-0"}>
-                <p className="px-3 pb-2 pt-3 text-caption text-muted">This clean</p>
+                <p className="label px-3 pb-2 pt-3 text-muted">This clean</p>
                 <dl className="grid grid-cols-2 gap-x-4 px-3 pb-1 md:block">
                   <Stat label="Scan age" value={project.scanAge} />
                   <Stat label="Wash progress" value={`${Math.round(pct)}%`} />
@@ -320,7 +320,7 @@ export function SoftwareView() {
               >
                 <PlayIcon playing={playing && live} />
               </button>
-              <span className="w-10 text-caption text-muted">Wash</span>
+              <span className="label w-12 text-muted">Wash</span>
               <input
                 type="range"
                 min={0}

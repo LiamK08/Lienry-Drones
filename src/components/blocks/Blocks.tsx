@@ -14,8 +14,8 @@ export function Steps({ id, eyebrow, headline, items, tone = "plaster" }: { id: 
         <RevealList className="mt-12 grid gap-8 md:mt-16 md:grid-cols-4 md:gap-6">
           {items.map((s) => (
             <RevealItem key={s.n} className="border-t border-hairline pt-5">
-              <p className="readout text-[0.75rem] text-glass">{s.n}</p>
-              <h3 className="mt-3 font-sans text-h4 font-medium">{s.title}</h3>
+              <p className="label text-glass">{s.n}</p>
+              <h3 className="mt-3 text-h3">{s.title}</h3>
               <p className="mt-2 text-small text-muted">{s.body}</p>
             </RevealItem>
           ))}
@@ -35,7 +35,7 @@ export function Tiles({ id, eyebrow, headline, items, tone = "raised", columns =
         <RevealList className={`mt-12 grid gap-6 md:mt-16 ${columns === 4 ? "sm:grid-cols-2 md:grid-cols-4" : "md:grid-cols-3"}`}>
           {items.map((t) => (
             <RevealItem key={t.title} className={`rounded-hard border p-6 ${tone === "dark" ? "border-plaster/25 bg-ink-raised" : "border-hairline bg-raised"}`}>
-              <h3 className="font-sans text-h4 font-medium">{t.title}</h3>
+              <h3 className="text-h3">{t.title}</h3>
               <p className={`mt-2 text-small ${tone === "dark" ? "text-muted-on-dark" : "text-muted"}`}>{t.body}</p>
             </RevealItem>
           ))}
@@ -55,7 +55,7 @@ export function AlternatingRows({ id, rows }: { id: string; rows: { id: string; 
               <Picture id={row.imageId} alt={`${row.eyebrow}: ${row.title}`} aspect="1/1" sizes="(min-width: 768px) 45vw, 100vw" />
             </div>
             <div className={`md:col-span-5 ${i % 2 === 1 ? "md:order-1 md:col-start-1" : "md:col-start-8"}`}>
-              <p className="text-caption text-muted">{row.eyebrow}</p>
+              <p className="label text-muted">{row.eyebrow}</p>
               <h2 className="mt-3 text-h2">{row.title}</h2>
               <p className="mt-4 max-w-[46ch] text-body text-muted">{row.body}</p>
               {row.readout ? <p className="mt-6 border-t border-hairline pt-3 text-caption text-muted">{row.readout}</p> : null}

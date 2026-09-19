@@ -32,7 +32,7 @@ export function SystemExplainer() {
                 <div className="mb-5 md:hidden">
                   <Picture id={t.imageId} alt={`${t.tab}: ${t.title}`} aspect="16/9" sizes="100vw" />
                 </div>
-                <p className="readout text-[0.75rem] text-glass">0{i + 1}</p>
+                <p className="label text-glass">0{i + 1}</p>
                 <h3 className={`mt-3 text-h3 transition-colors duration-300 ${i === active ? "text-ink" : "text-ink md:text-muted"}`}>{t.title}</h3>
                 <p className="mt-2 max-w-prose text-body text-muted">{t.body}</p>
                 <p className="mt-4 text-caption text-muted">{t.readout}</p>
@@ -53,8 +53,8 @@ export function SystemExplainer() {
                 ))}
               </div>
               <div className="mt-2 flex items-center justify-between">
-                <span className="caption">Concept render</span>
-                <span className="readout text-caption text-muted">
+                <span className="label text-muted">Concept render</span>
+                <span className="readout text-small text-muted">
                   {active + 1} / {tabs.length}
                 </span>
               </div>
