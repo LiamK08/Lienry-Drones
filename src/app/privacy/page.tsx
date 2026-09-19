@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { privacyPage } from "@/content/pages";
-import { Container, Eyebrow } from "@/components/ui/Section";
+import { Container, Rule } from "@/components/ui/Section";
 
 export const metadata: Metadata = {
   title: "Privacy",
@@ -14,7 +14,7 @@ export default function PrivacyPage() {
   return (
     <article className="page-x bg-plaster pb-[var(--section-y)] pt-[calc(var(--nav-h)+3rem)] md:pt-[calc(var(--nav-h)+5rem)]">
       <Container width="prose">
-        <Eyebrow className="mb-4">{p.eyebrow}</Eyebrow>
+        <Rule className="mb-6" />
         <h1 className="text-h1">{p.headline}</h1>
         <p className="mt-4 text-caption text-muted">Last updated {p.updated}. Template for legal review before launch.</p>
         <div className="mt-12 space-y-10">

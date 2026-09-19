@@ -71,15 +71,7 @@ export function Hero() {
       <div className="page-x mx-auto w-full max-w-grid pb-14 pt-[calc(var(--nav-h)+3rem)] md:pb-20">
         <div className="grid gap-8 md:grid-cols-12">
           <div className="md:col-span-8 lg:col-span-7">
-            <motion.p
-              className="eyebrow"
-              initial={reduce ? false : { opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              {hero.eyebrow}
-            </motion.p>
-            <h1 id="hero-heading" className="mt-5 text-display">
+            <h1 id="hero-heading" className="text-display">
               {words.map((w, i) => (
                 <Fragment key={`${w}-${i}`}>
                   <motion.span
@@ -118,10 +110,7 @@ export function Hero() {
             </motion.div>
           </div>
         </div>
-        <div className="mt-12 flex items-end justify-between text-caption text-plaster/70">
-          <span className="readout uppercase tracking-[0.08em]">Concept render</span>
-          <span className="readout uppercase tracking-[0.08em]">Scroll</span>
-        </div>
+        <p className="mt-12 text-caption text-plaster/70">Concept render</p>
       </div>
     </section>
   );

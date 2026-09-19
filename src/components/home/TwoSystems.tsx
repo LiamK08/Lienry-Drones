@@ -16,7 +16,7 @@ export function TwoSystems() {
             <Reveal key={s.id} delay={i * 0.08} as="article" className="flex flex-col rounded-hard border border-hairline bg-raised p-5 md:p-6">
               <Picture id={s.imageId} alt={`${s.name}: ${s.subtitle}`} aspect="4/3" sizes="(min-width: 768px) 50vw, 100vw" />
               <div className="flex flex-1 flex-col pt-6">
-                <p className="eyebrow">{s.subtitle}</p>
+                <p className="text-caption text-muted">{s.subtitle}</p>
                 <h3 className="mt-3 text-h3">{s.name}</h3>
                 <ul className="mt-5 space-y-2.5 text-small text-muted">
                   {s.points.map((p) => (
