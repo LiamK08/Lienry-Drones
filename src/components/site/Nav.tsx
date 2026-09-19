@@ -7,8 +7,16 @@ import { useEffect, useId, useState } from "react";
 import { nav } from "@/lib/site";
 import { useScrolledPast } from "@/lib/hooks";
 import { Button } from "@/components/ui/Button";
-import { Wordmark } from "@/components/ui/Wordmark";
+import { Mark } from "@/components/ui/Wordmark";
 
+/**
+ * The header: nav links pinned hard left, the mark centred as the link home, one action hard
+ * right. A 72px bar, 13px links in 30px boxes, a 30px button. The full bar needs 1024px: below
+ * that the absolutely centred mark would run into the left links, so phones and tablets get the
+ * burger. Over the home hero it is transparent
+ * and reads white on the hero's own scrim; past 80px it becomes a solid plaster bar with a
+ * hairline and ink text. Phones get the mark centred, a hamburger on the right and a full screen menu.
+ */
 export function Nav() {
   const pathname = usePathname();
   const scrolled = useScrolledPast(80);
@@ -27,24 +35,18 @@ export function Nav() {
     };
   }, [open]);
 
-  // Over the home hero the bar is transparent and reads on the hero's own scrim. Past 80px
-  // it fades to a solid plaster bar with a hairline and dark text. With the menu open it is
-  // always solid so the wordmark never sits on the film.
   const overHero = pathname === "/" && !scrolled;
   const dark = overHero && !open;
-  const solid = scrolled || open;
+  const solid = scrolled && !open;
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-50 border-b transition-[background-color,border-color,color] duration-300 ease-instrument ${
-        solid ? "border-hairline bg-plaster" : "border-transparent bg-transparent"
-      } ${dark ? "on-dark text-plaster" : "text-ink"}`}
+      className={`nav-bar fixed inset-x-0 top-0 z-50 h-[var(--nav-h)] border-b ${
+        solid ? "border-hairline bg-plaster" : open ? "border-transparent bg-plaster" : "border-transparent bg-transparent"
+      } ${dark ? "on-dark text-white" : "text-ink"}`}
     >
-      <nav aria-label="Primary" className="page-x mx-auto flex h-[var(--nav-h)] max-w-grid items-center justify-between gap-6">
-        <Link href="/" className="rounded-hard" aria-label="Lienry Drones home">
-          <Wordmark animate />
-        </Link>
-        <ul className="hidden items-center gap-7 md:flex">
+      <nav aria-label="Primary" className="relative flex h-full items-center px-[15px] md:px-6">
+        <ul className="-ml-[10px] hidden items-center lg:flex xl:-ml-[15px]">
           {nav.map((item) => {
             const active = pathname === item.href;
             return (
@@ -52,8 +54,8 @@ export function Nav() {
                 <Link
                   href={item.href}
                   aria-current={active ? "page" : undefined}
-                  className={`text-[0.9375rem] font-medium transition-colors duration-200 ${
-                    active ? "underline decoration-1 underline-offset-[8px]" : dark ? "hover:underline hover:underline-offset-[8px]" : "text-muted hover:text-ink"
+                  className={`relative flex h-[30px] items-center px-[10px] text-[0.8125rem] leading-none transition-opacity duration-200 after:absolute after:inset-x-[10px] after:bottom-[4px] after:h-px after:bg-current after:transition-opacity after:duration-200 hover:after:opacity-60 xl:px-[15px] xl:after:inset-x-[15px] ${
+                    active ? "after:opacity-100" : "after:opacity-0"
                   }`}
                 >
                   {item.label}
@@ -62,15 +64,18 @@ export function Nav() {
             );
           })}
         </ul>
-        <div className="flex items-center gap-3">
-          <div className="hidden md:block">
-            <Button href="/register-interest" onDark={dark}>
+        <Link href="/" aria-label="Lienry Drones home" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-hard">
+          <Mark className="h-7 w-auto" animate />
+        </Link>
+        <div className="ml-auto flex items-center">
+          <div className="hidden lg:block">
+            <Button href="/register-interest" size="sm" onDark={dark} arrow>
               Register interest
             </Button>
           </div>
           <button
             type="button"
-            className="inline-flex h-11 w-11 items-center justify-center rounded-hard md:hidden"
+            className="-mr-2 inline-flex h-11 w-11 items-center justify-center rounded-hard lg:hidden"
             aria-expanded={open}
             aria-controls={panelId}
             aria-label={open ? "Close menu" : "Open menu"}
@@ -78,9 +83,9 @@ export function Nav() {
           >
             <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" aria-hidden="true">
               {open ? (
-                <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+                <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
               ) : (
-                <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+                <path d="M3 8h18M3 16h18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
               )}
             </svg>
           </button>
@@ -90,30 +95,36 @@ export function Nav() {
         {open ? (
           <motion.div
             id={panelId}
-            className="page-x fixed inset-x-0 top-[var(--nav-h)] bottom-0 z-40 flex flex-col bg-plaster text-ink md:hidden"
+            className="fixed inset-x-0 top-[var(--nav-h)] bottom-0 z-40 flex flex-col overflow-y-auto bg-plaster px-[15px] text-ink md:px-6 lg:hidden"
             initial={reduce ? false : { opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
           >
-            <ul className="mt-6 flex flex-col divide-y divide-hairline border-y border-hairline">
-              {nav.map((item) => (
-                <li key={item.href}>
-                  <Link href={item.href} onClick={() => setOpen(false)} className="block py-4 font-display text-h3" aria-current={pathname === item.href ? "page" : undefined}>
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
+            <ul className="border-t border-hairline">
+              {nav.map((item) => {
+                const active = pathname === item.href;
+                return (
+                  <li key={item.href} className="border-b border-hairline">
+                    <Link href={item.href} onClick={() => setOpen(false)} className="flex items-center justify-between py-4 font-display text-h3" aria-current={active ? "page" : undefined}>
+                      <span className={active ? "underline decoration-1 underline-offset-[6px]" : undefined}>{item.label}</span>
+                      <svg viewBox="0 0 16 16" className="h-4 w-4 text-muted" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <path d="M3 8h10M8.5 3.5 13 8l-4.5 4.5" />
+                      </svg>
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
-            <div className="mt-8 flex flex-col gap-3">
-              <Button href="/register-interest" size="lg" onClick={() => setOpen(false)}>
+            <div className="mt-auto flex flex-col gap-4 pb-8 pt-10">
+              <Button href="/register-interest" size="lg" arrow onClick={() => setOpen(false)}>
                 Register interest
               </Button>
               <Button href="/register-interest?type=investor" variant="secondary" size="lg" onClick={() => setOpen(false)}>
                 Investor enquiries
               </Button>
+              <p className="label mt-2 text-muted">Concept stage. Sydney, Australia.</p>
             </div>
-            <p className="mt-auto mb-8 text-caption text-muted">Concept stage. Sydney, Australia.</p>
           </motion.div>
         ) : null}
       </AnimatePresence>

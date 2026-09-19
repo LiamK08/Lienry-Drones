@@ -41,8 +41,18 @@ const widths = {
   form: "max-w-form",
 } as const;
 
+/** Text columns. Centring these floats a paragraph in the middle of the page, so they are held
+ *  against the left edge of the grid rail instead and line up with every block above and below. */
+const textColumn = new Set(["statement", "prose", "form"]);
+
 export function Container({ width = "grid", className = "", children }: { width?: keyof typeof widths; className?: string; children: ReactNode }) {
-  return <div className={`mx-auto w-full ${widths[width]} ${className}`}>{children}</div>;
+  const inner = `w-full ${widths[width]} ${className}`;
+  if (!textColumn.has(width)) return <div className={`mx-auto ${inner}`}>{children}</div>;
+  return (
+    <div className="mx-auto w-full max-w-grid">
+      <div className={inner}>{children}</div>
+    </div>
+  );
 }
 
 /** A short rule above a heading. It replaces the old uppercase label everywhere. */
@@ -50,12 +60,12 @@ export function Rule({ className = "" }: { className?: string }) {
   return <span aria-hidden="true" className={`block h-px w-10 bg-ink [.on-dark_&]:bg-plaster/60 ${className}`} />;
 }
 
+/** Every heading on the site is left aligned; only the home hero centres. */
 export function SectionHeading({
   eyebrow,
   headline,
   intro,
   id,
-  align = "left",
   className = "",
   level = 2,
 }: {
@@ -64,14 +74,13 @@ export function SectionHeading({
   headline: string;
   intro?: string;
   id?: string;
-  align?: "left" | "center";
   className?: string;
   level?: 1 | 2;
 }) {
   const H = level === 1 ? "h1" : "h2";
   return (
-    <div className={`${align === "center" ? "mx-auto text-center" : ""} max-w-statement ${className}`}>
-      {eyebrow ? <Rule className={`mb-5 ${align === "center" ? "mx-auto" : ""}`} /> : null}
+    <div className={`max-w-statement ${className}`}>
+      {eyebrow ? <Rule className="mb-5" /> : null}
       <H id={id} className={level === 1 ? "text-h1" : "text-h2"}>
         {headline}
       </H>

@@ -2,7 +2,7 @@ import { getImage, largest, srcSet } from "@/lib/media";
 
 /**
  * Responsive picture backed by the optimised assets in public/media, with the
- * "Concept render" caption set below the image as plain mono text. When an asset has
+ * "Concept render" caption set below the image in the 12px uppercase Inter label style. When an asset has
  * not been generated yet it renders a flat placeholder so layouts never break.
  */
 export function Picture({
@@ -28,7 +28,7 @@ export function Picture({
 }) {
   const asset = getImage(id);
   const style = { aspectRatio: aspect } as const;
-  const caption = label ? <figcaption className="caption mt-2">Concept render</figcaption> : null;
+  const caption = label ? <figcaption className="label mt-2 text-muted [.on-dark_&]:text-muted-on-dark">Concept render</figcaption> : null;
   if (!asset) {
     return (
       <figure className={className}>

@@ -29,12 +29,17 @@ export function Mark({
   );
 }
 
-export function Wordmark({ className = "", animate = false }: { className?: string; animate?: boolean }) {
+/**
+ * The mark beside the name. Used in the footer; the header carries the mark alone.
+ * The name is set at a fixed 22px rather than a step of the type scale: it is a logotype locked
+ * to the 26px mark beside it, not a heading, so it must not flow with the viewport.
+ */
+export function Wordmark({ className = "" }: { className?: string }) {
   return (
     <span className={`inline-flex items-center gap-3 ${className}`}>
-      <Mark className="h-[26px] w-auto shrink-0" animate={animate} />
-      <span className="font-display text-[1.375rem] leading-none tracking-[-0.01em]">
-        Lienry <span className="font-sans text-[0.75rem] font-medium uppercase tracking-[0.12em] align-middle opacity-70">Drones</span>
+      <Mark className="h-[26px] w-auto shrink-0" />
+      <span className="font-display text-[1.375rem] leading-none tracking-[-0.02em]">
+        Lienry <span className="label align-middle opacity-70">Drones</span>
       </span>
     </span>
   );

@@ -1,8 +1,4 @@
 @import "tailwindcss";
-@import "@fontsource-variable/newsreader/standard.css";
-@import "@fontsource-variable/newsreader/standard-italic.css";
-@import "@fontsource-variable/hanken-grotesk";
-@import "@fontsource-variable/geist-mono";
 
 @theme {
   --color-*: initial;
@@ -15,7 +11,6 @@
   --color-muted-on-dark: #a9a197;
   --color-glass: #0f6a7c;
   --color-glass-deep: #0d6072;
-  --color-glass-tint: #dcedf0;
   --color-glass-on-dark: #8ed4e0;
   --color-water: #187566;
   --color-debris: #b9721c;
@@ -26,56 +21,81 @@
   --color-black: #000000;
   --color-transparent: transparent;
 
-  --font-display: "Newsreader Variable", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
-  --font-sans: "Hanken Grotesk Variable", "Helvetica Neue", Arial, sans-serif;
-  --font-mono: "Geist Mono Variable", ui-monospace, "SF Mono", Menlo, monospace;
-
   --ease-settle: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-instrument: cubic-bezier(0.4, 0, 0.2, 1);
 
   --radius-*: initial;
   --radius-hard: 4px;
-  --radius-full: 9999px;
 
-  --text-display: clamp(2.5rem, 1.6rem + 3.9vw, 4.75rem);
+  /* Clear Tailwind's default families (sans, serif, mono) so the only font utilities that
+     exist are the two the site actually ships. Redefined in the @theme inline block below. */
+  --font-*: initial;
+
+  /* One scale, set with clamp() so it flows from 390 to 1440 wide. Pixels at the two ends:
+     display 64 to 96, h1 44 to 64, h2 32 to 44, h3 24 to 28, h4 and lead 18 to 20, body 17 to 18,
+     small 14, label 12. Headings run tight (1.05 to 1.15) with -0.02em; text runs at 1.55. */
+  --text-display: clamp(4rem, 3.257rem + 3.048vw, 6rem);
   --text-display--line-height: 1.05;
-  --text-display--letter-spacing: -0.015em;
-  --text-h1: clamp(2.25rem, 1.7rem + 2.3vw, 3.75rem);
-  --text-h1--line-height: 1.07;
-  --text-h1--letter-spacing: -0.012em;
-  --text-h2: clamp(1.875rem, 1.55rem + 1.35vw, 2.75rem);
-  --text-h2--line-height: 1.14;
-  --text-h2--letter-spacing: -0.01em;
-  --text-h3: clamp(1.5rem, 1.35rem + 0.65vw, 2rem);
-  --text-h3--line-height: 1.19;
-  --text-h3--letter-spacing: -0.006em;
-  --text-h4: clamp(1.1875rem, 1.12rem + 0.28vw, 1.375rem);
-  --text-h4--line-height: 1.27;
-  --text-lead: clamp(1.125rem, 1.07rem + 0.24vw, 1.25rem);
-  --text-lead--line-height: 1.5;
-  --text-body: clamp(1rem, 0.98rem + 0.1vw, 1.0625rem);
+  --text-display--letter-spacing: -0.02em;
+  --text-h1: clamp(2.75rem, 2.286rem + 1.905vw, 4rem);
+  --text-h1--line-height: 1.08;
+  --text-h1--letter-spacing: -0.02em;
+  --text-h2: clamp(2rem, 1.721rem + 1.143vw, 2.75rem);
+  --text-h2--line-height: 1.12;
+  --text-h2--letter-spacing: -0.02em;
+  --text-h3: clamp(1.5rem, 1.407rem + 0.381vw, 1.75rem);
+  --text-h3--line-height: 1.15;
+  --text-h3--letter-spacing: -0.02em;
+  --text-h4: clamp(1.125rem, 1.079rem + 0.19vw, 1.25rem);
+  --text-h4--line-height: 1.3;
+  --text-h4--letter-spacing: -0.01em;
+  --text-lead: clamp(1.125rem, 1.079rem + 0.19vw, 1.25rem);
+  --text-lead--line-height: 1.45;
+  --text-body: clamp(1.0625rem, 1.039rem + 0.095vw, 1.125rem);
   --text-body--line-height: 1.55;
-  --text-small: 0.9375rem;
-  --text-small--line-height: 1.47;
-  --text-caption: 0.8125rem;
-  --text-caption--line-height: 1.38;
-  --text-numeral: clamp(3.5rem, 2.6rem + 3.8vw, 5.5rem);
+  --text-small: 0.875rem;
+  --text-small--line-height: 1.5;
+  --text-caption: 0.875rem;
+  --text-caption--line-height: 1.5;
+  --text-label: 0.75rem;
+  --text-label--line-height: 1.2;
+  --text-label--letter-spacing: 0.12em;
+  --text-numeral: clamp(3.5rem, 2.571rem + 3.81vw, 6rem);
   --text-numeral--line-height: 1;
   --text-numeral--letter-spacing: -0.02em;
 
   --container-grid: 80rem;
   --container-rows: 70rem;
   --container-statement: 55rem;
-  --container-prose: 43.75rem;
+  /* The 68-character cap, set in characters rather than zeroes. CSS ch is the advance of "0",
+     which Inter renders at 0.65em with optical sizing on, while a character of this site's own
+     prose averages about 0.47em, so 68ch sets 91 characters a line, not 68. This value was found
+     by counting the glyphs on every rendered line of all 172 paragraphs of 80+ characters on the
+     site, at 1440 and 390: 68ch gave a longest line of 91, 51ch gave 74, 47ch and 46ch each left
+     one paragraph at 70, and 45ch brings every line on the site to 68 or under. Longest 66,
+     median 62. max-w-* reads --max-width-* before --container-*, and Tailwind ships
+     --max-width-prose: 65ch, so the value has to be set in that namespace too or it is ignored. */
+  --container-prose: 45ch;
+  --max-width-prose: 45ch;
   --container-form: 40rem;
+}
+
+/* next/font sets these variables on <html>; inline so the utilities resolve them there. */
+@theme inline {
+  --font-display: var(--font-instrument), "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --font-display-italic: var(--font-instrument-italic), "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --font-sans: var(--font-inter), "Helvetica Neue", Arial, sans-serif;
 }
 
 @layer base {
   :root {
     color-scheme: light;
+    /* Preflight aims code, kbd, samp and pre at a monospace stack. There is no mono family in
+       this project, so they resolve to Inter like every other run of text. */
+    --default-mono-font-family: var(--font-sans);
     --page-margin: clamp(1.25rem, 0.5rem + 2.5vw, 2.5rem);
     --section-y: clamp(5rem, 3.6rem + 5.5vw, 8rem);
-    --nav-h: 4.25rem;
+    --nav-h: 4.5rem;
   }
 
   html {
@@ -89,21 +109,24 @@
     background-color: var(--color-plaster);
     color: var(--color-ink);
     font-family: var(--font-sans);
+    font-optical-sizing: auto;
     font-size: var(--text-body);
     line-height: var(--text-body--line-height);
-    font-feature-settings: "kern", "liga", "ss01";
+    font-feature-settings: "kern", "liga", "calt", "cv11";
     -webkit-font-smoothing: antialiased;
     overflow-x: clip;
   }
 
   ::selection {
-    background: var(--color-glass-tint);
+    background: var(--color-sunken);
     color: var(--color-ink);
   }
 
+  /* Headings: the serif at its one weight, sentence case, tight, never all caps. */
   h1, h2, h3 {
     font-family: var(--font-display);
     font-weight: 400;
+    letter-spacing: -0.02em;
     text-wrap: balance;
   }
 
@@ -113,7 +136,14 @@
     text-wrap: balance;
   }
 
+  em, i {
+    font-family: var(--font-display-italic);
+    font-style: italic;
+  }
+
+  /* Body copy never runs past 68 characters. Containers that need the full width set max-w-none. */
   p {
+    max-width: 45ch;
     text-wrap: pretty;
   }
 
@@ -142,12 +172,27 @@
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
+      transition-delay: 0s !important;
       scroll-behavior: auto !important;
     }
   }
 }
 
 @layer components {
+  /* The header swaps between white on the hero and ink on plaster. Interpolating the background
+     and the text colour together walks the text straight through its own background: measured
+     against the brightest possible hero frame the worst frame is 1.00:1. So the background
+     crossfades and the text colour steps once, 70ms in. That is where white-on-the-part-faded-bar
+     and ink-on-it come out equal, which is the best any crossfade between these two backgrounds
+     can do: 4.05:1 at the worst frame, with both resting states at 6.02:1 and 15.14:1.
+     Proved by scripts/contrast-hero.mjs, gate 3. */
+  .nav-bar {
+    transition:
+      background-color 300ms var(--ease-instrument),
+      border-color 300ms var(--ease-instrument),
+      color 0s linear 70ms;
+  }
+
   .page-x {
     padding-left: var(--page-margin);
     padding-right: var(--page-margin);
@@ -175,19 +220,39 @@
     animation: mark-rise 640ms var(--ease-settle) both;
   }
 
-  .readout {
-    font-family: var(--font-mono);
+  /* Small labels: Inter, uppercase, 12px, 0.12em. The only uppercase on the site. */
+  .label {
+    font-family: var(--font-sans);
+    font-size: var(--text-label);
+    line-height: var(--text-label--line-height);
+    letter-spacing: var(--text-label--letter-spacing);
     font-weight: 500;
+    text-transform: uppercase;
     font-variant-numeric: tabular-nums;
   }
 
+  /* Live numbers: tabular figures so nothing jumps while a value animates. */
+  .readout {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: normal;
+  }
+
+  /* Big statistics: light Inter, tabular, tight. */
   .numeral {
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-weight: 300;
     font-size: var(--text-numeral);
     line-height: var(--text-numeral--line-height);
     letter-spacing: var(--text-numeral--letter-spacing);
     font-variant-numeric: tabular-nums;
+  }
+
+  .signature {
+    font-family: var(--font-display-italic);
+    font-style: italic;
+    font-weight: 400;
   }
 
   .water-link {

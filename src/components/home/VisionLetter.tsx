@@ -36,7 +36,7 @@ export function VisionLetter() {
               ))}
             </div>
             <div className="mt-10">
-              <p className="font-display text-[1.75rem] italic leading-none">{visionLetter.signature.name}</p>
+              <p className="signature text-h3">{visionLetter.signature.name}</p>
               <p className="mt-2 text-caption text-muted">{visionLetter.signature.title}</p>
             </div>
           </Reveal>

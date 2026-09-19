@@ -21,7 +21,7 @@ export default function CompanyPage() {
           <Reveal>
             <Rule className="mb-6" />
             <h1 className="text-h2 text-muted">{c.headline}</h1>
-            <p className="mt-8 font-display text-[clamp(1.75rem,1.3rem+2vw,2.5rem)] leading-[1.25] tracking-[-0.01em]">{c.statement}</p>
+            <p className="mt-8 max-w-none font-display text-h2">{c.statement}</p>
           </Reveal>
         </Container>
         <Container className="mt-12 md:mt-16">

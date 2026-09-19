@@ -14,8 +14,11 @@ export function Footer() {
           </div>
           {footerColumns.map((col) => (
             <div key={col.heading} className="md:col-span-2 md:col-start-auto">
-              <h2 className="font-sans text-small font-medium text-plaster">{col.heading}</h2>
-              <ul className="mt-4 space-y-2.5">
+              {/* A label, not a heading: the label style is uppercase and no heading on this site is. */}
+              <p id={`foot-${col.heading}`} className="label text-muted-on-dark">
+                {col.heading}
+              </p>
+              <ul aria-labelledby={`foot-${col.heading}`} className="mt-4 space-y-2.5">
                 {col.links.map((l) => (
                   <li key={l.href}>
                     <Link href={l.href} className="text-small text-plaster/90 transition-opacity hover:opacity-70">
@@ -27,8 +30,10 @@ export function Footer() {
             </div>
           ))}
           <div className="md:col-span-3">
-            <h2 className="font-sans text-small font-medium text-plaster">Enquire</h2>
-            <ul className="mt-4 space-y-2.5 text-small">
+            <p id="foot-enquire" className="label text-muted-on-dark">
+              Enquire
+            </p>
+            <ul aria-labelledby="foot-enquire" className="mt-4 space-y-2.5 text-small">
               <li>
                 <Link href="/register-interest" className="text-plaster/90 hover:opacity-70">
                   Register interest
@@ -40,7 +45,7 @@ export function Footer() {
           </div>
         </div>
         <div className="mt-16 border-t border-plaster/15 pt-8 md:mt-24">
-          <p className="font-display text-[clamp(3rem,8vw,7.5rem)] leading-none tracking-[-0.02em] text-plaster/95">Lienry Drones</p>
+          <p className="font-display text-display text-plaster/95">Lienry Drones</p>
           <div className="mt-8 flex flex-col gap-3 text-caption text-muted-on-dark md:flex-row md:items-center md:justify-between">
             <p>© 2026 Lienry Drones. {brand.location}.</p>
             <p>Concept renders are labelled. No customers, results or approvals are claimed.</p>

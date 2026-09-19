@@ -10,7 +10,7 @@ const PANEL = 720;
 const LABEL = 44;
 
 async function label(text, width) {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${LABEL}"><rect width="100%" height="100%" fill="#1c1a17"/><text x="16" y="28" font-family="Menlo, monospace" font-size="15" letter-spacing="1.5" fill="#f3efe7">${text}</text></svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${LABEL}"><rect width="100%" height="100%" fill="#1c1a17"/><text x="16" y="28" font-family="Inter, Helvetica Neue, Arial, sans-serif" font-size="15" letter-spacing="1.5" fill="#f3efe7">${text}</text></svg>`;
   return sharp(Buffer.from(svg)).png().toBuffer();
 }
 

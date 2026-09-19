@@ -21,8 +21,10 @@ function AppScreen({ state }: { state: string }) {
   return (
     <div className="flex h-full flex-col bg-plaster text-ink">
       <div className="flex items-center justify-between px-5 pt-5">
-        <span className="font-display text-[1.125rem]">Lienry</span>
-        <span className="text-[0.6875rem] text-muted">Rental, Sydney</span>
+        {/* Fixed at 18px: this is UI inside a fixed-width device frame, so it must not flow with the
+            viewport the way the page's own type does. */}
+        <span className="font-display text-[1.125rem] leading-none tracking-[-0.02em]">Lienry</span>
+        <span className="label text-muted">Rental, Sydney</span>
       </div>
       <div className="mx-5 mt-4 rounded-hard border border-hairline bg-sunken p-3">
         <div className="grid grid-cols-6 gap-1">
@@ -33,7 +35,7 @@ function AppScreen({ state }: { state: string }) {
             />
           ))}
         </div>
-        <p className="mt-2 text-[0.6875rem] text-muted">Property map</p>
+        <p className="label mt-2 text-muted">Property map</p>
       </div>
       <ul className="mt-4 flex-1 space-y-1 px-5">
         {rows.map((r) => (
@@ -45,20 +47,20 @@ function AppScreen({ state }: { state: string }) {
                 </svg>
               ) : null}
             </span>
-            <span className="text-[0.8125rem] font-medium">{r.name}</span>
+            <span className="text-small font-medium">{r.name}</span>
             {r.pct > 0 ? (
               <span className="ml-auto flex items-center gap-2">
                 <span className="h-1 w-14 overflow-hidden bg-hairline">
                   <span className="block h-full w-full origin-left bg-water transition-transform duration-700 ease-instrument" style={{ transform: `scaleX(${r.pct / 100})` }} />
                 </span>
-                <span className="readout text-[0.625rem] text-muted">{r.pct}%</span>
+                <span className="readout text-label tracking-normal text-muted">{r.pct}%</span>
               </span>
             ) : null}
           </li>
         ))}
       </ul>
       <div className="p-5">
-        <div className={`flex h-11 items-center justify-center rounded-hard text-[0.875rem] font-medium ${state === "done" ? "bg-water text-plaster" : state === "progress" ? "border border-hairline bg-sunken text-muted" : "bg-ink text-plaster"}`}>
+        <div className={`flex h-11 items-center justify-center rounded-hard text-small font-medium ${state === "done" ? "bg-water text-plaster" : state === "progress" ? "border border-hairline bg-sunken text-muted" : "bg-ink text-plaster"}`}>
           {state === "map" ? "Choose surfaces" : state === "select" ? "Start clean" : state === "start" ? "Starting…" : state === "progress" ? "Cleaning in progress" : "Clean complete"}
         </div>
       </div>
@@ -69,8 +71,8 @@ function AppScreen({ state }: { state: string }) {
 /** Phone mock. Every app state is rendered once and crossfaded, so switching is opacity only. */
 function Phone({ state }: { state: string }) {
   return (
-    <div className="relative mx-auto w-[15.5rem] shrink-0 rounded-hard border border-border-strong/60 bg-ink p-2 md:w-[17rem]" aria-hidden="true">
-      <div className="relative h-[31rem] overflow-hidden rounded-hard md:h-[34rem]">
+    <div className="relative w-[15.5rem] shrink-0 rounded-hard border border-border-strong/60 bg-ink p-2 md:w-[17rem]" aria-hidden="true">
+      <div className="relative h-[33rem] overflow-hidden rounded-hard md:h-[34rem]">
         {states.map((s) => (
           <div key={s} className={`absolute inset-0 transition-opacity duration-300 ease-instrument ${s === state ? "opacity-100" : "opacity-0"}`}>
             <AppScreen state={s} />
@@ -106,7 +108,7 @@ export function LandlordStory() {
           <ol className="lg:col-span-5">
             {beats.map((b, i) => (
               <li key={b.title} ref={setRef(i)} className="border-t border-hairline py-8 lg:py-10" aria-current={i === active ? "step" : undefined}>
-                <p className="readout text-[0.75rem] text-glass">0{i + 1}</p>
+                <p className="label text-glass">0{i + 1}</p>
                 <h3 className={`mt-3 font-sans text-h4 font-medium transition-colors duration-300 ${i === active ? "text-ink" : "text-ink lg:text-muted"}`}>{b.title}</h3>
                 <p className="mt-2 max-w-prose text-small text-muted">{b.body}</p>
                 {i === 0 || b.imageId !== beats[i - 1].imageId ? (
@@ -128,7 +130,7 @@ export function LandlordStory() {
                     </div>
                   ))}
                 </div>
-                <p className="caption mt-2">Concept render</p>
+                <p className="label mt-2 text-muted">Concept render</p>
               </div>
             </div>
           </div>

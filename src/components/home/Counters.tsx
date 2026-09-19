@@ -16,7 +16,7 @@ export function Counters() {
             <RevealItem key={c.label} className="flex flex-col">
               <div className="flex items-baseline gap-2">
                 <Counter value={c.value} />
-                <span className="readout text-[0.9375rem] text-glass">{c.unit}</span>
+                <span className="readout text-small text-glass">{c.unit}</span>
               </div>
               <p className="mt-3 max-w-[22ch] text-caption text-muted">{c.label}</p>
             </RevealItem>
