@@ -141,7 +141,7 @@ export function EnquiryForm() {
 
       <label className="flex items-start gap-3 text-small text-muted">
         <input type="checkbox" name="updates" className="mt-1 h-4 w-4 accent-[#1c1a17]" />
-        <span>Keep me posted as the pilot program takes shape. No marketing lists, and you can stop any time.</span>
+        <span className="max-w-prose">Keep me posted as the pilot program takes shape. No marketing lists, and you can stop any time.</span>
       </label>
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center">

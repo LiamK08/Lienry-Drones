@@ -15,7 +15,7 @@ export function Steps({ id, eyebrow, headline, items, tone = "plaster" }: { id: 
           {items.map((s) => (
             <RevealItem key={s.n} className="border-t border-hairline pt-5">
               <p className="label text-glass">{s.n}</p>
-              <h3 className="mt-3 font-sans text-h4 font-medium">{s.title}</h3>
+              <h3 className="mt-3 text-h3">{s.title}</h3>
               <p className="mt-2 text-small text-muted">{s.body}</p>
             </RevealItem>
           ))}
@@ -35,7 +35,7 @@ export function Tiles({ id, eyebrow, headline, items, tone = "raised", columns =
         <RevealList className={`mt-12 grid gap-6 md:mt-16 ${columns === 4 ? "sm:grid-cols-2 md:grid-cols-4" : "md:grid-cols-3"}`}>
           {items.map((t) => (
             <RevealItem key={t.title} className={`rounded-hard border p-6 ${tone === "dark" ? "border-plaster/25 bg-ink-raised" : "border-hairline bg-raised"}`}>
-              <h3 className="font-sans text-h4 font-medium">{t.title}</h3>
+              <h3 className="text-h3">{t.title}</h3>
               <p className={`mt-2 text-small ${tone === "dark" ? "text-muted-on-dark" : "text-muted"}`}>{t.body}</p>
             </RevealItem>
           ))}

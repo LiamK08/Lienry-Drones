@@ -73,7 +73,7 @@ export function PlacesCarousel() {
                 <Picture id={card.id} alt={`${card.title}: ${card.body}`} aspect="2/3" sizes="(min-width: 1024px) 22rem, (min-width: 768px) 30vw, 72vw" />
                 <div className="mt-4 flex flex-1 flex-col">
                   <p className="label text-muted">{card.system}</p>
-                  <h3 className="mt-2 font-sans text-h4 font-medium">{card.title}</h3>
+                  <h3 className="mt-2 text-h3">{card.title}</h3>
                   <p className="mt-2 text-small text-muted">{card.body}</p>
                 </div>
               </article>

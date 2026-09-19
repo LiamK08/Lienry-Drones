@@ -109,7 +109,7 @@ export function LandlordStory() {
             {beats.map((b, i) => (
               <li key={b.title} ref={setRef(i)} className="border-t border-hairline py-8 lg:py-10" aria-current={i === active ? "step" : undefined}>
                 <p className="label text-glass">0{i + 1}</p>
-                <h3 className={`mt-3 font-sans text-h4 font-medium transition-colors duration-300 ${i === active ? "text-ink" : "text-ink lg:text-muted"}`}>{b.title}</h3>
+                <h3 className={`mt-3 text-h3 transition-colors duration-300 ${i === active ? "text-ink" : "text-ink lg:text-muted"}`}>{b.title}</h3>
                 <p className="mt-2 max-w-prose text-small text-muted">{b.body}</p>
                 {i === 0 || b.imageId !== beats[i - 1].imageId ? (
                   <div className="mt-5 lg:hidden">

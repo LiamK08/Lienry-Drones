@@ -64,7 +64,9 @@ Two families, self-hosted from Fontsource (`@fontsource/instrument-serif`, `@fon
 - Small labels: Inter 500, 12px, uppercase, 0.12em. The only uppercase on the site: figure captions ("Concept render"), the software window's section labels, step numbers and footer column heads.
 - Numerals in the counters and the software window: Inter with tabular figures so nothing jumps while a value animates; the big statistics run at weight 300.
 
-Scale, one `clamp()` per step from 390 to 1440 wide: display 64 to 96px; H1 44 to 64; H2 32 to 44; H3 24 to 28; H4 and lead 18 to 20; body 17 to 18; small 14; label 12; statistic numerals 56 to 96. Everything is left aligned except the home hero, which centres its headline low in the frame.
+Scale, one `clamp()` per step from 390 to 1440 wide: display 64 to 96px; H1 44 to 64; H2 32 to 44; H3 24 to 28; lead 18 to 20; body 17 to 18; small 14; label 12; statistic numerals 56 to 96. There is no step between H3 and body: every heading element on the site, down to a card title or an FAQ question, sits on H3 in Instrument Serif. Everything is left aligned except the home hero, which centres its headline low in the frame.
+
+The measure is 68 characters and the token that carries it is `45ch`. CSS `ch` is the advance of the digit zero, which Inter renders at 0.65em with optical sizing on, while a character of this site's prose averages about 0.47em, so `68ch` would set 91 characters a line. 45ch was found by counting the glyphs on every rendered line of every text run on the site at 390 and 1440, and brings the longest line anywhere to 66.
 
 ### Surfaces, shape and layout
 

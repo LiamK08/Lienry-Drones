@@ -39,7 +39,7 @@ export default function CompanyPage() {
             {c.founders.people.map((p, i) => (
               <Reveal key={p.name} delay={i * 0.08} as="article">
                 <PhotoPlaceholder label={`Photo of ${p.name} to come`} />
-                <h3 className="mt-5 font-sans text-h4 font-medium">{p.name}</h3>
+                <h3 className="mt-5 text-h3">{p.name}</h3>
                 <p className="text-small text-muted">{p.title}</p>
                 <p className="mt-3 text-small text-muted">{p.bio}</p>
               </Reveal>
