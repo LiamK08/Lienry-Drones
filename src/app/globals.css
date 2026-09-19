@@ -226,3 +226,52 @@
     display: none;
   }
 }
+
+@layer components {
+  /* The wash timeline in the software window: a hairline track, the done part in glass, a square thumb. */
+  .timeline {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 1.25rem;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .timeline:disabled {
+    cursor: default;
+  }
+
+  .timeline::-webkit-slider-runnable-track {
+    height: 2px;
+    background: linear-gradient(to right, var(--color-glass) var(--fill, 0%), var(--color-hairline) var(--fill, 0%));
+  }
+
+  .timeline::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    margin-top: -5px;
+    background: var(--color-ink);
+    border: 0;
+    border-radius: var(--radius-hard);
+  }
+
+  .timeline::-moz-range-track {
+    height: 2px;
+    background: var(--color-hairline);
+  }
+
+  .timeline::-moz-range-progress {
+    height: 2px;
+    background: var(--color-glass);
+  }
+
+  .timeline::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    background: var(--color-ink);
+    border: 0;
+    border-radius: var(--radius-hard);
+  }
+}
