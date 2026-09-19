@@ -28,10 +28,36 @@ export function Nav() {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
     document.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
+
+    // Lock the element that actually scrolls. globals.css sets overflow-x on <html>, which stops
+    // the viewport taking its scroll behaviour from <body>, so hiding body's overflow alone does
+    // nothing and the page slides around behind the open menu.
+    const root = document.documentElement;
+    const prevOverflow = root.style.overflow;
+    root.style.overflow = "hidden";
+
+    // Put the page behind the panel out of reach so Tab cannot land on a link the panel is
+    // covering. The skip link goes with it: its target is inert too, so following it does nothing.
+    // The header stays live because it carries the close button.
+    const behind = [
+      document.getElementById("main"),
+      document.querySelector("footer"),
+      document.querySelector('a[href="#main"]'),
+    ].filter(Boolean) as HTMLElement[];
+    behind.forEach((el) => el.setAttribute("inert", ""));
+
+    // Past lg the burger and the panel are both display:none. Without this a rotation or a resize
+    // would strand the menu open, holding the bar in its solid state with nothing left to close it.
+    const wide = window.matchMedia("(min-width: 64rem)");
+    const onWide = () => wide.matches && setOpen(false);
+    onWide();
+    wide.addEventListener("change", onWide);
+
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
+      wide.removeEventListener("change", onWide);
+      behind.forEach((el) => el.removeAttribute("inert"));
+      root.style.overflow = prevOverflow;
     };
   }, [open]);
 
@@ -46,7 +72,7 @@ export function Nav() {
       } ${dark ? "on-dark text-white" : "text-ink"}`}
     >
       <nav aria-label="Primary" className="relative flex h-full items-center px-[15px] md:px-6">
-        <ul className="-ml-[10px] hidden items-center lg:flex xl:-ml-[15px]">
+        <ul className="-ml-[10px] hidden items-center lg:flex min-[1100px]:-ml-[15px]">
           {nav.map((item) => {
             const active = pathname === item.href;
             return (
@@ -54,7 +80,7 @@ export function Nav() {
                 <Link
                   href={item.href}
                   aria-current={active ? "page" : undefined}
-                  className={`relative flex h-[30px] items-center px-[10px] text-[0.8125rem] leading-none transition-opacity duration-200 after:absolute after:inset-x-[10px] after:bottom-[4px] after:h-px after:bg-current after:transition-opacity after:duration-200 hover:after:opacity-60 xl:px-[15px] xl:after:inset-x-[15px] ${
+                  className={`relative flex h-[30px] items-center px-[10px] text-[0.8125rem] leading-none transition-opacity duration-200 after:absolute after:inset-x-[10px] after:bottom-[4px] after:h-px after:bg-current after:transition-opacity after:duration-200 hover:after:opacity-60 min-[1100px]:px-[15px] min-[1100px]:after:inset-x-[15px] ${
                     active ? "after:opacity-100" : "after:opacity-0"
                   }`}
                 >
@@ -95,6 +121,9 @@ export function Nav() {
         {open ? (
           <motion.div
             id={panelId}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menu"
             className="fixed inset-x-0 top-[var(--nav-h)] bottom-0 z-40 flex flex-col overflow-y-auto bg-plaster px-[15px] text-ink md:px-6 lg:hidden"
             initial={reduce ? false : { opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}

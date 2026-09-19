@@ -15,12 +15,15 @@ const sizes: Record<Size, string> = {
   lg: "h-12 px-6 text-small",
 };
 
-// Primary is always a solid ink fill with white text. Over the hero film a 60% white hairline
-// gives the button a 3:1 boundary against the scrimmed frame behind it.
+// Primary is always a solid ink fill with white text. Over the hero film it carries a white
+// hairline so its edge holds 3:1 against the scrimmed frame. The alpha is 75%, not 60%: the fill
+// paints under the border (background-clip is border-box), so the hairline composites over ink
+// rather than over the frame. 60% renders rgb(164,163,162) and measures 2.39:1 against the
+// brightest possible backdrop; 75% renders rgb(198,198,197) and measures 3.51:1.
 const variants: Record<Variant, { light: string; dark: string }> = {
   primary: {
     light: "bg-ink text-white hover:bg-ink-raised",
-    dark: "bg-ink text-white border border-white/60 hover:bg-ink-raised",
+    dark: "bg-ink text-white border border-white/75 hover:bg-ink-raised",
   },
   secondary: {
     light: "border border-ink text-ink hover:bg-sunken",

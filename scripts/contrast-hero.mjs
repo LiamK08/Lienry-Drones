@@ -16,6 +16,12 @@
 // match its background; the white hairline is the boundary and is what is gated here. The
 // fill row is printed for information only.
 //
+// The hairline is composited over the button's own INK FILL, not over the frame, because
+// background-clip defaults to border-box and the fill paints under the border. Reading the
+// rendered pixels confirms it: white/75 on the button's left edge comes back as rgb(198,198,197),
+// which is 0.75*255 + 0.25*28, not 0.75*255 + 0.25*backdrop. Compositing it over the frame
+// instead overstates the ratio by about a full point.
+//
 // Usage: node scripts/contrast-hero.mjs <frame image> [viewportWidth] [viewportHeight]
 import sharp from "sharp";
 
@@ -33,7 +39,7 @@ const scrimAt = (y) =>
 const ELEMENTS = [
   { name: "Nav links, white text", box: [9, 21, 493, 51], need: 4.5, gate: true, fg: [255, 255, 255] },
   { name: "Centred mark, white fill", box: [710, 21, 730, 50], need: 3, gate: true, fg: [255, 255, 255] },
-  { name: "Button boundary, white hairline", box: [1265, 20, 1416, 51], need: 3, gate: true, alpha: 0.6 },
+  { name: "Button boundary, white hairline", box: [1265, 20, 1416, 51], need: 3, gate: true, alpha: 0.75, overFill: INK },
   { name: "Button fill vs hero (informational)", box: [1265, 20, 1416, 51], need: 3, gate: false, fg: INK },
 ];
 
@@ -75,7 +81,7 @@ function run(label, sourcePx) {
     for (let y = y0; y <= y1; y++) {
       for (let x = x0; x <= x1; x++) {
         const bg = over([0, 0, 0], over(INK, sourcePx(x, y), 0.25), scrimAt(y));
-        const fg = el.fg ?? over([255, 255, 255], bg, el.alpha);
+        const fg = el.fg ?? over([255, 255, 255], el.overFill ?? bg, el.alpha);
         const r = ratio(fg, bg);
         if (r < worst) {
           worst = r;
