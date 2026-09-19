@@ -1,6 +1,6 @@
 import { Container, Section, SectionHeading } from "@/components/ui/Section";
 import { Picture } from "@/components/ui/Picture";
-import { Button, ArrowRight } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import { Reveal, RevealItem, RevealList } from "@/components/ui/Reveal";
 import type { Stat } from "@/content/stats";
 
@@ -34,7 +34,7 @@ export function Tiles({ id, eyebrow, headline, items, tone = "raised", columns =
         </Reveal>
         <RevealList className={`mt-12 grid gap-6 md:mt-16 ${columns === 4 ? "sm:grid-cols-2 md:grid-cols-4" : "md:grid-cols-3"}`}>
           {items.map((t) => (
-            <RevealItem key={t.title} className={`rounded-card border p-6 ${tone === "dark" ? "border-plaster/15 bg-ink-raised" : "border-hairline bg-raised"}`}>
+            <RevealItem key={t.title} className={`rounded-hard border p-6 ${tone === "dark" ? "border-plaster/25 bg-ink-raised" : "border-hairline bg-raised"}`}>
               <h3 className="font-sans text-h4 font-medium">{t.title}</h3>
               <p className={`mt-2 text-small ${tone === "dark" ? "text-muted-on-dark" : "text-muted"}`}>{t.body}</p>
             </RevealItem>
@@ -58,7 +58,7 @@ export function AlternatingRows({ id, rows }: { id: string; rows: { id: string; 
               <p className="eyebrow">{row.eyebrow}</p>
               <h2 className="mt-3 text-h2">{row.title}</h2>
               <p className="mt-4 max-w-[46ch] text-body text-muted">{row.body}</p>
-              {row.readout ? <p className="readout mt-6 inline-block rounded-chip border border-hairline px-2.5 py-1 text-[0.6875rem] uppercase tracking-[0.08em] text-muted">{row.readout}</p> : null}
+              {row.readout ? <p className="readout mt-6 border-t border-hairline pt-3 text-[0.6875rem] uppercase tracking-[0.08em] text-muted">{row.readout}</p> : null}
             </div>
           </Reveal>
         ))}
@@ -106,7 +106,7 @@ export function CtaBlock({ id, eyebrow, headline, body, cta, secondary, tone = "
             <p className={`mt-5 max-w-prose text-lead ${dark ? "text-muted-on-dark" : "text-muted"}`}>{body}</p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button href={cta.href} size="lg" onDark={dark}>
-                {cta.label} <ArrowRight />
+                {cta.label}
               </Button>
               {secondary ? (
                 <Button href={secondary.href} size="lg" variant="secondary" onDark={dark}>

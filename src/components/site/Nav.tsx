@@ -5,15 +5,13 @@ import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useId, useState } from "react";
 import { nav } from "@/lib/site";
-import { useScrollBits } from "@/lib/hooks";
+import { useScrolledPast } from "@/lib/hooks";
 import { Button } from "@/components/ui/Button";
 import { Wordmark } from "@/components/ui/Wordmark";
 
 export function Nav() {
   const pathname = usePathname();
-  const bits = useScrollBits();
-  const scrolled = (bits & 1) === 1;
-  const overHero = pathname === "/" && (bits & 2) === 2;
+  const scrolled = useScrolledPast(80);
   const [open, setOpen] = useState(false);
   const reduce = useReducedMotion();
   const panelId = useId();
@@ -29,18 +27,21 @@ export function Nav() {
     };
   }, [open]);
 
+  // Over the home hero the bar is transparent and reads on the hero's own scrim. Past 80px
+  // it fades to a solid plaster bar with a hairline and dark text. With the menu open it is
+  // always solid so the wordmark never sits on the film.
+  const overHero = pathname === "/" && !scrolled;
   const dark = overHero && !open;
-  // With the menu open the bar takes the panel's plaster so the wordmark never sits on the hero film.
-  const surface = open
-    ? "bg-plaster border-b border-hairline"
-    : scrolled && !overHero
-      ? "bg-raised/85 backdrop-blur-md border-b border-hairline"
-      : "bg-transparent border-b border-transparent";
+  const solid = scrolled || open;
 
   return (
-    <header className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${surface} ${dark ? "text-plaster on-dark" : "text-ink"}`}>
+    <header
+      className={`fixed inset-x-0 top-0 z-50 border-b transition-[background-color,border-color,color] duration-300 ease-instrument ${
+        solid ? "border-hairline bg-plaster" : "border-transparent bg-transparent"
+      } ${dark ? "on-dark text-plaster" : "text-ink"}`}
+    >
       <nav aria-label="Primary" className="page-x mx-auto flex h-[var(--nav-h)] max-w-grid items-center justify-between gap-6">
-        <Link href="/" className="rounded-sm" aria-label="Lienry Drones home">
+        <Link href="/" className="rounded-hard" aria-label="Lienry Drones home">
           <Wordmark animate />
         </Link>
         <ul className="hidden items-center gap-7 md:flex">
@@ -51,7 +52,9 @@ export function Nav() {
                 <Link
                   href={item.href}
                   aria-current={active ? "page" : undefined}
-                  className={`text-[0.9375rem] font-medium transition-opacity hover:opacity-100 ${active ? "opacity-100 underline decoration-1 underline-offset-[8px]" : "opacity-75"}`}
+                  className={`text-[0.9375rem] font-medium transition-colors duration-200 ${
+                    active ? "underline decoration-1 underline-offset-[8px]" : dark ? "hover:underline hover:underline-offset-[8px]" : "text-muted hover:text-ink"
+                  }`}
                 >
                   {item.label}
                 </Link>
@@ -67,7 +70,7 @@ export function Nav() {
           </div>
           <button
             type="button"
-            className="inline-flex h-11 w-11 items-center justify-center rounded-button md:hidden"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-hard md:hidden"
             aria-expanded={open}
             aria-controls={panelId}
             aria-label={open ? "Close menu" : "Open menu"}

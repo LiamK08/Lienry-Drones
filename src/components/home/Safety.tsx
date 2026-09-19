@@ -13,7 +13,7 @@ export function Safety() {
         <RevealList className="mt-12 grid gap-8 sm:grid-cols-2 md:mt-16 md:grid-cols-4 md:gap-6">
           {safety.items.map((item) => (
             <RevealItem key={item.id}>
-              <Picture id={item.id} alt={item.title} aspect="1/1" sizes="(min-width: 768px) 22vw, 45vw" rounded="rounded-card" placeholderText="Detail render to come" />
+              <Picture id={item.id} alt={item.title} aspect="1/1" sizes="(min-width: 768px) 22vw, 45vw" placeholderText="Detail render to come" />
               <h3 className="mt-5 font-sans text-h4 font-medium">{item.title}</h3>
               <p className="mt-2 text-small text-muted-on-dark">{item.body}</p>
             </RevealItem>

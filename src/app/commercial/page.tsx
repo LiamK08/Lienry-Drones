@@ -38,7 +38,7 @@ export default function CommercialPage() {
               <ul className="mt-8 divide-y divide-hairline border-y border-hairline text-small">
                 {["No crews to book for each visit", "No access equipment to arrange at height", "No waiting for a slot: the re-scan decides when a clean is due", "The building is planned, tracked and reported in one place"].map((line) => (
                   <li key={line} className="flex gap-3 py-3">
-                    <span className="mt-[0.55em] h-1.5 w-1.5 shrink-0 rounded-full bg-glass" aria-hidden="true" />
+                    <span className="mt-[0.55em] h-1.5 w-1.5 shrink-0 bg-glass" aria-hidden="true" />
                     {line}
                   </li>
                 ))}

@@ -46,14 +46,6 @@ for (const [vname, width, height, mobile] of viewports) {
       await page.evaluate((v) => window.scrollTo(0, v), y);
       await page.waitForTimeout(90);
     }
-    if (name === "home") {
-      // Mid-sequence frames for the pinned sections.
-      for (const frac of [0.12, 0.2, 0.32, 0.55, 0.62]) {
-        await page.evaluate((v) => window.scrollTo(0, v), Math.round(total * frac));
-        await page.waitForTimeout(500);
-        await page.screenshot({ path: path.join(out, `home-${vname}-frame-${Math.round(frac * 100)}.jpg`), type: "jpeg", quality: 82 });
-      }
-    }
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.waitForTimeout(400);
     await page.screenshot({ path: path.join(out, `${name}-${vname}.jpg`), type: "jpeg", quality: 82, fullPage: true });

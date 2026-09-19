@@ -14,7 +14,7 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><style>
 @font-face{font-family:"Hanken";src:url("${font("hanken-grotesk","hanken-grotesk-latin-wght-normal.woff2")}") format("woff2");font-weight:100 900}
 @font-face{font-family:"GeistMono";src:url("${font("geist-mono","geist-mono-latin-wght-normal.woff2")}") format("woff2");font-weight:100 900}
 html,body{margin:0}body{width:1200px;height:630px;background:#f3efe7;color:#1c1a17;font-family:Hanken,sans-serif;position:relative;overflow:hidden}
-.bg{position:absolute;inset:0;background:radial-gradient(90% 70% at 85% 10%,#dcedf0 0%,rgba(220,237,240,0) 60%),linear-gradient(180deg,#f3efe7 0%,#e9e3d8 100%)}
+.bg{position:absolute;inset:0;background:#f3efe7}
 .wm{position:absolute;left:72px;top:64px;display:flex;align-items:center;gap:14px;font-family:Newsreader;font-size:30px}
 .wm span{font-family:Hanken;font-size:13px;letter-spacing:.14em;text-transform:uppercase;opacity:.7;margin-left:6px}
 .eyebrow{position:absolute;left:72px;top:250px;font-family:GeistMono;font-weight:500;font-size:16px;letter-spacing:.1em;text-transform:uppercase;color:#5e584f}
@@ -23,8 +23,8 @@ p{position:absolute;left:72px;top:520px;margin:0;font-size:22px;color:#5e584f;wi
 .line{position:absolute;left:72px;right:72px;top:236px;height:1px;background:#dcd5c8}
 .mark{height:40px;width:auto;display:block}
 .big{position:absolute;right:56px;top:96px;height:560px;width:auto;color:#0f6a7c;opacity:.09}
-.water{position:absolute;right:0;bottom:0;width:520px;height:630px;background:linear-gradient(105deg,rgba(15,106,124,0) 0%,rgba(15,106,124,.06) 45%,rgba(15,106,124,0) 46%,rgba(15,106,124,0) 62%,rgba(15,106,124,.05) 80%,rgba(15,106,124,0) 81%)}
-</style></head><body><div class="bg"></div><div class="water"></div>
+
+</style></head><body><div class="bg"></div>
 ${mark("big")}
 <div class="wm">${mark("mark")}Lienry<span>Drones</span></div>
 <div class="line"></div>

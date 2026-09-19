@@ -24,3 +24,7 @@ media-src/
 
 # typescript incremental build info
 *.tsbuildinfo
+
+# raw before/after capture sets (the compare sheets are committed)
+docs/screenshots/before/
+docs/screenshots/after/

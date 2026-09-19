@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/Button";
 type Errors = Partial<Record<string, string>>;
 
 const inputCls =
-  "mt-2 block w-full rounded-chip border border-border-strong bg-raised px-3.5 py-3 text-body text-ink placeholder:text-muted/70 focus:border-glass focus:outline-none focus:ring-2 focus:ring-glass/30";
+  "mt-2 block w-full rounded-hard border border-border-strong bg-raised px-3.5 py-3 text-body text-ink placeholder:text-muted/70 focus:border-ink focus:outline-none";
 
 export function EnquiryForm() {
   const params = useSearchParams();
@@ -44,7 +44,7 @@ export function EnquiryForm() {
 
   if (status === "sent") {
     return (
-      <div role="status" className="rounded-panel border border-hairline bg-raised p-8">
+      <div role="status" className="rounded-hard border border-hairline bg-raised p-8">
         <h2 className="text-h3">{registerPage.success.headline}</h2>
         <p className="mt-3 text-body text-muted">{registerPage.success.body}</p>
       </div>
@@ -59,9 +59,9 @@ export function EnquiryForm() {
           {enquiryTypes.map((t) => (
             <label
               key={t}
-              className={`flex cursor-pointer items-center gap-3 rounded-card border px-4 py-3 text-small transition-colors ${type === t ? "border-glass bg-glass-tint" : "border-border-strong/60 bg-raised hover:bg-plaster"}`}
+              className={`flex cursor-pointer items-center gap-3 rounded-hard border px-4 py-3 text-small transition-colors ${type === t ? "border-ink bg-raised" : "border-hairline bg-raised hover:border-border-strong"}`}
             >
-              <input type="radio" name="type" value={t} checked={type === t} onChange={() => setType(t)} className="h-4 w-4 accent-[#0f6a7c]" />
+              <input type="radio" name="type" value={t} checked={type === t} onChange={() => setType(t)} className="h-4 w-4 accent-[#1c1a17]" />
               {enquiryTypeLabels[t]}
             </label>
           ))}
@@ -140,7 +140,7 @@ export function EnquiryForm() {
       </div>
 
       <label className="flex items-start gap-3 text-small text-muted">
-        <input type="checkbox" name="updates" className="mt-1 h-4 w-4 accent-[#0f6a7c]" />
+        <input type="checkbox" name="updates" className="mt-1 h-4 w-4 accent-[#1c1a17]" />
         <span>Keep me posted as the pilot program takes shape. No marketing lists, and you can stop any time.</span>
       </label>
 

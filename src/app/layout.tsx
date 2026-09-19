@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { MotionConfig } from "motion/react";
 import "./globals.css";
-import { LenisProvider } from "@/lib/lenis-provider";
 import { brand, siteUrl } from "@/lib/site";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
@@ -41,15 +40,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <MotionConfig reducedMotion="user">
           <a
             href="#main"
-            className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-button focus:bg-glass focus:px-4 focus:py-2 focus:text-plaster"
+            className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-hard focus:bg-ink focus:px-4 focus:py-2 focus:text-plaster"
           >
             Skip to content
           </a>
-          <LenisProvider>
-            <Nav />
-            <main id="main">{children}</main>
-            <Footer />
-          </LenisProvider>
+          <Nav />
+          <main id="main">{children}</main>
+          <Footer />
         </MotionConfig>
         <OrganizationJsonLd />
       </body>

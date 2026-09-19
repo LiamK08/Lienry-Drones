@@ -5,21 +5,23 @@ type Variant = "primary" | "secondary" | "tertiary";
 type Size = "md" | "lg";
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-button font-sans font-medium whitespace-nowrap transition-[background-color,color,border-color] duration-200 ease-instrument select-none";
+  "inline-flex items-center justify-center gap-2 rounded-hard font-sans font-medium whitespace-nowrap transition-[background-color,color,border-color] duration-200 ease-instrument select-none";
 
 const sizes: Record<Size, string> = {
   md: "h-11 px-5 text-[0.9375rem]",
   lg: "h-13 px-6 text-base",
 };
 
+// Primary is always a solid ink fill with plaster text. On dark surfaces a plaster
+// hairline gives the button a 3:1 boundary against the surface behind it.
 const variants: Record<Variant, { light: string; dark: string }> = {
   primary: {
-    light: "bg-glass text-plaster shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] hover:bg-glass-deep",
-    dark: "bg-glass-on-dark text-ink hover:bg-[#a4dfe8]",
+    light: "bg-ink text-plaster hover:bg-ink-raised",
+    dark: "bg-ink text-plaster border border-plaster/50 hover:bg-ink-raised",
   },
   secondary: {
-    light: "border border-border-strong text-ink hover:bg-raised",
-    dark: "border border-[rgba(243,239,231,0.32)] text-plaster hover:bg-ink-raised",
+    light: "border border-ink text-ink hover:bg-sunken",
+    dark: "border border-plaster/50 text-plaster hover:bg-ink-raised",
   },
   tertiary: {
     light: "text-glass hover:text-glass-deep underline decoration-1 underline-offset-[6px] hover:decoration-2 px-0",
@@ -54,13 +56,5 @@ export function Button(props: LinkProps | ButtonProps) {
     <button type="button" className={cls} {...rest}>
       {children}
     </button>
-  );
-}
-
-export function ArrowRight({ className = "h-4 w-4" }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path d="M2.5 8h10M8.5 3.5 13 8l-4.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
   );
 }
