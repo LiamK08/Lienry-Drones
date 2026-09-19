@@ -1,9 +1,8 @@
 "use client";
 
-import { Canvas, useFrame } from "@react-three/fiber";
-import { useMemo, useRef } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { useEffect, useMemo, useRef, type RefObject } from "react";
 import * as THREE from "three";
-import type { MotionValue } from "motion/react";
 
 const COLS = 9;
 const ROWS = 14;
@@ -27,17 +26,35 @@ for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) DEBRIS.add((r + 1) * COL
 for (let r = 0; r < 2; r++) for (let c = 0; c < 4; c++) DEBRIS.add((r + 8) * COLS + c + 4);
 for (let r = 0; r < 2; r++) for (let c = 0; c < 2; c++) DEBRIS.add((r + 11) * COLS + c + 6);
 
-function Facade({ progress }: { progress: MotionValue<number> }) {
+/** Requests frames only while the sequence is playing; otherwise the canvas stays idle. */
+function Driver({ progress, active }: { progress: RefObject<number>; active: boolean }) {
+  const invalidate = useThree((s) => s.invalidate);
+  useEffect(() => {
+    invalidate();
+    if (!active) return;
+    let raf = 0;
+    const loop = () => {
+      invalidate();
+      if (progress.current < 1) raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, [active, invalidate, progress]);
+  return null;
+}
+
+function Facade({ progress }: { progress: RefObject<number> }) {
   const mesh = useRef<THREE.InstancedMesh>(null);
   const sweep = useRef<THREE.Mesh>(null);
   const drone = useRef<THREE.Group>(null);
   const dummy = useMemo(() => new THREE.Object3D(), []);
   const colour = useMemo(() => new THREE.Color(), []);
+  const target = useMemo(() => new THREE.Vector3(), []);
 
   useFrame(() => {
     const m = mesh.current;
     if (!m) return;
-    const p = THREE.MathUtils.clamp(progress.get(), 0, 1);
+    const p = THREE.MathUtils.clamp(progress.current, 0, 1);
     // Phase 1 (0 to 0.4): scan sweep from bottom to top. Phase 2 (0.4 to 1): wash from top to bottom, column by column.
     const scan = THREE.MathUtils.clamp(p / 0.4, 0, 1);
     const wash = THREE.MathUtils.clamp((p - 0.42) / 0.58, 0, 1);
@@ -52,7 +69,6 @@ function Facade({ progress }: { progress: MotionValue<number> }) {
       m.setMatrixAt(i, dummy.matrix);
       const isDebris = DEBRIS.has(i);
       const scannedRow = (r + 0.5) / ROWS <= scan;
-      // Wash order: top row first, left to right.
       const order = (ROWS - 1 - r) * COLS + c;
       const washed = order < washedTiles;
       if (washed) colour.copy(colours.washed);
@@ -72,39 +88,33 @@ function Facade({ progress }: { progress: MotionValue<number> }) {
       const idx = Math.min(COLS * ROWS - 1, washedTiles);
       const r = ROWS - 1 - Math.floor(idx / COLS);
       const c = idx % COLS;
-      const tx = (c - (COLS - 1) / 2) * (TILE + GAP);
-      const ty = (r - (ROWS - 1) / 2) * (TILE + GAP);
-      drone.current.position.lerp(new THREE.Vector3(tx, ty, D / 2 + 0.75), 0.12);
+      target.set((c - (COLS - 1) / 2) * (TILE + GAP), (r - (ROWS - 1) / 2) * (TILE + GAP), D / 2 + 0.75);
+      drone.current.position.lerp(target, 0.12);
     }
   });
 
   return (
     <group>
-      {/* Building body */}
       <mesh position={[0, 0, 0]}>
         <boxGeometry args={[W + 0.2, H + 0.2, D]} />
-        <meshStandardMaterial color="#e4dfd5" roughness={0.9} metalness={0} />
+        <meshLambertMaterial color="#e4dfd5" />
       </mesh>
-      {/* Roof capsule */}
-      <mesh position={[W / 4, H / 2 + 0.22, -0.2]}>
-        <capsuleGeometry args={[0.16, 0.5, 6, 12]} />
-        <meshStandardMaterial color="#f3efe7" roughness={0.6} />
+      <mesh position={[W / 4, H / 2 + 0.16, -0.2]}>
+        <boxGeometry args={[0.7, 0.3, 0.36]} />
+        <meshLambertMaterial color="#f3efe7" />
       </mesh>
-      {/* Facade tiles */}
       <instancedMesh ref={mesh} args={[undefined, undefined, COLS * ROWS]}>
         <planeGeometry args={[TILE, TILE]} />
-        <meshStandardMaterial roughness={0.35} metalness={0.05} />
+        <meshLambertMaterial />
       </instancedMesh>
-      {/* Scan sweep */}
       <mesh ref={sweep} position={[0, -H / 2, D / 2 + 0.01]}>
         <planeGeometry args={[W + 0.4, 0.03]} />
         <meshBasicMaterial color="#8ed4e0" transparent opacity={0.9} />
       </mesh>
-      {/* Drone: body plus four rotor discs */}
       <group ref={drone} position={[0, H / 2, D / 2 + 0.75]}>
         <mesh>
           <boxGeometry args={[0.22, 0.06, 0.22]} />
-          <meshStandardMaterial color="#f3efe7" roughness={0.5} />
+          <meshLambertMaterial color="#f3efe7" />
         </mesh>
         {[
           [-0.16, 0, -0.16],
@@ -122,39 +132,29 @@ function Facade({ progress }: { progress: MotionValue<number> }) {
           <meshBasicMaterial color="#0f6a7c" />
         </mesh>
       </group>
-      {/* Ground */}
       <mesh position={[0, -H / 2 - 0.1, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[14, 14]} />
-        <meshStandardMaterial color="#ece6da" roughness={1} />
+        <meshLambertMaterial color="#ece6da" />
       </mesh>
     </group>
   );
 }
 
-function Rig() {
-  const t = useRef(0);
-  const target = useMemo(() => new THREE.Vector3(), []);
-  useFrame((state, dt) => {
-    t.current += dt;
-    const orbit = Math.sin(t.current * 0.12) * 0.18 + state.pointer.x * 0.25;
-    const lift = state.pointer.y * 0.2;
-    const radius = 8.6;
-    target.set(Math.sin(orbit + 0.55) * radius, 1.2 + lift, Math.cos(orbit + 0.55) * radius);
-    state.camera.position.lerp(target, 0.05);
-    state.camera.lookAt(0, 0.2, 0);
-  });
-  return null;
-}
-
-export default function BuildingScene({ progress }: { progress: MotionValue<number> }) {
+export default function BuildingScene({ progress, active }: { progress: RefObject<number>; active: boolean }) {
   return (
-    <Canvas dpr={[1, 1.5]} camera={{ position: [4.5, 1.2, 7.4], fov: 32, near: 0.1, far: 60 }} gl={{ antialias: true, alpha: true, powerPreference: "low-power" }} style={{ background: "transparent" }}>
+    <Canvas
+      frameloop="demand"
+      dpr={[1, 1.5]}
+      camera={{ position: [4.6, 1.3, 7.6], fov: 32, near: 0.1, far: 60 }}
+      gl={{ antialias: true, alpha: true, powerPreference: "low-power", stencil: false }}
+      style={{ background: "transparent" }}
+    >
       <ambientLight intensity={0.85} />
       <directionalLight position={[6, 8, 5]} intensity={1.1} color="#fff4e3" />
       <directionalLight position={[-5, 3, -4]} intensity={0.35} color="#dcedf0" />
       <fog attach="fog" args={["#f3efe7", 12, 22]} />
       <Facade progress={progress} />
-      <Rig />
+      <Driver progress={progress} active={active} />
     </Canvas>
   );
 }

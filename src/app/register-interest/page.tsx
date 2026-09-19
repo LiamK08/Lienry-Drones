@@ -34,7 +34,7 @@ export default function RegisterInterestPage() {
           </dl>
         </div>
         <div className="md:col-span-6 md:col-start-7">
-          <Suspense fallback={<div className="h-96 rounded-panel bg-raised" aria-hidden="true" />}>
+          <Suspense fallback={<div className="h-96 rounded-hard bg-raised" aria-hidden="true" />}>
             <EnquiryForm />
           </Suspense>
         </div>

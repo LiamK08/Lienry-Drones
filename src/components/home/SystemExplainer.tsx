@@ -1,142 +1,63 @@
 "use client";
 
-import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScroll } from "motion/react";
-import { useLenis } from "lenis/react";
-import { useCallback, useId, useRef, useState } from "react";
 import { systemExplainer } from "@/content/home";
-import { useMediaQuery } from "@/lib/hooks";
+import { useActiveStep } from "@/lib/hooks";
 import { Picture } from "@/components/ui/Picture";
 import { Eyebrow } from "@/components/ui/Section";
-import { instrument } from "@/lib/motion";
+import { Reveal } from "@/components/ui/Reveal";
 
 const tabs = systemExplainer.tabs;
 
-function TabList({ active, onSelect, idBase }: { active: number; onSelect: (i: number) => void; idBase: string }) {
-  const refs = useRef<(HTMLButtonElement | null)[]>([]);
-  const onKey = (e: React.KeyboardEvent, i: number) => {
-    const next = e.key === "ArrowDown" || e.key === "ArrowRight" ? i + 1 : e.key === "ArrowUp" || e.key === "ArrowLeft" ? i - 1 : e.key === "Home" ? 0 : e.key === "End" ? tabs.length - 1 : null;
-    if (next === null) return;
-    e.preventDefault();
-    const j = (next + tabs.length) % tabs.length;
-    onSelect(j);
-    refs.current[j]?.focus();
-  };
-  return (
-    <div role="tablist" aria-label="Parts of the Lienry system" aria-orientation="vertical" className="flex w-full max-w-full gap-2 overflow-x-auto no-scrollbar md:flex-col md:gap-1">
-      {tabs.map((t, i) => {
-        const selected = i === active;
-        return (
-          <button
-            key={t.id}
-            ref={(el) => {
-              refs.current[i] = el;
-            }}
-            role="tab"
-            id={`${idBase}-tab-${t.id}`}
-            aria-selected={selected}
-            aria-controls={`${idBase}-panel-${t.id}`}
-            tabIndex={selected ? 0 : -1}
-            onClick={() => onSelect(i)}
-            onKeyDown={(e) => onKey(e, i)}
-            className={`group flex shrink-0 items-center gap-3 rounded-chip border px-3 py-2 text-left text-small transition-colors duration-200 md:border-transparent md:px-0 md:py-2.5 ${
-              selected ? "border-glass bg-glass-tint text-ink md:bg-transparent" : "border-hairline text-muted hover:text-ink md:hover:bg-transparent"
-            }`}
-          >
-            <span className={`readout hidden w-6 text-[0.6875rem] md:inline ${selected ? "text-glass" : "text-muted"}`}>0{i + 1}</span>
-            <span className={`font-medium ${selected ? "md:text-ink" : ""}`}>{t.tab}</span>
-            <span className={`ml-auto hidden h-px transition-all duration-300 md:block ${selected ? "w-10 bg-glass" : "w-4 bg-hairline"}`} aria-hidden="true" />
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-function Panel({ active, idBase, pinned }: { active: number; idBase: string; pinned: boolean }) {
-  const reduce = useReducedMotion();
-  const t = tabs[active];
-  return (
-    <div className="grid gap-5">
-      <div className="relative">
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={t.id}
-            initial={reduce ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.32, ease: instrument }}
-          >
-            <Picture id={t.imageId} alt={`${t.tab}: ${t.title}`} aspect={pinned ? "16/10" : "4/3"} sizes="(min-width: 768px) 55vw, 100vw" className={pinned ? "max-h-[52svh] w-full" : ""} />
-          </motion.div>
-        </AnimatePresence>
-        <span className="readout absolute right-3 top-3 z-10 rounded-chip bg-raised/90 px-2 py-1 text-[0.6875rem] uppercase tracking-[0.08em] text-ink">
-          {t.readout}
-        </span>
-      </div>
-      {tabs.map((tab, i) => (
-        <div
-          key={tab.id}
-          role="tabpanel"
-          id={`${idBase}-panel-${tab.id}`}
-          aria-labelledby={`${idBase}-tab-${tab.id}`}
-          hidden={i !== active}
-          className="max-w-prose"
-        >
-          <h3 className="text-h3">{tab.title}</h3>
-          <p className="mt-2 text-body text-muted">{tab.body}</p>
-        </div>
-      ))}
-    </div>
-  );
-}
-
+/**
+ * The six parts of the system as a scroll-through list. Nothing is pinned: the page keeps
+ * moving, the still on the right follows the step nearest the viewport centre (one
+ * IntersectionObserver), and the stills swap with opacity only.
+ */
 export function SystemExplainer() {
-  const idBase = useId();
-  const reduce = useReducedMotion();
-  const desktop = useMediaQuery("(min-width: 768px)");
-  const pinned = desktop && !reduce;
-  const ref = useRef<HTMLDivElement>(null);
-  const [active, setActive] = useState(0);
-  const lenis = useLenis();
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
-
-  useMotionValueEvent(scrollYProgress, "change", (v) => {
-    if (!pinned) return;
-    const i = Math.min(tabs.length - 1, Math.max(0, Math.floor(v * tabs.length)));
-    setActive((prev) => (prev === i ? prev : i));
-  });
-
-  const select = useCallback(
-    (i: number) => {
-      setActive(i);
-      if (!pinned || !ref.current) return;
-      const rect = ref.current.getBoundingClientRect();
-      const top = rect.top + window.scrollY;
-      const track = rect.height - window.innerHeight;
-      const target = top + (track * (i + 0.5)) / tabs.length;
-      if (lenis) lenis.scrollTo(target, { duration: 0.9 });
-      else window.scrollTo({ top: target, behavior: "smooth" });
-    },
-    [pinned, lenis],
-  );
-
+  const [active, setRef] = useActiveStep(tabs.length);
   return (
-    <section id="system" aria-labelledby="system-heading" className="bg-plaster">
-      <div ref={ref} className={pinned ? "relative" : ""} style={pinned ? { height: `calc(100svh + ${tabs.length} * 72svh)` } : undefined}>
-        <div className={`page-x mx-auto max-w-grid ${pinned ? "sticky top-0 flex h-[100svh] items-center overflow-hidden pb-6 pt-[calc(var(--nav-h)+1rem)]" : "section-y"}`}>
-          <div className="grid w-full min-w-0 gap-10 md:grid-cols-12 md:gap-8">
-            <div className="min-w-0 md:col-span-5">
-              <Eyebrow className="mb-4">{systemExplainer.eyebrow}</Eyebrow>
-              <h2 id="system-heading" className="text-h2">
-                {systemExplainer.headline}
-              </h2>
-              <p className="mt-4 max-w-[44ch] text-body text-muted">{systemExplainer.intro}</p>
-              <div className="mt-8 md:mt-10">
-                <TabList active={active} onSelect={select} idBase={idBase} />
+    <section id="system" aria-labelledby="system-heading" className="page-x section-y bg-plaster">
+      <div className="mx-auto max-w-grid">
+        <Reveal className="max-w-statement">
+          <Eyebrow className="mb-4">{systemExplainer.eyebrow}</Eyebrow>
+          <h2 id="system-heading" className="text-h2">
+            {systemExplainer.headline}
+          </h2>
+          <p className="mt-4 max-w-[44ch] text-body text-muted">{systemExplainer.intro}</p>
+        </Reveal>
+        <div className="mt-12 grid gap-10 md:mt-16 md:grid-cols-12 md:gap-8">
+          <ol className="md:col-span-5">
+            {tabs.map((t, i) => (
+              <li key={t.id} ref={setRef(i)} className="border-t border-hairline py-8 md:py-10" aria-current={i === active ? "step" : undefined}>
+                <div className="mb-5 md:hidden">
+                  <Picture id={t.imageId} alt={`${t.tab}: ${t.title}`} aspect="16/9" sizes="100vw" />
+                </div>
+                <p className="readout text-[0.75rem] text-glass">0{i + 1}</p>
+                <h3 className={`mt-3 text-h3 transition-colors duration-300 ${i === active ? "text-ink" : "text-ink md:text-muted"}`}>{t.title}</h3>
+                <p className="mt-2 max-w-prose text-body text-muted">{t.body}</p>
+                <p className="readout mt-4 text-[0.6875rem] uppercase tracking-[0.08em] text-muted">{t.readout}</p>
+              </li>
+            ))}
+          </ol>
+          <div className="hidden md:col-span-7 md:block">
+            <div className="sticky top-[calc(var(--nav-h)+1.5rem)]">
+              <div className="relative" style={{ aspectRatio: "4/3" }}>
+                {tabs.map((t, i) => (
+                  <div
+                    key={t.id}
+                    className={`absolute inset-0 transition-opacity duration-500 ease-instrument ${i === active ? "opacity-100" : "opacity-0"}`}
+                    aria-hidden={i !== active}
+                  >
+                    <Picture id={t.imageId} alt={`${t.tab}: ${t.title}`} aspect="4/3" sizes="55vw" label={false} />
+                  </div>
+                ))}
               </div>
-            </div>
-            <div className="min-w-0 md:col-span-7">
-              <Panel active={active} idBase={idBase} pinned={pinned} />
+              <div className="mt-2 flex items-center justify-between">
+                <span className="caption">Concept render</span>
+                <span className="readout text-[0.6875rem] uppercase tracking-[0.08em] text-muted">
+                  0{active + 1} / 0{tabs.length}
+                </span>
+              </div>
             </div>
           </div>
         </div>

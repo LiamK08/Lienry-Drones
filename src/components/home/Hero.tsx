@@ -1,11 +1,12 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { preload } from "react-dom";
 import { hero } from "@/content/home";
 import { getImage, getVideo, largest, srcSet } from "@/lib/media";
-import { Button, ArrowRight } from "@/components/ui/Button";
+import { bindPlayback } from "@/lib/video";
+import { Button } from "@/components/ui/Button";
 import { settle } from "@/lib/motion";
 
 function HeroMedia() {
@@ -18,15 +19,7 @@ function HeroMedia() {
   useEffect(() => {
     const el = ref.current;
     if (!el || reduce) return;
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) el.play().catch(() => {});
-        else el.pause();
-      },
-      { threshold: 0.1 },
-    );
-    io.observe(el);
-    return () => io.disconnect();
+    return bindPlayback(el, 0.1);
   }, [reduce]);
 
   const posterSrc = poster ? largest(hero.posterId, "webp") : video ? `/media/${hero.videoId}-poster.webp` : null;
@@ -41,9 +34,7 @@ function HeroMedia() {
           <img src={posterSrc} srcSet={poster ? srcSet(hero.posterId, "webp") : undefined} sizes="100vw" alt="" className="h-full w-full object-cover" fetchPriority="high" decoding="async" />
         </picture>
       ) : (
-        <div className="h-full w-full bg-[radial-gradient(120%_90%_at_80%_10%,#a9b7bb_0%,#5f6b6d_35%,#2a2724_70%,#1c1a17_100%)]">
-          <div className="absolute inset-0 bg-[linear-gradient(105deg,transparent_0%,rgba(255,255,255,0.06)_35%,transparent_36%,transparent_60%,rgba(255,255,255,0.05)_78%,transparent_79%)]" />
-        </div>
+        <div className="h-full w-full bg-ink-raised" />
       )}
       {video && !reduce && !saveData ? (
         <video
@@ -52,7 +43,6 @@ function HeroMedia() {
           muted
           loop
           playsInline
-          autoPlay
           preload="metadata"
           poster={`/media/${hero.videoId}-poster.jpg`}
           onCanPlay={() => setReady(true)}
@@ -61,7 +51,12 @@ function HeroMedia() {
           <source src={`/media/${hero.videoId}.mp4`} type="video/mp4" />
         </video>
       ) : null}
-      <div className="grain absolute inset-0" />
+      {/* A quarter-strength ink veil over the whole film keeps every frame below the text. */}
+      <div className="absolute inset-0 bg-ink/25" />
+      {/* Header scrim: 72% black held through the bar, then fading out by 180px. Measured against the brightest
+          frame of the hero film, this keeps plaster nav links above 4.5:1 and the wordmark above 3:1. */}
+      <div className="absolute inset-x-0 top-0 h-[180px] bg-[linear-gradient(to_bottom,rgba(0,0,0,0.72)_0px,rgba(0,0,0,0.72)_64px,rgba(0,0,0,0.45)_110px,rgba(0,0,0,0)_180px)]" />
+      {/* Headline scrim. */}
       <div className="absolute inset-x-0 bottom-0 h-[70%] bg-[linear-gradient(to_top,rgba(28,26,23,0.92)_0%,rgba(28,26,23,0.55)_45%,transparent_100%)]" />
     </div>
   );
@@ -86,20 +81,22 @@ export function Hero() {
             </motion.p>
             <h1 id="hero-heading" className="mt-5 text-display">
               {words.map((w, i) => (
-                <motion.span
-                  key={`${w}-${i}`}
-                  className="inline-block will-change-transform"
-                  initial={reduce ? false : { opacity: 0, y: 18 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.9, ease: settle, delay: 0.35 + i * 0.07 }}
-                >
-                  {w}
-                  {i < words.length - 1 ? " " : ""}
-                </motion.span>
+                <Fragment key={`${w}-${i}`}>
+                  <motion.span
+                    className="inline-block will-change-transform"
+                    initial={reduce ? false : { opacity: 0, y: 18 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.9, ease: settle, delay: 0.35 + i * 0.07 }}
+                  >
+                    {w}
+                  </motion.span>
+                  {/* The space lives outside the inline-block so it is never trimmed. */}
+                  {i < words.length - 1 ? " " : null}
+                </Fragment>
               ))}
             </h1>
             <motion.p
-              className="mt-6 max-w-[46ch] text-lead text-plaster/85"
+              className="mt-6 max-w-[46ch] text-lead text-plaster"
               initial={reduce ? false : { opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: settle, delay: 0.75 }}
@@ -107,7 +104,7 @@ export function Hero() {
               {hero.support}
             </motion.p>
             <motion.div
-              className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center"
+              className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-6"
               initial={reduce ? false : { opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: settle, delay: 0.9 }}
@@ -115,13 +112,13 @@ export function Hero() {
               <Button href={hero.primary.href} size="lg" onDark>
                 {hero.primary.label}
               </Button>
-              <a href={hero.secondary.href} className="inline-flex items-center gap-2 text-[0.9375rem] font-medium text-plaster/85 hover:text-plaster">
-                {hero.secondary.label} <ArrowRight />
+              <a href={hero.secondary.href} className="text-[0.9375rem] font-medium text-plaster underline decoration-1 underline-offset-[6px] hover:decoration-2">
+                {hero.secondary.label}
               </a>
             </motion.div>
           </div>
         </div>
-        <div className="mt-12 flex items-end justify-between text-caption text-plaster/60">
+        <div className="mt-12 flex items-end justify-between text-caption text-plaster/70">
           <span className="readout uppercase tracking-[0.08em]">Concept render</span>
           <span className="readout uppercase tracking-[0.08em]">Scroll</span>
         </div>

@@ -67,7 +67,7 @@ Scale (1440 to 390, set with `clamp()` so there is one scale): display 76/80px t
 
 ### Surfaces, shape and layout
 
-- Radii: 4px chips and inputs, 8px buttons and cards, 16px panels and media, 24px device frames. No pills.
+- Radius: one token, 4px, on every button, card, input, image and container (`rounded-hard`). `rounded-full` is reserved for real circles. No pills, chips or badges: labels are small uppercase letterspaced mono text or a short rule above a heading. No tinted backgrounds, glows, blurred blobs or drop shadows; hairline borders and flat section colours only.
 - Buttons 44px tall (52px in the hero), 20px horizontal padding, Hanken 500. Primary: glass fill, plaster label, 1px inner top highlight as a glass edge. Secondary: 1px strong border, ink label. Tertiary: text with a drawn water-line underline. On dark: glass-on-dark fill with ink label.
 - Surfaces are flat: cards separate by a tone step and a hairline, never a drop shadow. The sticky nav is the one exception, with a 1px hairline under it once the page has scrolled.
 - 12-column grid, 24px gutters, page margins 40px at 1280+, 20px at 390. Containers 1280px (grid), 1120px (alternating rows), 880px (statements, founder letter), 700px (prose), 640px (forms). Spacing scale 4, 8, 12, 16, 24, 32, 48, 64, 96, 128, 160. Section padding 128px desktop, 80px mobile.
@@ -80,8 +80,8 @@ Scale (1440 to 390, set with `clamp()` so there is one scale): display 76/80px t
 - Scroll-linked sequences (system explainer, landlord story, 3D scan sweep): transform and clip-path only, mapped to scroll progress through a spring, linear underneath.
 - Counters: 1200ms, once, tabular figures so nothing shifts.
 - Scale never exceeds 1.03 on content; hover never scales. No speed ramps, no HUD, no whoosh.
-- Lenis (lerp 0.09, smoothWheel, native touch) drives scrolling on pointer devices; Motion for React owns everything else. GSAP is not planned; it is added only if a sequence needs frame-accurate scrubbing that Motion cannot express.
-- `prefers-reduced-motion`: no smooth scroll, pinned sequences become stacked static states, counters render their final value, the hero video is replaced by its poster, the 3D building is replaced by its video or a still.
+- Native scrolling only. Reveals are driven by IntersectionObserver (Motion's `whileInView`), never by per-frame scroll maths, and only `transform` and `opacity` animate. Nothing pins the page: the system explainer and the landlord story are scroll-through lists with a sticky media column that follows the step nearest the viewport centre. The 3D building renders on demand and plays its sequence once each time it comes on screen. Videos preload metadata only and one clip decodes at a time.
+- `prefers-reduced-motion`: no smooth anchor scrolling, crossfades become instant, counters render their final value, the hero video is replaced by its poster, the 3D building shows its finished state.
 
 ### Imagery direction
 
@@ -137,11 +137,11 @@ Candidates that were found but not verified against their primary source in this
 | --- | --- | --- | --- |
 | 1 | Hero | Full-viewport film (H1 shot), poster image, eyebrow, headline, support line, two buttons, "Concept render" label, scroll cue | Headline words settle in over 900ms after the poster loads; video fades in when ready |
 | 2 | Property strip | Five property types as a quiet mono-label row with small line icons | Reveal only |
-| 3 | System explainer | Pinned panel: six tab buttons on the left, one still per tab on the right with a caption | Scroll or click advances; scroll progress mapped to tab index through a spring; reduced motion stacks the six states |
+| 3 | System explainer | Scroll-through list of six steps on the left, sticky still on the right that follows the step in view | IntersectionObserver picks the active step; stills crossfade with opacity only |
 | 4 | 3D building | React Three Fiber: a low-poly mid-rise block of glass and render, a scan sweep line, wash progress filling facade tiles in glass-tint, debris zones shaded in debris amber, a legend, and a "Model is illustrative" note. Video fallback (from the Software still) on low-power phones and reduced motion | Scroll-linked sweep and progress; pointer orbit within 20 degrees |
 | 5 | Two systems | Two portrait cards (M2 and M3 stills), three-line spec lists, links to the system pages | Reveal, stagger |
 | 6 | Places it works | Horizontal card carousel of five tall portraits (P1 to P5), drag, arrow keys, dots | Transform-driven track, 320ms ease |
-| 7 | Landlord story | Pinned two-column sequence: phone frame with the app on the left, property stills on the right (Y1 to Y5), five beats of copy | Scroll-linked crossfades and a progress rail |
+| 7 | Landlord story | Scroll-through list of five beats with a sticky phone frame and still from lg up; each beat carries its own still below lg | IntersectionObserver picks the active beat; app states and stills crossfade with opacity only |
 | 8 | Counters | Five true-fact counters in Geist Mono 300 | Count up once over 1200ms |
 | 9 | Vision letter | Sunken band, letter from Liam Kennedy, photo placeholder, co-founder card | Reveal |
 | 10 | Safety by design | Dark band, four columns with small stills (F1 to F4), pre-launch statement | Reveal, stagger |
@@ -210,8 +210,8 @@ Approval gates: M1 (this round), then M2, M3 and H0 together, then everything el
 
 ## 7. Build plan
 
-- Next.js 16 (App Router, Turbopack), TypeScript 5.9, Tailwind CSS 4 with the identity as `@theme` tokens, Motion for React 13, Lenis 1.3, React Three Fiber 9 and drei 10 for the building, zod 4 for the form, sharp for image work. Fonts from Fontsource.
-- Structure: `src/app` (routes, layout, sitemap, robots, API route), `src/components` (primitives, sections, three), `src/content` (all copy, navigation, statistics with citations), `src/lib` (Lenis provider, motion presets, utilities), `public/media` (optimised assets), `scripts/media` (download and optimise pipeline), `scripts/screenshots.mjs`.
+- Next.js 16 (App Router, Turbopack), TypeScript 5.9, Tailwind CSS 4 with the identity as `@theme` tokens, Motion for React 13, React Three Fiber 9 and drei 10 for the building, zod 4 for the form, sharp for image work. Fonts from Fontsource.
+- Structure: `src/app` (routes, layout, sitemap, robots, API route), `src/components` (primitives, sections, three), `src/content` (all copy, navigation, statistics with citations), `src/lib` (motion presets, IntersectionObserver hooks, video playback helper, utilities), `public/media` (optimised assets), `scripts/media` (download and optimise pipeline), `scripts/screenshots.mjs`.
 - Performance budget: hero video under 4 MB as MP4 and WebM with a poster; images as AVIF/WebP with explicit sizes; everything below the fold lazy; the 3D scene loaded only on capable desktops; largest contentful paint under 2.5s on mobile, which means the hero poster is a small, preloaded AVIF and the film is deferred.
 - Accessibility: WCAG AA contrast for every text pair, visible focus rings, full keyboard operation of tabs, carousel and form, `prefers-reduced-motion` respected everywhere, alt text on every image, no motion that cannot be paused.
 - SEO: per-page metadata, Open Graph image, favicon, `sitemap.xml`, `robots.txt`, canonical URLs, JSON-LD Organization.
