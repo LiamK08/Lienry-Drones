@@ -67,7 +67,7 @@ Scale (1440 to 390, set with `clamp()` so there is one scale): display 76/80px t
 
 ### Surfaces, shape and layout
 
-- Radius: one token, 4px, on every button, card, input, image and container (`rounded-hard`). `rounded-full` is reserved for real circles. No pills, chips or badges: labels are small uppercase letterspaced mono text or a short rule above a heading. No tinted backgrounds, glows, blurred blobs or drop shadows; hairline borders and flat section colours only.
+- Radius: one token, 4px, on every button, card, input, image and container (`rounded-hard`). `rounded-full` is reserved for real circles. No pills, chips, badges or uppercase labels anywhere: a heading gets a short rule above it, and any small supporting text is plain sentence-case sans in the caption size. No tinted backgrounds, glows, blurred blobs or drop shadows; hairline borders and flat section colours only.
 - Buttons 44px tall (52px in the hero), 20px horizontal padding, Hanken 500. Primary: glass fill, plaster label, 1px inner top highlight as a glass edge. Secondary: 1px strong border, ink label. Tertiary: text with a drawn water-line underline. On dark: glass-on-dark fill with ink label.
 - Surfaces are flat: cards separate by a tone step and a hairline, never a drop shadow. The sticky nav is the one exception, with a 1px hairline under it once the page has scrolled.
 - 12-column grid, 24px gutters, page margins 40px at 1280+, 20px at 390. Containers 1280px (grid), 1120px (alternating rows), 880px (statements, founder letter), 700px (prose), 640px (forms). Spacing scale 4, 8, 12, 16, 24, 32, 48, 64, 96, 128, 160. Section padding 128px desktop, 80px mobile.

@@ -118,11 +118,11 @@ export function BuildingModel() {
             </ul>
             <dl className="mt-8 grid grid-cols-2 gap-4 border-t border-hairline pt-6 text-caption text-muted">
               <div>
-                <dt className="readout text-[0.6875rem] uppercase tracking-[0.08em]">Scan</dt>
+                <dt className="text-caption">Scan</dt>
                 <dd className="readout mt-1 text-[1.25rem] text-ink">{Math.round(Math.min(1, p / 0.4) * 100)}%</dd>
               </div>
               <div>
-                <dt className="readout text-[0.6875rem] uppercase tracking-[0.08em]">Wash progress</dt>
+                <dt className="text-caption">Wash progress</dt>
                 <dd className="readout mt-1 text-[1.25rem] text-ink">{Math.round(Math.max(0, Math.min(1, (p - 0.42) / 0.58)) * 100)}%</dd>
               </div>
             </dl>

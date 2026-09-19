@@ -45,8 +45,9 @@ export function Container({ width = "grid", className = "", children }: { width?
   return <div className={`mx-auto w-full ${widths[width]} ${className}`}>{children}</div>;
 }
 
-export function Eyebrow({ children, className = "", as: Tag = "p" }: { children: ReactNode; className?: string; as?: "p" | "span" | "div" }) {
-  return <Tag className={`eyebrow ${className}`}>{children}</Tag>;
+/** A short rule above a heading. It replaces the old uppercase label everywhere. */
+export function Rule({ className = "" }: { className?: string }) {
+  return <span aria-hidden="true" className={`block h-px w-10 bg-ink [.on-dark_&]:bg-plaster/60 ${className}`} />;
 }
 
 export function SectionHeading({
@@ -58,6 +59,7 @@ export function SectionHeading({
   className = "",
   level = 2,
 }: {
+  /** Kept for the content files; when present the heading gets a short rule above it, never a label. */
   eyebrow?: string;
   headline: string;
   intro?: string;
@@ -69,7 +71,7 @@ export function SectionHeading({
   const H = level === 1 ? "h1" : "h2";
   return (
     <div className={`${align === "center" ? "mx-auto text-center" : ""} max-w-statement ${className}`}>
-      {eyebrow ? <Eyebrow className="mb-4">{eyebrow}</Eyebrow> : null}
+      {eyebrow ? <Rule className={`mb-5 ${align === "center" ? "mx-auto" : ""}`} /> : null}
       <H id={id} className={level === 1 ? "text-h1" : "text-h2"}>
         {headline}
       </H>

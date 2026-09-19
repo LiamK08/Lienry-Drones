@@ -55,10 +55,10 @@ export function AlternatingRows({ id, rows }: { id: string; rows: { id: string; 
               <Picture id={row.imageId} alt={`${row.eyebrow}: ${row.title}`} aspect="1/1" sizes="(min-width: 768px) 45vw, 100vw" />
             </div>
             <div className={`md:col-span-5 ${i % 2 === 1 ? "md:order-1 md:col-start-1" : "md:col-start-8"}`}>
-              <p className="eyebrow">{row.eyebrow}</p>
+              <p className="text-caption text-muted">{row.eyebrow}</p>
               <h2 className="mt-3 text-h2">{row.title}</h2>
               <p className="mt-4 max-w-[46ch] text-body text-muted">{row.body}</p>
-              {row.readout ? <p className="readout mt-6 border-t border-hairline pt-3 text-[0.6875rem] uppercase tracking-[0.08em] text-muted">{row.readout}</p> : null}
+              {row.readout ? <p className="mt-6 border-t border-hairline pt-3 text-caption text-muted">{row.readout}</p> : null}
             </div>
           </Reveal>
         ))}
@@ -138,7 +138,7 @@ export function SpecTable({ id, eyebrow, headline, rows }: { id: string; eyebrow
             <dl className="divide-y divide-hairline border-y border-hairline">
               {rows.map(([k, v]) => (
                 <div key={k} className="grid gap-1 py-4 sm:grid-cols-3 sm:gap-6">
-                  <dt className="readout text-[0.75rem] uppercase tracking-[0.08em] text-muted sm:pt-1">{k}</dt>
+                  <dt className="text-small font-medium text-ink sm:pt-0.5">{k}</dt>
                   <dd className="text-body sm:col-span-2">{v}</dd>
                 </div>
               ))}

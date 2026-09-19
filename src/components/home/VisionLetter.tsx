@@ -1,5 +1,5 @@
 import { visionLetter } from "@/content/home";
-import { Container, Section, Eyebrow } from "@/components/ui/Section";
+import { Container, Section, Rule } from "@/components/ui/Section";
 import { Reveal } from "@/components/ui/Reveal";
 
 export function PhotoPlaceholder({ label, className = "" }: { label: string; className?: string }) {
@@ -26,7 +26,7 @@ export function VisionLetter() {
             </div>
           </Reveal>
           <Reveal className="md:col-span-7 md:col-start-6" delay={0.08}>
-            <Eyebrow className="mb-4">{visionLetter.eyebrow}</Eyebrow>
+            <Rule className="mb-5" />
             <h2 id="vision-heading" className="text-h2">
               {visionLetter.headline}
             </h2>

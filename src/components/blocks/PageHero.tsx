@@ -1,17 +1,17 @@
-import { Container, Eyebrow } from "@/components/ui/Section";
+import { Container, Rule } from "@/components/ui/Section";
 import { Picture } from "@/components/ui/Picture";
 import { Reveal } from "@/components/ui/Reveal";
 import type { ReactNode } from "react";
 
 export function PageHero({
-  eyebrow,
   headline,
   lead,
   imageId,
   imageAlt,
   children,
 }: {
-  eyebrow: string;
+  /** Kept for the callers; the page header shows a short rule instead of a label. */
+  eyebrow?: string;
   headline: string;
   lead: string;
   imageId?: string;
@@ -22,7 +22,7 @@ export function PageHero({
     <header className="page-x bg-plaster pt-[calc(var(--nav-h)+3rem)] md:pt-[calc(var(--nav-h)+5rem)]">
       <Container>
         <Reveal>
-          <Eyebrow className="mb-4">{eyebrow}</Eyebrow>
+          <Rule className="mb-6" />
           <h1 className="max-w-[18ch] text-display">{headline}</h1>
           <p className="mt-6 max-w-prose text-lead text-muted">{lead}</p>
           {children ? <div className="mt-8 flex flex-col gap-3 sm:flex-row">{children}</div> : null}

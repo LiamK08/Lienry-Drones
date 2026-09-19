@@ -54,7 +54,7 @@ export function EnquiryForm() {
   return (
     <form onSubmit={onSubmit} noValidate className="space-y-8" aria-describedby={`${id}-note`}>
       <fieldset>
-        <legend className="eyebrow">I am a</legend>
+        <legend className="text-small font-medium">I am a</legend>
         <div className="mt-3 grid gap-2 sm:grid-cols-2">
           {enquiryTypes.map((t) => (
             <label

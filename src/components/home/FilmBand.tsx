@@ -6,6 +6,7 @@ import { getImage, getVideo, largest, srcSet } from "@/lib/media";
 import { bindPlayback } from "@/lib/video";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/ui/Reveal";
+import { Rule } from "@/components/ui/Section";
 
 /**
  * Full-bleed film band: a muted looping clip with a poster, one line of copy and one link.
@@ -15,14 +16,14 @@ import { Reveal } from "@/components/ui/Reveal";
 export function FilmBand({
   videoId,
   stillId,
-  eyebrow,
   headline,
   body,
   cta,
 }: {
   videoId: string;
   stillId: string;
-  eyebrow: string;
+  /** Kept for the callers; the band shows a short rule instead of a label. */
+  eyebrow?: string;
   headline: string;
   body: string;
   cta: { label: string; href: string };
@@ -62,8 +63,8 @@ export function FilmBand({
       </div>
       <div className="page-x mx-auto flex min-h-[70svh] w-full max-w-grid flex-col justify-end pb-14 pt-24 md:min-h-[85svh] md:pb-20">
         <Reveal className="max-w-[34rem]">
-          <p className="eyebrow">{eyebrow}</p>
-          <h2 id="film-heading" className="mt-4 text-h1">
+          <Rule className="mb-5" />
+          <h2 id="film-heading" className="text-h1">
             {headline}
           </h2>
           <p className="mt-5 text-lead text-plaster">{body}</p>
@@ -73,9 +74,7 @@ export function FilmBand({
             </Button>
           </div>
         </Reveal>
-        <div className="mt-10 flex justify-between text-caption text-plaster/70">
-          <span className="readout uppercase tracking-[0.08em]">Concept render</span>
-        </div>
+        <p className="mt-10 text-caption text-plaster/70">Concept render</p>
       </div>
     </section>
   );

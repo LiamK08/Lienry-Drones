@@ -10,11 +10,11 @@ export function Footer() {
           <div className="md:col-span-5">
             <Wordmark />
             <p className="mt-6 max-w-[38ch] text-small text-muted-on-dark">{brand.description}</p>
-            <p className="mt-4 readout text-[0.75rem] uppercase tracking-[0.08em] text-muted-on-dark">{brand.status}</p>
+            <p className="mt-4 text-caption text-muted-on-dark">{brand.status}</p>
           </div>
           {footerColumns.map((col) => (
             <div key={col.heading} className="md:col-span-2 md:col-start-auto">
-              <h2 className="font-sans text-[0.8125rem] font-medium uppercase tracking-[0.08em] text-muted-on-dark">{col.heading}</h2>
+              <h2 className="font-sans text-small font-medium text-plaster">{col.heading}</h2>
               <ul className="mt-4 space-y-2.5">
                 {col.links.map((l) => (
                   <li key={l.href}>
@@ -27,7 +27,7 @@ export function Footer() {
             </div>
           ))}
           <div className="md:col-span-3">
-            <h2 className="font-sans text-[0.8125rem] font-medium uppercase tracking-[0.08em] text-muted-on-dark">Enquire</h2>
+            <h2 className="font-sans text-small font-medium text-plaster">Enquire</h2>
             <ul className="mt-4 space-y-2.5 text-small">
               <li>
                 <Link href="/register-interest" className="text-plaster/90 hover:opacity-70">

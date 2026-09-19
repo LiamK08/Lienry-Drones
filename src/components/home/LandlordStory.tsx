@@ -3,7 +3,7 @@
 import { landlordStory } from "@/content/home";
 import { useActiveStep } from "@/lib/hooks";
 import { Picture } from "@/components/ui/Picture";
-import { Eyebrow } from "@/components/ui/Section";
+import { Rule } from "@/components/ui/Section";
 import { Reveal } from "@/components/ui/Reveal";
 
 const beats = landlordStory.beats;
@@ -22,7 +22,7 @@ function AppScreen({ state }: { state: string }) {
     <div className="flex h-full flex-col bg-plaster text-ink">
       <div className="flex items-center justify-between px-5 pt-5">
         <span className="font-display text-[1.125rem]">Lienry</span>
-        <span className="readout text-[0.625rem] uppercase tracking-[0.08em] text-muted">Rental, Sydney</span>
+        <span className="text-[0.6875rem] text-muted">Rental, Sydney</span>
       </div>
       <div className="mx-5 mt-4 rounded-hard border border-hairline bg-sunken p-3">
         <div className="grid grid-cols-6 gap-1">
@@ -33,7 +33,7 @@ function AppScreen({ state }: { state: string }) {
             />
           ))}
         </div>
-        <p className="mt-2 readout text-[0.625rem] uppercase tracking-[0.08em] text-muted">Property map</p>
+        <p className="mt-2 text-[0.6875rem] text-muted">Property map</p>
       </div>
       <ul className="mt-4 flex-1 space-y-1 px-5">
         {rows.map((r) => (
@@ -93,7 +93,7 @@ export function LandlordStory() {
     <section id="story" aria-labelledby="story-heading" className="page-x section-y bg-plaster">
       <div className="mx-auto max-w-grid">
         <Reveal className="max-w-statement">
-          <Eyebrow className="mb-4">{landlordStory.eyebrow}</Eyebrow>
+          <Rule className="mb-5" />
           <h2 id="story-heading" className="text-h2">
             {landlordStory.headline}
           </h2>

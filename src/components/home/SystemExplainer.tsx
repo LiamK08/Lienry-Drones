@@ -3,7 +3,7 @@
 import { systemExplainer } from "@/content/home";
 import { useActiveStep } from "@/lib/hooks";
 import { Picture } from "@/components/ui/Picture";
-import { Eyebrow } from "@/components/ui/Section";
+import { Rule } from "@/components/ui/Section";
 import { Reveal } from "@/components/ui/Reveal";
 
 const tabs = systemExplainer.tabs;
@@ -19,7 +19,7 @@ export function SystemExplainer() {
     <section id="system" aria-labelledby="system-heading" className="page-x section-y bg-plaster">
       <div className="mx-auto max-w-grid">
         <Reveal className="max-w-statement">
-          <Eyebrow className="mb-4">{systemExplainer.eyebrow}</Eyebrow>
+          <Rule className="mb-5" />
           <h2 id="system-heading" className="text-h2">
             {systemExplainer.headline}
           </h2>
@@ -35,7 +35,7 @@ export function SystemExplainer() {
                 <p className="readout text-[0.75rem] text-glass">0{i + 1}</p>
                 <h3 className={`mt-3 text-h3 transition-colors duration-300 ${i === active ? "text-ink" : "text-ink md:text-muted"}`}>{t.title}</h3>
                 <p className="mt-2 max-w-prose text-body text-muted">{t.body}</p>
-                <p className="readout mt-4 text-[0.6875rem] uppercase tracking-[0.08em] text-muted">{t.readout}</p>
+                <p className="mt-4 text-caption text-muted">{t.readout}</p>
               </li>
             ))}
           </ol>
@@ -54,8 +54,8 @@ export function SystemExplainer() {
               </div>
               <div className="mt-2 flex items-center justify-between">
                 <span className="caption">Concept render</span>
-                <span className="readout text-[0.6875rem] uppercase tracking-[0.08em] text-muted">
-                  0{active + 1} / 0{tabs.length}
+                <span className="readout text-caption text-muted">
+                  {active + 1} / {tabs.length}
                 </span>
               </div>
             </div>

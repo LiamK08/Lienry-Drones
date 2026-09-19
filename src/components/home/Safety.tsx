@@ -20,7 +20,7 @@ export function Safety() {
           ))}
         </RevealList>
         <Reveal className="mt-12 border-t border-plaster/15 pt-6">
-          <p className="readout max-w-[70ch] text-[0.75rem] uppercase tracking-[0.06em] text-muted-on-dark">{safety.note}</p>
+          <p className="max-w-[70ch] text-caption text-muted-on-dark">{safety.note}</p>
         </Reveal>
       </Container>
     </Section>
