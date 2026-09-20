@@ -52,7 +52,7 @@ export function AlternatingRows({ id, rows }: { id: string; rows: { id: string; 
         {rows.map((row, i) => (
           <Reveal key={row.id} as="article" className="grid items-center gap-8 md:grid-cols-12" >
             <div className={`md:col-span-6 ${i % 2 === 1 ? "md:order-2 md:col-start-7" : ""}`} id={row.id}>
-              <Picture id={row.imageId} alt={`${row.eyebrow}: ${row.title}`} aspect="1/1" sizes="(min-width: 768px) 45vw, 100vw" />
+              <Picture id={row.imageId} alt={`${row.eyebrow}: ${row.title}`} aspect="3/2" sizes="(min-width: 768px) 45vw, 100vw" />
             </div>
             <div className={`md:col-span-5 ${i % 2 === 1 ? "md:order-1 md:col-start-1" : "md:col-start-8"}`}>
               <p className="label text-muted">{row.eyebrow}</p>
