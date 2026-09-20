@@ -1,6 +1,6 @@
 # Media log
 
-Every AI-generated asset on the site, with its prompt, model, references, file path and placement. Assets are generated with the connected Higgsfield account, downloaded and optimised by `scripts/media/fetch.mjs` (locally, as the `prebuild` step on the host, or via the "Fetch and optimise media" GitHub Actions workflow), and written to `public/media/`. Each carries a "Concept render" label on the site.
+Every AI-generated asset on the site, with its prompt, model, references, file path and placement. Assets are generated with the connected Higgsfield account, downloaded and optimised by `scripts/media/fetch.mjs` (locally, as the `prebuild` step on the host, or via the "Fetch and optimise media" GitHub Actions workflow), and written to `public/media/`. The "Concept render" labels were removed from the site on request, so this file is now the only record that these are renders.
 
 The whole set was regenerated on 18 September 2026 from an approved design sheet, replacing the pale-grey quadcopter renders of 17 and 18 September. The asset ids and file paths are unchanged, so nothing on the site had to move.
 

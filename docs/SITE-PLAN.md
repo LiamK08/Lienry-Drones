@@ -61,7 +61,7 @@ Two families, self-hosted from Fontsource (`@fontsource/instrument-serif`, `@fon
 
 - Headings: Instrument Serif, weight 400 only, sentence case, never all caps. Line height 1.05 on the display size rising to 1.15 on H3; letter spacing -0.02em throughout.
 - Body, navigation, buttons and labels: Inter with `font-optical-sizing: auto`, weights 400 and 500. Body line height 1.55, no letter spacing, a measure capped at 68 characters.
-- Small labels: Inter 500, 12px, uppercase, 0.12em. The only uppercase on the site: figure captions ("Concept render"), the software window's section labels, step numbers and footer column heads.
+- Small labels: Inter 500, 12px, uppercase, 0.12em. The only uppercase on the site: the software window's section labels, step numbers and footer column heads.
 - Numerals in the counters and the software window: Inter with tabular figures so nothing jumps while a value animates; the big statistics run at weight 300.
 
 Scale, one `clamp()` per step from 390 to 1440 wide: display 64 to 96px; H1 44 to 64; H2 32 to 44; H3 24 to 28; lead 18 to 20; body 17 to 18; small 14; label 12; statistic numerals 56 to 96. There is no step between H3 and body: every heading element on the site, down to a card title or an FAQ question, sits on H3 in Instrument Serif. Everything is left aligned except the home hero, which centres its headline low in the frame.
@@ -88,7 +88,7 @@ The measure is 68 characters and the token that carries it is `45ch`. CSS `ch` i
 
 ### Imagery direction
 
-Photoreal AI stills and short loops, each with a small "Concept render" label. Early morning light only (sun 15 to 30 degrees, or bright overcast), soft haze, long soft shadows, cool highlights, warm lifted shadows. Subjects: mid-rise commercial glass under 70 metres (6 to 18 storeys, never a skyline tower), a rooftop plant deck with the weatherproof capsule, thin sheets of water running down curtain-wall glass, solar panels beaded with water, a wet driveway on a quiet suburban street, the ground pod beside a garden tap, a solar farm row at first light. No landmarks, no signage, no logos, no faces, no aviation markings, no sci-fi.
+Photoreal AI stills and short loops. The "Concept render" labels were removed on request, so nothing on the page marks them as renders. Early morning light only (sun 15 to 30 degrees, or bright overcast), soft haze, long soft shadows, cool highlights, warm lifted shadows. Subjects: mid-rise commercial glass under 70 metres (6 to 18 storeys, never a skyline tower), a rooftop plant deck with the weatherproof capsule, thin sheets of water running down curtain-wall glass, solar panels beaded with water, a wet driveway on a quiet suburban street, the ground pod beside a garden tap, a solar farm row at first light. No landmarks, no signage, no logos, no faces, no aviation markings, no sci-fi.
 
 ## 4. Copy direction
 
@@ -138,7 +138,7 @@ Candidates that were found but not verified against their primary source in this
 
 | # | Section | Content and media | Motion |
 | --- | --- | --- | --- |
-| 1 | Hero | Full-viewport film (H1 shot), poster image, eyebrow, headline, support line, two buttons, "Concept render" label, scroll cue | Headline words settle in over 900ms after the poster loads; video fades in when ready |
+| 1 | Hero | Full-viewport film (H1 shot), poster image, eyebrow, headline, support line, two buttons, scroll cue | Headline words settle in over 900ms after the poster loads; video fades in when ready |
 | 2 | Property strip | Five property types as a quiet mono-label row with small line icons | Reveal only |
 | 3 | System explainer | Scroll-through list of six steps on the left, sticky still on the right that follows the step in view | IntersectionObserver picks the active step; stills crossfade with opacity only |
 | 4 | Software view | The desktop software as an app window: title bar with the project and a Live mark, a zone tree (north facade, east facade, roof glazing, ground floor shopfront) with surface type and pressure preset, layer toggles for Scan, Wash, Debris and Zones, a stats panel (scan age, wash progress, panels completed, debris zones, next clean) and a timeline that scrubs the wash. Inside it a React Three Fiber model of a 12-storey block (3.2 m floors, slabs, mullion grid, recessed glass, parapet, roof plant, glazed lantern, roof capsule with tether reel) with instanced physical glass, a debris heat map, a scan sweep that reveals a point cloud, the hexacopter on its route with a sagging tether, an environment from light formers, contact shadows and a slow damped auto orbit. Phones and reduced motion get a 12 s recording. A "Demo data" tag and the line "Model is illustrative. The software renders the real building from its scan." stay in view. |
@@ -224,7 +224,7 @@ Approval gates: M1 (this round), then M2, M3 and H0 together, then everything el
 - No customers, logos, testimonials, results, prices, certifications or CASA approval anywhere.
 - Every statistic on the site is in the verified table above and cited on the page.
 - The hose-free model appears once, on the Company page, as an idea in development.
-- Every AI visual carries a "Concept render" label. No AI portraits of the founders.
+- AI visuals no longer carry a "Concept render" label; it was removed on request. No AI portraits of the founders.
 - Pre-launch wording on every page: register interest, pilot program, in development.
 
 ## 9. Open items for Liam

@@ -37,7 +37,7 @@ Colour analysis of the hero frames: at t=0 the frame averages `#4C4133` (luminan
 
 Why it works: the film carries the emotion and the words stay out of its way. Because the headline is low and short, the eye reads film first, promise second, action third.
 
-Lienry's take: a full-viewport Higgsfield film of the drone finishing a glass wash at dawn, water sheeting off the facade, poster image shown until the MP4 is ready, both under 4 MB. Headline low in the frame, one support line, one Register interest button. A small "Concept render" label in the corner, honest about the pre-launch status.
+Lienry's take: a full-viewport Higgsfield film of the drone finishing a glass wash at dawn, water sheeting off the facade, poster image shown until the MP4 is ready, both under 4 MB. Headline low in the frame, one support line, one Register interest button. A small "Concept render" label in the corner was part of the original build and has since been removed on request.
 
 ### 3.2 Pinned explainer (the interactive product diagram)
 

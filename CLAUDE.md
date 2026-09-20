@@ -13,7 +13,9 @@ and confirm all three are clean.
 
 Honesty: no customers, logos, testimonials, results, prices, certifications or approvals
 are claimed anywhere. Statistics come only from `src/content/stats.ts`, each cited to its
-primary source. AI visuals carry a "Concept render" label.
+primary source. The imagery is AI-generated and no longer carries a "Concept render"
+label; it was removed on request, so nothing on the page tells a visitor the renders are
+not photographs.
 
 Type: two families only, Instrument Serif for headings and Inter for everything else.
 Every size comes from a step of the scale in `src/app/globals.css`; there is no step

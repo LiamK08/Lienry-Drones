@@ -48,12 +48,11 @@ export function SystemExplainer() {
                     className={`absolute inset-0 transition-opacity duration-500 ease-instrument ${i === active ? "opacity-100" : "opacity-0"}`}
                     aria-hidden={i !== active}
                   >
-                    <Picture id={t.imageId} alt={`${t.tab}: ${t.title}`} aspect="4/3" sizes="55vw" label={false} />
+                    <Picture id={t.imageId} alt={`${t.tab}: ${t.title}`} aspect="4/3" sizes="55vw" />
                   </div>
                 ))}
               </div>
-              <div className="mt-2 flex items-center justify-between">
-                <span className="label text-muted">Concept render</span>
+              <div className="mt-2 flex items-center justify-end">
                 <span className="readout text-small text-muted">
                   {active + 1} / {tabs.length}
                 </span>

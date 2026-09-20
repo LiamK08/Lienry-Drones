@@ -74,10 +74,7 @@ export function Footer() {
             </p>
             <div className="mt-8 flex flex-col gap-3 text-caption text-muted-on-dark md:flex-row md:items-center md:justify-between">
               <p>© 2026 Lienry Drones. {brand.location}.</p>
-              <p>
-                Concept renders are labelled. No customers, results or approvals
-                are claimed.
-              </p>
+              <p>No customers, results or approvals are claimed.</p>
             </div>
           </div>
         </div>

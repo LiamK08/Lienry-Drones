@@ -60,7 +60,9 @@ The mark is three building silhouettes with the flight arc cut through them, sup
 
 ## Honesty rules baked in
 
-No customers, logos, testimonials, results, prices, certifications or approvals are claimed anywhere. Statistics come only from `src/content/stats.ts`, each verified against and cited to its primary source. AI visuals carry a "Concept render" label. The founders' photos are placeholders until real photos are supplied.
+No customers, logos, testimonials, results, prices, certifications or approvals are claimed anywhere. Statistics come only from `src/content/stats.ts`, each verified against and cited to its primary source. The founders' photos are placeholders until real photos are supplied.
+
+The imagery is AI-generated. It used to carry a "Concept render" caption under every figure, and a footer line saying so; both were removed on request, so a visitor now has nothing on the page telling them these are renders rather than photographs of a working product. `docs/MEDIA.md` still records every asset with its prompt and model.
 
 ## Deploy
 

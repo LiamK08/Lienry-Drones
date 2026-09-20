@@ -126,11 +126,10 @@ export function LandlordStory() {
                 <div className="relative" style={{ aspectRatio: "4/5" }}>
                   {images.map((id) => (
                     <div key={id} className={`absolute inset-0 transition-opacity duration-500 ease-instrument ${id === beat.imageId ? "opacity-100" : "opacity-0"}`} aria-hidden={id !== beat.imageId}>
-                      <Picture id={id} alt={beats.find((b) => b.imageId === id)?.title ?? ""} aspect="4/5" sizes="30vw" label={false} />
+                      <Picture id={id} alt={beats.find((b) => b.imageId === id)?.title ?? ""} aspect="4/5" sizes="30vw" />
                     </div>
                   ))}
                 </div>
-                <p className="label mt-2 text-muted">Concept render</p>
               </div>
             </div>
           </div>

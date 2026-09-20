@@ -108,7 +108,6 @@ export function Hero() {
             {hero.secondary.label}
           </a>
         </motion.div>
-        <p className="label mt-14 text-white/60">Concept render</p>
       </div>
     </section>
   );

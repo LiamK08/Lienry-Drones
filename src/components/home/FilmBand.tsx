@@ -104,7 +104,6 @@ export function FilmBand({
               </Button>
             </div>
           </Reveal>
-          <p className="label mt-10 text-plaster/70">Concept render</p>
         </div>
       </div>
     </section>
