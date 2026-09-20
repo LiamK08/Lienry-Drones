@@ -55,21 +55,15 @@ export function Container({ width = "grid", className = "", children }: { width?
   );
 }
 
-/** A short rule above a heading. It replaces the old uppercase label everywhere. */
-export function Rule({ className = "" }: { className?: string }) {
-  return <span aria-hidden="true" className={`block h-px w-10 bg-ink [.on-dark_&]:bg-plaster/60 ${className}`} />;
-}
-
 /** Every heading on the site is left aligned; only the home hero centres. */
 export function SectionHeading({
-  eyebrow,
   headline,
   intro,
   id,
   className = "",
   level = 2,
 }: {
-  /** Kept for the content files; when present the heading gets a short rule above it, never a label. */
+  /** Kept for the content files; nothing is rendered above the heading. */
   eyebrow?: string;
   headline: string;
   intro?: string;
@@ -80,7 +74,6 @@ export function SectionHeading({
   const H = level === 1 ? "h1" : "h2";
   return (
     <div className={`max-w-statement ${className}`}>
-      {eyebrow ? <Rule className="mb-5" /> : null}
       <H id={id} className={level === 1 ? "text-h1" : "text-h2"}>
         {headline}
       </H>

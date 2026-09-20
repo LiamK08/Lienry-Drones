@@ -5,9 +5,6 @@
 export const softwareSection = {
   headline: "The software sees the whole building.",
   body: "Every clean starts from the scan. The desktop software renders the building as a model, plans the wash route, tracks progress live and shades the areas where debris has built up.",
-  note: "Model is illustrative. The software renders the real building from its scan.",
-  filmCaption: "The same kind of facade on a real building.",
-  filmId: "h1-hero-film",
 };
 
 export type ZoneId = "north" | "east" | "roof" | "shopfront";

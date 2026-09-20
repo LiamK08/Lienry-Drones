@@ -6,7 +6,6 @@ import { getImage, getVideo, largest, srcSet } from "@/lib/media";
 import { bindPlayback } from "@/lib/video";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/ui/Reveal";
-import { Rule } from "@/components/ui/Section";
 
 /**
  * Full-bleed film band: a muted looping clip with a poster, one line of copy and one link.
@@ -22,7 +21,7 @@ export function FilmBand({
 }: {
   videoId: string;
   stillId: string;
-  /** Kept for the callers; the band shows a short rule instead of a label. */
+  /** Kept for the callers; nothing is rendered above the headline. */
   eyebrow?: string;
   headline: string;
   body: string;
@@ -93,7 +92,6 @@ export function FilmBand({
       <div className="page-x flex min-h-[70svh] flex-col justify-end pb-14 pt-24 md:min-h-[85svh] md:pb-20">
         <div className="mx-auto w-full max-w-grid">
           <Reveal className="max-w-[34rem]">
-            <Rule className="mb-5" />
             <h2 id="film-heading" className="text-h1">
               {headline}
             </h2>

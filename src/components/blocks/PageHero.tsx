@@ -1,4 +1,4 @@
-import { Container, Rule } from "@/components/ui/Section";
+import { Container } from "@/components/ui/Section";
 import { Picture } from "@/components/ui/Picture";
 import { Reveal } from "@/components/ui/Reveal";
 import type { ReactNode } from "react";
@@ -10,7 +10,7 @@ export function PageHero({
   imageAlt,
   children,
 }: {
-  /** Kept for the callers; the page header shows a short rule instead of a label. */
+  /** Kept for the callers; nothing is rendered above the headline. */
   eyebrow?: string;
   headline: string;
   lead: string;
@@ -22,7 +22,6 @@ export function PageHero({
     <header className="page-x bg-plaster pt-[calc(var(--nav-h)+3rem)] md:pt-[calc(var(--nav-h)+5rem)]">
       <Container>
         <Reveal>
-          <Rule className="mb-6" />
           <h1 className="max-w-[18ch] text-display">{headline}</h1>
           <p className="mt-6 max-w-prose text-lead text-muted">{lead}</p>
           {children ? <div className="mt-8 flex flex-col gap-3 sm:flex-row">{children}</div> : null}

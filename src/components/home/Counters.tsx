@@ -1,5 +1,5 @@
 import { counters } from "@/content/home";
-import { Container, Section, Rule } from "@/components/ui/Section";
+import { Container, Section } from "@/components/ui/Section";
 import { Counter } from "@/components/ui/Counter";
 import { RevealItem, RevealList } from "@/components/ui/Reveal";
 
@@ -10,7 +10,6 @@ export function Counters() {
         <h2 id="facts-heading" className="sr-only">
           {counters.eyebrow}
         </h2>
-        <Rule className="mb-10" />
         <RevealList className="grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-5 md:gap-x-8">
           {counters.items.map((c) => (
             <RevealItem key={c.label} className="flex flex-col">

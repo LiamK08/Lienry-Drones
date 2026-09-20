@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { registerPage } from "@/content/pages";
-import { Container, Rule } from "@/components/ui/Section";
+import { Container } from "@/components/ui/Section";
 import { EnquiryForm } from "@/components/forms/EnquiryForm";
 
 export const metadata: Metadata = {
@@ -15,7 +15,6 @@ export default function RegisterInterestPage() {
     <div className="page-x bg-plaster pb-[var(--section-y)] pt-[calc(var(--nav-h)+3rem)] md:pt-[calc(var(--nav-h)+5rem)]">
       <Container className="grid gap-12 md:grid-cols-12">
         <div className="md:col-span-5">
-          <Rule className="mb-6" />
           <h1 className="text-h1">{registerPage.headline}</h1>
           <p className="mt-5 max-w-prose text-lead text-muted">{registerPage.lead}</p>
           <dl className="mt-10 max-w-prose space-y-4 border-t border-hairline pt-6 text-small">
