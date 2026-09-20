@@ -6,10 +6,9 @@ import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type CS
 import { useCanRender3d, useMediaQuery, useOnScreen } from "@/lib/hooks";
 import { captureVariant, isCapture, now, onTick } from "@/lib/clock";
 import { bindPlayback } from "@/lib/video";
-import { getVideo } from "@/lib/media";
 import { layers as LAYERS, project, softwareSection, zones, type LayerId, type ZoneId } from "@/content/software";
 import { DEFAULT_LAYERS, createControl, type HoverInfo, type Layers } from "@/components/three/software/control";
-import { Container, Rule, Section } from "@/components/ui/Section";
+import { Container, Section } from "@/components/ui/Section";
 import { Reveal } from "@/components/ui/Reveal";
 
 const SoftwareScene = dynamic(() => import("@/components/three/SoftwareScene"), { ssr: false, loading: () => null });
@@ -68,7 +67,6 @@ export function SoftwareView() {
   const dragging = useRef(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const live = can3d && !reduce;
-  const film = getVideo(softwareSection.filmId);
   const capture = useSyncExternalStore(noop, captureVariant, () => null);
 
   // Warm the three.js chunk in idle time so its evaluation never lands mid-scroll.
@@ -188,7 +186,6 @@ export function SoftwareView() {
     <Section id="software-view" ariaLabelledby="software-heading" tone="raised" className="border-y border-hairline">
       <Container>
         <Reveal className="max-w-statement">
-          <Rule className="mb-5" />
           <h2 id="software-heading" className="text-h2">
             {softwareSection.headline}
           </h2>
@@ -346,38 +343,7 @@ export function SoftwareView() {
             </div>
           </div>
         </div>
-
-        <div className="mt-6 grid gap-6 md:grid-cols-12 md:items-end">
-          <p className="max-w-[44ch] text-caption text-muted md:col-span-6">{softwareSection.note}</p>
-          <figure className="md:col-span-5 md:col-start-8">
-            <div className="relative overflow-hidden rounded-hard bg-sunken" style={{ aspectRatio: "16/9" }}>
-              {film ? (
-                <FilmTile id={softwareSection.filmId} paused={!!reduce} />
-              ) : (
-                <div className="flex h-full items-end p-3" data-media-placeholder={softwareSection.filmId}>
-                  <span className="caption">Film to come</span>
-                </div>
-              )}
-            </div>
-            <figcaption className="caption mt-2">{softwareSection.filmCaption}</figcaption>
-          </figure>
-        </div>
       </Container>
     </Section>
-  );
-}
-
-function FilmTile({ id, paused }: { id: string; paused: boolean }) {
-  const ref = useRef<HTMLVideoElement>(null);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || paused) return;
-    return bindPlayback(el, 0.3);
-  }, [paused]);
-  return (
-    <video ref={ref} className="h-full w-full object-cover" muted loop playsInline preload="metadata" controls={paused} poster={`/media/${id}-poster.jpg`}>
-      <source src={`/media/${id}.webm`} type="video/webm" />
-      <source src={`/media/${id}.mp4`} type="video/mp4" />
-    </video>
   );
 }

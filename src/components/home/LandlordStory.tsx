@@ -3,7 +3,6 @@
 import { landlordStory } from "@/content/home";
 import { useActiveStep } from "@/lib/hooks";
 import { Picture } from "@/components/ui/Picture";
-import { Rule } from "@/components/ui/Section";
 import { Reveal } from "@/components/ui/Reveal";
 
 const beats = landlordStory.beats;
@@ -95,7 +94,6 @@ export function LandlordStory() {
     <section id="story" aria-labelledby="story-heading" className="page-x section-y bg-plaster">
       <div className="mx-auto max-w-grid">
         <Reveal className="max-w-statement">
-          <Rule className="mb-5" />
           <h2 id="story-heading" className="text-h2">
             {landlordStory.headline}
           </h2>

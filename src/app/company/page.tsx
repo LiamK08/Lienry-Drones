@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { companyPage } from "@/content/pages";
 import { CtaBlock, Tiles } from "@/components/blocks/Blocks";
-import { Container, Section, SectionHeading, Rule } from "@/components/ui/Section";
+import { Container, Section, SectionHeading } from "@/components/ui/Section";
 import { Reveal } from "@/components/ui/Reveal";
 import { PhotoPlaceholder } from "@/components/home/VisionLetter";
 import { Picture } from "@/components/ui/Picture";
@@ -19,7 +19,6 @@ export default function CompanyPage() {
       <header className="page-x bg-plaster pt-[calc(var(--nav-h)+3rem)] md:pt-[calc(var(--nav-h)+5rem)]">
         <Container width="statement">
           <Reveal>
-            <Rule className="mb-6" />
             <h1 className="text-h2 text-muted">{c.headline}</h1>
             <p className="mt-8 max-w-none font-display text-h2">{c.statement}</p>
           </Reveal>
