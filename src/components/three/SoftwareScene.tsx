@@ -129,7 +129,7 @@ function Rig({ controlRef, clockRef }: { controlRef: RefObject<SceneControl>; cl
       c.target.lerpVectors(fl.fromT, fl.toT, e);
       if (u >= 1) flight.current = null;
     }
-    c.autoRotate = !fl && t > pauseUntil.current;
+    c.autoRotate = control.active && !fl && t > pauseUntil.current;
     c.update(dt);
   });
   return null;

@@ -234,3 +234,11 @@ Approval gates: M1 (this round), then M2, M3 and H0 together, then everything el
 3. Supply the co-founder's name, title and photo, plus Liam's photo, for the Company page and the vision letter.
 4. Confirm the email address that enquiries should go to, or a webhook URL for the form.
 5. Confirm the domain (the plan assumes lienry.com for metadata).
+
+## Current implementation — 22 September 2026
+
+The latest user brief supersedes earlier contradictions in this document. Work is reviewed in a feature-branch pull request; production is not pushed directly. AI visuals must carry Concept render captions. The confirmed domain is www.lienrydrones.com and two founders are confirmed.
+
+The home explorer and landlord story now use compact, keyboard-operable disclosures instead of long scroll sequences. Product comparisons and feature columns are open layouts rather than boxed cards. Native scrolling and the existing imagery remain. The footer uses an editorial grid and native mobile disclosures. The software retains its coded model, zone list, layer controls and timeline, with an illustrative-model note and pause control. Reduced motion uses a still video poster with native play controls so playback is a deliberate user choice.
+
+The revised scale uses 16px reading text, 13px captions and fluid Instrument Serif headings. Palette and 4px radius are unchanged. Primary page content is visible immediately; only secondary content uses entry reveals. The header changes surface and text together to maintain contrast in every state.

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { nav } from "@/lib/site";
 import { useScrolledPast } from "@/lib/hooks";
 import { Button } from "@/components/ui/Button";
@@ -23,10 +23,20 @@ export function Nav() {
   const [open, setOpen] = useState(false);
   const reduce = useReducedMotion();
   const panelId = useId();
+  const headerRef = useRef<HTMLElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    const focusables = () => Array.from(headerRef.current?.querySelectorAll<HTMLElement>('a[href],button:not([disabled])') ?? []).filter(el => el.getClientRects().length > 0);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { setOpen(false); menuButtonRef.current?.focus(); }
+      if (e.key === "Tab") {
+        const items = focusables(); const first = items[0]; const last = items[items.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
+      }
+    };
     document.addEventListener("keydown", onKey);
 
     // Lock the element that actually scrolls. globals.css sets overflow-x on <html>, which stops
@@ -63,10 +73,14 @@ export function Nav() {
 
   const overHero = pathname === "/" && !scrolled;
   const dark = overHero && !open;
-  const solid = scrolled && !open;
+  const solid = (scrolled || pathname !== "/") && !open;
 
   return (
     <header
+      ref={headerRef}
+      role={open ? "dialog" : undefined}
+      aria-modal={open ? true : undefined}
+      aria-label={open ? "Menu" : undefined}
       className={`nav-bar fixed inset-x-0 top-0 z-50 h-[var(--nav-h)] border-b ${
         solid ? "border-hairline bg-plaster" : open ? "border-transparent bg-plaster" : "border-transparent bg-transparent"
       } ${dark ? "on-dark text-white" : "text-ink"}`}
@@ -91,7 +105,7 @@ export function Nav() {
           })}
         </ul>
         <Link href="/" aria-label="Lienry Drones home" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-hard">
-          <Mark className="h-7 w-auto" animate />
+          <Mark className="h-7 w-auto" />
         </Link>
         <div className="ml-auto flex items-center">
           <div className="hidden lg:block">
@@ -100,6 +114,7 @@ export function Nav() {
             </Button>
           </div>
           <button
+            ref={menuButtonRef}
             type="button"
             className="-mr-2 inline-flex h-11 w-11 items-center justify-center rounded-hard lg:hidden"
             aria-expanded={open}
@@ -121,9 +136,6 @@ export function Nav() {
         {open ? (
           <motion.div
             id={panelId}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Menu"
             className="fixed inset-x-0 top-[var(--nav-h)] bottom-0 z-40 flex flex-col overflow-y-auto bg-plaster px-[15px] text-ink md:px-6 lg:hidden"
             initial={reduce ? false : { opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}

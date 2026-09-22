@@ -11,6 +11,8 @@ import { DEFAULT_LAYERS, createControl, type HoverInfo, type Layers } from "@/co
 import { Container, Section } from "@/components/ui/Section";
 import { Reveal } from "@/components/ui/Reveal";
 
+const PanelReadouts = dynamic(() => import("./PanelReadouts"), { ssr: false, loading: () => <p className="mt-3 text-caption" role="status">Loading panel data…</p> });
+
 const SoftwareScene = dynamic(() => import("@/components/three/SoftwareScene"), { ssr: false, loading: () => null });
 
 const CYCLE_MS = 48000;
@@ -59,6 +61,7 @@ export function SoftwareView() {
   const [viewRef, onScreen] = useOnScreen<HTMLDivElement>("0px");
   const controlRef = useRef(createControl());
   const [layers, setLayers] = useState<Layers>(() => ({ ...DEFAULT_LAYERS }));
+  const [readoutsOpen, setReadoutsOpen] = useState(false);
   const [selected, setSelected] = useState<ZoneId | null>(null);
   const [wash, setWash] = useState(0);
   const [playing, setPlaying] = useState(true);
@@ -86,9 +89,9 @@ export function SoftwareView() {
 
   useEffect(() => {
     const control = controlRef.current;
-    control.active = live && onScreen;
+    control.active = live && onScreen && playing;
     control.requestFrame();
-  }, [live, onScreen]);
+  }, [live, onScreen, playing]);
 
   useEffect(() => {
     controlRef.current.onHover = (info, x, y) => {
@@ -101,7 +104,7 @@ export function SoftwareView() {
 
   // The wash runs along the route on its own; the timeline scrubs it, and the numbers follow the model.
   useEffect(() => {
-    if (!live || !onScreen) return;
+    if (!live || !onScreen || !playing) return;
     const control = controlRef.current;
     const capture = isCapture();
     const cycle = capture ? CAPTURE_CYCLE_MS : CYCLE_MS;
@@ -142,9 +145,9 @@ export function SoftwareView() {
 
   useEffect(() => {
     const el = videoRef.current;
-    if (!el || live || reduce) return;
+    if (!el || live || reduce || !playing) { el?.pause(); return; }
     return bindPlayback(el, 0.2);
-  }, [live, reduce, wide]);
+  }, [live, reduce, wide, playing]);
 
   const toggle = useCallback((id: LayerId) => {
     const control = controlRef.current;
@@ -202,9 +205,9 @@ export function SoftwareView() {
               <div className="flex shrink-0 items-center gap-4">
                 <span className="label flex items-center gap-2 whitespace-nowrap text-ink">
                   <span className="h-1.5 w-1.5 bg-water" aria-hidden="true" />
-                  Live
+                  Preview
                 </span>
-                <span className="label whitespace-nowrap border border-hairline px-1.5 py-1 text-muted">Demo data</span>
+                <span className="label whitespace-nowrap text-muted">Demo data</span>
               </div>
             </div>
 
@@ -256,7 +259,7 @@ export function SoftwareView() {
               <div
                 ref={viewRef}
                 className={capture === "tall" ? "relative aspect-[4/5]" : "relative aspect-[4/5] md:aspect-auto md:h-[34rem] lg:h-[38rem]"}
-                style={{ background: "linear-gradient(to bottom, #fbf9f4 0%, #f1ece3 55%, #e6e0d4 100%)" }}
+                style={{ background: "var(--color-raised)" }}
                 onPointerLeave={() => setHover(null)}
               >
                 {live ? (
@@ -311,11 +314,11 @@ export function SoftwareView() {
               <button
                 type="button"
                 onClick={() => setPlaying((p) => !p)}
-                disabled={!live}
-                aria-label={playing ? "Pause the wash" : "Play the wash"}
+                disabled={!!reduce}
+                aria-label={playing ? "Pause preview" : "Play preview"}
                 className="flex h-7 w-7 items-center justify-center rounded-hard border border-hairline text-ink hover:bg-sunken disabled:opacity-50"
               >
-                <PlayIcon playing={playing && live} />
+                <PlayIcon playing={playing && !reduce} />
               </button>
               <span className="label w-12 text-muted">Wash</span>
               <input
@@ -341,6 +344,13 @@ export function SoftwareView() {
               />
               <span className="readout w-12 text-right text-small text-ink">{Math.round(pct)}%</span>
             </div>
+          </div>
+          <div className="mt-4 flex flex-col gap-3 md:flex-row md:justify-between">
+            <p className="text-caption text-muted">Model is illustrative. The software will render each property from its scan.</p>
+            <details className="text-caption text-muted md:w-[28rem]" onToggle={e => setReadoutsOpen(e.currentTarget.open)}>
+              <summary className="cursor-pointer underline underline-offset-4">Inspect panel data</summary>
+              {readoutsOpen ? <PanelReadouts /> : null}
+            </details>
           </div>
         </div>
       </Container>

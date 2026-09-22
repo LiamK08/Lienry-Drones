@@ -7,7 +7,7 @@ import { LandlordStory } from "@/components/home/LandlordStory";
 import { Button } from "@/components/ui/Button";
 
 export const metadata: Metadata = {
-  title: "Homes and Rentals",
+  title: "Lienry Drones",
   description: "A waterproof ground pod, a drone that knows each material, and an app that starts the clean wherever you are. For houses, apartments, rentals and solar farms.",
   alternates: { canonical: "/homes-and-rentals" },
 };
@@ -20,7 +20,7 @@ export default function HomesPage() {
         <Button href="/register-interest?type=homeowner" size="lg">
           Register interest
         </Button>
-        <Button href="/register-interest?type=landlord" size="lg" variant="secondary">
+        <Button href="/register-interest?type=landlord" size="md" variant="tertiary" arrow>
           I own rentals
         </Button>
       </PageHero>

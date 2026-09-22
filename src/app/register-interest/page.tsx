@@ -5,7 +5,7 @@ import { Container } from "@/components/ui/Section";
 import { EnquiryForm } from "@/components/forms/EnquiryForm";
 
 export const metadata: Metadata = {
-  title: "Register interest",
+  title: "Lienry Drones",
   description: "Tell us about your property. Homeowners, landlords, commercial pilot buildings and investors.",
   alternates: { canonical: "/register-interest" },
 };

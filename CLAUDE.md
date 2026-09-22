@@ -2,20 +2,18 @@
 
 ## Branch and deploy
 
-`main` is production: Vercel builds it to lienrydrones.com. Work lands on `main`, and
-that is what makes a change visible on the live site. A feature branch only ever gets a
-Vercel preview URL, so leaving work on one means the site does not change.
-
-Before pushing to `main`, run `npm run typecheck`, `npm run lint` and `npm run build`,
-and confirm all three are clean.
+`main` is production and deploys to www.lienrydrones.com. Work on a feature branch
+and open a pull request with desktop (1440px) and mobile (390px) screenshots.
+Never push straight to `main`. Run typecheck, lint and build before requesting review.
+The user's current project brief wins over older notes in this repository.
 
 ## The rules this site is built on
 
 Honesty: no customers, logos, testimonials, results, prices, certifications or approvals
 are claimed anywhere. Statistics come only from `src/content/stats.ts`, each cited to its
-primary source. The imagery is AI-generated and no longer carries a "Concept render"
-label; it was removed on request, so nothing on the page tells a visitor the renders are
-not photographs.
+primary source. The imagery is AI-generated and every image or film carries a plain Concept render
+caption. The coded software preview carries Demo data and an illustrative-model note.
+No new or replacement media without the user's instructions.
 
 Type: two families only, Instrument Serif for headings and Inter for everything else.
 Every size comes from a step of the scale in `src/app/globals.css`; there is no step

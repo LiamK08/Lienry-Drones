@@ -1,134 +1,68 @@
 "use client";
 
+import { useState } from "react";
 import { landlordStory } from "@/content/home";
-import { useActiveStep } from "@/lib/hooks";
 import { Picture } from "@/components/ui/Picture";
 import { Reveal } from "@/components/ui/Reveal";
 
 const beats = landlordStory.beats;
-const states = Array.from(new Set(beats.map((b) => b.app)));
-const images = Array.from(new Set(beats.map((b) => b.imageId)));
 
-function AppScreen({ state }: { state: string }) {
-  const rows = [
-    { name: "Solar panels", checked: state !== "map", pct: state === "progress" ? 64 : state === "done" ? 100 : 0 },
-    { name: "Driveway", checked: state !== "map", pct: state === "progress" ? 31 : state === "done" ? 100 : 0 },
-    { name: "Windows", checked: false, pct: 0 },
-    { name: "Walls", checked: false, pct: 0 },
-    { name: "Roofing", checked: false, pct: 0 },
-  ];
+/** An illustrative interface, deliberately a flat app panel rather than a decorative phone. */
+function AppPreview({ state }: { state: string }) {
+  const selected = state !== "map";
+  const complete = state === "done";
+  const progressing = state === "progress";
   return (
-    <div className="flex h-full flex-col bg-plaster text-ink">
-      <div className="flex items-center justify-between px-5 pt-5">
-        {/* Fixed at 18px: this is UI inside a fixed-width device frame, so it must not flow with the
-            viewport the way the page's own type does. */}
-        <span className="font-display text-[1.125rem] leading-none tracking-[-0.02em]">Lienry</span>
-        <span className="label text-muted">Rental, Sydney</span>
+    <div className="rounded-hard border border-hairline bg-raised p-5 md:p-6" aria-label="Illustrative mobile app, demo data">
+      <div className="flex items-center justify-between gap-4 border-b border-hairline pb-5">
+        <span className="text-small font-medium">Your property</span><span className="label text-muted">Demo data</span>
       </div>
-      <div className="mx-5 mt-4 rounded-hard border border-hairline bg-sunken p-3">
-        <div className="grid grid-cols-6 gap-1">
-          {Array.from({ length: 18 }).map((_, i) => (
-            <span
-              key={i}
-              className={`h-4 ${[2, 3, 8, 9].includes(i) ? (state === "done" ? "bg-glass/35" : state === "map" ? "bg-hairline" : "bg-glass/70") : [13, 14, 15, 16].includes(i) ? (state === "done" ? "bg-glass/35" : state === "map" ? "bg-hairline" : "bg-debris/60") : "bg-hairline"}`}
-            />
-          ))}
-        </div>
-        <p className="label mt-2 text-muted">Property map</p>
-      </div>
-      <ul className="mt-4 flex-1 space-y-1 px-5">
-        {rows.map((r) => (
-          <li key={r.name} className="flex items-center gap-3 rounded-hard border border-hairline bg-raised px-3 py-2.5">
-            <span className={`flex h-4 w-4 items-center justify-center rounded-hard border ${r.checked ? "border-ink bg-ink" : "border-border-strong"}`} aria-hidden="true">
-              {r.checked ? (
-                <svg viewBox="0 0 12 12" className="h-3 w-3 text-plaster" fill="none" stroke="currentColor" strokeWidth="1.6">
-                  <path d="M2.5 6.5 5 9l4.5-5.5" />
-                </svg>
-              ) : null}
-            </span>
-            <span className="text-small font-medium">{r.name}</span>
-            {r.pct > 0 ? (
-              <span className="ml-auto flex items-center gap-2">
-                <span className="h-1 w-14 overflow-hidden bg-hairline">
-                  <span className="block h-full w-full origin-left bg-water transition-transform duration-700 ease-instrument" style={{ transform: `scaleX(${r.pct / 100})` }} />
-                </span>
-                <span className="readout text-label tracking-normal text-muted">{r.pct}%</span>
-              </span>
-            ) : null}
+      <p className="mt-5 font-display text-h3">Rental, Sydney</p>
+      <p className="mt-1 text-caption text-muted">Choose the areas for this clean</p>
+      <ul className="mt-6 divide-y divide-hairline border-y border-hairline">
+        {["Driveway", "Solar panels", "Windows"].map((name, i) => (
+          <li key={name} className="flex items-center gap-3 py-4 text-small">
+            <span aria-hidden="true" className={`flex h-4 w-4 items-center justify-center rounded-hard border ${selected && i < 2 ? "bg-ink border-ink text-white" : "border-border-strong"}`}>{selected && i < 2 ? "✓" : ""}</span>
+            <span>{name}</span>
+            {selected && i < 2 ? <span className="ml-auto text-caption text-muted">{complete ? "Complete" : progressing ? (i === 0 ? "31%" : "64%") : "Selected"}</span> : null}
           </li>
         ))}
       </ul>
-      <div className="p-5">
-        <div className={`flex h-11 items-center justify-center rounded-hard text-small font-medium ${state === "done" ? "bg-water text-plaster" : state === "progress" ? "border border-hairline bg-sunken text-muted" : "bg-ink text-plaster"}`}>
-          {state === "map" ? "Choose surfaces" : state === "select" ? "Start clean" : state === "start" ? "Starting…" : state === "progress" ? "Cleaning in progress" : "Clean complete"}
-        </div>
-      </div>
+      <div className="mt-6 rounded-hard bg-ink px-4 py-3 text-center text-small text-white">{complete ? "Clean complete" : progressing ? "Cleaning in progress" : state === "start" ? "Starting clean…" : selected ? "Start clean" : "Choose surfaces"}</div>
+      <p className="mt-4 text-caption text-muted">Illustrative app interface.</p>
     </div>
   );
 }
 
-/** Phone mock. Every app state is rendered once and crossfaded, so switching is opacity only. */
-function Phone({ state }: { state: string }) {
-  return (
-    <div className="relative w-[15.5rem] shrink-0 rounded-hard border border-border-strong/60 bg-ink p-2 md:w-[17rem]" aria-hidden="true">
-      <div className="relative h-[33rem] overflow-hidden rounded-hard md:h-[34rem]">
-        {states.map((s) => (
-          <div key={s} className={`absolute inset-0 transition-opacity duration-300 ease-instrument ${s === state ? "opacity-100" : "opacity-0"}`}>
-            <AppScreen state={s} />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/**
- * The landlord story as a scroll-through list. Below lg each beat carries its own still;
- * from lg the phone and the still sit in a sticky column and follow the beat nearest the
- * viewport centre. No pinning, no scroll maths, opacity only.
- */
 export function LandlordStory() {
-  const [active, setRef] = useActiveStep(beats.length);
+  const [active, setActive] = useState(0);
   const beat = beats[active];
   return (
     <section id="story" aria-labelledby="story-heading" className="page-x section-y bg-plaster">
       <div className="mx-auto max-w-grid">
-        <Reveal className="max-w-statement">
-          <h2 id="story-heading" className="text-h2">
-            {landlordStory.headline}
-          </h2>
-          <p className="mt-4 max-w-prose text-lead text-muted">{landlordStory.intro}</p>
+        <Reveal className="grid gap-6 md:grid-cols-2 md:gap-16 md:items-end">
+          <h2 id="story-heading" className="max-w-[18ch] text-h2">{landlordStory.headline}</h2>
+          <p className="text-body text-muted">{landlordStory.intro}</p>
         </Reveal>
-        <div className="mt-10 lg:hidden">
-          <Phone state="select" />
-        </div>
-        <div className="mt-12 grid gap-10 md:mt-16 lg:grid-cols-12 lg:gap-8">
-          <ol className="lg:col-span-5">
+        <div className="mt-12 grid gap-10 lg:mt-16 lg:grid-cols-12 lg:gap-12">
+          <ol className="border-t border-hairline lg:col-span-4">
             {beats.map((b, i) => (
-              <li key={b.title} ref={setRef(i)} className="border-t border-hairline py-8 lg:py-10" aria-current={i === active ? "step" : undefined}>
-                <p className="label text-glass">0{i + 1}</p>
-                <h3 className={`mt-3 text-h3 transition-colors duration-300 ${i === active ? "text-ink" : "text-ink lg:text-muted"}`}>{b.title}</h3>
-                <p className="mt-2 max-w-prose text-small text-muted">{b.body}</p>
-                {i === 0 || b.imageId !== beats[i - 1].imageId ? (
-                  <div className="mt-5 lg:hidden">
-                    <Picture id={b.imageId} alt={b.title} aspect="16/9" sizes="(min-width: 768px) 60vw, 100vw" />
-                  </div>
-                ) : null}
+              <li key={b.app} className="border-b border-hairline">
+                <h3><button type="button" id={`story-${b.app}`} onClick={() => setActive(i)} aria-expanded={i === active} aria-disabled={i === active} aria-controls={`story-panel-${b.app}`} className="flex min-h-16 w-full items-start gap-4 py-5 text-left">
+                  <span className="readout pt-1 text-caption text-muted" aria-hidden="true">0{i + 1}</span>
+                  <span className="font-display text-h3">{b.title}</span>
+                </button></h3>
+                <div hidden={active !== i} id={`story-panel-${b.app}`} role="region" aria-labelledby={`story-${b.app}`} className="pb-6 pl-8">
+                  <p className="text-small text-muted">{b.body}</p>
+                  <div className="mt-5 lg:hidden"><Picture id={b.imageId} alt={b.title} aspect="4/3" sizes="90vw" /></div>
+                </div>
               </li>
             ))}
           </ol>
-          <div className="hidden lg:col-span-7 lg:block">
-            <div className="sticky top-[calc(var(--nav-h)+1.5rem)] flex items-start gap-8">
-              <Phone state={beat.app} />
-              <div className="min-w-0 flex-1">
-                <div className="relative" style={{ aspectRatio: "4/5" }}>
-                  {images.map((id) => (
-                    <div key={id} className={`absolute inset-0 transition-opacity duration-500 ease-instrument ${id === beat.imageId ? "opacity-100" : "opacity-0"}`} aria-hidden={id !== beat.imageId}>
-                      <Picture id={id} alt={beats.find((b) => b.imageId === id)?.title ?? ""} aspect="4/5" sizes="30vw" />
-                    </div>
-                  ))}
-                </div>
-              </div>
+          <div className="lg:col-span-8">
+            <div className="grid gap-6 lg:grid-cols-2 lg:sticky lg:top-[calc(var(--nav-h)+2rem)]">
+              <AppPreview state={beat.app} />
+              <div className="hidden lg:block"><Picture id={beat.imageId} alt={beat.title} aspect="3/4" sizes="30vw" /></div>
             </div>
           </div>
         </div>

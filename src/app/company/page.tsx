@@ -7,7 +7,7 @@ import { PhotoPlaceholder } from "@/components/home/VisionLetter";
 import { Picture } from "@/components/ui/Picture";
 
 export const metadata: Metadata = {
-  title: "Company",
+  title: "Lienry Drones",
   description: "Lienry Drones is a Sydney company at concept stage, building a resident cleaning drone and raising a pre-seed round.",
   alternates: { canonical: "/company" },
 };
@@ -18,15 +18,15 @@ export default function CompanyPage() {
     <>
       <header className="page-x bg-plaster pt-[calc(var(--nav-h)+3rem)] md:pt-[calc(var(--nav-h)+5rem)]">
         <Container width="statement">
-          <Reveal>
+          <div>
             <h1 className="text-h2 text-muted">{c.headline}</h1>
             <p className="mt-8 max-w-none font-display text-h2">{c.statement}</p>
-          </Reveal>
+          </div>
         </Container>
         <Container className="mt-12 md:mt-16">
-          <Reveal delay={0.1}>
-            <Picture id="co1-company" alt="A harbour-side street of mid-rise buildings at dawn" aspect="21/9" sizes="(min-width: 1280px) 1280px, 100vw" />
-          </Reveal>
+          <div>
+            <Picture id="co1-company" alt="A harbour-side street of mid-rise buildings at dawn" aspect="21/9" sizes="(min-width: 1280px) 1280px, 100vw" priority />
+          </div>
         </Container>
       </header>
       <Section id="founders" ariaLabelledby="founders-heading">

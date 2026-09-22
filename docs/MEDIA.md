@@ -138,3 +138,9 @@ The 17 September review candidates `m1-drone-master-a` and `m1-drone-master-b` a
 ## Software view
 
 The home page software view is rendered in code, not generated: a React Three Fiber model of a 12-storey block inside a mock of the desktop window. The commercial hexacopter in it is built from primitives to the design above (charcoal base, off-white shell with a gasket seam, six guarded rotors with the accent lip, sensor bar, scanner, spray bar over the pad, standoff rollers, rear tether port, skids, status light). A Higgsfield or Meshy GLB was not commissioned: the account had 8 credits left when the section was rebuilt, which does not cover a model and a matching film, and a generated mesh could not be inspected from this environment. The film tile beside the window reuses the hero film (`h1-hero-film`) until a dedicated clip of the same facade being washed is generated. `public/video/software-view-{wide,tall}.{mp4,webm}` are recordings of the model made with `scripts/record-software-view.mjs`, kept under 3 MB each, and are not part of the media pipeline.
+
+## Presentation update — 22 September 2026
+
+No images or videos were generated or replaced. The existing 29 manifest assets were downloaded and optimised locally using the existing pipeline for review; generated build outputs are not part of the design source commit. The approved design sheets were retrieved from the source URLs above and inspected locally.
+
+Restored plain Concept render captions to all shared Picture figures and both film components, as required by the current brief. Adjusted display crops: system comparison images use 3:2, the property gallery 4:5, inner-page hero images 2:1, and the home closing image 1:1. The source files and manifest URLs are unchanged. Video pause controls were added. Existing software-view recordings remain; the software panel is still rendered in code on capable desktops.

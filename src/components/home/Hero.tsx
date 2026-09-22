@@ -1,13 +1,11 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
-import { Fragment, useEffect, useRef, useState } from "react";
-import { preload } from "react-dom";
+import { useReducedMotion } from "motion/react";
+import { useEffect, useRef, useState } from "react";
 import { hero } from "@/content/home";
 import { getImage, getVideo, largest, srcSet } from "@/lib/media";
 import { bindPlayback } from "@/lib/video";
 import { Button } from "@/components/ui/Button";
-import { settle } from "@/lib/motion";
 
 function HeroMedia() {
   const video = getVideo(hero.videoId);
@@ -15,18 +13,19 @@ function HeroMedia() {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLVideoElement>(null);
   const [ready, setReady] = useState(false);
+  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
     const el = ref.current;
-    if (!el || reduce) return;
+    if (!el || reduce || paused) { el?.pause(); return; }
     return bindPlayback(el, 0.1);
-  }, [reduce]);
+  }, [reduce, paused]);
 
   const posterSrc = poster ? largest(hero.posterId, "webp") : video ? `/media/${hero.videoId}-poster.webp` : null;
-  if (posterSrc) preload(posterSrc, { as: "image", fetchPriority: "high" });
   const saveData = typeof navigator !== "undefined" && (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
 
   return (
+    <>
     <div className="absolute inset-0 -z-10 overflow-hidden bg-ink" aria-hidden="true">
       {posterSrc ? (
         <picture>
@@ -60,54 +59,30 @@ function HeroMedia() {
       {/* Headline scrim. */}
       <div className="absolute inset-x-0 bottom-0 h-[70%] bg-[linear-gradient(to_top,rgba(28,26,23,0.92)_0%,rgba(28,26,23,0.55)_45%,transparent_100%)]" />
     </div>
+    {video && !reduce && !saveData ? (
+      <button type="button" onClick={() => setPaused(p => !p)} aria-label={paused ? "Play hero film" : "Pause hero film"} className="absolute right-[var(--page-margin)] bottom-6 z-10 flex h-11 w-11 items-center justify-center rounded-hard border border-white/75 bg-ink text-white">
+        <svg viewBox="0 0 16 16" className="h-4 w-4" aria-hidden="true" fill="currentColor">{paused ? <path d="M4 2l9 6-9 6z" /> : <path d="M4 2h3v12H4zM10 2h3v12h-3z" />}</svg>
+      </button>
+    ) : null}
+    </>
   );
 }
 
-/** The one centred composition on the site: headline low in the frame, one line, one action. */
+/** Film first, then a concise proposition and a single primary action. */
 export function Hero() {
-  const reduce = useReducedMotion();
-  const words = hero.headline.split(" ");
   return (
     <section className="on-dark relative isolate flex min-h-[100svh] flex-col justify-end text-white" aria-labelledby="hero-heading">
       <HeroMedia />
-      <div className="page-x mx-auto flex w-full max-w-grid flex-col items-center pb-16 pt-[calc(var(--nav-h)+3rem)] text-center md:pb-24">
-        <h1 id="hero-heading" className="max-w-[16ch] text-display">
-          {words.map((w, i) => (
-            <Fragment key={`${w}-${i}`}>
-              <motion.span
-                className="inline-block will-change-transform"
-                initial={reduce ? false : { opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.9, ease: settle, delay: 0.35 + i * 0.07 }}
-              >
-                {w}
-              </motion.span>
-              {/* The space lives outside the inline-block so it is never trimmed. */}
-              {i < words.length - 1 ? " " : null}
-            </Fragment>
-          ))}
-        </h1>
-        <motion.p
-          className="mx-auto mt-6 max-w-[44ch] text-lead text-white/90"
-          initial={reduce ? false : { opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: settle, delay: 0.75 }}
-        >
-          {hero.support}
-        </motion.p>
-        <motion.div
-          className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center sm:gap-6"
-          initial={reduce ? false : { opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: settle, delay: 0.9 }}
-        >
-          <Button href={hero.primary.href} size="lg" onDark arrow>
-            {hero.primary.label}
-          </Button>
-          <a href={hero.secondary.href} className="text-small font-medium text-white underline decoration-1 underline-offset-[6px] hover:decoration-2">
-            {hero.secondary.label}
-          </a>
-        </motion.div>
+      <div className="page-x mx-auto flex w-full max-w-grid flex-col items-center pb-24 pt-[calc(var(--nav-h)+8rem)] text-center md:pb-28">
+        <h1 id="hero-heading" className="max-w-[18ch] text-display md:max-w-none">{hero.headline}</h1>
+        <div className="mt-7 flex flex-col items-center gap-6 md:flex-row md:gap-8">
+          <p className="max-w-[32ch] text-body text-white md:max-w-[48ch]">{hero.support}</p>
+          <Button href={hero.primary.href} onDark arrow>{hero.primary.label}</Button>
+        </div>
+      </div>
+      <div className="page-x absolute inset-x-0 bottom-6 flex items-center justify-between text-caption text-white">
+        <span>Concept render</span>
+        <a href={hero.secondary.href} className="flex min-h-11 items-center gap-3 hover:underline underline-offset-4 mr-14">Explore the system <span aria-hidden="true">↓</span></a>
       </div>
     </section>
   );

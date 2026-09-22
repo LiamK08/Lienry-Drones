@@ -7,7 +7,7 @@ import { Reveal } from "@/components/ui/Reveal";
 import { Button } from "@/components/ui/Button";
 
 export const metadata: Metadata = {
-  title: "Commercial system",
+  title: "Lienry Drones",
   description: "A weatherproof roof capsule, a tether fed from above, and desktop software that runs the whole building. Window cleaning that lives on the roof.",
   alternates: { canonical: "/commercial" },
 };
@@ -20,7 +20,7 @@ export default function CommercialPage() {
         <Button href={c.pilot.cta.href} size="lg">
           {c.pilot.cta.label}
         </Button>
-        <Button href="/platform" size="lg" variant="secondary">
+        <Button href="/platform" size="md" variant="tertiary" arrow>
           See the platform
         </Button>
       </PageHero>
