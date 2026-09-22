@@ -196,3 +196,38 @@ Lienry's take: no blog, so the enquiry form's "keep me updated" tick is the pre-
 - Register interest: company or strata, property type, how many properties, the consent tick.
 - Company: the "Three rules we build by." trio.
 - Left out on purpose: certification tiles, trust centre, logo strips, quotes, careers, newsroom, press kit, blog, report downloads and campaign pages. Each of them would imply customers, staff or news that Lienry does not have yet.
+
+## 10. Direct visual review — 22 September 2026
+
+This review supersedes the earlier implementation recommendations where they conflict with the current project brief. The live reference was viewed directly in the browser, not inferred from pixel averages: [home](https://legora.com/), [aOS](https://legora.com/product/aos), and [enquiry](https://legora.com/book-a-demo). Desktop and mobile compositions were inspected. Some reference media could not play in the review browser; no playback quality conclusions are drawn from those failures. No reference assets or source code were imported.
+
+### What produces the professional impression
+
+| Detail | Observation | Lienry decision |
+| --- | --- | --- |
+| Hero hierarchy | At 1440px, the reference H1 is about 56px with 59px leading, positioned around y=721 in a 900px viewport. Supporting copy is a short, subordinate line beside the action. The image carries most of the screen. | Keep Instrument Serif, but give the film more uninterrupted space. Use one desktop headline line, a short support line and one primary action. Put the exploration link at the lower edge. |
+| Header | A thin, edge-aligned navigation, centred identity and a small action. At mobile width the navigation becomes a minimal menu. | Retain Lienry's mark, 72px bar, left navigation and rectangular dark action. Make the mark immediately visible. Change surface and ink together after 80px so the transition cannot reduce text contrast. |
+| Type hierarchy | Main section headings around 41px; supporting paragraphs are much smaller. Several words of headline can carry an entire section. Weight is restrained. | Keep the prescribed fonts. Set reading text to 16px, captions to 13px, and use fluid serif section headings. Reduce the oversized paragraph and card treatment. |
+| Information density | Large areas of quiet space frame a short message. More complex information is revealed deliberately. | Replace the six long scroll steps with an accessible product disclosure list and one substantial image. Keep the detail accessible on demand and on the Platform page. |
+| Product cards | The image and text carry the structure. Heavy containers and repeated borders are unnecessary. | Remove outer card boxes from the two systems and feature grids. Use image proportions, fine rules and aligned text. |
+| Gallery | Portrait imagery creates a distinct rhythm; controls are secondary to the photography. | Keep existing approved renders, use a restrained three-column desktop gallery, native swipe and keyboard controls. Remove tiny pagination bars. |
+| Editorial sections | The founder material reads as an editorial composition, with modest body text and intentional asymmetry. | Reduce the oversized vision letter and remove decorative profile-card framing. Preserve real-photo placeholders for both founders. |
+| Calls to action | One action leads; supporting links do not have equal visual weight. | Keep Register interest as the primary button; commercial and investor paths become text links where appropriate. |
+| Footer | Navigation, space and identity are the composition. Mobile navigation is collapsible. | Replace the cramped 14-column content in a 12-column grid with an intentional grid. Add native mobile disclosures. Keep one large identity line and concise pre-launch context. |
+| Motion | The composition is mostly still once settled. Motion introduces or explains something. | Remove the animated hero word sequence and counting product facts. Keep short transform/opacity reveals below the fold. Add explicit video pause controls; the software preview pause stops automatic rendering. |
+
+### What remains specifically Lienry
+
+Instrument Serif and Inter; the existing plaster, stone and ink colours; 4px corners; industrial drone imagery; two resident systems; Australian copy; native scrolling; a real coded software demonstration. No pills, certification strips, testimonials, fabricated traction or reference-site wording were introduced.
+
+### Corrections found during implementation
+
+- AI figures and films now carry a plain Concept render caption. The software includes an illustrative-model note and keeps Demo data visible.
+- The mobile app illustration is a flat interface with meaningful surface rows, replacing the decorative block-grid property map and artificial phone shell.
+- Product facts are static and labelled as design intent. Building height is explicitly **under** 70m.
+- Hose-free exploration appears only on Company.
+- The confirmed public domain is `https://www.lienrydrones.com`; all browser titles follow the brief's Lienry Drones wording.
+- Mobile navigation contains keyboard focus, Escape closes it, and content behind it is inert.
+- The enquiry API returns an unavailable response when no delivery webhook is configured, rather than presenting a false success.
+
+See `docs/DESIGN-QA.md` for validation, screenshots and remaining launch inputs.

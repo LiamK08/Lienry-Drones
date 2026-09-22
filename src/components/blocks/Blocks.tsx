@@ -34,7 +34,7 @@ export function Tiles({ id, eyebrow, headline, items, tone = "raised", columns =
         </Reveal>
         <RevealList className={`mt-12 grid gap-6 md:mt-16 ${columns === 4 ? "sm:grid-cols-2 md:grid-cols-4" : "md:grid-cols-3"}`}>
           {items.map((t) => (
-            <RevealItem key={t.title} className={`rounded-hard border p-6 ${tone === "dark" ? "border-plaster/25 bg-ink-raised" : "border-hairline bg-raised"}`}>
+            <RevealItem key={t.title} className={`border-t pt-6 ${tone === "dark" ? "border-plaster/25" : "border-hairline"}`}>
               <h3 className="text-h3">{t.title}</h3>
               <p className={`mt-2 text-small ${tone === "dark" ? "text-muted-on-dark" : "text-muted"}`}>{t.body}</p>
             </RevealItem>

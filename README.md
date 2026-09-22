@@ -17,7 +17,7 @@ npm run lint       # eslint
 npm run typecheck  # tsc --noEmit
 ```
 
-Copy `.env.example` to `.env.local` if you want enquiries forwarded to a webhook (`ENQUIRY_WEBHOOK_URL`) or a different public URL (`NEXT_PUBLIC_SITE_URL`). Without them the site builds and runs; enquiries are logged on the server.
+Copy `.env.example` to `.env.local` if you want enquiries forwarded to a webhook (`ENQUIRY_WEBHOOK_URL`) or a different public URL (`NEXT_PUBLIC_SITE_URL`). Without a delivery webhook the site builds and runs, but enquiry submissions return 503 instead of reporting false success.
 
 ## Where things live
 
@@ -62,8 +62,12 @@ The mark is three building silhouettes with the flight arc cut through them, sup
 
 No customers, logos, testimonials, results, prices, certifications or approvals are claimed anywhere. Statistics come only from `src/content/stats.ts`, each verified against and cited to its primary source. The founders' photos are placeholders until real photos are supplied.
 
-The imagery is AI-generated. It used to carry a "Concept render" caption under every figure, and a footer line saying so; both were removed on request, so a visitor now has nothing on the page telling them these are renders rather than photographs of a working product. `docs/MEDIA.md` still records every asset with its prompt and model.
+The imagery is AI-generated. Every AI figure and film carries a plain "Concept render" caption. The coded software preview is labelled "Demo data" with an illustrative-model note. `docs/MEDIA.md` still records every asset with its prompt and model.
 
 ## Deploy
 
 Any Next.js host works. On Vercel, import the repository and set `NEXT_PUBLIC_SITE_URL` and, if you want form delivery, `ENQUIRY_WEBHOOK_URL`.
+
+## September design refinement
+
+See `docs/DESIGN-RESEARCH.md` section 10 for the direct Legora review and `docs/DESIGN-QA.md` for validation and screenshots. The current layout uses compact product disclosures, open feature columns, a flat app illustration, a restrained type scale, native mobile footer disclosures and explicit media pause controls. The confirmed public domain is www.lienrydrones.com. Work is reviewed through pull requests; never push directly to main.

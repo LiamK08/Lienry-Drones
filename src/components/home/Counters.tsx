@@ -1,26 +1,23 @@
 import { counters } from "@/content/home";
 import { Container, Section } from "@/components/ui/Section";
-import { Counter } from "@/components/ui/Counter";
-import { RevealItem, RevealList } from "@/components/ui/Reveal";
 
 export function Counters() {
   return (
-    <Section id="facts" tone="raised" ariaLabelledby="facts-heading" className="border-y border-hairline">
+    <Section id="facts" ariaLabelledby="facts-heading" className="border-t border-hairline">
       <Container>
-        <h2 id="facts-heading" className="sr-only">
-          {counters.eyebrow}
-        </h2>
-        <RevealList className="grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-5 md:gap-x-8">
+        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-baseline">
+          <h2 id="facts-heading" className="text-h3">The platform, by design.</h2>
+          <p className="text-caption text-muted">Design intent. Concept stage.</p>
+        </div>
+        <dl className="mt-10 grid grid-cols-2 gap-x-8 gap-y-10 md:grid-cols-5">
           {counters.items.map((c) => (
-            <RevealItem key={c.label} className="flex flex-col">
-              <div className="flex items-baseline gap-2">
-                <Counter value={c.value} />
-                <span className="readout text-small text-glass">{c.unit}</span>
-              </div>
-              <p className="mt-3 max-w-[22ch] text-caption text-muted">{c.label}</p>
-            </RevealItem>
+            <div key={c.label} className="border-t border-hairline pt-5">
+              <dt className="text-caption text-muted">{c.unit === "m" ? "Building height" : c.unit === "days" ? "Re-scan interval" : c.unit === "people" ? "People on site" : c.unit === "surfaces" ? "Exterior surfaces" : "Resident systems"}</dt>
+              <dd className="mt-4 flex items-baseline gap-2"><span className="numeral">{c.unit === "m" ? "<70" : c.value}</span><span className="text-small text-muted">{c.unit === "m" || c.unit === "days" ? c.unit : ""}</span></dd>
+              <dd className="mt-3 text-caption text-muted">{c.label}</dd>
+            </div>
           ))}
-        </RevealList>
+        </dl>
       </Container>
     </Section>
   );

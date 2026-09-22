@@ -3,7 +3,7 @@ import { privacyPage } from "@/content/pages";
 import { Container } from "@/components/ui/Section";
 
 export const metadata: Metadata = {
-  title: "Privacy",
+  title: "Lienry Drones",
   description: "How Lienry Drones handles the details you share through this website.",
   alternates: { canonical: "/privacy" },
   robots: { index: false, follow: true },

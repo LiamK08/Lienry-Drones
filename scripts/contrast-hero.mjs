@@ -117,47 +117,13 @@ console.table([
   { pair: "white label on ink button", ratio: `${ratio([255, 255, 255], INK).toFixed(2)}:1`, target: "4.5:1", result: ratio([255, 255, 255], INK) >= 4.5 ? "PASS" : "FAIL" },
 ]);
 
-// Gate 3: the 300ms swap from white-on-hero to ink-on-plaster.
-//
-// Both resting states are proved above, but the bar crossfades between them. If the text colour
-// interpolates alongside the background it walks straight through its own background. The bar
-// therefore crossfades the background only and steps the text colour once, at the delay set in
-// .nav-bar (src/app/globals.css). This replays that timing against the worst pixel Gate 2 found
-// and reports the darkest frame of the swap.
-const STEP_MS = 70;
-const DURATION_MS = 300;
-const ease = (x, x1 = 0.4, y1 = 0, x2 = 0.2, y2 = 1) => {
-  let lo = 0;
-  let hi = 1;
-  for (let i = 0; i < 60; i++) {
-    const m = (lo + hi) / 2;
-    const bx = 3 * (1 - m) ** 2 * m * x1 + 3 * (1 - m) * m * m * x2 + m ** 3;
-    if (bx < x) lo = m;
-    else hi = m;
-  }
-  const m = (lo + hi) / 2;
-  return 3 * (1 - m) ** 2 * m * y1 + 3 * (1 - m) * m * m * y2 + m ** 3;
-};
-// The brightest backdrop the bar can ever sit on: pure white through the ink veil and the scrim.
-const worstBackdrop = over([0, 0, 0], over(INK, [255, 255, 255], 0.25), scrimAt(36));
-const mix = (a, b, t) => a.map((c, i) => c + t * (b[i] - c));
-let stepped = Infinity;
-let bothFade = Infinity;
-for (let i = 0; i <= 600; i++) {
-  const t = i / 600;
-  const bg = mix(worstBackdrop, PLASTER, ease(t));
-  stepped = Math.min(stepped, ratio(t * DURATION_MS < STEP_MS ? [255, 255, 255] : INK, bg));
-  bothFade = Math.min(bothFade, ratio(mix([255, 255, 255], INK, ease(t)), bg));
-}
-console.log(`\nGate 3: the ${DURATION_MS}ms scroll swap, against that same worst backdrop`);
-console.table([
-  { approach: `background crossfades, colour steps at ${STEP_MS}ms (shipped)`, "worst frame": `${stepped.toFixed(2)}:1`, target: "3:1", result: stepped >= 3 ? "PASS" : "FAIL" },
-  { approach: "both crossfade together (not shipped)", "worst frame": `${bothFade.toFixed(2)}:1`, target: "3:1", result: bothFade >= 3 ? "PASS" : "FAIL" },
-]);
-if (stepped < 3) failed++;
-
-if (failed) {
-  console.log(`\n${failed} gate(s) failed.`);
-  process.exit(1);
-}
-console.log("\nEvery gated header element clears its target, on the supplied frame, against pure white, and through the scroll swap.");
+// Gate 3: the header switches its surface and ink together. Any interpolation can
+// pass through a low-contrast frame, even when both resting states pass.
+const { readFileSync } = await import("node:fs");
+const css = readFileSync(new URL("../src/app/globals.css", import.meta.url), "utf8");
+const atomic = /\.nav-bar\s*\{\s*transition:\s*none;\s*\}/.test(css);
+const restingMinimum = Math.min(ratio([255,255,255], over([0,0,0], over(INK,[255,255,255],0.25),scrimAt(36))), ratio(INK,PLASTER));
+console.log(`\nGate 3: atomic surface and text switch. Minimum text contrast ${restingMinimum.toFixed(2)}:1; target 4.5:1.`);
+if (!atomic || restingMinimum < 4.5) failed++;
+if (failed) { console.error(`${failed} gate(s) failed.`); process.exit(1); }
+console.log("Every gated header element clears its target, including the scroll switch.");

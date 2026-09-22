@@ -76,8 +76,6 @@ let capability: boolean | null = null;
 function compute3d() {
   if (capability !== null) return capability;
   const nav = navigator as Navigator & { connection?: { saveData?: boolean }; deviceMemory?: number };
-  const wide = window.matchMedia("(min-width: 768px)").matches;
-  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const cores = navigator.hardwareConcurrency ?? 4;
   const saveData = nav.connection?.saveData === true;
   const memory = nav.deviceMemory ?? 8;
@@ -88,11 +86,14 @@ function compute3d() {
   } catch {
     webgl = false;
   }
-  capability = wide && !reduce && cores >= 4 && !saveData && memory >= 4 && webgl;
+  capability = cores >= 4 && !saveData && memory >= 4 && webgl;
   return capability;
 }
 
 /** Whether this device should get the WebGL building instead of the fallback. */
 export function useCanRender3d(): boolean {
-  return useSyncExternalStore(noop, compute3d, () => false);
+  const wide = useMediaQuery("(min-width: 768px)");
+  const reduce = useMediaQuery("(prefers-reduced-motion: reduce)");
+  const capable = useSyncExternalStore(noop, compute3d, () => false);
+  return wide && !reduce && capable;
 }

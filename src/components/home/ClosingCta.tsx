@@ -9,21 +9,21 @@ export function ClosingCta() {
     <Section id="closing" ariaLabelledby="closing-heading">
       <Container>
         <div className="grid items-center gap-10 md:grid-cols-12 md:gap-8">
-          <Reveal className="md:col-span-7">
+          <Reveal className="md:col-span-5">
             <h2 id="closing-heading" className="text-h1">
               {closing.headline}
             </h2>
             <p className="mt-5 max-w-prose text-lead text-muted">{closing.body}</p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <div className="mt-8 flex flex-col gap-3 items-start">
               {closing.buttons.map((b) => (
-                <Button key={b.href} href={b.href} variant={b.variant} size="lg">
+                <Button key={b.href} href={b.href} variant={b.variant === "primary" ? "primary" : "tertiary"} size="md" arrow>
                   {b.label}
                 </Button>
               ))}
             </div>
           </Reveal>
-          <Reveal className="md:col-span-4 md:col-start-9" delay={0.1}>
-            <Picture id={closing.imageId} alt="The Lienry ground pod beside a house at first light" aspect="4/3" sizes="(min-width: 768px) 30vw, 100vw" />
+          <Reveal className="md:col-span-5 md:col-start-8" delay={0.1}>
+            <Picture id={closing.imageId} alt="The Lienry ground pod beside a house at first light" aspect="1/1" sizes="(min-width: 768px) 30vw, 100vw" />
           </Reveal>
         </div>
       </Container>

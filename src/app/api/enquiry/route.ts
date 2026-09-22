@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { enquirySchema } from "@/lib/enquiry-schema";
+import { siteUrl } from "@/lib/site";
 
 // Stub: validates the enquiry and forwards it to ENQUIRY_WEBHOOK_URL when set,
-// otherwise logs it on the server. Swap in an email service or CRM here.
+// otherwise returns an unavailable response so nobody is told an enquiry was delivered.
 
 const hits = new Map<string, { count: number; reset: number }>();
 
@@ -36,7 +37,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true });
   }
 
-  const enquiry = { ...parsed.data, company: undefined, receivedAt: new Date().toISOString(), source: "lienry.com/register-interest" };
+  const enquiry = { ...parsed.data, company: undefined, receivedAt: new Date().toISOString(), source: `${siteUrl}/register-interest` };
   const webhook = process.env.ENQUIRY_WEBHOOK_URL;
   if (webhook) {
     try {
@@ -47,7 +48,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "Delivery failed" }, { status: 502 });
     }
   } else {
-    console.info("Enquiry received (no ENQUIRY_WEBHOOK_URL set)", enquiry);
+    return NextResponse.json({ ok: false, error: "Registration is temporarily unavailable. Please try again later." }, { status: 503 });
   }
   return NextResponse.json({ ok: true });
 }

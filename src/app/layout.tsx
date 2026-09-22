@@ -9,10 +9,7 @@ import { OrganizationJsonLd } from "@/components/site/JsonLd";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: {
-    default: brand.name,
-    template: `%s | ${brand.name}`,
-  },
+  title: brand.name,
   applicationName: brand.name,
   description: brand.description,
   manifest: "/site.webmanifest",

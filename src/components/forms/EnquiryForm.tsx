@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/Button";
 type Errors = Partial<Record<string, string>>;
 
 const inputCls =
-  "mt-2 block w-full rounded-hard border border-border-strong bg-raised px-3.5 py-3 text-body text-ink placeholder:text-muted/70 focus:border-ink focus:outline-none";
+  "mt-2 block w-full rounded-hard border border-border-strong bg-raised px-3.5 py-3 text-body text-ink placeholder:text-muted/70 focus:border-ink";
 
 export function EnquiryForm() {
   const params = useSearchParams();
@@ -59,7 +59,7 @@ export function EnquiryForm() {
           {enquiryTypes.map((t) => (
             <label
               key={t}
-              className={`flex cursor-pointer items-center gap-3 rounded-hard border px-4 py-3 text-small transition-colors ${type === t ? "border-ink bg-raised" : "border-hairline bg-raised hover:border-border-strong"}`}
+              className={`flex cursor-pointer items-center gap-3 rounded-hard border px-4 py-3 text-small transition-colors ${type === t ? "border-ink bg-raised" : "border-border-strong bg-transparent hover:border-ink"}`}
             >
               <input type="radio" name="type" value={t} checked={type === t} onChange={() => setType(t)} className="h-4 w-4 accent-[#1c1a17]" />
               {enquiryTypeLabels[t]}
@@ -146,7 +146,7 @@ export function EnquiryForm() {
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
         <Button type="submit" size="lg" disabled={status === "sending"} aria-busy={status === "sending"}>
-          {status === "sending" ? "Sending…" : "Send"}
+          {status === "sending" ? "Sending…" : "Register interest"}
         </Button>
         <p id={`${id}-note`} className="text-caption text-muted">
           We only use your details to reply. See our <a href="/privacy" className="water-link">privacy policy</a>.
@@ -154,7 +154,7 @@ export function EnquiryForm() {
       </div>
       {status === "failed" ? (
         <p role="alert" className="text-small text-debris-text">
-          Something went wrong sending that. Please try again, or email us directly.
+          Something went wrong sending that. Please try again later.
         </p>
       ) : null}
     </form>

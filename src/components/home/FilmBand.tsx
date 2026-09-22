@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
 import { getImage, getVideo, largest, srcSet } from "@/lib/media";
 import { bindPlayback } from "@/lib/video";
@@ -31,12 +31,13 @@ export function FilmBand({
   const still = getImage(stillId);
   const reduce = useReducedMotion();
   const ref = useRef<HTMLVideoElement>(null);
+  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
     const el = ref.current;
-    if (!el || reduce) return;
+    if (!el || reduce || paused) { el?.pause(); return; }
     return bindPlayback(el, 0.2);
-  }, [reduce]);
+  }, [reduce, paused]);
 
   const posterSrc = still
     ? largest(stillId, "webp")
@@ -95,14 +96,18 @@ export function FilmBand({
             <h2 id="film-heading" className="text-h1">
               {headline}
             </h2>
-            <p className="mt-5 text-lead text-plaster">{body}</p>
+            <p className="mt-5 text-body text-plaster">{body}</p>
             <div className="mt-8">
-              <Button href={cta.href} onDark size="lg">
+              <Button href={cta.href} onDark variant="tertiary" arrow>
                 {cta.label}
               </Button>
             </div>
           </Reveal>
         </div>
+      </div>
+      <div className="page-x absolute bottom-4 inset-x-0 flex items-center justify-between text-caption text-white">
+        <span>Concept render</span>
+        {video && !reduce ? <button type="button" onClick={() => setPaused(p => !p)} className="min-h-11 rounded-hard border border-white/75 bg-ink px-3" aria-label={paused ? "Play product film" : "Pause product film"}>{paused ? "Play film" : "Pause film"}</button> : null}
       </div>
     </section>
   );
