@@ -62,7 +62,6 @@ export function Picture({
           />
         </picture>
       </div>
-      <figcaption className="mt-2 text-caption text-muted concept-caption">Concept render</figcaption>
     </figure>
   );
 }
