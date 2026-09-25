@@ -35,6 +35,7 @@ export default function HomesPage() {
         secondary={h.actions.secondary}
         media={{ kind: "image", id: h.heroImageId, alt: h.heroAlt, position: h.heroPosition }}
       />
+      {/* Starts inside the first screen, so nothing in it waits for a reveal. */}
       <StepCards
         id="how"
         tone="plaster"
@@ -45,6 +46,7 @@ export default function HomesPage() {
         aspect="4/5"
         items={h.steps.items}
         track={h.steps.track}
+        reveal={false}
       />
       <LandlordStory />
       <StatBand

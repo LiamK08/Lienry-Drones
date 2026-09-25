@@ -29,6 +29,9 @@ export type StepCardsProps = {
   items: readonly StepCardsItem[];
   /** The track's name and its previous and next buttons, below 1024. */
   track: { label: string; prevLabel: string; nextLabel: string };
+  /** Default true: the head and the cards rise in once. False when the band starts inside the
+   *  first screen (straight after a page hero), where nothing waits for a reveal. */
+  reveal?: boolean;
 };
 
 // Four columns are 330px at 1440 and three are 448px; a track item is 46% from 768 and 82% below.
@@ -40,19 +43,19 @@ const sizes = {
 /**
  * A row of step cards: the section head, 48, then image-led cards in a row of `columns` from 1024
  * and a snap track with previous and next buttons below it (SnapTrack). Each card is its image,
- * the Concept render caption, the step number as its label, the title and the body. The cards
- * rise in with a 60ms stagger.
+ * the Concept render caption, the step number as its label, the title and the body. The head
+ * and the cards rise in, the cards with a 60ms stagger, unless `reveal` is false.
  */
-export function StepCards({ id, tone, headline, emphasis, intro, numbered, columns, aspect, items, track }: StepCardsProps) {
+export function StepCards({ id, tone, headline, emphasis, intro, numbered, columns, aspect, items, track, reveal = true }: StepCardsProps) {
   const dark = tone === "ink";
   return (
     <Band id={id} tone={tone} labelledBy={`${id}-heading`}>
       <Container>
-        <SectionHead id={`${id}-heading`} headline={headline} emphasis={emphasis} aside={{ intro }} tone={dark ? "dark" : "light"} />
+        <SectionHead id={`${id}-heading`} headline={headline} emphasis={emphasis} aside={{ intro }} tone={dark ? "dark" : "light"} reveal={reveal} />
         <div className="mt-[var(--gap-head)]">
           <SnapTrack columns={columns} label={track.label} prevLabel={track.prevLabel} nextLabel={track.nextLabel} tone={dark ? "dark" : "light"}>
-            {items.map((item, i) => (
-              <RevealItem key={item.title}>
+            {items.map((item, i) => {
+              const card = (
                 <MediaCard
                   media={{ kind: "image", id: item.image.id, alt: item.image.alt, position: item.image.position, aspect, sizes: sizes[columns] }}
                   label={numbered ? (item.n ?? String(i + 1).padStart(2, "0")) : undefined}
@@ -60,8 +63,10 @@ export function StepCards({ id, tone, headline, emphasis, intro, numbered, colum
                   body={item.body}
                   tone={dark ? "dark" : "light"}
                 />
-              </RevealItem>
-            ))}
+              );
+              // A plain li carries no reveal variants, so the track shows it at once.
+              return reveal ? <RevealItem key={item.title}>{card}</RevealItem> : <li key={item.title}>{card}</li>;
+            })}
           </SnapTrack>
         </div>
       </Container>

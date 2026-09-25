@@ -34,6 +34,7 @@ export default function SolarPage() {
         secondary={s.actions.secondary}
         media={{ kind: "image", id: s.heroImageId, alt: s.heroAlt }}
       />
+      {/* Starts inside the first screen, so nothing in it waits for a reveal. */}
       <StatBand
         kind="cited"
         id="soiling"
@@ -41,6 +42,7 @@ export default function SolarPage() {
         intro={s.statsIntro}
         items={pickStats(solarStats, ["unsw-soiling", "iea-soiling", "joule-soiling"])}
         note={CITED_NOTE}
+        reveal={false}
       />
       <Switcher id="how" tone="plaster" headline={s.how.headline} emphasis={s.how.emphasis} intro={s.how.intro} tabsLabel={s.how.tabsLabel} items={s.how.items} />
       <Faq id="faq" tone="raised" headline={platformFaq.headline} intro={platformFaq.intro} link={s.actions.primary} items={questions} />

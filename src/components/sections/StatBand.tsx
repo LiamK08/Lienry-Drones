@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { Stat } from "@/content/stats";
 import type { Action } from "@/lib/types";
 import { Band, Container } from "@/components/ui/Band";
@@ -19,6 +20,9 @@ export type StatBandProps = {
   note: string;
   /** The band's one primary, as an inverse (plaster) button beside the note. */
   action?: Action;
+  /** Default true: the head and the columns rise in once. False when the band starts inside the
+   *  first screen (straight after a page hero), where nothing waits for a reveal. */
+  reveal?: boolean;
 } & (
   | { kind: "cited"; items: readonly Stat[] }
   | { kind: "design"; items: readonly DesignFact[] }
@@ -60,41 +64,67 @@ function Figure({ value, unit, className = "" }: { value: string; unit?: string;
  * figure with its unit on the baseline, 12, and the text; cited figures carry, 12 under the text,
  * a source line with its index and a link to the primary source. After the columns, 32, then the
  * note (cited: `CITED_NOTE`; design: "Design intent. Concept stage.") with the optional inverse
- * primary at the right. Below 1024 everything stacks. The columns reveal once; nothing counts up.
+ * primary at the right. Below 1024 the columns stack 16 apart, then the note and the action.
+ * The head and the columns rise in once; nothing counts up.
  */
 export function StatBand(props: StatBandProps) {
-  const { id, headline, emphasis, intro, note, action } = props;
+  const { id, headline, emphasis, intro, note, action, reveal = true } = props;
   const count = Math.min(Math.max(props.items.length, 1), 4) as 1 | 2 | 3 | 4;
-  const item = "border-t border-plaster/20 pt-4";
+
+  const cells: { key: string; content: ReactNode }[] =
+    props.kind === "cited"
+      ? props.items.map((stat, i) => ({
+          key: stat.id,
+          content: (
+            <>
+              <Figure value={stat.value} />
+              <p className="mt-3 text-body text-plaster">{stat.label}</p>
+              <p className="mt-3 text-caption text-muted-on-dark">
+                <sup className="mr-1 text-label">{i + 1}</sup>
+                {stat.source}.{" "}
+                <a href={stat.sourceUrl} className="water-link text-glass-on-dark" target="_blank" rel="noreferrer noopener">
+                  Source<span className="sr-only">, opens in a new tab</span>
+                </a>
+              </p>
+            </>
+          ),
+        }))
+      : props.items.map((fact) => ({
+          key: fact.term,
+          content: (
+            <>
+              <p className="text-caption text-muted-on-dark">{fact.term}</p>
+              <Figure value={fact.value} unit={fact.unit} className="mt-2" />
+              <p className="mt-3 text-body text-plaster">{fact.text}</p>
+            </>
+          ),
+        }));
+
+  const list = `mt-[var(--gap-head)] grid gap-y-4 lg:gap-x-6 ${columns[count]}`;
+  const cell = "border-t border-plaster/20 pt-4";
 
   return (
     <Band id={id} tone="ink" labelledBy={`${id}-heading`}>
       <Container>
-        <SectionHead id={`${id}-heading`} headline={headline} emphasis={emphasis} aside={{ intro }} tone="dark" />
+        <SectionHead id={`${id}-heading`} headline={headline} emphasis={emphasis} aside={{ intro }} tone="dark" reveal={reveal} />
 
-        <RevealList className={`mt-[var(--gap-head)] grid gap-y-4 lg:gap-x-6 ${columns[count]}`}>
-          {props.kind === "cited"
-            ? props.items.map((stat, i) => (
-                <RevealItem key={stat.id} className={item}>
-                  <Figure value={stat.value} />
-                  <p className="mt-3 text-body text-plaster">{stat.label}</p>
-                  <p className="mt-3 text-caption text-muted-on-dark">
-                    <sup className="mr-1 text-label">{i + 1}</sup>
-                    {stat.source}.{" "}
-                    <a href={stat.sourceUrl} className="water-link text-glass-on-dark" target="_blank" rel="noreferrer noopener">
-                      Source<span className="sr-only">, opens in a new tab</span>
-                    </a>
-                  </p>
-                </RevealItem>
-              ))
-            : props.items.map((fact) => (
-                <RevealItem key={fact.term} className={item}>
-                  <p className="text-caption text-muted-on-dark">{fact.term}</p>
-                  <Figure value={fact.value} unit={fact.unit} className="mt-2" />
-                  <p className="mt-3 text-body text-plaster">{fact.text}</p>
-                </RevealItem>
-              ))}
-        </RevealList>
+        {reveal ? (
+          <RevealList className={list}>
+            {cells.map((c) => (
+              <RevealItem key={c.key} className={cell}>
+                {c.content}
+              </RevealItem>
+            ))}
+          </RevealList>
+        ) : (
+          <ul className={list}>
+            {cells.map((c) => (
+              <li key={c.key} className={cell}>
+                {c.content}
+              </li>
+            ))}
+          </ul>
+        )}
 
         <div className="mt-8 flex flex-col items-start gap-4 lg:flex-row lg:items-center lg:justify-between lg:gap-6">
           <p className="text-caption text-muted-on-dark">{note}</p>
