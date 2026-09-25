@@ -72,7 +72,7 @@ export function StatBand(props: StatBandProps) {
       <Container>
         <SectionHead id={`${id}-heading`} headline={headline} emphasis={emphasis} aside={{ intro }} tone="dark" />
 
-        <RevealList className={`mt-[var(--gap-head)] grid gap-y-8 lg:gap-x-6 ${columns[count]}`}>
+        <RevealList className={`mt-[var(--gap-head)] grid gap-y-4 lg:gap-x-6 ${columns[count]}`}>
           {props.kind === "cited"
             ? props.items.map((stat, i) => (
                 <RevealItem key={stat.id} className={item}>
@@ -96,7 +96,7 @@ export function StatBand(props: StatBandProps) {
               ))}
         </RevealList>
 
-        <div className="mt-8 flex flex-col items-start gap-6 lg:flex-row lg:items-center lg:justify-between">
+        <div className="mt-8 flex flex-col items-start gap-4 lg:flex-row lg:items-center lg:justify-between lg:gap-6">
           <p className="text-caption text-muted-on-dark">{note}</p>
           {action ? (
             <Button href={action.href} variant="inverse" arrow className="shrink-0">

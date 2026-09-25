@@ -24,7 +24,9 @@ export function SiblingCards({ current }: SiblingCardsProps) {
         <SectionHead id="more-heading" headline={siblings.headline} aside={{ intro: siblings.intro, link: siblings.link }} />
         <RevealList className="mt-[var(--gap-head)] grid gap-6 lg:grid-cols-2">
           {cards.map((card) => (
-            <RevealItem key={card.href}>
+            // The body is one short line (68 characters at most): it runs the card's width rather
+            // than wrapping at the 45ch paragraph cap, which is set for running text.
+            <RevealItem key={card.href} className="[&_p]:max-w-none">
               <MediaCard
                 media={{
                   kind: "image",
