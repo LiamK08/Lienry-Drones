@@ -80,7 +80,8 @@ export function Hero() {
           <Button href={hero.primary.href} onDark arrow>{hero.primary.label}</Button>
         </div>
       </div>
-      <div className="page-x absolute inset-x-0 bottom-6 flex items-center justify-end text-caption text-white">
+      <div className="page-x absolute inset-x-0 bottom-6 flex items-center justify-between text-caption text-white">
+        <span>Concept render</span>
         <a href={hero.secondary.href} className="flex min-h-11 items-center gap-3 hover:underline underline-offset-4 mr-14">Explore the system <span aria-hidden="true">↓</span></a>
       </div>
     </section>

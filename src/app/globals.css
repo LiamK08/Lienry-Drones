@@ -31,28 +31,26 @@
      exist are the two the site actually ships. Redefined in the @theme inline block below. */
   --font-*: initial;
 
-  /* One scale, set with clamp() so it flows from 390 to 1440 wide. Pixels at the two ends:
-     display 64 to 96, h1 44 to 64, h2 32 to 44, h3 24 to 28, lead 18 to 20, body 17 to 18,
-     small 14, label 12. Headings run tight (1.05 to 1.15) with -0.02em; text runs at 1.55. */
-  --text-display: clamp(4rem, 3.257rem + 3.048vw, 6rem);
+  /* Restrained fluid display sizes, with 16px reading text and 13px captions. */
+  --text-display: clamp(3.25rem, 2.5rem + 3vw, 5.75rem);
   --text-display--line-height: 1.05;
   --text-display--letter-spacing: -0.02em;
-  --text-h1: clamp(2.75rem, 2.286rem + 1.905vw, 4rem);
+  --text-h1: clamp(2.75rem, 2.1rem + 2.5vw, 4.5rem);
   --text-h1--line-height: 1.08;
   --text-h1--letter-spacing: -0.02em;
-  --text-h2: clamp(2rem, 1.721rem + 1.143vw, 2.75rem);
+  --text-h2: clamp(2.25rem, 1.8rem + 1.5vw, 3.25rem);
   --text-h2--line-height: 1.12;
   --text-h2--letter-spacing: -0.02em;
-  --text-h3: clamp(1.5rem, 1.407rem + 0.381vw, 1.75rem);
+  --text-h3: clamp(1.5rem, 1.3rem + 0.7vw, 1.875rem);
   --text-h3--line-height: 1.15;
   --text-h3--letter-spacing: -0.02em;
-  --text-lead: clamp(1.125rem, 1.079rem + 0.19vw, 1.25rem);
+  --text-lead: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
   --text-lead--line-height: 1.45;
-  --text-body: clamp(1.0625rem, 1.039rem + 0.095vw, 1.125rem);
+  --text-body: 1rem;
   --text-body--line-height: 1.55;
   --text-small: 0.875rem;
   --text-small--line-height: 1.5;
-  --text-caption: 0.875rem;
+  --text-caption: 0.8125rem;
   --text-caption--line-height: 1.5;
   --text-label: 0.75rem;
   --text-label--line-height: 1.2;
@@ -330,3 +328,4 @@
   }
 }
 
+.on-dark .concept-caption { color: var(--color-muted-on-dark); }

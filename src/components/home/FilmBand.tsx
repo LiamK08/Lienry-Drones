@@ -105,7 +105,8 @@ export function FilmBand({
           </Reveal>
         </div>
       </div>
-      <div className="page-x absolute bottom-4 inset-x-0 flex items-center justify-end text-caption text-white">
+      <div className="page-x absolute bottom-4 inset-x-0 flex items-center justify-between text-caption text-white">
+        <span>Concept render</span>
         {video && !reduce ? <button type="button" onClick={() => setPaused(p => !p)} className="min-h-11 rounded-hard border border-white/75 bg-ink px-3" aria-label={paused ? "Play product film" : "Pause product film"}>{paused ? "Play film" : "Pause film"}</button> : null}
       </div>
     </section>
