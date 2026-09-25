@@ -37,7 +37,8 @@ export function FilmBand({ videoId, stillId, headline, body, cta }: FilmBandProp
       className="on-dark relative isolate flex min-h-[70svh] flex-col justify-end overflow-hidden bg-ink text-plaster md:min-h-[85svh]"
     >
       <FilmLayer film={film} videoId={videoId} posterId={stillId} overlays={scrim} />
-      <div className="page-x pb-14 pt-24 md:pb-20">
+      {/* 80px at the foot at every width, so the copy clears the rail (16px up, 44px tall) with 20 to spare. */}
+      <div className="page-x pb-20 pt-24">
         <div className="mx-auto w-full max-w-grid">
           <Reveal className="max-w-[34rem]">
             <h2 id="film-heading" className="text-h2">

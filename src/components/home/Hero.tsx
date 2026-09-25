@@ -42,7 +42,7 @@ export function Hero() {
           <Headline text={hero.headline} emphasis={hero.emphasis} />
         </h1>
         <div className="mt-7 flex flex-col items-center gap-6 md:flex-row md:gap-8">
-          <p className="max-w-[32ch] text-body text-white md:max-w-[48ch]">{hero.support}</p>
+          <p className="max-w-[32ch] text-balance text-body text-white md:max-w-[48ch]">{hero.support}</p>
           <Button href={hero.primary.href} onDark arrow>
             {hero.primary.label}
           </Button>

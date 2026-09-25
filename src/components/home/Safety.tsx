@@ -5,6 +5,15 @@ import { Reveal } from "@/components/ui/Reveal";
 import { SectionHead } from "@/components/ui/SectionHead";
 import { SnapTrack } from "@/components/ui/SnapTrack";
 
+// A cell: a top rule, 24, then the content. From 1024 the cells abut in a ruled row, each with a rule
+// below as well and 24px padding all round; the rule between two cells is drawn by the later cell's
+// ::before, so it takes no width and all four renders stay 300px wide.
+const cell = [
+  "relative flex flex-col border-t border-plaster/20 pt-6",
+  "lg:border-b lg:p-6",
+  "lg:not-first:before:absolute lg:not-first:before:inset-y-0 lg:not-first:before:left-0 lg:not-first:before:w-px lg:not-first:before:bg-plaster/20",
+].join(" ");
+
 /**
  * Safety by design, on an ink plate. The heading sits beside the plain status line, which stands
  * where a certification list would, then come the four design details. From 1024 they are four
@@ -23,7 +32,7 @@ export function Safety() {
         <Reveal className="mt-8 lg:[&_ul]:gap-0">
           <SnapTrack tone="dark" columns={4} label={safety.track.label} prevLabel={safety.track.prevLabel} nextLabel={safety.track.nextLabel}>
             {safety.items.map((item) => (
-              <li key={item.id} className="flex flex-col border-t border-plaster/20 pt-6 lg:border-b lg:border-l lg:p-6 lg:first:border-l-0">
+              <li key={item.id} className={cell}>
                 <h3 className="text-h3">{item.title}</h3>
                 <p className="mt-2 text-small text-muted-on-dark">{item.body}</p>
                 <Picture
