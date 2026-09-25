@@ -75,10 +75,12 @@ export function Footer() {
         </div>
         {/* The legal row's rule is the wordmark's bottom border, 32px under it and 16px over the row. */}
         <p aria-hidden="true" className="mt-10 max-w-none border-b border-border-strong/40 pb-8 font-display text-display leading-none md:mt-12">
-          Lienry Drones
+          {brand.name}
         </p>
         <div className="flex flex-col gap-3 pt-4 text-caption text-muted sm:flex-row sm:items-center sm:justify-between">
-          <p>© 2026 Lienry Drones. Sydney, Australia.</p>
+          <p>
+            © 2026 {brand.name}. {brand.location}.
+          </p>
           <p>
             In development.{" "}
             <Link href="/privacy" className="ml-4 underline underline-offset-4">
