@@ -17,7 +17,9 @@ export function PlacesRow() {
     <Band id="places" tone="plaster" labelledBy="places-heading">
       <Container>
         <SectionHead id="places-heading" headline={places.headline} emphasis={places.emphasis} aside={{ intro: places.intro }} />
-        <div className="mt-[var(--gap-head)]">
+        {/* The track's own control row (44px, then 16) sits above the cards. From 1024 it takes half
+            the heading gap, so the band stays within 900px with the cards still 84px below the head. */}
+        <div className="mt-[var(--gap-head)] lg:mt-6">
           <SnapTrack
             from="none"
             visible={4}

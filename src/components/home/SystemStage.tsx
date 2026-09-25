@@ -106,7 +106,7 @@ export function SystemStage() {
                         aria-disabled={open}
                         aria-controls={`part-panel-${part.id}`}
                         onClick={() => setActive(i)}
-                        className="flex min-h-12 w-full items-baseline gap-4 py-2"
+                        className="flex min-h-12 w-full items-baseline gap-4 py-1.5"
                       >
                         <span className="readout w-6 shrink-0 text-caption text-muted-on-dark" aria-hidden="true">
                           {two(i + 1)}
@@ -117,15 +117,19 @@ export function SystemStage() {
                         </span>
                       </button>
                     </h3>
-                    <div id={`part-panel-${part.id}`} role="region" aria-labelledby={`part-${part.id}`} hidden={!open} className="pb-4 pt-2">
+                    <div id={`part-panel-${part.id}`} role="region" aria-labelledby={`part-${part.id}`} hidden={!open} className="pb-4 pt-2 lg:pb-3">
+                      {/* From 1024 the cell takes the longest part's height. A shorter part's slack is
+                          split above and below its readout, so no run inside the sidebar exceeds 48px. */}
                       <div className="grid pl-10">
-                        <div className="col-start-1 row-start-1">
+                        <div className="col-start-1 row-start-1 flex flex-col">
                           <p className="text-small text-plaster">{part.body}</p>
+                          <span className="grow" />
                           <p className="mt-3 text-caption text-muted-on-dark">{part.readout}</p>
+                          <span className="grow" />
                         </div>
                         {open
                           ? parts.map((copy) => (
-                              <div key={copy.id} aria-hidden="true" className="invisible col-start-1 row-start-1">
+                              <div key={copy.id} aria-hidden="true" className="invisible col-start-1 row-start-1 hidden lg:block">
                                 <p className="text-small">{copy.body}</p>
                                 <p className="mt-3 text-caption">{copy.readout}</p>
                               </div>
@@ -146,7 +150,7 @@ export function SystemStage() {
                 );
               })}
             </div>
-            <div className="mt-auto flex flex-wrap items-center justify-between gap-x-6 gap-y-3 pt-4">
+            <div className="mt-auto flex flex-wrap items-center justify-between gap-x-6 gap-y-3 pt-4 lg:pt-3">
               <div className="flex items-center gap-2">
                 <button type="button" aria-label="Previous part" aria-disabled={active === 0 || undefined} onClick={() => step(active - 1)} className={control}>
                   <ArrowGlyph back />
