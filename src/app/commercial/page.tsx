@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
-import { commercialPage } from "@/content/pages";
-import { PageHero } from "@/components/blocks/PageHero";
-import { CtaBlock, Steps, Tiles } from "@/components/blocks/Blocks";
-import { Container, Section, SectionHeading } from "@/components/ui/Section";
-import { Reveal } from "@/components/ui/Reveal";
-import { Button } from "@/components/ui/Button";
+import { designFacts } from "@/content/home";
+import { commercialPage, faqSets, platformFaq } from "@/content/pages";
+import { softwareSection } from "@/content/software";
+import { CtaPanel } from "@/components/sections/CtaPanel";
+import { Faq } from "@/components/sections/Faq";
+import { FeatureRow } from "@/components/sections/FeatureRow";
+import { PageHeroSplit } from "@/components/sections/PageHeroSplit";
+import { SiblingCards } from "@/components/sections/SiblingCards";
+import { StatBand } from "@/components/sections/StatBand";
+import { Switcher } from "@/components/sections/Switcher";
+import { SoftwareBand } from "@/components/software/SoftwareBand";
 
 export const metadata: Metadata = {
   title: "Lienry Drones",
@@ -12,42 +17,64 @@ export const metadata: Metadata = {
   alternates: { canonical: "/commercial" },
 };
 
+// The page's questions, in the order faqSets gives them.
+const questions = faqSets.commercial.map((id) => platformFaq.items.find((item) => item.id === id)).filter((item) => item !== undefined);
+
+/**
+ * /commercial (docs/REDESIGN-SPEC.md C3): the split hero with the commercial film, the four steps,
+ * the working software with its strip, the design figures, the running cost, questions, the other
+ * product pages and the pilot panel.
+ */
 export default function CommercialPage() {
   const c = commercialPage;
   return (
     <>
-      <PageHero eyebrow={c.eyebrow} headline={c.headline} lead={c.lead} imageId={c.heroImageId} imageAlt="The Lienry roof capsule on a plant deck at dawn">
-        <Button href={c.pilot.cta.href} size="lg">
-          {c.pilot.cta.label}
-        </Button>
-        <Button href="/platform" size="md" variant="tertiary" arrow>
-          See the platform
-        </Button>
-      </PageHero>
-      <div className="h-[var(--section-y)]" aria-hidden="true" />
-      <Steps id="how" eyebrow={c.steps.eyebrow} headline={c.steps.headline} items={c.steps.items} />
-      <Tiles id="software" eyebrow={c.software.eyebrow} headline={c.software.headline} items={c.software.tiles} />
-      <Section id="cost" ariaLabelledby="cost-heading">
-        <Container>
-          <div className="grid gap-8 md:grid-cols-12">
-            <Reveal className="md:col-span-5">
-              <SectionHeading id="cost-heading" eyebrow={c.cost.eyebrow} headline={c.cost.headline} />
-            </Reveal>
-            <Reveal className="md:col-span-6 md:col-start-7" delay={0.08}>
-              <p className="text-lead text-muted">{c.cost.body}</p>
-              <ul className="mt-8 divide-y divide-hairline border-y border-hairline text-small">
-                {["No crews to book for each visit", "No access equipment to arrange at height", "No waiting for a slot: the re-scan decides when a clean is due", "The building is planned, tracked and reported in one place"].map((line) => (
-                  <li key={line} className="flex gap-3 py-3">
-                    <span className="mt-[0.55em] h-1.5 w-1.5 shrink-0 bg-glass" aria-hidden="true" />
-                    {line}
-                  </li>
-                ))}
-              </ul>
-            </Reveal>
-          </div>
-        </Container>
-      </Section>
-      <CtaBlock id="pilot" eyebrow={c.pilot.eyebrow} headline={c.pilot.headline} body={c.pilot.body} cta={c.pilot.cta} imageId="m2-capsule-master" />
+      <PageHeroSplit
+        id="hero-heading"
+        headline={c.headline}
+        emphasis={c.emphasis}
+        lead={c.lead}
+        primary={c.actions.primary}
+        secondary={c.actions.secondary}
+        media={{ kind: "film", videoId: c.heroVideoId, posterId: c.heroImageId, alt: c.heroAlt, name: "commercial film" }}
+      />
+      <Switcher
+        id="how"
+        tone="plaster"
+        headline={c.steps.headline}
+        emphasis={c.steps.emphasis}
+        intro={c.steps.intro}
+        tabsLabel={c.steps.tabsLabel}
+        items={c.steps.items}
+      />
+      <SoftwareBand
+        id="software"
+        tone="sunken"
+        headline={c.software.headline}
+        body={softwareSection.body}
+        strip={c.software.tiles.map((tile) => ({ term: tile.title, text: tile.body }))}
+      />
+      <StatBand
+        kind="design"
+        id="by-design"
+        headline={c.byDesign.headline}
+        intro={c.byDesign.intro}
+        items={designFacts.items}
+        note={designFacts.note}
+        action={c.pilot.cta}
+      />
+      <FeatureRow
+        id="cost"
+        tone="raised"
+        side="right"
+        title={c.cost.headline}
+        body={c.cost.body}
+        facts={c.cost.points.map((text) => ({ text }))}
+        image={c.cost.image}
+      />
+      <Faq id="faq" tone="plaster" headline={platformFaq.headline} intro={platformFaq.intro} link={c.pilot.cta} items={questions} />
+      <SiblingCards current="commercial" />
+      <CtaPanel id="pilot" headline={c.pilot.headline} body={c.pilot.body} primary={c.pilot.cta} links={c.pilot.links} image={c.pilot.image} />
     </>
   );
 }
