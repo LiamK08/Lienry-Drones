@@ -21,15 +21,19 @@ export const metadata: Metadata = {
 // Each part's panel id is its part id (dock ... automation), so the footer's /platform#part links
 // open it; no other element on this page may take one of those ids.
 
-const parts: SwitcherItem[] = systemExplainer.tabs.map((part, i) => ({
-  id: part.id,
-  tab: part.tab,
-  label: `${String(i + 1).padStart(2, "0")} · ${part.tab}`,
-  title: part.title,
-  body: part.body,
-  image: { id: part.imageId, alt: part.alt, position: part.position },
-  ...platformPage.partFacts[part.id],
-}));
+const parts: SwitcherItem[] = systemExplainer.tabs.map((part, i) => {
+  const { facts, link } = platformPage.partFacts[part.id];
+  return {
+    id: part.id,
+    tab: part.tab,
+    label: `${String(i + 1).padStart(2, "0")} · ${part.tab}`,
+    title: part.title,
+    body: part.body,
+    image: { id: part.imageId, alt: part.alt, position: part.position },
+    facts,
+    link,
+  };
+});
 
 const [commercialSystem, homeSystem] = twoSystems.systems;
 
