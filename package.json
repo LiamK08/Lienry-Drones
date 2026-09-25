@@ -10,6 +10,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "screenshots": "node scripts/screenshots.mjs",
+    "check:layout": "node scripts/check-layout.mjs",
     "media:fetch": "node scripts/media/fetch.mjs",
     "prebuild": "node scripts/media/fetch.mjs --soft",
     "shots:set": "node scripts/shots-set.mjs",
