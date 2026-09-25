@@ -13,6 +13,16 @@ export const metadata: Metadata = {
   alternates: { canonical: "/company" },
 };
 
+/**
+ * Keeps a hyphenated compound whole in a display heading: a word joiner (U+2060, zero width and
+ * silent) after the hyphen removes the line break the hyphen allows, so a balanced heading never
+ * ends a line on "pre-". The fonts have no non-breaking hyphen (U+2011), which would fall back to
+ * another typeface.
+ */
+function keepCompounds(text: string) {
+  return text.replace(/(\w)-(\w)/g, "$1-⁠$2");
+}
+
 // /company (docs/REDESIGN-SPEC.md C6): the statement over one wide image, the two narrative rows,
 // the founders with what is next, then the investor panel. Tones: raised, plaster, raised, sunken,
 // plaster (with the glass-deep panel), then the sunken footer.
@@ -48,7 +58,7 @@ export default function CompanyPage() {
         id="where"
         tone="plaster"
         side="left"
-        title={c.where.headline}
+        title={keepCompounds(c.where.headline)}
         body={c.where.body}
         facts={c.where.items.map((i) => ({ term: i.title, text: i.body }))}
         image={c.where.image}
@@ -80,7 +90,7 @@ export default function CompanyPage() {
       {/* 5. Investors: the closing panel. */}
       <CtaPanel
         id="investors"
-        headline={c.investors.headline}
+        headline={keepCompounds(c.investors.headline)}
         body={`${c.investors.body} ${c.investors.note}`}
         primary={c.investors.cta}
         links={c.investors.links}
