@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { companyPage } from "@/content/pages";
-import { CtaBlock, Tiles } from "@/components/blocks/Blocks";
-import { Container, Section, SectionHeading } from "@/components/ui/Section";
-import { Reveal } from "@/components/ui/Reveal";
-import { PhotoPlaceholder } from "@/components/home/VisionLetter";
+import { FounderList } from "@/components/company/FounderList";
+import { CtaPanel } from "@/components/sections/CtaPanel";
+import { FeatureRow } from "@/components/sections/FeatureRow";
+import { Band, Container } from "@/components/ui/Band";
 import { Picture } from "@/components/ui/Picture";
+import { SectionHead } from "@/components/ui/SectionHead";
 
 export const metadata: Metadata = {
   title: "Lienry Drones",
@@ -12,55 +13,79 @@ export const metadata: Metadata = {
   alternates: { canonical: "/company" },
 };
 
+// /company (docs/REDESIGN-SPEC.md C6): the statement over one wide image, the two narrative rows,
+// the founders with what is next, then the investor panel. Tones: raised, plaster, raised, sunken,
+// plaster (with the glass-deep panel), then the sunken footer.
 export default function CompanyPage() {
   const c = companyPage;
   return (
     <>
-      <header className="page-x bg-plaster pt-[calc(var(--nav-h)+3rem)] md:pt-[calc(var(--nav-h)+5rem)]">
-        <Container width="statement">
-          <div>
-            <h1 className="text-h2 text-muted">{c.headline}</h1>
-            <p className="mt-8 max-w-none font-display text-h2">{c.statement}</p>
-          </div>
-        </Container>
-        <Container className="mt-12 md:mt-16">
-          <div>
-            <Picture id="co1-company" alt="A harbour-side street of mid-rise buildings at dawn" aspect="21/9" sizes="(min-width: 1280px) 1280px, 100vw" priority />
-          </div>
-        </Container>
-      </header>
-      <Section id="founders" ariaLabelledby="founders-heading">
+      {/* 1. Statement: a media hero, so nothing in it waits for a reveal. */}
+      <Band id="statement" as="header" tone="raised" pad="page" labelledBy="company-heading">
         <Container>
-          <Reveal>
-            <SectionHeading id="founders-heading" eyebrow={c.founders.eyebrow} headline={c.founders.headline} />
-          </Reveal>
-          <div className="mt-12 grid gap-8 sm:grid-cols-2 md:mt-16 md:max-w-[52rem]">
-            {c.founders.people.map((p, i) => (
-              <Reveal key={p.name} delay={i * 0.08} as="article">
-                <PhotoPlaceholder label={`Photo of ${p.name} to come`} />
-                <h3 className="mt-5 text-h3">{p.name}</h3>
-                <p className="text-small text-muted">{p.title}</p>
-                <p className="mt-3 text-small text-muted">{p.bio}</p>
-              </Reveal>
-            ))}
-          </div>
+          <SectionHead
+            id="company-heading"
+            as="h1"
+            size="h1"
+            headline={c.headline}
+            emphasis={c.emphasis}
+            reveal={false}
+            aside={{ action: <p className="text-lead text-ink">{c.statement}</p> }}
+          />
+          <Picture
+            id={c.heroImageId}
+            alt={c.heroAlt}
+            aspect="21/9"
+            priority
+            sizes="(min-width: 1440px) 1392px, 100vw"
+            className="mt-[var(--gap-head)]"
+          />
         </Container>
-      </Section>
-      <Tiles id="where" eyebrow={c.where.eyebrow} headline={c.where.headline} items={c.where.items} columns={4} />
-      <Tiles id="values" eyebrow={c.values.eyebrow} headline={c.values.headline} items={c.values.items} tone="plaster" />
-      <Section id="exploring" ariaLabelledby="exploring-heading">
+      </Band>
+
+      {/* 2. Where we are. */}
+      <FeatureRow
+        id="where"
+        tone="plaster"
+        side="left"
+        title={c.where.headline}
+        body={c.where.body}
+        facts={c.where.items.map((i) => ({ term: i.title, text: i.body }))}
+        image={c.where.image}
+      />
+
+      {/* 3. How we work. */}
+      <FeatureRow
+        id="values"
+        tone="raised"
+        side="right"
+        title={c.values.headline}
+        body={c.values.body}
+        facts={c.values.items.map((i) => ({ term: i.title, text: i.body }))}
+        termStyle="strong"
+        image={c.values.image}
+      />
+
+      {/* 4. Founders and what is next: two split blocks divided by a hairline. The band is named by
+          the founders heading; the second block is its own section, named by its heading. */}
+      <Band id="founders" tone="sunken" labelledBy="founders-heading">
         <Container>
-          <div className="grid gap-8 md:grid-cols-12">
-            <Reveal className="md:col-span-5">
-              <SectionHeading id="exploring-heading" eyebrow={c.exploring.eyebrow} headline={c.exploring.headline} />
-            </Reveal>
-            <Reveal className="md:col-span-6 md:col-start-7" delay={0.08}>
-              <p className="text-lead text-muted">{c.exploring.body}</p>
-            </Reveal>
-          </div>
+          <SectionHead id="founders-heading" headline={c.founders.headline} aside={{ action: <FounderList people={c.founders.people} /> }} />
+          <section aria-labelledby="exploring-heading" className="mt-[var(--gap-head)] border-t border-hairline pt-[var(--gap-head)]">
+            <SectionHead id="exploring-heading" headline={c.exploring.headline} aside={{ label: c.exploring.eyebrow, intro: c.exploring.body }} />
+          </section>
         </Container>
-      </Section>
-      <CtaBlock id="investors" eyebrow={c.investors.eyebrow} headline={c.investors.headline} body={c.investors.body} cta={c.investors.cta} />
+      </Band>
+
+      {/* 5. Investors: the closing panel. */}
+      <CtaPanel
+        id="investors"
+        headline={c.investors.headline}
+        body={`${c.investors.body} ${c.investors.note}`}
+        primary={c.investors.cta}
+        links={c.investors.links}
+        image={c.investors.image}
+      />
     </>
   );
 }
