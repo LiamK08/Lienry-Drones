@@ -108,7 +108,6 @@ const stepImages = [
   { id: "p5-solar-farm", alt: "The home drone low over a solar farm row, its tether running back to the pod", position: "50% 60%" },
 ];
 
-const faqIds = ["surfaces", "height", "water", "decide", "attend", "operating", "cost"];
 
 const aspects: PictureAspect[] = ["16/9", "21/9", "2/1", "3/2", "4/3", "1/1", "4/5", "3/4"];
 
@@ -443,7 +442,7 @@ export default async function KitPage({ searchParams }: { searchParams: Promise<
         headline={platformFaq.headline}
         intro="Straight answers, including what we cannot claim yet."
         link={{ label: "All questions", href: "/platform#faq" }}
-        items={platformFaq.items.map((item, i) => ({ id: faqIds[i], ...item }))}
+        items={platformFaq.items}
       />
 
       <CtaPanel

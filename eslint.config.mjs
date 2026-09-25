@@ -5,7 +5,7 @@ import nextTs from "eslint-config-next/typescript";
 export default defineConfig([
   ...nextVitals,
   ...nextTs,
-  globalIgnores([".next/**", "out/**", "node_modules/**", "scripts/**", "docs/**"]),
+  globalIgnores([".next/**", "out/**", "node_modules/**", "scripts/**", "docs/**", ".claude/**"]),
   {
     rules: {
       "@next/next/no-img-element": "off",
