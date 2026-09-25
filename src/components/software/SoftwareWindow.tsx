@@ -35,8 +35,12 @@ const PRESET_LAYERS: Record<StepId, Layers> = {
 
 type Hover = { info: NonNullable<HoverInfo>; x: number; y: number };
 
-/** The poster covers the live canvas until the model's first frame, then fades out and unmounts. */
-type Paint = "waiting" | "painted" | "settled";
+/**
+ * The live scene's life: off (not mounted), starting (mounted, not drawn yet), painted (first frame
+ * drawn, the poster fading out) and settled (the poster unmounted). The poster covers the canvas
+ * until the first frame.
+ */
+type Paint = "off" | "starting" | "painted" | "settled";
 
 export type SoftwareWindowProps = {
   /** Applies a step's layers and camera in live mode. Unset: the window's default (the clean). */
@@ -105,7 +109,7 @@ export function SoftwareWindow({ preset, tone = "sunken" }: SoftwareWindowProps)
   const [playing, setPlaying] = useState(true);
   const [completed, setCompleted] = useState(0);
   const [hover, setHover] = useState<Hover | null>(null);
-  const [paint, setPaint] = useState<Paint>("waiting");
+  const [paint, setPaint] = useState<Paint>("off");
   const dragging = useRef(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const live = can3d && !reduce;
@@ -123,10 +127,11 @@ export function SoftwareWindow({ preset, tone = "sunken" }: SoftwareWindowProps)
     }
   }
 
-  // The scene unmounts when the window is far off screen; the poster covers it again until the
-  // remounted scene draws.
-  const sceneMounted = live && near;
-  if (!sceneMounted && paint !== "waiting") setPaint("waiting");
+  // The scene mounts when the window comes within 600px of the screen and unmounts when it is far
+  // away again, but never before its first frame: R3F creates the canvas asynchronously and throws
+  // if it is unmounted mid-creation (a fast scroll past the window). The poster covers it meanwhile.
+  const nextPaint: Paint = !live ? "off" : near ? (paint === "off" ? "starting" : paint) : paint === "starting" ? "starting" : "off";
+  if (nextPaint !== paint) setPaint(nextPaint);
 
   // Write the preset into the scene. The first one applied skips the flight: the camera already
   // starts on the overview, so a first paint on Clean is exactly the window's default.
@@ -143,7 +148,7 @@ export function SoftwareWindow({ preset, tone = "sunken" }: SoftwareWindowProps)
     control.requestFrame();
   }, [live, preset]);
 
-  const onFirstFrame = useCallback(() => setPaint((p) => (p === "waiting" ? "painted" : p)), []);
+  const onFirstFrame = useCallback(() => setPaint((p) => (p === "starting" ? "painted" : p)), []);
 
   useEffect(() => {
     if (paint !== "painted") return;
@@ -283,7 +288,7 @@ export function SoftwareWindow({ preset, tone = "sunken" }: SoftwareWindowProps)
   );
 
   return (
-    <div ref={nearRef} data-software-preview data-preset={preset} data-live={live ? "" : undefined} data-painted={live && paint !== "waiting" ? "" : undefined}>
+    <div ref={nearRef} data-software-preview data-preset={preset} data-live={live ? "" : undefined} data-painted={live && (paint === "painted" || paint === "settled") ? "" : undefined}>
       <div role="group" aria-label={`${project.app}, demo window`} className={`overflow-hidden rounded-hard border bg-plaster text-ink ${border}`}>
         <div className="flex h-10 items-center justify-between border-b border-hairline px-3 text-small">
           <div className="flex min-w-0 items-center gap-3">
@@ -374,7 +379,7 @@ export function SoftwareWindow({ preset, tone = "sunken" }: SoftwareWindowProps)
             {live ? (
               <>
                 <div className="absolute inset-0" aria-hidden="true">
-                  {near ? <SoftwareScene controlRef={controlRef} onFirstFrame={onFirstFrame} /> : null}
+                  {paint !== "off" ? <SoftwareScene controlRef={controlRef} onFirstFrame={onFirstFrame} /> : null}
                 </div>
                 {paint !== "settled" ? (
                   // The recording's poster is 1020x756: contained, so the roof and the base stay in frame.
