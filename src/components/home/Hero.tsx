@@ -23,9 +23,10 @@ const scrims = (
 /**
  * The home hero: the film full screen, one short centred line low in the frame with its italic turn,
  * then the support line and the one primary action on a single row. The bottom rail carries the
- * Concept render caption at the left margin, the link down to the system, and the film's pause
- * control at the right margin (only while the film plays; under reduced motion or Save-Data the
- * poster stands alone). Nothing here reveals on scroll: it is the first screen.
+ * Concept render caption at the left margin, the link down to the system, and the film's pause and
+ * play control at the right margin. Under reduced motion or Save-Data the poster stands alone, with no
+ * video and so no control, and the link takes the right margin. Nothing here reveals on scroll: it is
+ * the first screen.
  */
 export function Hero() {
   const film = useFilm({ videoId: hero.videoId, threshold: 0.1 });
