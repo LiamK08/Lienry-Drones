@@ -11,7 +11,7 @@ export function FounderList({ people }: { people: readonly FounderEntry[] }) {
   const published = people.filter((p) => p.published);
   if (published.length === 0) return null;
   return (
-    <ul className={`grid gap-8 ${published.length > 1 ? "sm:grid-cols-2 sm:gap-6" : ""}`}>
+    <ul className={published.length > 1 ? "grid gap-8 sm:grid-cols-2 sm:gap-6" : "grid gap-8"}>
       {published.map((p) => (
         <li key={p.name}>
           {p.photo ? (
