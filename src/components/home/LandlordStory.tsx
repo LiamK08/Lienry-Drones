@@ -33,8 +33,9 @@ const strip = homesPage.app.items.map((item) => ({ term: item.title, text: item.
  * panel's status line announces each change.
  *
  * From 1024 one row holds the beat list (columns 1-5), the panel (6-9) and the active beat's image
- * (10-12), stretched to one height; then 32 and the app's features in four columns. Below 1024 the
- * image sits inside the open beat at 4:3, then 32, the panel, 32, and the features in one column.
+ * (10-12), stretched to one height; then 32 and the app's features in four columns (FactList
+ * switches to its columns from 768). Below 1024 the image sits inside the open beat at 4:3, then
+ * 32, the panel, 32, and the features, in one column on phones.
  */
 export function LandlordStory() {
   const [active, setActive] = useState(0);

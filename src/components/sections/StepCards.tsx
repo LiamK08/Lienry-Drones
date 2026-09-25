@@ -41,10 +41,10 @@ const sizes = {
 } as const;
 
 /**
- * A row of step cards: the section head, 48, then image-led cards in a row of `columns` from 1024
- * and a snap track with previous and next buttons below it (SnapTrack). Each card is its image,
- * the Concept render caption, the step number as its label, the title and the body. The head
- * and the cards rise in, the cards with a 60ms stagger, unless `reveal` is false.
+ * A row of step cards: the section head, 48, then image-led cards, `columns` across from 1024 and
+ * a snap track with previous and next buttons below 1024 (SnapTrack). Each card is its image, the
+ * Concept render caption, the step number as its label, the title and the body. The head and the
+ * cards rise in, the cards with a 60ms stagger, unless `reveal` is false.
  */
 export function StepCards({ id, tone, headline, emphasis, intro, numbered, columns, aspect, items, track, reveal = true }: StepCardsProps) {
   const dark = tone === "ink";
