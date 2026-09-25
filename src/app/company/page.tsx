@@ -20,7 +20,7 @@ export const metadata: Metadata = {
  * another typeface.
  */
 function keepCompounds(text: string) {
-  return text.replace(/(\w)-(\w)/g, "$1-⁠$2");
+  return text.replace(/(\w)-(?=\w)/g, "$1-\u2060");
 }
 
 // /company (docs/REDESIGN-SPEC.md C6): the statement over one wide image, the two narrative rows,
