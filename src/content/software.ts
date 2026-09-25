@@ -7,6 +7,46 @@ export const softwareSection = {
   body: "Every clean starts from the scan. The desktop software renders the building as a model, plans the wash route, tracks progress live and shades the areas where debris has built up.",
 };
 
+/**
+ * The home software band's four steps, in Lienry's own process words. Each tab applies a preset to the
+ * window; none of them shares a name with a layer toggle (Scan, Wash, Debris, Zones). `short` is the line
+ * in the static list shown when the window is a recording (phones, reduced motion, no WebGL).
+ */
+export type StepId = "map" | "plan" | "clean" | "rescan";
+
+export const softwareSteps: { id: StepId; tab: string; caption: string; hint?: string; short: string }[] = [
+  {
+    id: "map",
+    tab: "Map",
+    caption: "The drone maps the structure and dimensions of the building, and the software builds its model from that scan.",
+    short: "The drone maps the building, and the model is built from the scan.",
+  },
+  {
+    id: "plan",
+    tab: "Plan",
+    caption: "Each zone has its own surface, preset and pressure.",
+    hint: "Select a zone in the window to fly to it.",
+    short: "Each zone gets its own surface, preset and pressure.",
+  },
+  {
+    id: "clean",
+    tab: "Clean",
+    caption: "The clean moves down the facade, two passes per floor, top down.",
+    hint: "Drag the timeline to scrub it.",
+    short: "The clean moves down the facade, two passes per floor.",
+  },
+  {
+    id: "rescan",
+    tab: "Re-scan",
+    caption: "On its interval the drone re-scans the building, and built-up debris is shaded where the next clean is needed.",
+    short: "The re-scan shades built-up debris where the next clean is needed.",
+  },
+];
+
+export const softwareDefaultStep: StepId = "clean";
+
+export const softwareStepsLabel = "Software steps";
+
 export type ZoneId = "north" | "east" | "roof" | "shopfront";
 
 export type Zone = {
