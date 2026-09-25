@@ -15,6 +15,8 @@ import type { ZoneId } from "@/content/software";
 
 const deg = (d: number) => (d * Math.PI) / 180;
 const FLIGHT_MS = 1500;
+/** Building's scan sweep takes 4.2s; a little over it, so its last frame is drawn. */
+const SCAN_SWEEP_MS = 4400;
 
 const skyMaterial = new THREE.ShaderMaterial({
   side: THREE.BackSide,
@@ -40,7 +42,7 @@ function Sky() {
 }
 
 /** Slow auto orbit with damping between 25 and 70 degrees, no zoom, no pan, and camera flights to each zone. */
-function Rig({ controlRef, clockRef }: { controlRef: RefObject<SceneControl>; clockRef: RefObject<Clock> }) {
+function Rig({ controlRef, clockRef, flyingRef }: { controlRef: RefObject<SceneControl>; clockRef: RefObject<Clock>; flyingRef: RefObject<boolean> }) {
   const get = useThree((s) => s.get);
   const size = useThree((s) => s.size);
   const controls = useRef<OrbitControls | null>(null);
@@ -79,14 +81,21 @@ function Rig({ controlRef, clockRef }: { controlRef: RefObject<SceneControl>; cl
     const onStart = () => {
       pauseUntil.current = now() + 6000;
     };
+    // While the preview plays the driver draws every frame. While it is paused, a drag (and the
+    // damping after it) still has to be drawn, so each camera change asks for the next frame.
+    const onChange = () => {
+      if (!controlRef.current.active) get().invalidate();
+    };
     c.addEventListener("start", onStart);
+    c.addEventListener("change", onChange);
     controls.current = c;
     return () => {
       c.removeEventListener("start", onStart);
+      c.removeEventListener("change", onChange);
       c.dispose();
       controls.current = null;
     };
-  }, [get]);
+  }, [get, controlRef]);
 
   // Fit the current preset to the canvas on mount and whenever it is resized.
   useEffect(() => {
@@ -129,14 +138,31 @@ function Rig({ controlRef, clockRef }: { controlRef: RefObject<SceneControl>; cl
       c.target.lerpVectors(fl.fromT, fl.toT, e);
       if (u >= 1) flight.current = null;
     }
+    flyingRef.current = flight.current !== null;
     c.autoRotate = control.active && !fl && t > pauseUntil.current;
     c.update(dt);
   });
   return null;
 }
 
-/** Keeps frames coming only while the window is on screen. In capture mode the recorder steps time by hand. */
-function Driver({ controlRef, clockRef }: { controlRef: RefObject<SceneControl>; clockRef: RefObject<Clock> }) {
+/**
+ * Whether a change the user started still needs frames: a layer fading in or out, the scan's sweep
+ * up the building, or a camera flight. The driver draws these to the end even while the preview is
+ * paused (a step preset or a zone chosen while paused would otherwise stop after one frame); the
+ * wash and the orbit stay paused.
+ */
+function settling(control: SceneControl, fade: Fade, flying: boolean): boolean {
+  const L = control.layers;
+  if (flying) return true;
+  if (fade.scan !== (L.scan ? 1 : 0) || fade.wash !== (L.wash ? 1 : 0) || fade.debris !== (L.debris ? 1 : 0) || fade.zones !== (L.zones ? 1 : 0)) return true;
+  return L.scan && control.scanStartedAt !== null && now() - control.scanStartedAt < SCAN_SWEEP_MS;
+}
+
+/**
+ * Keeps frames coming only while the window is on screen and playing, or while a change is still
+ * settling. In capture mode the recorder steps time by hand.
+ */
+function Driver({ controlRef, clockRef, fadeRef, flyingRef }: { controlRef: RefObject<SceneControl>; clockRef: RefObject<Clock>; fadeRef: RefObject<Fade>; flyingRef: RefObject<boolean> }) {
   const invalidate = useThree((s) => s.invalidate);
   const get = useThree((s) => s.get);
   useEffect(() => {
@@ -160,12 +186,13 @@ function Driver({ controlRef, clockRef }: { controlRef: RefObject<SceneControl>;
     }
     let raf = 0;
     const loop = () => {
-      if (controlRef.current.active && document.visibilityState === "visible") invalidate();
+      const control = controlRef.current;
+      if (document.visibilityState === "visible" && (control.active || settling(control, fadeRef.current, flyingRef.current))) invalidate();
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
-  }, [controlRef, invalidate, get]);
+  }, [controlRef, fadeRef, flyingRef, invalidate, get]);
   useFrame(() => {
     const t = now();
     const c = clockRef.current;
@@ -175,9 +202,26 @@ function Driver({ controlRef, clockRef }: { controlRef: RefObject<SceneControl>;
   return null;
 }
 
-export default function SoftwareScene({ controlRef }: { controlRef: RefObject<SceneControl> }) {
+/**
+ * Reports the scene's first frame once, after it is drawn: useFrame runs just before the frame
+ * renders, so the report waits for the next animation frame. The window shows its poster until then.
+ */
+function FirstFrame({ onFirstFrame }: { onFirstFrame: () => void }) {
+  const reported = useRef(false);
+  const pending = useRef(0);
+  useEffect(() => () => cancelAnimationFrame(pending.current), []);
+  useFrame(() => {
+    if (reported.current) return;
+    reported.current = true;
+    pending.current = requestAnimationFrame(() => onFirstFrame());
+  });
+  return null;
+}
+
+export default function SoftwareScene({ controlRef, onFirstFrame }: { controlRef: RefObject<SceneControl>; onFirstFrame?: () => void }) {
   const clockRef = useRef<Clock>({ t: 0, dt: 0 });
   const fadeRef = useRef<Fade>({ scan: 0, wash: 1, debris: 1, zones: 0 });
+  const flyingRef = useRef(false);
   return (
     <Canvas
       frameloop="demand"
@@ -207,8 +251,9 @@ export default function SoftwareScene({ controlRef }: { controlRef: RefObject<Sc
       <Building controlRef={controlRef} clockRef={clockRef} fadeRef={fadeRef} />
       <Fleet controlRef={controlRef} clockRef={clockRef} fadeRef={fadeRef} />
       <ContactShadows position={[0, 0.01, 0]} scale={100} far={20} blur={2.2} opacity={0.6} resolution={1024} frames={1} color="#1c1a17" />
-      <Rig controlRef={controlRef} clockRef={clockRef} />
-      <Driver controlRef={controlRef} clockRef={clockRef} />
+      <Rig controlRef={controlRef} clockRef={clockRef} flyingRef={flyingRef} />
+      <Driver controlRef={controlRef} clockRef={clockRef} fadeRef={fadeRef} flyingRef={flyingRef} />
+      {onFirstFrame ? <FirstFrame onFirstFrame={onFirstFrame} /> : null}
     </Canvas>
   );
 }
