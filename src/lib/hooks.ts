@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 const noop = () => () => {};
 
@@ -25,37 +25,6 @@ function subscribeScroll(cb: () => void) {
 /** True once the page has scrolled past `px`. Reads scrollY only when the browser fires a scroll event. */
 export function useScrolledPast(px: number): boolean {
   return useSyncExternalStore(subscribeScroll, () => window.scrollY > px, () => false);
-}
-
-/**
- * Which of `count` elements currently sits in the band around the viewport centre.
- * One IntersectionObserver, no per-frame scroll maths. Register elements with `setRef(i)`.
- */
-export function useActiveStep(count: number, band = "-40% 0px -40% 0px"): [number, (i: number) => (el: HTMLElement | null) => void] {
-  const [active, setActive] = useState(0);
-  const els = useRef<(HTMLElement | null)[]>([]);
-  const setRef = useCallback(
-    (i: number) => (el: HTMLElement | null) => {
-      els.current[i] = el;
-    },
-    [],
-  );
-  useEffect(() => {
-    const nodes = els.current.slice(0, count).filter((el): el is HTMLElement => !!el);
-    if (nodes.length === 0) return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        const hit = entries.filter((e) => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (!hit) return;
-        const i = nodes.indexOf(hit.target as HTMLElement);
-        if (i >= 0) setActive(i);
-      },
-      { rootMargin: band, threshold: [0, 0.25, 0.5, 0.75, 1] },
-    );
-    nodes.forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, [count, band]);
-  return [active, setRef];
 }
 
 /** Whether an element is on screen, with an optional margin. IntersectionObserver only. */

@@ -59,7 +59,9 @@
   --text-numeral--line-height: 1;
   --text-numeral--letter-spacing: -0.02em;
 
-  --container-grid: 84rem;
+  /* 1,392px: at 1440 the content starts at x=24, the edge the header links already use. */
+  --container-grid: 87rem;
+  /* --container-rows and --container-statement are deleted in the closing step (F9). */
   --container-rows: 70rem;
   --container-statement: 55rem;
   /* The 68-character cap, set in characters rather than zeroes. CSS ch is the advance of "0",
@@ -88,9 +90,25 @@
     /* Preflight aims code, kbd, samp and pre at a monospace stack. There is no mono family in
        this project, so they resolve to Inter like every other run of text. */
     --default-mono-font-family: var(--font-sans);
-    --page-margin: clamp(1.25rem, 0.5rem + 2.5vw, 2.5rem);
-    --section-y: clamp(4.5rem, 2rem + 7vw, 8.5rem);
+    --page-margin: 1rem;                              /* 16px below 768px */
+    --band-y: clamp(3.5rem, 2rem + 4.5vw, 6rem);      /* band padding: 56px at 390, 96px at 1440 */
+    --plate-y: clamp(2rem, 1rem + 2vw, 2.5rem);       /* plate padding: 32px at 390, 40px at 1440 */
+    --gap-head: clamp(2rem, 1.25rem + 2.5vw, 3rem);   /* heading row to content: 32px at 390, 48px at 1440 */
+    --section-y: var(--band-y);                       /* old name, kept until F9 so unconverted pages follow the new rhythm */
     --nav-h: 4.5rem;
+  }
+
+  /* 24px from 768px: the header's own edge. */
+  @media (min-width: 48rem) {
+    :root {
+      --page-margin: 1.5rem;
+    }
+  }
+
+  /* The UA centres button text. Button labels centre by flex instead, so no text is centred
+     anywhere outside the home hero. */
+  button {
+    text-align: inherit;
   }
 
   html {
@@ -190,21 +208,21 @@
     padding-bottom: var(--section-y);
   }
 
-  /* The three blocks of the mark rise into place once, in step with the hero reveal. */
-  @keyframes mark-rise {
-    from {
-      opacity: 0;
-      transform: translateY(12%);
-    }
-    to {
-      opacity: 1;
-      transform: none;
-    }
+  /* The glass-deep closing panel: white text, and a focus ring that holds 3:1 on glass-deep
+     (glass-on-dark measures 4.31:1 there). */
+  .on-accent {
+    color: var(--color-white);
   }
 
-  .mark-rise {
-    transform-box: fill-box;
-    animation: mark-rise 640ms var(--ease-settle) both;
+  .on-accent :focus-visible {
+    outline-color: var(--color-glass-on-dark);
+  }
+
+  /* A hairline where two light tones meet: plaster, raised and sunken differ by only 1.09 to 1.21:1.
+     Bands carry data-tone (ui/Band.tsx); :where keeps this at zero specificity. */
+  :where([data-tone="plaster"], [data-tone="raised"], [data-tone="sunken"])
+    + :where([data-tone="plaster"], [data-tone="raised"], [data-tone="sunken"]) {
+    border-top: 1px solid var(--color-hairline);
   }
 
   /* Small labels: Inter, uppercase, 12px, 0.12em. The only uppercase on the site. */
@@ -236,12 +254,6 @@
     font-variant-numeric: tabular-nums;
   }
 
-  .signature {
-    font-family: var(--font-display-italic);
-    font-style: italic;
-    font-weight: 400;
-  }
-
   .water-link {
     color: var(--color-glass);
     text-decoration: underline;
@@ -253,10 +265,6 @@
   .water-link:hover {
     color: var(--color-glass-deep);
     text-decoration-thickness: 2px;
-  }
-
-  .hairline-y {
-    border-top: 1px solid var(--color-hairline);
   }
 
   .caption {
@@ -328,4 +336,8 @@
   }
 }
 
+/* Unlayered, so these beat the colour utilities: the caption follows the surface it sits on.
+   On the glass-deep closing panel (.on-dark.on-accent) plaster measures 6.24:1, where
+   muted-on-dark would measure only 2.81:1. */
 .on-dark .concept-caption { color: var(--color-muted-on-dark); }
+.on-accent .concept-caption { color: var(--color-plaster); }

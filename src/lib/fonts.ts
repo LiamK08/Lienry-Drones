@@ -1,8 +1,9 @@
 import localFont from "next/font/local";
 
-// Two families, self-hosted from Fontsource (see src/fonts/README.md). Each preloaded family holds
-// exactly one file, so the browser preloads only the two used above the fold: the regular serif
-// for headlines and Inter for everything else. The italic serif loads on demand for signatures.
+// Two families, self-hosted from Fontsource (see src/fonts/README.md). Each font below is exactly
+// one file, and all three are preloaded because all three are used above the fold: the regular
+// serif for headlines, its italic for the payoff phrase that closes the home hero headline and
+// every inner-page H1, and Inter for everything else.
 //
 // next/font derives the emitted CSS family name from the export identifier, so these are named for
 // the typeface, never `serif` or `sans` — those would shadow the CSS generic keywords in the
@@ -19,12 +20,13 @@ export const instrumentSerif = localFont({
   variable: "--font-instrument",
 });
 
+/** Instrument Serif italic: only the trailing payoff phrase of a heading (`Headline`'s emphasis). */
 export const instrumentSerifItalic = localFont({
   src: "../fonts/instrument-serif-latin-400-italic.woff2",
   weight: "400",
   style: "italic",
   display: "swap",
-  preload: false,
+  preload: true,
   adjustFontFallback: "Times New Roman",
   variable: "--font-instrument-italic",
 });
