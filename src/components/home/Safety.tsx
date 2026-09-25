@@ -1,28 +1,44 @@
 import { safety } from "@/content/home";
-import { Container, Section, SectionHeading } from "@/components/ui/Section";
+import { Band, Container } from "@/components/ui/Band";
 import { Picture } from "@/components/ui/Picture";
-import { Reveal, RevealItem, RevealList } from "@/components/ui/Reveal";
+import { Reveal } from "@/components/ui/Reveal";
+import { SectionHead } from "@/components/ui/SectionHead";
+import { SnapTrack } from "@/components/ui/SnapTrack";
 
+/**
+ * Safety by design, on an ink plate. The heading sits beside the plain status line, which stands
+ * where a certification list would, then come the four design details. From 1024 they are four
+ * equal cells in a ruled row: a rule above and below the row and between the cells, 24px padding,
+ * and in each cell the title, 8, the body, then its detail render at 4:3 pinned to the foot with at
+ * least 24 above it, so the renders line up along the bottom. Below 1024 the cells run on a snap
+ * track, each under a top rule, with the same anatomy.
+ */
 export function Safety() {
   return (
-    <Section id="safety" tone="dark" ariaLabelledby="safety-heading">
+    <Band id="safety" tone="ink" pad="plate" labelledBy="safety-heading">
       <Container>
-        <Reveal>
-          <SectionHeading id="safety-heading" eyebrow={safety.eyebrow} headline={safety.headline} />
-        </Reveal>
-        <RevealList className="mt-12 grid gap-8 sm:grid-cols-2 md:mt-16 md:grid-cols-4 md:gap-6">
-          {safety.items.map((item) => (
-            <RevealItem key={item.id}>
-              <Picture id={item.id} alt={item.title} aspect="1/1" sizes="(min-width: 768px) 22vw, 45vw" placeholderText="Detail render to come" />
-              <h3 className="mt-5 text-h3">{item.title}</h3>
-              <p className="mt-2 text-small text-muted-on-dark">{item.body}</p>
-            </RevealItem>
-          ))}
-        </RevealList>
-        <Reveal className="mt-12 border-t border-plaster/15 pt-6">
-          <p className="text-caption text-muted-on-dark">{safety.note}</p>
+        <SectionHead id="safety-heading" tone="dark" headline={safety.headline} aside={{ intro: safety.note }} />
+        {/* The row rises in as one piece so its rules stay continuous. SnapTrack's grid (from 1024)
+            has 24px gutters; the ruled cells abut with a rule between them, so the gutter is zeroed. */}
+        <Reveal className="mt-8 lg:[&_ul]:gap-0">
+          <SnapTrack tone="dark" columns={4} label={safety.track.label} prevLabel={safety.track.prevLabel} nextLabel={safety.track.nextLabel}>
+            {safety.items.map((item) => (
+              <li key={item.id} className="flex flex-col border-t border-plaster/20 pt-6 lg:border-b lg:border-l lg:p-6 lg:first:border-l-0">
+                <h3 className="text-h3">{item.title}</h3>
+                <p className="mt-2 text-small text-muted-on-dark">{item.body}</p>
+                <Picture
+                  id={item.id}
+                  alt={item.title}
+                  aspect="4/3"
+                  tone="dark"
+                  sizes="(min-width: 1440px) 300px, (min-width: 1024px) calc(25vw - 60px), (min-width: 768px) 44vw, 80vw"
+                  className="mt-auto pt-6"
+                />
+              </li>
+            ))}
+          </SnapTrack>
         </Reveal>
       </Container>
-    </Section>
+    </Band>
   );
 }

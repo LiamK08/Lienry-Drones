@@ -1,113 +1,60 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useReducedMotion } from "motion/react";
-import { getImage, getVideo, largest, srcSet } from "@/lib/media";
-import { bindPlayback } from "@/lib/video";
+import type { Action, FilmId, PosterId } from "@/lib/types";
 import { Button } from "@/components/ui/Button";
+import { FilmLayer, FilmPause, useFilm } from "@/components/ui/FilmMedia";
 import { Reveal } from "@/components/ui/Reveal";
 
-/**
- * Full-bleed film band: a muted looping clip with a poster, one line of copy and one link.
- * The clip plays only while on screen and never alongside another clip. Falls back to the
- * still, then to flat ink, when the clip is not available.
- */
-export function FilmBand({
-  videoId,
-  stillId,
-  headline,
-  body,
-  cta,
-}: {
-  videoId: string;
-  stillId: string;
+export type FilmBandProps = {
+  videoId: FilmId;
+  /** The film's poster. */
+  stillId: PosterId;
   /** Kept for the callers; nothing is rendered above the headline. */
   eyebrow?: string;
   headline: string;
   body: string;
-  cta: { label: string; href: string };
-}) {
-  const video = getVideo(videoId);
-  const still = getImage(stillId);
-  const reduce = useReducedMotion();
-  const ref = useRef<HTMLVideoElement>(null);
-  const [paused, setPaused] = useState(false);
+  cta: Action;
+};
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || reduce || paused) { el?.pause(); return; }
-    return bindPlayback(el, 0.2);
-  }, [reduce, paused]);
+// The copy scrim, unchanged: 86% ink at the left edge where the text sits, easing to 25% on the right.
+const scrim = (
+  <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(28,26,23,0.86)_0%,rgba(28,26,23,0.55)_45%,rgba(28,26,23,0.25)_100%)]" />
+);
 
-  const posterSrc = still
-    ? largest(stillId, "webp")
-    : video
-      ? `/media/${videoId}-poster.webp`
-      : null;
-
+/**
+ * Full-bleed film band: a muted looping clip over its poster, with the heading, a short body and one
+ * link at the bottom left inside 544px, and a rail 16px from the bottom carrying the Concept render
+ * caption and the film's pause control. The clip plays only while on screen and never alongside
+ * another film (useFilm); under reduced motion or Save-Data only the poster shows, with no control.
+ */
+export function FilmBand({ videoId, stillId, headline, body, cta }: FilmBandProps) {
+  const film = useFilm({ videoId, threshold: 0.2 });
   return (
     <section
-      className="on-dark relative isolate min-h-[70svh] overflow-hidden bg-ink text-plaster md:min-h-[85svh]"
       aria-labelledby="film-heading"
+      data-band="film"
+      data-tone="film"
+      className="on-dark relative isolate flex min-h-[70svh] flex-col justify-end overflow-hidden bg-ink text-plaster md:min-h-[85svh]"
     >
-      <div className="absolute inset-0 -z-10" aria-hidden="true">
-        {posterSrc ? (
-          <picture>
-            {still ? (
-              <source
-                type="image/avif"
-                srcSet={srcSet(stillId, "avif")}
-                sizes="100vw"
-              />
-            ) : null}
-            <img
-              src={posterSrc}
-              srcSet={still ? srcSet(stillId, "webp") : undefined}
-              sizes="100vw"
-              alt=""
-              className="h-full w-full object-cover"
-              loading="lazy"
-              decoding="async"
-            />
-          </picture>
-        ) : (
-          <div className="h-full w-full bg-ink-raised" />
-        )}
-        {video && !reduce ? (
-          <video
-            ref={ref}
-            className="absolute inset-0 h-full w-full object-cover"
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            poster={`/media/${videoId}-poster.jpg`}
-          >
-            <source src={`/media/${videoId}.webm`} type="video/webm" />
-            <source src={`/media/${videoId}.mp4`} type="video/mp4" />
-          </video>
-        ) : null}
-        {/* Copy scrim, strongest on the left where the text sits. */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(28,26,23,0.86)_0%,rgba(28,26,23,0.55)_45%,rgba(28,26,23,0.25)_100%)]" />
-      </div>
-      <div className="page-x flex min-h-[70svh] flex-col justify-end pb-14 pt-24 md:min-h-[85svh] md:pb-20">
+      <FilmLayer film={film} videoId={videoId} posterId={stillId} overlays={scrim} />
+      <div className="page-x pb-14 pt-24 md:pb-20">
         <div className="mx-auto w-full max-w-grid">
           <Reveal className="max-w-[34rem]">
-            <h2 id="film-heading" className="text-h1">
+            <h2 id="film-heading" className="text-h2">
               {headline}
             </h2>
             <p className="mt-5 text-body text-plaster">{body}</p>
             <div className="mt-8">
-              <Button href={cta.href} onDark variant="tertiary" arrow>
+              <Button href={cta.href} variant="tertiary" onDark arrow>
                 {cta.label}
               </Button>
             </div>
           </Reveal>
         </div>
       </div>
-      <div className="page-x absolute bottom-4 inset-x-0 flex items-center justify-between text-caption text-white">
+      <div className="page-x absolute inset-x-0 bottom-4 flex items-center justify-between gap-4 text-caption text-white">
         <span>Concept render</span>
-        {video && !reduce ? <button type="button" onClick={() => setPaused(p => !p)} className="min-h-11 rounded-hard border border-white/75 bg-ink px-3" aria-label={paused ? "Play product film" : "Pause product film"}>{paused ? "Play film" : "Pause film"}</button> : null}
+        <FilmPause film={film} name="product film" />
       </div>
     </section>
   );
