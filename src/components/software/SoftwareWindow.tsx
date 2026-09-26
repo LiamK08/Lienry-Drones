@@ -388,6 +388,7 @@ export function SoftwareWindow({ preset, tone = "sunken" }: SoftwareWindowProps)
                     alt=""
                     aria-hidden="true"
                     decoding="async"
+                    fetchPriority="low"
                     className={`pointer-events-none absolute inset-0 h-full w-full object-contain transition-opacity duration-200 ease-instrument ${paint === "painted" ? "opacity-0" : "opacity-100"}`}
                   />
                 ) : null}
