@@ -221,7 +221,6 @@ function loadContent() {
   try {
     const home = load(path.join(ROOT, "src/content/home.ts"));
     const pages = load(path.join(ROOT, "src/content/pages.ts"));
-    const software = load(path.join(ROOT, "src/content/software.ts"));
     const stats = load(path.join(ROOT, "src/content/stats.ts"));
     const site = load(path.join(ROOT, "src/lib/site.ts"));
     const faq = (id) => pages.platformFaq.items.find((q) => q.id === id)?.a;
@@ -252,7 +251,6 @@ function loadContent() {
       designFacts: home.designFacts,
       appNote: home.appPanel.note,
       fragment: home.productCards.cards.find((c) => c.fragment)?.fragment ?? null,
-      windowLabel: `${software.project.app}, demo window`,
     };
   } catch (err) {
     return { error: `could not load src/content: ${String(err.message).split("\n")[0]}` };
@@ -412,7 +410,7 @@ function pageLib() {
     const footer = document.querySelector("body > footer") || [...document.querySelectorAll("footer")].find((f) => !f.closest("main")) || null;
     const h1 = main?.querySelector("h1");
     const homeHero = location.pathname === "/" && h1 ? items.find((it) => it.el.contains(h1))?.el ?? null : null;
-    const burger = document.querySelector("header button[aria-controls]");
+    const burger = document.querySelector("body > header button[aria-controls][aria-expanded]");
     const menu = burger ? document.getElementById(burger.getAttribute("aria-controls")) : null;
     R.state = { main, items, footer, homeHero, burger, menu, controls: items.map((it) => controlsOf(it.el)) };
     return R.state;
@@ -583,10 +581,12 @@ function pageLib() {
       });
       if (above) add(10, h, "a .label sits directly above the heading", `(${R.describe(above)})`);
     }
-    captions(scope, add);
+    const counted = captions(scope, add);
+    if (scope === document.body) R.lastCaptions = counted;
     demos(scope, add);
     return out;
   };
+  R.captionCounts = () => R.lastCaptions;
 
   // Check 12: media frames and their captions inside a scope.
   function captionOf(frame) {
@@ -1210,6 +1210,7 @@ const siteFailures = [];
 const idsSeen = new Set();
 const scripts = new Set();
 const fontsLoaded = new Map();
+const stepsByWidth = new Map();
 const pending = [];
 let totalFailures = 0;
 const byCheck = {};
@@ -1275,6 +1276,9 @@ for (const route of opts.routes) {
     const pageRes = await R(page, "pageAudit");
     failures.push(...pageRes.violations.map((v) => ({ ...v, where: String(v.where) })));
     failures.push(...(await R(page, "elementAudit", "document")).map((v) => ({ ...v, where: String(v.where) })));
+    if (!stepsByWidth.has(width)) stepsByWidth.set(width, await R(page, "steps"));
+    const counts = await R(page, "captionCounts");
+    notes.push(`captions: ${counts.frames} media frame${counts.frames === 1 ? "" : "s"}, ${counts.captions} Concept render caption${counts.captions === 1 ? "" : "s"}`);
     const found = await R(page, "demosFound");
     const want = SPEC.demos[route];
     if (want) {
@@ -1578,6 +1582,15 @@ for (const file of walk(path.join(ROOT, "src"))) {
       if (/rounded-(?!hard)/.test(line)) siteAdd(5, "rounded-(?!hard) in src", `${rel} ${line.trim().slice(0, 90)}`);
       if (line.includes("text-[")) siteAdd(7, "text-[ in src", `${rel} ${line.trim().slice(0, 90)}`);
     });
+}
+
+// Check 7: the scale's tokens compute to the spec's steps at 1440 and 390.
+for (const [width, steps] of stepsByWidth) {
+  const want = SPEC.steps[width];
+  if (!want) continue;
+  for (const [step, px] of Object.entries(want)) {
+    if (Math.abs((steps[step] ?? 0) - px) > 0.1) siteAdd(7, `the ${step} step computes to ${steps[step]}px at ${width}, not the spec's ${px}px`);
+  }
 }
 
 const siteGroups = new Map();

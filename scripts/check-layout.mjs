@@ -18,7 +18,8 @@
 //     blocks whose contents end far apart is reported as a warning: mark such columns with data-col.
 //  3  Band heights. At 1440 no band is taller than 900px, except a band that holds the page's h1 (the
 //     home hero, the split heroes, the company statement, the register and privacy bands) or the
-//     software window (the software bands and the platform close).
+//     software window (the software bands and the platform close). A band's height never changes when
+//     one of its tabs or stage parts is selected (B6 Switcher, C1 sections 4 and 5).
 //  4  Tones. Adjacent bands never share a tone; at most one ink band and one glass-deep panel on a page;
 //     the band before the footer is never sunken; every boundary between two light tones shows exactly
 //     one 1px hairline. Every block in <main> must be a Band (data-band, data-tone) or a film band
@@ -623,16 +624,16 @@ function pageLib() {
   };
 
   P.menuButton = () => {
-    const b = [...document.querySelectorAll("header button[aria-controls][aria-expanded]")].find((x) => x.getClientRects().length > 0 && getComputedStyle(x).visibility === "visible");
+    const b = [...document.querySelectorAll("body > header button[aria-controls][aria-expanded]")].find((x) => x.getClientRects().length > 0 && getComputedStyle(x).visibility === "visible");
     return b ? b.getAttribute("aria-label") || "menu" : null;
   };
   P.toggleMenu = () => {
-    const b = [...document.querySelectorAll("header button[aria-controls][aria-expanded]")].find((x) => x.getClientRects().length > 0);
+    const b = [...document.querySelectorAll("body > header button[aria-controls][aria-expanded]")].find((x) => x.getClientRects().length > 0);
     if (!b) return false;
     b.click();
     return true;
   };
-  P.menuOpen = () => !!document.querySelector("header button[aria-expanded='true']");
+  P.menuOpen = () => !!document.querySelector("body > header button[aria-expanded='true']");
 }
 
 // ---------------------------------------------------------------------------------------------------
@@ -679,7 +680,7 @@ const blockName = (b) => {
 };
 const LIGHT = new Set(["plaster", "raised", "sunken"]);
 
-function judge(route, width, audit, sweeps, overflow) {
+function judge(width, audit, sweeps, overflow) {
   const failures = [];
   const warnings = [];
   const add = (check, where, message) => failures.push({ check, where, message });
@@ -854,7 +855,7 @@ for (const route of opts.routes) {
       } else overflow.push({ state: "menu open", viewport: vp.width, rootScrollWidth: 0, bodyScrollWidth: 0, culprits: [{ what: "the menu did not open", left: 0, right: 0, band: 0 }] });
     }
 
-    const { failures, warnings } = judge(route, width, audit, sweeps, overflow);
+    const { failures, warnings } = judge(width, audit, sweeps, overflow);
     for (const e of errors) failures.push({ check: "page", where: "page", message: e });
     totalFailures += failures.length;
     totalWarnings += warnings.length;
