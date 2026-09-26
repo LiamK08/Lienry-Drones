@@ -40,6 +40,7 @@ export default function CommercialPage() {
       />
       <Switcher
         id="how"
+        reveal={false}
         tone="plaster"
         headline={c.steps.headline}
         emphasis={c.steps.emphasis}

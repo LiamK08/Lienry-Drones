@@ -131,10 +131,10 @@ export function SnapTrack({ label, prevLabel, nextLabel, columns, from = "lg", v
         onKeyDown={onKeyDown}
         onScroll={measure}
         className={listCls}
-        initial={reduce ? false : "hidden"}
+        initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "0px 0px -10% 0px" }}
-        variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.06 } } }}
+        variants={{ hidden: {}, visible: { transition: { staggerChildren: reduce ? 0 : 0.06 } } }}
       >
         {children}
       </motion.ul>

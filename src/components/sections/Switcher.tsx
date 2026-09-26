@@ -33,6 +33,8 @@ export type SwitcherProps = {
   items: readonly SwitcherItem[];
   /** Select an item from the URL hash: on load, on hashchange, and on clicks of same-page links to it. */
   hashSync?: boolean;
+  /** Reveal the section head on scroll (default). Pass false when the band sits in the first screen. */
+  reveal?: boolean;
 };
 
 /**
@@ -47,7 +49,7 @@ export type SwitcherProps = {
  *
  * Panel ids equal item ids, so `/platform#dock` also works as a plain anchor.
  */
-export function Switcher({ id, tone, headline, emphasis, intro, tabsLabel, items, hashSync = false }: SwitcherProps) {
+export function Switcher({ id, tone, headline, emphasis, intro, tabsLabel, items, hashSync = false, reveal = true }: SwitcherProps) {
   const [active, setActive] = useState(0);
   const tabs = useRef<(HTMLButtonElement | null)[]>([]);
   const ids = items.map((item) => item.id).join(" ");
@@ -106,7 +108,7 @@ export function Switcher({ id, tone, headline, emphasis, intro, tabsLabel, items
   return (
     <Band id={id} tone={tone} labelledBy={`${id}-heading`}>
       <Container>
-        <SectionHead id={`${id}-heading`} headline={headline} emphasis={emphasis} aside={{ intro }} tone={dark ? "dark" : "light"} />
+        <SectionHead id={`${id}-heading`} headline={headline} emphasis={emphasis} aside={{ intro }} tone={dark ? "dark" : "light"} reveal={reveal} />
 
         <div role="tablist" aria-label={tabsLabel} className={`mt-[var(--gap-head)] grid ${tabCols} lg:flex lg:gap-8 lg:border-b ${rule}`}>
           {items.map((item, i) => {
@@ -173,18 +175,23 @@ export function Switcher({ id, tone, headline, emphasis, intro, tabsLabel, items
                       sizes="(min-width: 1440px) 684px, (min-width: 1024px) 48vw, 100vw"
                     />
                   </div>
-                  <div data-col className="lg:col-span-5 lg:col-start-8">
+                  {/* The text is anchored at both ends like FeatureRow: label, title and body at the top, the facts
+                      and link on the image's bottom edge (the bottom padding matches the image's caption), so the
+                      column never ends far above its image. */}
+                  <div data-col className="lg:col-span-5 lg:col-start-8 lg:flex lg:flex-col lg:pb-[1.71875rem]">
                     <p className={`label ${dark ? "text-muted-on-dark" : "text-muted"}`}>{item.label}</p>
                     <h3 className="mt-2 text-h3">{item.title}</h3>
                     <p className={`mt-3 text-body ${dark ? "text-muted-on-dark" : "text-muted"}`}>{item.body}</p>
-                    <FactList items={item.facts} tone={dark ? "dark" : "light"} className="mt-6" />
-                    {item.link ? (
-                      <div className="mt-4 flex">
-                        <Button href={item.link.href} variant="tertiary" onDark={dark} arrow>
-                          {item.link.label}
-                        </Button>
-                      </div>
-                    ) : null}
+                    <div className="mt-6 lg:mt-auto lg:pt-6">
+                      <FactList items={item.facts} tone={dark ? "dark" : "light"} />
+                      {item.link ? (
+                        <div className="mt-4 flex">
+                          <Button href={item.link.href} variant="tertiary" onDark={dark} arrow>
+                            {item.link.label}
+                          </Button>
+                        </div>
+                      ) : null}
+                    </div>
                   </div>
                 </div>
               </div>

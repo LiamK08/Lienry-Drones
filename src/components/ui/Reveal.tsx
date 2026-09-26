@@ -22,10 +22,12 @@ export function Reveal({
   return (
     <Tag
       className={className}
-      initial={reduce ? false : { opacity: 0, y }}
+      // The server cannot know the visitor's motion preference, so the first render is always the hidden
+      // state; under reduced motion the reveal then completes instantly instead of fading.
+      initial={{ opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "0px 0px -10% 0px" }}
-      transition={{ duration: 0.64, ease: settle, delay }}
+      transition={reduce ? { duration: 0 } : { duration: 0.64, ease: settle, delay }}
     >
       {children}
     </Tag>
@@ -37,10 +39,10 @@ export function RevealList({ children, className = "", stagger = 0.06 }: { child
   return (
     <motion.ul
       className={className}
-      initial={reduce ? false : "hidden"}
+      initial="hidden"
       whileInView="visible"
       viewport={{ once: true, margin: "0px 0px -10% 0px" }}
-      variants={{ hidden: {}, visible: { transition: { staggerChildren: stagger } } }}
+      variants={{ hidden: {}, visible: { transition: { staggerChildren: reduce ? 0 : stagger } } }}
     >
       {children}
     </motion.ul>
@@ -48,10 +50,11 @@ export function RevealList({ children, className = "", stagger = 0.06 }: { child
 }
 
 export function RevealItem({ children, className = "" }: { children: ReactNode; className?: string }) {
+  const reduce = useReducedMotion();
   return (
     <motion.li
       className={className}
-      variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0, transition: { duration: 0.64, ease: settle } } }}
+      variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0, transition: reduce ? { duration: 0 } : { duration: 0.64, ease: settle } } }}
     >
       {children}
     </motion.li>

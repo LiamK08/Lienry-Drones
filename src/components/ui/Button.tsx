@@ -92,6 +92,16 @@ export function Button(props: LinkProps | ButtonProps) {
   );
   if ("href" in props && typeof props.href === "string") {
     const { href, variant: _v, size: _s, onDark: _d, onAccent: _o, arrow: _a, className: _c, children: _ch, ...rest } = props;
+    // In-page anchors use a native link: next/link scrolls to the target but leaves focus on the link,
+    // so keyboard and screen-reader users never reach the section. Native fragment navigation moves
+    // the focus start point to the target.
+    if (href.startsWith("#")) {
+      return (
+        <a href={href} className={cls} {...rest}>
+          {content}
+        </a>
+      );
+    }
     return (
       <Link href={href} className={cls} {...rest}>
         {content}

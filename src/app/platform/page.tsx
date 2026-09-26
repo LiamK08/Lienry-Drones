@@ -54,6 +54,7 @@ export default function PlatformPage() {
       />
       <Switcher
         id="parts"
+        reveal={false}
         tone="plaster"
         headline={partsSection.headline}
         emphasis={partsSection.emphasis}

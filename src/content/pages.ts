@@ -54,6 +54,7 @@ const partFacts: Record<string, PartFacts> = {
     facts: [
       { term: "People on site", text: "None during a clean" },
       { term: "Starting a clean", text: "From the app or the desktop software, from anywhere" },
+      { term: "Status", text: "Concept stage; pilot program in preparation" },
     ],
     link: { label: "Register interest", href: "/register-interest" },
   },
