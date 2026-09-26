@@ -96,6 +96,8 @@ Every page now follows one of the references' page anatomies, filled with Lienry
 | Local rule audit with labelled stand-in media | 0 violations on all 16 route/width views; every image and film captioned; no console errors |
 | `npm run contrast` against the brightest hero frame | All three gates pass: links 6.47:1, mark 8.07:1, button boundary 5.85:1 on the frame; 6.02:1 against pure white |
 | Software window off screen | 0 draw calls once it leaves the screen; settling changes draw only while it is visible |
+| axe-core WCAG 2.0–2.2 A/AA scan, reduced motion | 0 violations on all 8 routes at 1440 and 390 |
+| Real-media review | Built with the real media and captured at 1440 and 390: every page's crops, captions and bands read correctly |
 
 ## Page heights at 1440 (390)
 
