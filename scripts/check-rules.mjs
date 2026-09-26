@@ -1293,10 +1293,17 @@ for (const route of opts.routes) {
     if (pageRes.title !== cfg.brand) add(22, "page", `<title> is "${pageRes.title}", not "${cfg.brand}"`, "");
 
     // Check 14 per state: no id in two frames.
+    // A repeat is reported once: in the default state, or in the first state that shows it.
+    const reported = new Set();
     const dupes = (frames, state) => {
       const seen = new Map();
       for (const f of frames) for (const id of f.ids) seen.set(id, [...(seen.get(id) ?? []), f]);
-      for (const [id, list] of seen) if (list.length > 1) add(14, list[1].where, `${id} shows in ${list.length} frames${state ? ` with ${state}` : ""}`, `(blocks ${list.map((f) => f.where).join(", ")})`);
+      for (const [id, list] of seen) {
+        const blocks = list.map((f) => f.where).join(", ");
+        if (list.length < 2 || reported.has(`${id}|${blocks}`)) continue;
+        reported.add(`${id}|${blocks}`);
+        add(14, list[1].where, `${id} shows in ${list.length} frames${state ? ` with ${state}` : ""}`, `(blocks ${blocks})`);
+      }
     };
     dupes(await R(page, "mediaFrames"), "");
     for (const id of await R(page, "mediaInDom")) idsSeen.add(id);
