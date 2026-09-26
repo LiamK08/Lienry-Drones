@@ -20,7 +20,7 @@ export type CtaPanelProps = {
  * The closing card: one glass-deep panel across the full grid on a plaster band. From 1024 the
  * text takes columns 1-6 (40px padding) with the heading and body at the top and the actions
  * pinned to the bottom, and the image fills columns 7-12, inset 16px from the panel's top, right
- * and bottom, with its plaster caption inside the inset. The panel's height follows the text.
+ * and bottom. The panel's height follows the text.
  * Below 1024 (24px padding): heading, body, the image at 16:9, the primary, then the links.
  */
 export function CtaPanel({ id, headline, body, primary, links = [], image }: CtaPanelProps) {
@@ -59,7 +59,6 @@ export function CtaPanel({ id, headline, body, primary, links = [], image }: Cta
               fillFrom="lg"
               aspect="16/9"
               minHeight="18rem"
-              tone="accent"
               sizes="(min-width: 1440px) 668px, (min-width: 1024px) 46vw, 100vw"
             />
           </div>

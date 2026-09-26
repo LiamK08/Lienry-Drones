@@ -14,7 +14,7 @@ const ORDER = ["commercial", "homes", "solar"] as const;
 /**
  * The other two product pages, as whole-card links: a sunken band (id `more`) with the section
  * head (its aside links to /platform), 48, then two cards of six columns each: the image at 2:1,
- * its caption, the title with an arrow, and a one-line body. Below 1024 they stack 24px apart.
+ * the title with an arrow, and a one-line body. Below 1024 they stack 24px apart.
  */
 export function SiblingCards({ current }: SiblingCardsProps) {
   const cards = ORDER.filter((key) => key !== current).map((key) => siblings.cards[key]);

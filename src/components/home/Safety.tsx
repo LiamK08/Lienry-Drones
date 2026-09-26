@@ -39,7 +39,6 @@ export function Safety() {
                   id={item.id}
                   alt={item.title}
                   aspect="4/3"
-                  tone="dark"
                   sizes="(min-width: 1440px) 300px, (min-width: 1024px) calc(25vw - 60px), (min-width: 768px) 44vw, 80vw"
                   className="mt-auto pt-6"
                 />

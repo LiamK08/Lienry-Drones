@@ -62,7 +62,7 @@ The mark is three building silhouettes with the flight arc cut through them, sup
 
 No customers, logos, testimonials, results, prices, certifications or approvals are claimed anywhere. Statistics come only from `src/content/stats.ts`, each verified against and cited to its primary source. Founders are listed as text until real photographs are supplied; there are no placeholder photos.
 
-The imagery is AI-generated. Every AI figure and film carries a plain "Concept render" caption. The coded software preview is labelled "Demo data" with an illustrative-model note. `docs/MEDIA.md` still records every asset with its prompt and model.
+The imagery is AI-generated. The owner removed the "Concept render" captions on 26 September 2026, so figures and films carry none. The coded software preview is labelled "Demo data" with an illustrative-model note. `docs/MEDIA.md` still records every asset with its prompt and model.
 
 ## Deploy
 

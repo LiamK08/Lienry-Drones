@@ -104,7 +104,7 @@ function PartRow({ part, index, open, onOpen }: { part: Part; index: number; ope
               ))
             : null}
         </div>
-        <Picture id={part.imageId} alt={part.alt} position={part.position} aspect="4/3" tone="dark" sizes="90vw" className="mt-4 lg:hidden" />
+        <Picture id={part.imageId} alt={part.alt} position={part.position} aspect="4/3" sizes="90vw" className="mt-4 lg:hidden" />
       </div>
     </div>
   );
@@ -120,9 +120,9 @@ function PartRow({ part, index, open, onOpen }: { part: Part; index: number; ope
  * themselves; a polite status line names the part they opened.
  *
  * From 1024 the frame runs the full grid: the sidebar in four columns (five to 1279) and the image
- * area in the rest, where the six stills are stacked and crossfade in 200ms, with one Concept render
- * caption under the frame at the image area's left edge. The open region reserves the height of the
- * longest part, so the sidebar, and with it the frame, keeps one height whichever part is open.
+ * area in the rest, where the six stills are stacked and crossfade in 200ms. The open region reserves
+ * the height of the longest part, so the sidebar, and with it the frame, keeps one height whichever
+ * part is open.
  *
  * Below 1024 the stage is one ink panel with no fixed height, and each open region carries its own
  * still at 4:3 under the readout.
@@ -143,9 +143,7 @@ export function SystemStage() {
       <Container>
         <SectionHead id="system-heading" headline={systemExplainer.headline} emphasis={systemExplainer.emphasis} aside={{ intro: systemExplainer.intro }} />
 
-        {/* The stage's box reserves the caption's line under the frame (8 + 19.5px) and is the
-            caption's containing block, so the frame's overflow clip (its 4px corners) never reaches it. */}
-        <div className="relative mt-[var(--gap-head)] lg:pb-[1.71875rem] lg:[--stage-side:calc((100%_-_16.5rem)/12*5_+_6rem)] xl:[--stage-side:calc((100%_-_16.5rem)/12*4_+_4.5rem)]">
+        <div className="mt-[var(--gap-head)] lg:[--stage-side:calc((100%_-_16.5rem)/12*5_+_6rem)] xl:[--stage-side:calc((100%_-_16.5rem)/12*4_+_4.5rem)]">
           <div className="overflow-hidden rounded-hard lg:grid lg:min-h-[30rem] lg:grid-cols-[var(--stage-side)_minmax(0,1fr)]">
             <div className="on-dark flex flex-col bg-ink px-4 py-6 text-plaster lg:p-6">
               <div className="divide-y divide-plaster/15">
@@ -174,14 +172,12 @@ export function SystemStage() {
               </p>
             </div>
 
-            {/* Not positioned, so the caption inside takes the stage's box as its containing block. */}
             <figure className="hidden lg:block">
               <div className="relative h-full bg-sunken">
                 {parts.map((part, i) => (
                   <StageImage key={part.id} part={part} on={i === active} />
                 ))}
               </div>
-              <figcaption className="concept-caption absolute bottom-0 left-[var(--stage-side)] text-caption text-muted">Concept render</figcaption>
             </figure>
           </div>
         </div>

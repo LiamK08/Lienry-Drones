@@ -21,8 +21,8 @@
 // 11  No claims: the banned words appear only inside the allowed sentences; "approval" only where
 //     allowed; every .numeral is a cited stat (with its source link and the cited note), a design fact
 //     (with its term and "Design intent. Concept stage.") or demo data inside the window or app panel.
-// 12  Captions: every /media/ image and video sits in a figure or film frame captioned exactly
-//     "Concept render" (plain text at the caption step, 8px under its frame); frames equal captions.
+// 12  No Concept render captions: no rendered text anywhere reads "Concept render". The owner removed
+//     the caption from every image and film on 26 September 2026.
 // 13  Coded demos: each software window shows "Demo data" and the illustrative-model note beneath it
 //     once, and its panel data keeps its Demo data line; the app panel (role="group") shows "Demo data"
 //     and its note; the home fragment's caption reads its note. The window, app panel and fragment
@@ -59,7 +59,8 @@ const VIEWPORTS = {
 
 // Acceptance strings and values that the spec itself defines (E2, B4, B6, B7), not copy from content.
 const SPEC = {
-  caption: "Concept render",
+  // E2 check 12: the caption the owner removed, which must not come back.
+  retiredCaption: "Concept render",
   demoData: "Demo data",
   windowNote: "Model is illustrative. The software will render each property from its scan.",
   readoutsNote: "Demo data. These readings are illustrative, not operating specifications.",
@@ -109,7 +110,7 @@ const CHECKS = {
   9: "italic budget",
   10: "labels above headings",
   11: "no claims, figures",
-  12: "Concept render captions",
+  12: "no Concept render captions",
   13: "coded demos labelled",
   14: "manifest media",
   21: "motion",
@@ -588,11 +589,7 @@ function pageLib() {
   };
   R.captionCounts = () => R.lastCaptions;
 
-  // Check 12: media frames and their captions inside a scope.
-  function captionOf(frame) {
-    if (frame.tagName === "FIGURE") return [...frame.querySelectorAll("figcaption")].find((fc) => fc.closest("figure") === frame && present(fc)) || null;
-    return [...frame.querySelectorAll("*")].find((e) => /concept render/i.test(ownText(e)) && present(e)) || null;
-  }
+  // The media inside a scope, grouped by frame: a figure, or a film block. Check 14 reads them too.
   function frames(scope) {
     const map = new Map();
     for (const m of scope.querySelectorAll("img, video")) {
@@ -605,40 +602,12 @@ function pageLib() {
     }
     return map;
   }
+  // Check 12: no Concept render caption inside a scope.
   function captions(scope, add) {
-    const st = R.steps();
-    const map = frames(scope);
-    const claimed = new Set();
-    for (const f of map.values()) {
-      const ids = [...f.ids].join(", ");
-      if (!f.frame) {
-        add(12, f.media, "media outside a figure or film frame", `(${ids})`);
-        continue;
-      }
-      const cap = captionOf(f.frame);
-      if (!cap) {
-        add(12, f.frame, "no Concept render caption", `(${ids})`);
-        continue;
-      }
-      claimed.add(cap);
-      const text = clean(cap.textContent);
-      if (text !== R.cfg.caption) add(12, cap, `caption does not read exactly "${R.cfg.caption}"`, `("${text}", ${ids})`);
-      const cs = getComputedStyle(cap);
-      if (Math.abs(parseFloat(cs.fontSize) - st.caption) > 0.1) add(12, cap, "caption not at the caption step", `(${cs.fontSize}, ${ids})`);
-      const badge = cs.textTransform !== "none" || alphaOf(cs.backgroundColor) > 0.02 || parseFloat(cs.borderTopWidth) + parseFloat(cs.borderLeftWidth) > 0 || parseFloat(cs.paddingTop) + parseFloat(cs.paddingLeft) > 0 || cap.children.length > 0;
-      if (badge) add(12, cap, "caption is not plain text (fill, border, padding, icon or case)", `(${ids})`);
-      if (f.frame.tagName === "FIGURE") {
-        const above = cap.previousElementSibling;
-        if (above) {
-          const gap = cap.getBoundingClientRect().top - above.getBoundingClientRect().bottom;
-          if (Math.abs(gap - 8) > 1) add(12, cap, "caption is not 8px under its frame", `(${Math.round(gap)}px, ${ids})`);
-          if (Math.abs(cap.getBoundingClientRect().left - above.getBoundingClientRect().left) > 1) add(12, cap, "caption is not on its frame's left edge", `(${ids})`);
-        }
-      }
-    }
-    const all = [...scope.querySelectorAll("*")].filter((e) => /^concept render$/i.test(ownText(e)) && present(e));
-    for (const c of all) if (!claimed.has(c)) add(12, c, "Concept render caption with no media in its frame");
-    return { frames: map.size, captions: all.length };
+    const retired = new RegExp(R.cfg.retiredCaption, "i");
+    const all = [...scope.querySelectorAll("*")].filter((e) => retired.test(ownText(e)) && present(e));
+    for (const c of all) add(12, c, `a "${R.cfg.retiredCaption}" caption, which the owner removed`, `("${clean(c.textContent)}")`);
+    return { frames: frames(scope).size, captions: all.length };
   }
 
   // Check 13: the coded demos inside a scope.
@@ -1072,7 +1041,7 @@ try {
 
 const cfg = {
   brand: content.brand ?? "Lienry Drones",
-  caption: SPEC.caption,
+  retiredCaption: SPEC.retiredCaption,
   demoData: SPEC.demoData,
   windowNote: SPEC.windowNote,
   readoutsNote: SPEC.readoutsNote,

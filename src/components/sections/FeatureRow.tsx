@@ -46,13 +46,10 @@ export function FeatureRow({ id, tone, side, title, body, link, facts, termStyle
               aspect="4/3"
               minHeight="385px"
               maxHeight="684px"
-              tone={dark ? "dark" : "light"}
               sizes="(min-width: 1440px) 684px, (min-width: 1024px) 48vw, 100vw"
             />
           </div>
-          {/* The caption under the frame is 8 + 19.5px; the text column stops that much short so
-              its fact list ends on the frame's bottom edge. */}
-          <div data-col className={right ? "lg:col-span-5 lg:col-start-1 lg:row-start-1 lg:pb-[1.71875rem]" : "lg:col-span-5 lg:col-start-8 lg:pb-[1.71875rem]"}>
+          <div data-col className={right ? "lg:col-span-5 lg:col-start-1 lg:row-start-1" : "lg:col-span-5 lg:col-start-8"}>
             <Reveal className="flex h-full flex-col">
               <div>
                 <h2 id={`${id}-heading`} className="text-h2">

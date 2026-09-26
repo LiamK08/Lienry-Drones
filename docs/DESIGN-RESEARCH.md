@@ -37,7 +37,7 @@ Colour analysis of the hero frames: at t=0 the frame averages `#4C4133` (luminan
 
 Why it works: the film carries the emotion and the words stay out of its way. Because the headline is low and short, the eye reads film first, promise second, action third.
 
-Lienry's take: a full-viewport Higgsfield film of the drone finishing a glass wash at dawn, water sheeting off the facade, poster image shown until the MP4 is ready, both under 4 MB. Headline low in the frame, one support line, one Register interest button. A plain "Concept render" caption sits in the frame's bottom rail, as on every image and film on the site.
+Lienry's take: a full-viewport Higgsfield film of the drone finishing a glass wash at dawn, water sheeting off the facade, poster image shown until the MP4 is ready, both under 4 MB. Headline low in the frame, one support line, one Register interest button.
 
 ### 3.2 Pinned explainer (the interactive product diagram)
 
@@ -222,7 +222,7 @@ Instrument Serif and Inter; the existing plaster, stone and ink colours; 4px cor
 
 ### Corrections found during implementation
 
-- AI figures and films now carry a plain Concept render caption. The software includes an illustrative-model note and keeps Demo data visible.
+- AI figures and films now carry a plain Concept render caption (since removed at the owner's request, 26 September 2026). The software includes an illustrative-model note and keeps Demo data visible.
 - The mobile app illustration is a flat interface with meaningful surface rows, replacing the decorative block-grid property map and artificial phone shell.
 - Product facts are static and labelled as design intent. Building height is explicitly **under** 70m.
 - Hose-free exploration appears only on Company.

@@ -4,8 +4,7 @@ import type { FounderEntry } from "@/content/pages";
  * The founders on /company, as text: the name (h3), 4, the title, 8, the bio. Only `published`
  * entries render, so a founder appears once the owner supplies a name and title, never as a
  * "to come" line. A photograph renders above the name only when the owner supplies a real one;
- * there is never a placeholder box. A real photograph is not a render, so it carries no Concept
- * render caption.
+ * there is never a placeholder box.
  */
 export function FounderList({ people }: { people: readonly FounderEntry[] }) {
   const published = people.filter((p) => p.published);

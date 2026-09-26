@@ -22,11 +22,10 @@ const scrims = (
 
 /**
  * The home hero: the film full screen, one short centred line low in the frame with its italic turn,
- * then the support line and the one primary action on a single row. The bottom rail carries the
- * Concept render caption at the left margin, the link down to the system, and the film's pause and
- * play control at the right margin. Under reduced motion or Save-Data the poster stands alone, with no
- * video and so no control, and the link takes the right margin. Nothing here reveals on scroll: it is
- * the first screen.
+ * then the support line and the one primary action on a single row. The bottom rail carries the link
+ * down to the system and the film's pause and play control at the right margin. Under reduced motion
+ * or Save-Data the poster stands alone, with no video and so no control, and the link takes the right
+ * margin. Nothing here reveals on scroll: it is the first screen.
  */
 export function Hero() {
   const film = useFilm({ videoId: hero.videoId, threshold: 0.1 });
@@ -49,15 +48,12 @@ export function Hero() {
           </Button>
         </div>
       </div>
-      <div className="page-x absolute inset-x-0 bottom-6 flex items-center justify-between gap-4 text-caption text-white">
-        <span>Concept render</span>
-        <div className="flex items-center gap-3">
-          <a href={hero.secondary.href} className="flex min-h-11 items-center gap-2 underline-offset-4 hover:underline focus-visible:underline">
-            {hero.secondary.label}
-            <span aria-hidden="true">↓</span>
-          </a>
-          <FilmPause film={film} name="hero film" />
-        </div>
+      <div className="page-x absolute inset-x-0 bottom-6 flex items-center justify-end gap-3 text-caption text-white">
+        <a href={hero.secondary.href} className="flex min-h-11 items-center gap-2 underline-offset-4 hover:underline focus-visible:underline">
+          {hero.secondary.label}
+          <span aria-hidden="true">↓</span>
+        </a>
+        <FilmPause film={film} name="hero film" />
       </div>
     </section>
   );

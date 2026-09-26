@@ -21,26 +21,17 @@ export type PictureProps = {
   maxHeight?: string;
   /** object-position. Default "50% 50%". */
   position?: string;
-  /** Caption colour: muted (light, default), muted-on-dark (dark) or plaster (accent). */
-  tone?: "light" | "dark" | "accent";
   priority?: boolean;
   className?: string;
   imgClassName?: string;
 };
 
-const captionTone = {
-  light: "text-muted",
-  dark: "text-muted-on-dark",
-  accent: "text-plaster",
-} as const;
-
 /**
- * A manifest still in a 4px frame with object-fit cover, and the plain "Concept render" caption
- * 8px under it. No prop removes the caption: every render on the site is AI-generated.
+ * A manifest still in a 4px frame with object-fit cover. It carries no caption.
  *
  * fit="fill" stretches the frame to its grid cell (the figure is a flex column at h-full, the frame
- * takes the space above the caption between `minHeight` and `maxHeight`), which is how rows and
- * stages end level with the text beside them.
+ * takes its height between `minHeight` and `maxHeight`), which is how rows and stages end level
+ * with the text beside them.
  */
 export function Picture({
   id,
@@ -52,7 +43,6 @@ export function Picture({
   minHeight,
   maxHeight,
   position = "50% 50%",
-  tone = "light",
   priority = false,
   className = "",
   imgClassName = "",
@@ -72,7 +62,7 @@ export function Picture({
 
   if (!asset) {
     // The build fetches every asset first (prebuild), so this only shows in a local tree without
-    // media: an empty frame of the right size, with no text and no caption.
+    // media: an empty frame of the right size, with no text.
     return (
       <div className={`${figureCls} ${className}`}>
         <div className={frame} style={frameStyle} aria-hidden="true" data-media-placeholder={id} />
@@ -104,7 +94,6 @@ export function Picture({
           />
         </picture>
       </div>
-      <figcaption className={`concept-caption mt-2 text-caption ${captionTone[tone]}`}>Concept render</figcaption>
     </figure>
   );
 }

@@ -11,8 +11,9 @@ The user's current project brief wins over older notes in this repository.
 
 Honesty: no customers, logos, testimonials, results, prices, certifications or approvals
 are claimed anywhere. Statistics come only from `src/content/stats.ts`, each cited to its
-primary source. The imagery is AI-generated and every image or film carries a plain Concept render
-caption. The coded software preview carries Demo data and an illustrative-model note.
+primary source. The imagery is AI-generated. The owner removed the Concept render captions on
+26 September 2026, so no image or film carries one, and `npm run check:rules` fails if one returns.
+The coded software preview carries Demo data and an illustrative-model note.
 No new or replacement media without the user's instructions.
 
 Type: two families only, Instrument Serif for headings and Inter for everything else.

@@ -2,6 +2,8 @@
 
 **Status.** Final build spec. Baseline: `main` at pull request 9 (merge 50ffe59, the owner's 22 September refinement). The feature branch starts identical to it: its only earlier change, ca89b8f, removed the Concept render captions against the current rules and was reverted by bd54837. The rules in `CLAUDE.md` and the owner's standing briefs bind everything here. Where a line in this spec and a rule disagree, the rule wins and the engineer flags the conflict in the pull request. A critical review raised 28 issues against the first version (6 blocking); all are resolved in this text.
 
+**Since the build.** On 26 September 2026 the owner removed the Concept render captions. Every caption line below (B7, the Picture, MediaCard and film anatomies, the stage and row paddings that made room for the caption, and E2 check 12) is superseded: no image or film carries one, and check 12 now fails if one returns.
+
 **References.** legora.com and refresh.tech are references for quality, structure and motion only. This document describes their patterns by structure. No code, text, imagery, icons, logos or assets from either site enter the repository, and the site never loads anything from them.
 
 **Which reference each page follows**

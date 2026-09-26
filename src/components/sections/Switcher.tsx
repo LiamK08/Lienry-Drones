@@ -158,7 +158,7 @@ export function Switcher({ id, tone, headline, emphasis, intro, tabsLabel, items
                 }`}
               >
                 {/* The panel stretches to the cell (the tallest panel), and so does this grid, so a shorter panel's
-                    image grows to fill it rather than leaving an empty run below its caption. */}
+                    image grows to fill it rather than leaving an empty run below it. */}
                 <div className="grid gap-y-4 lg:h-full lg:grid-cols-12 lg:gap-x-6">
                   {/* An inactive panel's image leaves the layout once its fade-out ends, so only the
                       active image is rendered; the cell's height is unchanged, because every image
@@ -173,14 +173,12 @@ export function Switcher({ id, tone, headline, emphasis, intro, tabsLabel, items
                       aspect="4/3"
                       minHeight="385px"
                       maxHeight="684px"
-                      tone={dark ? "dark" : "light"}
                       sizes="(min-width: 1440px) 684px, (min-width: 1024px) 48vw, 100vw"
                     />
                   </div>
                   {/* The text is anchored at both ends like FeatureRow: label, title and body at the top, the facts
-                      and link on the image's bottom edge (the bottom padding matches the image's caption), so the
-                      column never ends far above its image. */}
-                  <div data-col className="lg:col-span-5 lg:col-start-8 lg:flex lg:flex-col lg:pb-[1.71875rem]">
+                      and link on the image's bottom edge, so the column never ends far above its image. */}
+                  <div data-col className="lg:col-span-5 lg:col-start-8 lg:flex lg:flex-col">
                     <p className={`label ${dark ? "text-muted-on-dark" : "text-muted"}`}>{item.label}</p>
                     <h3 className="mt-2 text-h3">{item.title}</h3>
                     <p className={`mt-3 text-body ${dark ? "text-muted-on-dark" : "text-muted"}`}>{item.body}</p>

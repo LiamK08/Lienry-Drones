@@ -333,9 +333,3 @@
     border-radius: var(--radius-hard);
   }
 }
-
-/* Unlayered, so these beat the colour utilities: the caption follows the surface it sits on.
-   On the glass-deep closing panel (.on-dark.on-accent) plaster measures 6.24:1, where
-   muted-on-dark would measure only 2.81:1. */
-.on-dark .concept-caption { color: var(--color-muted-on-dark); }
-.on-accent .concept-caption { color: var(--color-plaster); }

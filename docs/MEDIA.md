@@ -1,6 +1,6 @@
 # Media log
 
-Every AI-generated asset on the site, with its prompt, model, references, file path and placement. Assets are generated with the connected Higgsfield account, downloaded and optimised by `scripts/media/fetch.mjs` (locally, as the `prebuild` step on the host, or via the "Fetch and optimise media" GitHub Actions workflow), and written to `public/media/`. Every image and film on the site carries a plain "Concept render" caption, as CLAUDE.md requires.
+Every AI-generated asset on the site, with its prompt, model, references, file path and placement. Assets are generated with the connected Higgsfield account, downloaded and optimised by `scripts/media/fetch.mjs` (locally, as the `prebuild` step on the host, or via the "Fetch and optimise media" GitHub Actions workflow), and written to `public/media/`. No image or film on the site carries a Concept render caption: the owner removed them on 26 September 2026.
 
 The whole set was regenerated on 18 September 2026 from an approved design sheet, replacing the pale-grey quadcopter renders of 17 and 18 September. The asset ids and file paths are unchanged, so nothing on the site had to move.
 
@@ -144,3 +144,7 @@ The home page software view is rendered in code, not generated: a React Three Fi
 No images or videos were generated or replaced. The existing 29 manifest assets were downloaded and optimised locally using the existing pipeline for review; generated build outputs are not part of the design source commit. The approved design sheets were retrieved from the source URLs above and inspected locally.
 
 Restored plain Concept render captions to all shared Picture figures and both film components, as required by the current brief. Adjusted display crops: system comparison images use 3:2, the property gallery 4:5, inner-page hero images 2:1, and the home closing image 1:1. The source files and manifest URLs are unchanged. Video pause controls were added. Existing software-view recordings remain; the software panel is still rendered in code on capable desktops.
+
+## Captions removed — 26 September 2026
+
+No images or videos were generated or replaced. At the owner's request the plain Concept render caption is gone from every image and film: the caption under each still, under the six-part stage and under the split heroes' films, and the one in the rails of the home hero and the film band. The manifest, the files and every placement are unchanged.

@@ -36,13 +36,15 @@ function TitleArrow() {
 
 /**
  * An image-led card with no box, border, fill or shadow: the image is the card. Top to bottom:
- * media (4px, cover), 8, its caption, 16, label or meta, 8, title, 8, body, 16, link. The link sits
- * at the foot of the card, so the links of a row of cards line up.
+ * media (4px, cover), 16, label or meta, 8, title, 8, body, 16, link. The link sits at the foot of
+ * the card, so the links of a row of cards line up.
  *
  * The root is a `div` that fills its parent's height: wrap it in the `li` of a list or track.
  * A fragment (a piece of coded UI such as the app panel) sits in a sunken 4:3 frame that is
  * `role="img"` with `ariaLabel`; the node inside is aria-hidden and positions itself (the frame's
- * inner layer is `absolute inset-0`), and `note` is its caption in place of Concept render.
+ * inner layer is `absolute inset-0`), and `note` is its caption, 8px under the frame. From 1024,
+ * where cards sit in rows, the frame gives up the note's height: frame and note together take an
+ * image's 4:3 box, so the text under a fragment starts level with the text under the images.
  */
 export function MediaCard({ media, meta, label, title, body, link, wholeCard, tone = "light" }: MediaCardProps) {
   const dark = tone === "dark";
@@ -52,10 +54,10 @@ export function MediaCard({ media, meta, label, title, body, link, wholeCard, to
   return (
     <div className={`group relative flex h-full flex-col ${dark ? "text-plaster" : "text-ink"}`}>
       {media.kind === "image" ? (
-        <Picture id={media.id} alt={media.alt} aspect={media.aspect} position={media.position} sizes={media.sizes} tone={dark ? "dark" : "light"} />
+        <Picture id={media.id} alt={media.alt} aspect={media.aspect} position={media.position} sizes={media.sizes} />
       ) : (
-        <figure>
-          <div role="img" aria-label={media.ariaLabel} className="relative aspect-[4/3] w-full overflow-hidden rounded-hard bg-sunken">
+        <figure className="lg:flex lg:aspect-[4/3] lg:flex-col">
+          <div role="img" aria-label={media.ariaLabel} className="relative aspect-[4/3] w-full overflow-hidden rounded-hard bg-sunken lg:aspect-auto lg:flex-1">
             <div className="absolute inset-0" aria-hidden="true">
               {media.node}
             </div>

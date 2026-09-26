@@ -143,3 +143,38 @@ These are unchanged from the 22 September record:
 - public contact details;
 - an enquiry delivery service;
 - the privacy draft's legal review.
+
+# Concept render captions removed — review record
+
+26 September 2026. The owner asked for the Concept render captions to come off the site. Checked on local production builds of `main` and of this change at 1440 and 390, with labelled stand-in media in the real media's ids and aspect ratios (the media CDN is not reachable from the build container).
+
+## What changed
+
+- **No caption on any image or film.** It is gone from under every still (`Picture`), from under the split heroes' films and the home stage, and from the rails of the home hero and the film band. `Picture`'s `tone` prop, which only coloured the caption, and the `.concept-caption` rules go with it.
+- **Nothing makes room for it any more.** The stage, `FeatureRow` and `Switcher` no longer hold back the caption's 27.5px, so fact lists and links end on the image's bottom edge.
+- **The film rails keep their controls.** The home hero's rail holds the link down to the system and the pause control at the right margin; the film band's holds its pause control.
+- **The app card keeps its note.** "Illustrative app interface. Demo data." still captions the coded app fragment. From 1024 the fragment's frame and note share the 4:3 box of the images beside it, so the three product titles stay level. The fragment shows its two ticked rows at every width, which keeps it whole in that shorter frame at 1440 and costs it only its foot at 1280.
+- **`check:rules` check 12 is inverted.** It now fails if "Concept render" appears anywhere on the site.
+
+## Validation
+
+| Check | Result |
+| --- | --- |
+| `npm run typecheck`, `npm run lint`, `npm run build` | Clean |
+| `git diff --check` | Clean |
+| `npm run check:layout` (E2 checks 2–4, 19) | Every check passes on all 8 routes at 1440 and 390 |
+| `npm run check:rules` (E2 checks 5–14, 21–24) | Every check passes on all 8 routes at 1440 and 390, check 12 included, but one: check 21's test that the live software window stops drawing within a second of leaving the screen. It fails on an untouched `main` build in this container too (7 of 8 runs of `/` and `/commercial` at 1440, against 8 of 8 here), because software WebGL lands the last frames after the one-second wait. This change does not touch the window. |
+| `npm run contrast` | All three gates pass; against pure white, links 6.02:1, mark 6.02:1, button boundary 3.52:1 |
+
+## Page heights at 1440 (390)
+
+| Route | Before | After |
+| --- | --- | --- |
+| `/` | 8,643 (11,120) | 8,533 (10,927) |
+| `/platform` | 5,613 (7,241) | 5,503 (7,131) |
+| `/commercial` | 6,375 (7,977) | 6,265 (7,812) |
+| `/homes-and-rentals` | 5,410 (6,973) | 5,328 (6,808) |
+| `/solar` | 4,497 (5,572) | 4,415 (5,435) |
+| `/company` | 3,994 (4,427) | 3,912 (4,317) |
+| `/register-interest` | 1,636 (2,645) | unchanged |
+| `/privacy` | 1,257 (2,225) | unchanged |

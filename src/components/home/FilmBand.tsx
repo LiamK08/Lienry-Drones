@@ -21,9 +21,9 @@ const scrim = (
 
 /**
  * Full-bleed film band: a muted looping clip over its poster, with the heading, a short body and one
- * link at the bottom left inside 544px, and a rail 16px from the bottom carrying the Concept render
- * caption and the film's pause control. The clip plays only while on screen and never alongside
- * another film (useFilm); under reduced motion or Save-Data only the poster shows, with no control.
+ * link at the bottom left inside 544px, and the film's pause control at the right of a rail 16px from
+ * the bottom. The clip plays only while on screen and never alongside another film (useFilm); under
+ * reduced motion or Save-Data only the poster shows, with no control.
  */
 export function FilmBand({ videoId, stillId, headline, body, cta }: FilmBandProps) {
   const film = useFilm({ videoId, threshold: 0.2 });
@@ -51,8 +51,7 @@ export function FilmBand({ videoId, stillId, headline, body, cta }: FilmBandProp
           </Reveal>
         </div>
       </div>
-      <div className="page-x absolute inset-x-0 bottom-4 flex items-center justify-between gap-4 text-caption text-white">
-        <span>Concept render</span>
+      <div className="page-x absolute inset-x-0 bottom-4 flex items-center justify-end text-caption text-white">
         <FilmPause film={film} name="product film" />
       </div>
     </section>

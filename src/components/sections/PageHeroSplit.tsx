@@ -36,7 +36,6 @@ function HeroFilm({ media }: { media: Extract<PageHeroMedia, { kind: "film" }> }
         </div>
         <FilmPause film={film} name={media.name} className="absolute bottom-3 right-3" />
       </div>
-      <figcaption className="concept-caption mt-2 text-caption text-muted">Concept render</figcaption>
     </figure>
   );
 }
@@ -47,7 +46,7 @@ function HeroFilm({ media }: { media: Extract<PageHeroMedia, { kind: "film" }> }
  * first screen. Below 1024: H1, 16, lead, 24, primary, 16, link, 24, media. Nothing in it reveals.
  * The columns carry no data-col: the text is centred on the media by design, not balanced with it.
  * Film media is a 16:9 `role="img"` frame named by `alt`, with its pause control beside it (never
- * inside the img role) and the caption under the frame.
+ * inside the img role).
  */
 export function PageHeroSplit({ id, headline, emphasis, lead, primary, secondary, media }: PageHeroSplitProps) {
   return (

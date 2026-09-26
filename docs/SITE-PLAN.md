@@ -88,7 +88,7 @@ The measure is 68 characters and the token that carries it is `45ch`. CSS `ch` i
 
 ### Imagery direction
 
-Photoreal AI stills and short loops. Every image and film carries a plain "Concept render" caption (CLAUDE.md); the coded software preview carries Demo data and an illustrative-model note instead. Early morning light only (sun 15 to 30 degrees, or bright overcast), soft haze, long soft shadows, cool highlights, warm lifted shadows. Subjects: mid-rise commercial glass under 70 metres (6 to 18 storeys, never a skyline tower), a rooftop plant deck with the weatherproof capsule, thin sheets of water running down curtain-wall glass, solar panels beaded with water, a wet driveway on a quiet suburban street, the ground pod beside a garden tap, a solar farm row at first light. No landmarks, no signage, no logos, no faces, no aviation markings, no sci-fi.
+Photoreal AI stills and short loops, with no caption: the owner removed the Concept render captions on 26 September 2026. The coded software preview carries Demo data and an illustrative-model note. Early morning light only (sun 15 to 30 degrees, or bright overcast), soft haze, long soft shadows, cool highlights, warm lifted shadows. Subjects: mid-rise commercial glass under 70 metres (6 to 18 storeys, never a skyline tower), a rooftop plant deck with the weatherproof capsule, thin sheets of water running down curtain-wall glass, solar panels beaded with water, a wet driveway on a quiet suburban street, the ground pod beside a garden tap, a solar farm row at first light. No landmarks, no signage, no logos, no faces, no aviation markings, no sci-fi.
 
 ## 4. Copy direction
 
@@ -224,7 +224,7 @@ Approval gates: M1 (this round), then M2, M3 and H0 together, then everything el
 - No customers, logos, testimonials, results, prices, certifications or CASA approval anywhere.
 - Every statistic on the site is in the verified table above and cited on the page.
 - The hose-free model appears once, on the Company page, as an idea in development.
-- Every AI image and film carries a plain "Concept render" caption, as CLAUDE.md requires. No AI portraits of the founders.
+- No AI image or film carries a Concept render caption; the owner removed them on 26 September 2026. No AI portraits of the founders.
 - Pre-launch wording on every page: register interest, pilot program, in development.
 
 ## 9. Open items for Liam
@@ -237,7 +237,7 @@ Approval gates: M1 (this round), then M2, M3 and H0 together, then everything el
 
 ## Current implementation — 22 September 2026
 
-The latest user brief supersedes earlier contradictions in this document. Work is reviewed in a feature-branch pull request; production is not pushed directly. AI visuals must carry Concept render captions. The confirmed domain is www.lienrydrones.com and two founders are confirmed.
+The latest user brief supersedes earlier contradictions in this document. Work is reviewed in a feature-branch pull request; production is not pushed directly. AI visuals carry no Concept render captions (removed at the owner's request on 26 September 2026). The confirmed domain is www.lienrydrones.com and two founders are confirmed.
 
 The home explorer and landlord story now use compact, keyboard-operable disclosures instead of long scroll sequences. Product comparisons and feature columns are open layouts rather than boxed cards. Native scrolling and the existing imagery remain. The footer uses an editorial grid and native mobile disclosures. The software retains its coded model, zone list, layer controls and timeline, with an illustrative-model note and pause control. Reduced motion uses a still video poster with native play controls so playback is a deliberate user choice.
 
