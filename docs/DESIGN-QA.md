@@ -178,3 +178,7 @@ These are unchanged from the 22 September record:
 | `/company` | 3,994 (4,427) | 3,912 (4,317) |
 | `/register-interest` | 1,636 (2,645) | unchanged |
 | `/privacy` | 1,257 (2,225) | unchanged |
+
+## Release
+
+The change reached `main` as `212d522` on 26 September 2026. Vercel built its preview but never started a production deployment for that push, so the live site kept the captions. The next commit on `main` was pushed to start a fresh production build.
