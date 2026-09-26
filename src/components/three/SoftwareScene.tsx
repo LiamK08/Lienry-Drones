@@ -194,7 +194,9 @@ function Driver({ controlRef, clockRef, fadeRef, flyingRef }: { controlRef: RefO
     let raf = 0;
     const loop = () => {
       const control = controlRef.current;
-      if (document.visibilityState === "visible" && (control.active || settling(control, fadeRef.current, flyingRef.current))) invalidate();
+      // A change still settling (a fade, the scan sweep, a flight) finishes drawing only on screen; off
+      // screen it resumes, time-based, when the window comes back.
+      if (document.visibilityState === "visible" && (control.active || (control.visible && settling(control, fadeRef.current, flyingRef.current)))) invalidate();
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);

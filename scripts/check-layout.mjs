@@ -651,7 +651,7 @@ try {
 
 let browser;
 try {
-  browser = await chromium.launch({ args: ["--use-gl=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"] });
+  browser = await chromium.launch({ args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"] });
 } catch (err) {
   fail(`Chromium could not start: ${String(err.message).split("\n")[0]}\nInstall it with: npm i -D playwright && npx playwright install chromium`);
 }
@@ -667,6 +667,21 @@ async function settlePage(page, vh) {
   }
   await call(page, () => window.scrollTo(0, document.documentElement.scrollHeight));
   await page.waitForTimeout(200);
+  // A quick scroll-through can pass a reveal between two slow headless frames (the 3D window slows
+  // them), leaving it hidden until it is next on screen. Bring each one still hidden into view.
+  const hidden = await call(page, () =>
+    [...document.querySelectorAll("[data-reveal]")].filter((e) => Number(getComputedStyle(e).opacity) < 0.99).length,
+  );
+  for (let i = 0; i < hidden; i++) {
+    const left = await call(page, () => {
+      const e = [...document.querySelectorAll("[data-reveal]")].find((x) => Number(getComputedStyle(x).opacity) < 0.99);
+      if (!e) return false;
+      e.scrollIntoView({ block: "center" });
+      return true;
+    });
+    if (!left) break;
+    await page.waitForTimeout(750);
+  }
   await call(page, () => window.scrollTo(0, 0));
   await page.waitForTimeout(900);
   await call(page, () => window.__p7layout.idle(null, 3000));

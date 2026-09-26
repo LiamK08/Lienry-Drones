@@ -1,5 +1,3 @@
-import { systemExplainer } from "./home";
-
 // Inner page copy. The conventions in home.ts apply: `emphasis` is the trailing phrase of its `headline`,
 // images are ImageRef-compatible `{ id, alt, position }` with manifest still ids, and links are `{ label, href }`.
 
@@ -61,7 +59,6 @@ const partFacts: Record<string, PartFacts> = {
 } satisfies Record<PartId, PartFacts>;
 
 export const platformPage = {
-  eyebrow: "Platform",
   headline: "One platform. Two systems. Six parts.",
   emphasis: "Six parts.",
   lead: "Lienry is a single drone platform. It lives on the property, maps it, and cleans glass, solar panels, walls, roofing and driveways on buildings under 70 metres.",
@@ -71,7 +68,6 @@ export const platformPage = {
     primary: { label: "Register interest", href: "/register-interest" },
     secondary: { label: "See the six parts", href: "#parts" },
   },
-  parts: systemExplainer.tabs.map((t) => ({ id: t.id, eyebrow: t.tab, title: t.title, body: t.body, imageId: t.imageId, readout: t.readout })),
   partsSection: { headline: "How the six parts fit together.", emphasis: "fit together.", tabsLabel: "The six parts" },
   partFacts,
   rows: {
@@ -89,7 +85,6 @@ export const platformPage = {
     },
   },
   specs: {
-    eyebrow: "Specifications",
     headline: "What we can say today.",
     intro: "Design intent at concept stage. None of it has been tested in service yet.",
     rows: [
@@ -113,7 +108,6 @@ export const platformPage = {
 };
 
 export const platformFaq = {
-  eyebrow: "Questions",
   headline: "What people ask first.",
   intro: "Straight answers, including what we cannot claim yet.",
   link: { label: "Register interest", href: "/register-interest" },
@@ -141,7 +135,6 @@ export const faqSets = {
 } as const satisfies Record<"home" | "platform" | "commercial" | "homes" | "solar", readonly FaqId[]>;
 
 export const commercialPage = {
-  eyebrow: "Commercial system",
   headline: "Window cleaning that lives on the roof.",
   emphasis: "on the roof.",
   lead: "A weatherproof capsule on the roof, a tether fed from above, and desktop software that runs the whole building. Lienry is a cheaper long-term alternative to outsourced commercial window cleaning.",
@@ -153,7 +146,6 @@ export const commercialPage = {
     secondary: { label: "See the platform", href: "/platform" },
   },
   steps: {
-    eyebrow: "How it works",
     headline: "Four steps, then it runs itself.",
     emphasis: "then it runs itself.",
     intro: "From an empty roof to a building that decides when it needs a clean.",
@@ -218,7 +210,6 @@ export const commercialPage = {
     ],
   },
   software: {
-    eyebrow: "The software",
     headline: "What the desktop software shows.",
     tiles: [
       { title: "A 3D model of your building", body: "Built from the scan, so every clean is planned on the real structure." },
@@ -231,7 +222,6 @@ export const commercialPage = {
     intro: "Design intent for the pilot, not results.",
   },
   cost: {
-    eyebrow: "Over time",
     headline: "Why it costs less over time.",
     body: "Instead of paying for each visit from an outsourced crew, the drone lives on the building and cleans when the scan says it should. We are not publishing prices before the pilot program; we will share them with pilot buildings first.",
     points: [
@@ -243,7 +233,6 @@ export const commercialPage = {
     image: { id: "s1-dock", alt: "The Lienry roof capsule lid closing on a wet roof", position: "50% 55%" },
   },
   pilot: {
-    eyebrow: "Pilot program",
     headline: "A small number of buildings, first.",
     body: "We are preparing a pilot program for commercial buildings under 70 metres in Sydney. If you own or manage one, book a conversation and we will walk you through what the pilot involves.",
     cta: { label: "Book a pilot conversation", href: "/register-interest?type=commercial" },
@@ -253,7 +242,6 @@ export const commercialPage = {
 };
 
 export const homesPage = {
-  eyebrow: "Home system",
   headline: "Your property, cleaned from anywhere.",
   emphasis: "from anywhere.",
   lead: "A waterproof ground pod, a drone that knows each material, and an app that starts the clean wherever you are. For houses, apartments, rental properties and solar farms.",
@@ -266,7 +254,6 @@ export const homesPage = {
     secondary: { label: "I own rentals", href: "/register-interest?type=landlord" },
   },
   steps: {
-    eyebrow: "How it works",
     headline: "Set up once. Start from anywhere.",
     intro: "Four steps from a new pod to a clean you start from your phone.",
     track: { label: "Setup steps. Use left and right arrow keys to browse.", prevLabel: "Previous step", nextLabel: "Next step" },
@@ -298,8 +285,6 @@ export const homesPage = {
     ],
   },
   app: {
-    eyebrow: "The app",
-    headline: "Made for the way you own property.",
     items: [
       { title: "Start a clean remotely", body: "From another suburb or another country." },
       { title: "Choose the areas", body: "The driveway before an inspection, the panels after a dusty week." },
@@ -320,7 +305,6 @@ export const homesPage = {
 };
 
 export const solarPage = {
-  eyebrow: "Solar",
   headline: "A cleaner surface for solar.",
   emphasis: "for solar.",
   lead: "Dust and grime cost solar owners real energy. Lienry treats a panel as its own material, sets the pressure to match, and cleans on the interval you choose.",
@@ -330,11 +314,9 @@ export const solarPage = {
     primary: { label: "Register interest", href: "/register-interest?type=homeowner" },
     secondary: { label: "See the home system", href: "/homes-and-rentals" },
   },
-  closeImageId: "so2-solar-closeup",
   statsHeadline: "What soiling costs.",
   statsIntro: "These figures are from peer-reviewed and international sources; each is cited.",
   how: {
-    eyebrow: "How Lienry cleans panels",
     headline: "The right pressure, on your schedule.",
     emphasis: "on your schedule.",
     intro: "The home system cleans rooftop panels and solar farm rows from the same ground pod.",
@@ -418,7 +400,6 @@ export const siblings = {
 };
 
 export const companyPage = {
-  eyebrow: "Company",
   headline: "Built in Sydney for the buildings people own.",
   emphasis: "for the buildings people own.",
   statement:
@@ -426,7 +407,6 @@ export const companyPage = {
   heroImageId: "co1-company",
   heroAlt: "A harbour-side street of mid-rise buildings at dawn",
   founders: {
-    eyebrow: "Founders",
     headline: "Two founders, one building at a time.",
     // The co-founder stays unpublished, with no name or title, until the owner supplies them.
     people: [
@@ -435,7 +415,6 @@ export const companyPage = {
     ] satisfies FounderEntry[],
   },
   where: {
-    eyebrow: "Where we are",
     headline: "Concept stage, pre-seed, pilot in preparation.",
     body: "Everything on this site describes the design. None of it is in service yet.",
     image: { id: "s6-automation", alt: "The roof capsule open at dawn, the drone rising from its cradle", position: "50% 40%" },
@@ -447,7 +426,6 @@ export const companyPage = {
     ],
   },
   values: {
-    eyebrow: "How we work",
     headline: "Three rules we build by.",
     body: "The rules behind every decision on the platform and on this site.",
     image: { id: "f3-surface", alt: "The drone's spray bar, pad and roller on a pane of glass", position: "50% 50%" },
@@ -463,7 +441,6 @@ export const companyPage = {
     body: "For some sites we are exploring a hose-free model. It is an idea in development, not a product, and it is not part of the pilot program.",
   },
   investors: {
-    eyebrow: "Investors",
     headline: "Talk to us about the pre-seed round.",
     body: "If you invest in hardware, property technology or automation, we would like to walk you through the platform, the two systems and the pilot plan.",
     note: "Liam Kennedy, our founder and CEO, replies directly.",
@@ -477,7 +454,6 @@ export const companyPage = {
 };
 
 export const registerPage = {
-  eyebrow: "Register interest",
   headline: "Tell us about your property.",
   lead: "Whether you own a home, manage a building, hold rentals or invest, we would like to hear from you. Lienry is pre-launch, and we reply personally.",
   image: { id: "h0-hero-still", alt: "The Lienry drone washing a glass curtain wall, its tether rising to the roof", position: "60% 50%" },
@@ -488,7 +464,6 @@ export const registerPage = {
 };
 
 export const privacyPage = {
-  eyebrow: "Privacy",
   headline: "Privacy policy.",
   updated: "September 2026",
   sections: [

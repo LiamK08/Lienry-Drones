@@ -33,7 +33,7 @@ async function record(name, v) {
   const page = await browser.newPage({ viewport: { width: v.width, height: v.height }, deviceScaleFactor: v.dpr });
   page.on("pageerror", (e) => console.log("pageerror:", e.message));
   await page.goto(`${base}/?capture=${name}`, { waitUntil: "networkidle" });
-  await page.evaluate(() => document.querySelector("#software-view").scrollIntoView({ block: "center" }));
+  await page.evaluate(() => document.querySelector("#software").scrollIntoView({ block: "center" }));
   await page.waitForFunction(() => !!window.__lienryCapture, null, { timeout: 30000 });
   const raf = () => page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
   const step = async (ms) => {
@@ -44,13 +44,13 @@ async function record(name, v) {
   await step(0);
   await page.waitForTimeout(800);
   await step(0);
-  await page.click('button:has-text("Scan")');
-  const canvas = await page.$("#software-view canvas");
+  await page.getByRole("group", { name: "Layers" }).getByRole("button", { name: "Scan", exact: true }).click();
+  const canvas = await page.$("#software canvas");
   const total = FPS * SECONDS;
   const started = Date.now();
   for (let i = 0; i < total; i++) {
     const t = (i * 1000) / FPS;
-    if (i === Math.round(FPS * 5.2)) await page.click('button:has-text("Scan")');
+    if (i === Math.round(FPS * 5.2)) await page.getByRole("group", { name: "Layers" }).getByRole("button", { name: "Scan", exact: true }).click();
     await step(t);
     await canvas.screenshot({ path: path.join(frames, `${String(i).padStart(4, "0")}.jpg`), type: "jpeg", quality: 94 });
     if (i === Math.round(FPS * POSTER_AT)) await canvas.screenshot({ path: path.join(frames, "poster.jpg"), type: "jpeg", quality: 84 });

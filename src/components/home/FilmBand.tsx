@@ -9,8 +9,6 @@ export type FilmBandProps = {
   videoId: FilmId;
   /** The film's poster. */
   stillId: PosterId;
-  /** Kept for the callers; nothing is rendered above the headline. */
-  eyebrow?: string;
   headline: string;
   body: string;
   cta: Action;

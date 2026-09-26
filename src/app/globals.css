@@ -61,9 +61,6 @@
 
   /* 1,392px: at 1440 the content starts at x=24, the edge the header links already use. */
   --container-grid: 87rem;
-  /* --container-rows and --container-statement are deleted in the closing step (F9). */
-  --container-rows: 70rem;
-  --container-statement: 55rem;
   /* The 68-character cap, set in characters rather than zeroes. CSS ch is the advance of "0",
      which Inter renders at 0.65em with optical sizing on, while a character of this site's own
      prose averages about 0.47em, so 68ch sets 91 characters a line, not 68. This value was found
@@ -94,7 +91,6 @@
     --band-y: clamp(3.5rem, 2rem + 4.5vw, 6rem);      /* band padding: 56px at 390, 96px at 1440 */
     --plate-y: clamp(2rem, 1rem + 2vw, 2.5rem);       /* plate padding: 32px at 390, 40px at 1440 */
     --gap-head: clamp(2rem, 1.25rem + 2.5vw, 3rem);   /* heading row to content: 32px at 390, 48px at 1440 */
-    --section-y: var(--band-y);                       /* old name, kept until F9 so unconverted pages follow the new rhythm */
     --nav-h: 4.5rem;
   }
 
@@ -191,6 +187,12 @@
       transition-delay: 0s !important;
       scroll-behavior: auto !important;
     }
+    /* Reveals render their hidden state on the server, which cannot know this preference. Show them
+       outright instead, so nothing appears or moves as it scrolls in (the inline styles are overridden). */
+    [data-reveal] {
+      opacity: 1 !important;
+      transform: none !important;
+    }
   }
 }
 
@@ -203,10 +205,6 @@
     padding-right: var(--page-margin);
   }
 
-  .section-y {
-    padding-top: var(--section-y);
-    padding-bottom: var(--section-y);
-  }
 
   /* The glass-deep closing panel: white text, and a focus ring that holds 3:1 on glass-deep
      (glass-on-dark measures 4.31:1 there). */

@@ -174,6 +174,7 @@ export function SoftwareWindow({ preset, tone = "sunken" }: SoftwareWindowProps)
   useEffect(() => {
     const control = controlRef.current;
     control.active = live && onScreen && playing;
+    control.visible = live && onScreen;
     control.requestFrame();
   }, [live, onScreen, playing]);
 

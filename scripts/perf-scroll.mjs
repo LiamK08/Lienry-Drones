@@ -7,7 +7,7 @@ try { ({ chromium } = require("playwright")); } catch { ({ chromium } = require(
 const base = process.argv[2] ?? "http://localhost:3011";
 const width = Number(process.argv[3] ?? 1440);
 const height = width < 600 ? 844 : 900;
-const browser = await chromium.launch({ args: ["--use-gl=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"] });
+const browser = await chromium.launch({ args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"] });
 const page = await browser.newPage({ viewport: { width, height }, isMobile: width < 600, hasTouch: width < 600 });
 await page.goto(base + "/", { waitUntil: "networkidle" });
 await page.waitForTimeout(1500);

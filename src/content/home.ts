@@ -2,10 +2,8 @@
 // - `emphasis` is always the trailing phrase of its `headline`; `Headline` sets it in the italic.
 // - Images are ImageRef-compatible `{ id, alt, position }`, where `id` is a still in scripts/media/manifest.json.
 // - Links are Action-compatible `{ label, href }`.
-// Older keys (eyebrows, icons, counters and the like) stay until the closing step (F9) removes what nothing reads.
 
 export const hero = {
-  eyebrow: "Resident exterior cleaning",
   headline: "Clean exteriors. Nobody on site.",
   emphasis: "Nobody on site.",
   support:
@@ -19,11 +17,11 @@ export const hero = {
 export const propertyStrip = {
   label: "Built for",
   items: [
-    { label: "Commercial buildings under 70 m", icon: "tower", href: "/commercial" },
-    { label: "Apartment buildings", icon: "apartments", href: "/commercial" },
-    { label: "Homes", icon: "house", href: "/homes-and-rentals" },
-    { label: "Rental properties", icon: "key", href: "/homes-and-rentals" },
-    { label: "Solar farms", icon: "solar", href: "/solar" },
+    { label: "Commercial buildings under 70 m", href: "/commercial" },
+    { label: "Apartment buildings", href: "/commercial" },
+    { label: "Homes", href: "/homes-and-rentals" },
+    { label: "Rental properties", href: "/homes-and-rentals" },
+    { label: "Solar farms", href: "/solar" },
   ],
 } as const;
 
@@ -57,7 +55,6 @@ export const productCards = {
 };
 
 export const systemExplainer = {
-  eyebrow: "The system",
   headline: "Designed to stay. Built to clean.",
   emphasis: "Built to clean.",
   intro: "One resident platform for glass, solar panels, walls, roofing and driveways. Explore the six parts of the system.",
@@ -127,7 +124,6 @@ export const systemExplainer = {
 };
 
 export const twoSystems = {
-  eyebrow: "Two systems",
   headline: "The right system for your property.",
   systems: [
     {
@@ -162,7 +158,6 @@ export const twoSystems = {
 };
 
 export const places = {
-  eyebrow: "Where it works",
   headline: "Built around your property.",
   emphasis: "your property.",
   intro: "Five kinds of property, one platform. Each card shows which system does the work and opens its page.",
@@ -180,7 +175,6 @@ export const places = {
 export const filmBand = {
   videoId: "c2-commercial-clip" as const,
   stillId: "c1-commercial-hero" as const,
-  eyebrow: "Every two days",
   headline: "The building checks itself.",
   body: "The capsule stays on the roof between cleans. When the scan says the glass needs it, the drone goes out, washes and comes home. Nobody books it. Nobody attends it.",
   cta: { label: "The commercial system", href: "/commercial" },
@@ -199,7 +193,6 @@ export const designFacts = {
 };
 
 export const landlordStory = {
-  eyebrow: "How it feels",
   headline: "Your property. Wherever you are.",
   emphasis: "Wherever you are.",
   intro: "You own a rental in Sydney and live overseas. The driveway and the solar panels need a clean before the next tenant moves in.",
@@ -223,19 +216,8 @@ export const appPanel = {
   note: "Illustrative app interface.",
 };
 
-export const counters = {
-  eyebrow: "By design",
-  items: [
-    { value: 2, suffix: "", unit: "days", label: "between re-scans on commercial buildings, and you can change it" },
-    { value: 0, suffix: "", unit: "people", label: "on site during a clean" },
-    { value: 70, suffix: "", unit: "m", label: "building height, under 70 metres" },
-    { value: 5, suffix: "", unit: "surfaces", label: "glass, solar panels, walls, roofing and driveways" },
-    { value: 2, suffix: "", unit: "systems", label: "on one drone platform" },
-  ],
-};
 
 export const visionLetter = {
-  eyebrow: "From the founder",
   headline: "Why we are building Lienry.",
   paragraphs: [
     "Buildings get dirty on a schedule that has nothing to do with when anyone is free to clean them. Owners book contractors, wait, pay, and repeat, and every job puts someone at height.",
@@ -243,12 +225,10 @@ export const visionLetter = {
     "Lienry is at concept stage in Sydney and we are raising our pre-seed round. If you own or manage a building, or you invest in the companies that serve them, we would like to hear from you.",
   ],
   signature: { name: "Liam Kennedy", title: "Founder and CEO, Lienry Drones" },
-  cofounder: { name: "Co-founder", title: "Name and title to come" },
   image: { id: "co1-company", alt: "A harbour-side street of mid-rise buildings at dawn", position: "50% 50%" },
 };
 
 export const safety = {
-  eyebrow: "Safety by design",
   headline: "Safety starts with the design.",
   items: [
     { id: "f1-tether", title: "Tether", body: "A water tether connects the drone to its dock for the whole clean, so it always works on a fixed line close to the building." },

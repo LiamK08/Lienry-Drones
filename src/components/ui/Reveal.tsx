@@ -22,6 +22,7 @@ export function Reveal({
   return (
     <Tag
       className={className}
+      data-reveal=""
       // The server cannot know the visitor's motion preference, so the first render is always the hidden
       // state; under reduced motion the reveal then completes instantly instead of fading.
       initial={{ opacity: 0, y }}
@@ -54,6 +55,7 @@ export function RevealItem({ children, className = "" }: { children: ReactNode; 
   return (
     <motion.li
       className={className}
+      data-reveal=""
       variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0, transition: reduce ? { duration: 0 } : { duration: 0.64, ease: settle } } }}
     >
       {children}

@@ -25,6 +25,8 @@ export type SceneControl = {
   scanStartedAt: number | null;
   /** Keep rendering: on screen, tab visible and motion allowed. */
   active: boolean;
+  /** The window is live and on screen. A change that is still settling draws only while this holds. */
+  visible: boolean;
   /** Written by the scene each frame so the window can show live counts without re-rendering the model. */
   stats: { completed: number; total: number };
   /** Where the drone is, written by the scene each frame (used by the recorder's close-up check). */
@@ -44,6 +46,7 @@ export function createControl(): SceneControl {
     flyTo: null,
     scanStartedAt: null,
     active: false,
+    visible: false,
     stats: { completed: 0, total: 0 },
     drone: { x: 0, y: 0, z: 0 },
     requestFrame: () => {},

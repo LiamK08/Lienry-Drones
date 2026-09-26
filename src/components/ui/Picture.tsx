@@ -26,8 +26,6 @@ export type PictureProps = {
   priority?: boolean;
   className?: string;
   imgClassName?: string;
-  /** @deprecated Ignored: a missing asset renders an empty frame. Removed in F9. */
-  placeholderText?: string;
 };
 
 const captionTone = {

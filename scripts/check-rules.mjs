@@ -1065,7 +1065,7 @@ try {
 
 let browser;
 try {
-  browser = await chromium.launch({ args: ["--use-gl=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"] });
+  browser = await chromium.launch({ args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"] });
 } catch (err) {
   fail(`Chromium could not start: ${String(err.message).split("\n")[0]}\nInstall it with: npm i -D playwright && npx playwright install chromium`);
 }
@@ -1421,7 +1421,11 @@ for (const route of opts.routes) {
         const a = await R(page, "draws");
         await page.waitForTimeout(800);
         const b = await R(page, "draws");
-        await call(page, (y) => window.scrollTo(0, y), w.bottom + vp.height * 2);
+        // Scroll the window fully off screen: below it when the page is long enough, otherwise above it
+        // (a window near the end of the page would stay partly visible at the clamped bottom).
+        const docH = await call(page, () => document.documentElement.scrollHeight);
+        const below = w.bottom + vp.height * 2;
+        await call(page, (y) => window.scrollTo(0, y), below + vp.height <= docH ? below : Math.max(0, w.top - vp.height * 2));
         await page.waitForTimeout(1000);
         const c = await R(page, "draws");
         await page.waitForTimeout(1500);

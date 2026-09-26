@@ -153,15 +153,17 @@ export function Switcher({ id, tone, headline, emphasis, intro, tabsLabel, items
                 aria-hidden={on ? undefined : true}
                 inert={!on}
                 tabIndex={on ? 0 : -1}
-                className={`col-start-1 row-start-1 transition-[opacity,visibility] duration-200 ease-instrument max-lg:starting:opacity-0 ${
+                className={`col-start-1 row-start-1 transition-[opacity,visibility] duration-200 ease-instrument max-lg:starting:opacity-0 motion-reduce:transition-none ${
                   on ? "visible opacity-100" : "invisible opacity-0 max-lg:hidden"
                 }`}
               >
-                <div className="grid gap-y-4 lg:grid-cols-12 lg:gap-x-6">
+                {/* The panel stretches to the cell (the tallest panel), and so does this grid, so a shorter panel's
+                    image grows to fill it rather than leaving an empty run below its caption. */}
+                <div className="grid gap-y-4 lg:h-full lg:grid-cols-12 lg:gap-x-6">
                   {/* An inactive panel's image leaves the layout once its fade-out ends, so only the
                       active image is rendered; the cell's height is unchanged, because every image
                       has the same floor and the text columns stay in place. */}
-                  <div data-col className={`transition-[display] duration-200 transition-discrete lg:col-span-6 ${on ? "" : "lg:hidden"}`}>
+                  <div data-col className={`transition-[display] duration-200 transition-discrete motion-reduce:transition-none lg:col-span-6 ${on ? "" : "lg:hidden"}`}>
                     <Picture
                       id={item.image.id}
                       alt={item.image.alt}
