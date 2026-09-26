@@ -22,8 +22,8 @@
 //     one of its tabs or stage parts is selected (B6 Switcher, C1 sections 4 and 5).
 //  4  Tones. Adjacent bands never share a tone; at most one ink band and one glass-deep panel on a page;
 //     the band before the footer is never sunken; every boundary between two light tones shows exactly
-//     one 1px hairline. Every block in <main> must be a Band (data-band, data-tone) or a film band
-//     (data-tone="film"), or the checks cannot see it.
+//     one 1px hairline; a band's data-tone is the surface it renders. Every block in <main> must be a
+//     Band (data-band, data-tone) or a film band (data-tone="film"), or the checks cannot see it.
 // 19  Overflow. Nothing runs past the viewport's edge, with the phone menu open and closed. The page
 //     clips overflow-x on <html> and <body>, which hides overflow from documentElement.scrollWidth, so
 //     body.scrollWidth and the elements past the edge are checked as well.
@@ -737,7 +737,10 @@ function judge(width, audit, sweeps, overflow) {
     }
   }
 
-  // Check 4.
+  // Check 4. A band's data-tone must be the surface it renders, or the hairline rule reads it wrong.
+  for (const b of blocks) {
+    if (b.dataTone && b.dataTone !== "film" && b.bgTone && b.dataTone !== b.bgTone) add(4, b.index, `data-tone is ${b.dataTone} but the band renders ${b.bgTone}`);
+  }
   const seq = blocks.map((b) => ({ ...b, tone: b.film ? "film" : b.tone }));
   for (let i = 1; i < seq.length; i++) {
     const a = seq[i - 1];
