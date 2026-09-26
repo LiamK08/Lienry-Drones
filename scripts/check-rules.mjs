@@ -1311,9 +1311,10 @@ for (const route of opts.routes) {
     // Sweeps: audit each block again in every tab and disclosure state.
     const blockList = await R(page, "blockList");
     const swept = [];
+    // What the default state already reported: a state or the open menu only adds what is new.
+    const baseline = new Set(failures.map((f) => `${f.check}|${f.where}|${f.kind}|${f.sample}`));
     if (opts.sweep) {
       const groups = await R(page, "controls");
-      const baseline = new Set(failures.map((f) => `${f.check}|${f.where}|${f.kind}|${f.sample}`));
       for (const g of groups) {
         swept.push(`${g.labels.length} ${g.kind}s in block ${g.block + 1}`);
         for (let i = 0; i < g.labels.length; i++) {
@@ -1342,8 +1343,18 @@ for (const route of opts.routes) {
       await R(page, "toggleMenu");
       await page.waitForTimeout(500);
       if (await R(page, "menuState")) {
-        for (const v of await R(page, "elementAudit", "body > header")) failures.push({ ...v, where: "header", kind: `${v.kind} (menu open)` });
-        judgeLinks(await R(page, "enquiryLinks", "body > header"), (c, w, k, s) => add(c, "header", `${k} (menu open)`, s));
+        for (const v of await R(page, "elementAudit", "body > header")) {
+          const key = `${v.check}|header|${v.kind}|${v.sample}`;
+          if (baseline.has(key)) continue;
+          baseline.add(key);
+          failures.push({ ...v, where: "header", sample: `with the menu open: ${v.sample}` });
+        }
+        judgeLinks(await R(page, "enquiryLinks", "body > header"), (c, w, k, s) => {
+          const key = `${c}|${w}|${k}|${s}`;
+          if (baseline.has(key)) return;
+          baseline.add(key);
+          add(c, w, k, `with the menu open: ${s}`);
+        });
         await page.keyboard.press("Escape");
         await page.waitForTimeout(300);
       }
