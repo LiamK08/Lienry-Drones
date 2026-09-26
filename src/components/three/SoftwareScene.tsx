@@ -78,19 +78,26 @@ function Rig({ controlRef, clockRef, flyingRef }: { controlRef: RefObject<SceneC
       c.enableRotate = false;
       gl.domElement.style.touchAction = "auto";
     }
+    let dragging = false;
     const onStart = () => {
+      dragging = true;
       pauseUntil.current = now() + 6000;
     };
-    // While the preview plays the driver draws every frame. While it is paused, a drag (and the
-    // damping after it) still has to be drawn, so each camera change asks for the next frame.
+    const onEnd = () => {
+      dragging = false;
+    };
+    // While the preview plays the driver draws every frame. While it is paused (or off screen) it
+    // draws nothing, except that the user's own drag is drawn as it happens.
     const onChange = () => {
-      if (!controlRef.current.active) get().invalidate();
+      if (dragging && !controlRef.current.active) get().invalidate();
     };
     c.addEventListener("start", onStart);
+    c.addEventListener("end", onEnd);
     c.addEventListener("change", onChange);
     controls.current = c;
     return () => {
       c.removeEventListener("start", onStart);
+      c.removeEventListener("end", onEnd);
       c.removeEventListener("change", onChange);
       c.dispose();
       controls.current = null;
