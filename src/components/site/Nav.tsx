@@ -94,7 +94,7 @@ export function Nav() {
                 <Link
                   href={item.href}
                   aria-current={active ? "page" : undefined}
-                  className={`relative flex h-[30px] items-center px-[10px] text-[0.8125rem] leading-none transition-opacity duration-200 after:absolute after:inset-x-[10px] after:bottom-[4px] after:h-px after:bg-current after:transition-opacity after:duration-200 hover:after:opacity-60 min-[1100px]:px-[15px] min-[1100px]:after:inset-x-[15px] ${
+                  className={`relative flex h-[30px] items-center px-[10px] text-caption leading-none transition-opacity duration-200 after:absolute after:inset-x-[10px] after:bottom-[4px] after:h-px after:bg-current after:transition-opacity after:duration-200 hover:after:opacity-60 min-[1100px]:px-[15px] min-[1100px]:after:inset-x-[15px] ${
                     active ? "after:opacity-100" : "after:opacity-0"
                   }`}
                 >

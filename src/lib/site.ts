@@ -43,7 +43,7 @@ export const footerColumns = [
     links: [
       { href: "/company", label: "About Lienry" },
       { href: "/register-interest", label: "Register interest" },
-      { href: "/register-interest?type=commercial", label: "Book a pilot" },
+      { href: "/register-interest?type=commercial", label: "Book a pilot conversation" },
       { href: "/register-interest?type=investor", label: "Investor enquiries" },
       { href: "/privacy", label: "Privacy" },
     ],
