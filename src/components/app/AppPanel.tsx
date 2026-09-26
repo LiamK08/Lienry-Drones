@@ -33,9 +33,9 @@ function Tick({ on }: { on: boolean }) {
 }
 
 /** One area of the property: its tick (decorative) and its state as text, so the tick is never the only signal. */
-function Row({ name, text, height }: { name: string; text: string | null; height: string }) {
+function Row({ name, text, className }: { name: string; text: string | null; className: string }) {
   return (
-    <li className={`flex items-center gap-3 border-b border-hairline text-small ${height}`}>
+    <li className={`items-center gap-3 border-b border-hairline text-small ${className}`}>
       <Tick on={text !== null} />
       <span>{name}</span>
       {text ? <span className="ml-auto text-caption text-muted">{text}</span> : null}
@@ -56,7 +56,8 @@ function Header({ pad }: { pad: string }) {
  * The compact select state for the home product card. It is decorative (the card's frame carries
  * the label and the caption carries the note), so it has no role, no button and no note. The right
  * padding clears the 24px the card runs the panel past its frame, so the label and the row states
- * stay whole.
+ * stay whole. Its 36px rows keep it inside the 4:3 frame at 390; from 1024, where the frame is
+ * taller, the unticked Windows row shows too, so the panel sits in the frame with an even margin.
  */
 function Fragment() {
   return (
@@ -64,8 +65,8 @@ function Fragment() {
       <Header pad="pb-3" />
       <p className="mt-3 text-lead font-medium">{appPanel.property}</p>
       <ul className="mt-3 border-t border-hairline">
-        {appPanel.rows.slice(0, 2).map((name, i) => (
-          <Row key={name} name={name} text={rowText("select", i)} height="h-10" />
+        {appPanel.rows.map((name, i) => (
+          <Row key={name} name={name} text={rowText("select", i)} className={`h-9 ${i < 2 ? "flex" : "hidden lg:flex"}`} />
         ))}
       </ul>
       <div className="mt-4 flex h-10 items-center justify-center rounded-hard bg-ink text-small font-medium text-white">{appPanel.buttons.select}</div>
@@ -93,7 +94,7 @@ function Control({ state, onAdvance }: { state: AppState; onAdvance: () => void 
       <p className="mt-1 text-caption text-muted">{appPanel.prompt}</p>
       <ul className="mt-4 border-t border-hairline">
         {appPanel.rows.map((name, i) => (
-          <Row key={name} name={name} text={rowText(state, i)} height="h-11" />
+          <Row key={name} name={name} text={rowText(state, i)} className="flex h-11" />
         ))}
       </ul>
       <div className="mt-auto pt-6">
