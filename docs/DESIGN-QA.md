@@ -61,3 +61,83 @@ These are native viewport captures, with no composition edits. All eight changed
 Real founder photography, the second founder's name and title, public contact details, and an enquiry delivery service remain outstanding. The existing privacy draft still needs the planned legal review. The hosting plan remains an owner/account launch decision. No approvals, customer results, fabricated staff or generated founder photos were introduced.
 
 The owner explicitly requested publication to main after this review. The pull request preserves the changes, screenshots and validation history.
+
+---
+
+# Reference-structure redesign — review record
+
+26 September 2026. Built from [REDESIGN-SPEC.md](REDESIGN-SPEC.md) on `claude/nifty-wozniak-ini85h`. Legora and ReFresh are references for structure and quality only; nothing of theirs is in the repository.
+
+## What changed
+
+Every page now follows one of the references' page anatomies, filled with Lienry's own copy, media and working software:
+
+- **Home** follows Legora's home anatomy in ReFresh's order:
+  - the film hero, then a linked "Built for" row;
+  - three product cards: roof capsule, ground pod and phone app;
+  - the working 3D software, driven by Map, Plan, Clean and Re-scan step tabs;
+  - a click-driven six-part stage, then the places track;
+  - the film band with its design facts attached below;
+  - the founder letter, the dark safety band, a short FAQ and one closing panel.
+- **Inner pages** share ReFresh's feature-page skeleton: a split hero with the product in the first screen, a switcher or step cards, feature rows with fact strips, one ink band (cited `stats.ts` figures, or facts labelled as design intent), a FAQ, sibling cards and a closing panel.
+- **The commercial film** finally plays in the /commercial hero.
+- **/solar** gains a switcher as its demonstration.
+- **Placeholders are gone:** no founder photo boxes and no "to come" text.
+- **Section padding** drops from 133px to 96px (56px on phones), and content moves onto the header's 24px edge.
+
+## Validation
+
+| Check | Result |
+| --- | --- |
+| `npm run typecheck`, `npm run lint`, `npm run build` | Clean |
+| `git diff --check` | Clean |
+| `npm run check:rules` (E2 checks 5–14, 21–24) | Every check passes on all 8 routes at 1440 and 390, with tabs, parts and beats swept and the reduced-motion pass |
+| `npm run check:layout` (E2 checks 2–4, 19) | Every check passes; no empty run over 48px inside a band and no horizontal overflow |
+| Local rule audit with labelled stand-in media | 0 violations on all 16 route/width views; every image and film captioned; no console errors |
+| `npm run contrast` against the brightest hero frame | All three gates pass: links 6.47:1, mark 8.07:1, button boundary 5.85:1 on the frame; 6.02:1 against pure white |
+| Software window off screen | 0 draw calls once it leaves the screen; settling changes draw only while it is visible |
+
+## Page heights at 1440 (390)
+
+| Route | Before | After |
+| --- | --- | --- |
+| `/` | 11,389 (14,120) | 8,643 (11,120) |
+| `/platform` | 8,020 | 5,613 (7,241) |
+| `/commercial` | 4,460 | 6,375 (7,977), now with the working software and the hero film |
+| `/homes-and-rentals` | 5,601 | 5,410 (6,973) |
+| `/solar` | 4,583 | 4,497 (5,572) |
+| `/company` | 4,729 | 3,994 (4,427) |
+| `/register-interest` | 1,925 | 1,636 (2,645) |
+| `/privacy` | 2,246 | 1,257 (2,225) |
+
+## Decisions for the owner
+
+All of these are built and reversible:
+
+1. The home headline moves from the display step to the H1 step, with "Nobody on site." in the italic.
+2. The founder photo placeholders are removed. The letter carries the street render, and /company lists Liam as text until real photographs and the co-founder's name are supplied.
+3. The closing panels are glass-deep (the deep link colour); the alternative is ink.
+4. On ink and glass-deep, the primary button is a plaster fill.
+5. Content moves to the header's 24px rail on a 1,392px grid.
+6. The six parts appear on home (the stage) and on /platform (the switcher, with specification lines).
+7. Home runs product cards, then the working software, then the six-part stage. The landlord story lives on /homes-and-rentals, where the app panel's own button drives it.
+8. Every commercial pilot link reads "Book a pilot conversation".
+9. The /solar rooftop band is removed; its CER figure stays on /homes-and-rentals.
+10. No uppercase label sits above a section heading.
+11. Places show four 330px cards on a track at every width, the fifth one step along.
+12. The footer wordmark moves to the display step, onto the scale.
+13. FAQ questions are 16px Inter at weight 500; the serif is for headings only.
+14. Safety renders are 4:3 crops at the bottom of ruled cells.
+15. The home stage has an ink sidebar.
+16. /company keeps "Two founders, one building at a time." with Liam listed alone for now.
+17. The home software steps are Map, Plan, Clean and Re-scan.
+
+## Outstanding owner inputs
+
+These are unchanged from the 22 September record:
+
+- real founder photography;
+- the second founder's name and title;
+- public contact details;
+- an enquiry delivery service;
+- the privacy draft's legal review.

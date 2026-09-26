@@ -4,7 +4,7 @@ Marketing site for Lienry Drones: a resident cleaning drone that lives on a prop
 
 ## Stack
 
-Next.js 16 (App Router, Turbopack), TypeScript, Tailwind CSS 4, Motion for React, native scrolling, React Three Fiber, zod. Two typefaces, both self-hosted from Fontsource and loaded with `next/font/local`: Instrument Serif for headings and Inter, with its optical size axis, for body, navigation, buttons, labels and numerals. `font-display: swap`, size-adjusted fallbacks, and a preload for the two files used above the fold. `node scripts/fonts.mjs` copies the files out of the packages into `src/fonts`.
+Next.js 16 (App Router, Turbopack), TypeScript, Tailwind CSS 4, Motion for React, native scrolling, React Three Fiber, zod. Two typefaces, both self-hosted from Fontsource and loaded with `next/font/local`: Instrument Serif for headings and Inter, with its optical size axis, for body, navigation, buttons, labels and numerals. `font-display: swap`, size-adjusted fallbacks, and a preload for the three files used above the fold (Instrument Serif in roman and italic, and Inter). `node scripts/fonts.mjs` copies the files out of the packages into `src/fonts`.
 
 ## Run it
 
@@ -34,7 +34,7 @@ Copy `.env.example` to `.env.local` if you want enquiries forwarded to a webhook
 
 ## Media pipeline
 
-AI visuals are generated with Higgsfield, logged in `docs/MEDIA.md`, and listed with their result URLs in `scripts/media/manifest.json`. `npm run media:fetch` downloads them, writes AVIF and WebP images at several widths, compressed MP4 and WebM video under 4 MB with a poster, and `public/media/index.json`, which the site reads to decide what to render. Any asset id that is not in the index shows a labelled placeholder, so the site never breaks while renders are pending. Raw downloads and finished output are cached in `.next/cache/lienry-media`, so a second run only restores files; each index entry records the source URL it was made from, so changing an asset's URL in the manifest refetches it instead of restoring the old files, and files no entry lists are pruned. The approved design sheets the renders are made from live in `docs/references`.
+AI visuals are generated with Higgsfield, logged in `docs/MEDIA.md`, and listed with their result URLs in `scripts/media/manifest.json`. `npm run media:fetch` downloads them, writes AVIF and WebP images at several widths, compressed MP4 and WebM video under 4 MB with a poster, and `public/media/index.json`, which the site reads to decide what to render. Any asset id that is not in the index renders an empty frame, with no text and no caption, so the site never breaks while renders are pending. Raw downloads and finished output are cached in `.next/cache/lienry-media`, so a second run only restores files; each index entry records the source URL it was made from, so changing an asset's URL in the manifest refetches it instead of restoring the old files, and files no entry lists are pruned. The approved design sheets the renders are made from live in `docs/references`.
 
 The same script runs in two other places. As a `prebuild` step it runs in soft mode before every `next build`, so a host with open internet (Vercel, Netlify) downloads and optimises the whole set on its first build and restores it from the build cache on later builds, while a machine that cannot reach the CDN keeps the placeholders and still builds. On GitHub Actions ("Fetch and optimise media" in the Actions tab, once Actions is enabled for the repository) it commits the result back to the branch. Video compression needs ffmpeg: `ffmpeg-static` is a dev dependency, so the build must install dev dependencies (the default on Vercel), and a system ffmpeg works too.
 
@@ -60,7 +60,7 @@ The mark is three building silhouettes with the flight arc cut through them, sup
 
 ## Honesty rules baked in
 
-No customers, logos, testimonials, results, prices, certifications or approvals are claimed anywhere. Statistics come only from `src/content/stats.ts`, each verified against and cited to its primary source. The founders' photos are placeholders until real photos are supplied.
+No customers, logos, testimonials, results, prices, certifications or approvals are claimed anywhere. Statistics come only from `src/content/stats.ts`, each verified against and cited to its primary source. Founders are listed as text until real photographs are supplied; there are no placeholder photos.
 
 The imagery is AI-generated. Every AI figure and film carries a plain "Concept render" caption. The coded software preview is labelled "Demo data" with an illustrative-model note. `docs/MEDIA.md` still records every asset with its prompt and model.
 

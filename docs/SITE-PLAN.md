@@ -83,12 +83,12 @@ The measure is 68 characters and the token that carries it is `45ch`. CSS `ch` i
 - Scroll-linked sequences (system explainer, landlord story, 3D scan sweep): transform and clip-path only, mapped to scroll progress through a spring, linear underneath.
 - Counters: 1200ms, once, tabular figures so nothing shifts.
 - Scale never exceeds 1.03 on content; hover never scales. No speed ramps, no HUD, no whoosh.
-- Native scrolling only. Reveals are driven by IntersectionObserver (Motion's `whileInView`), never by per-frame scroll maths, and only `transform` and `opacity` animate. Nothing pins the page: the system explainer and the landlord story are scroll-through lists with a sticky media column that follows the step nearest the viewport centre. The 3D building renders on demand and plays its sequence once each time it comes on screen. Videos preload metadata only and one clip decodes at a time.
+- Native scrolling only. Reveals are driven by IntersectionObserver (Motion's `whileInView`), never by per-frame scroll maths, and only `transform` and `opacity` animate. Nothing pins the page and nothing is sticky except the header: the six parts are a click-driven stage, the software steps and the switchers are tabs, and no figure counts up (see docs/REDESIGN-SPEC.md, B8).
 - `prefers-reduced-motion`: no smooth anchor scrolling, crossfades become instant, counters render their final value, the hero video is replaced by its poster, the 3D building shows its finished state.
 
 ### Imagery direction
 
-Photoreal AI stills and short loops. The "Concept render" labels were removed on request, so nothing on the page marks them as renders. Early morning light only (sun 15 to 30 degrees, or bright overcast), soft haze, long soft shadows, cool highlights, warm lifted shadows. Subjects: mid-rise commercial glass under 70 metres (6 to 18 storeys, never a skyline tower), a rooftop plant deck with the weatherproof capsule, thin sheets of water running down curtain-wall glass, solar panels beaded with water, a wet driveway on a quiet suburban street, the ground pod beside a garden tap, a solar farm row at first light. No landmarks, no signage, no logos, no faces, no aviation markings, no sci-fi.
+Photoreal AI stills and short loops. Every image and film carries a plain "Concept render" caption (CLAUDE.md); the coded software preview carries Demo data and an illustrative-model note instead. Early morning light only (sun 15 to 30 degrees, or bright overcast), soft haze, long soft shadows, cool highlights, warm lifted shadows. Subjects: mid-rise commercial glass under 70 metres (6 to 18 storeys, never a skyline tower), a rooftop plant deck with the weatherproof capsule, thin sheets of water running down curtain-wall glass, solar panels beaded with water, a wet driveway on a quiet suburban street, the ground pod beside a garden tap, a solar farm row at first light. No landmarks, no signage, no logos, no faces, no aviation markings, no sci-fi.
 
 ## 4. Copy direction
 
@@ -224,7 +224,7 @@ Approval gates: M1 (this round), then M2, M3 and H0 together, then everything el
 - No customers, logos, testimonials, results, prices, certifications or CASA approval anywhere.
 - Every statistic on the site is in the verified table above and cited on the page.
 - The hose-free model appears once, on the Company page, as an idea in development.
-- AI visuals no longer carry a "Concept render" label; it was removed on request. No AI portraits of the founders.
+- Every AI image and film carries a plain "Concept render" caption, as CLAUDE.md requires. No AI portraits of the founders.
 - Pre-launch wording on every page: register interest, pilot program, in development.
 
 ## 9. Open items for Liam
