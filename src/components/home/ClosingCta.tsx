@@ -1,32 +1,20 @@
 import { closing } from "@/content/home";
-import { Container, Section } from "@/components/ui/Section";
-import { Picture } from "@/components/ui/Picture";
-import { Button } from "@/components/ui/Button";
-import { Reveal } from "@/components/ui/Reveal";
+import { CtaPanel } from "@/components/sections/CtaPanel";
 
+/**
+ * The home close: one glass-deep panel carrying Lienry's three real enquiry routes. The first
+ * button in `closing` is the plaster primary; the other two follow it as white links.
+ */
 export function ClosingCta() {
+  const [primary, ...links] = closing.buttons;
   return (
-    <Section id="closing" ariaLabelledby="closing-heading">
-      <Container>
-        <div className="grid items-center gap-10 md:grid-cols-12 md:gap-8">
-          <Reveal className="md:col-span-5">
-            <h2 id="closing-heading" className="text-h1">
-              {closing.headline}
-            </h2>
-            <p className="mt-5 max-w-prose text-lead text-muted">{closing.body}</p>
-            <div className="mt-8 flex flex-col gap-3 items-start">
-              {closing.buttons.map((b) => (
-                <Button key={b.href} href={b.href} variant={b.variant === "primary" ? "primary" : "tertiary"} size="md" arrow>
-                  {b.label}
-                </Button>
-              ))}
-            </div>
-          </Reveal>
-          <Reveal className="md:col-span-5 md:col-start-8" delay={0.1}>
-            <Picture id={closing.imageId} alt="The Lienry ground pod beside a house at first light" aspect="1/1" sizes="(min-width: 768px) 30vw, 100vw" />
-          </Reveal>
-        </div>
-      </Container>
-    </Section>
+    <CtaPanel
+      id="closing"
+      headline={closing.headline}
+      body={closing.body}
+      primary={primary}
+      links={links}
+      image={{ id: closing.imageId, alt: closing.imageAlt, position: closing.imagePosition }}
+    />
   );
 }
