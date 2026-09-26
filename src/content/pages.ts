@@ -410,7 +410,7 @@ export const companyPage = {
     headline: "Two founders, one building at a time.",
     // The co-founder stays unpublished, with no name or title, until the owner supplies them.
     people: [
-      { name: "Liam Kennedy", title: "Founder and CEO", bio: "Liam leads Lienry Drones from Sydney with his co-founder.", photo: null, published: true },
+      { name: "Liam Kennedy", title: "Founder and CEO", bio: "Liam leads Lienry Drones from Sydney with a co-founder.", photo: null, published: true },
       { name: "Co-founder", title: "", bio: "", photo: null, published: false },
     ] satisfies FounderEntry[],
   },
