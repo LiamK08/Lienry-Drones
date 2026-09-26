@@ -2,71 +2,109 @@
 
 import { useState } from "react";
 import { landlordStory } from "@/content/home";
+import { homesPage } from "@/content/pages";
+import { AppPanel, type AppState } from "@/components/app/AppPanel";
+import { Band, Container } from "@/components/ui/Band";
+import { FactList } from "@/components/ui/FactList";
 import { Picture } from "@/components/ui/Picture";
-import { Reveal } from "@/components/ui/Reveal";
+import { SectionHead } from "@/components/ui/SectionHead";
 
-const beats = landlordStory.beats;
+const STATES: readonly AppState[] = ["map", "select", "start", "progress", "done"];
 
-/** An illustrative interface, deliberately a flat app panel rather than a decorative phone. */
-function AppPreview({ state }: { state: string }) {
-  const selected = state !== "map";
-  const complete = state === "done";
-  const progressing = state === "progress";
-  return (
-    <div className="rounded-hard border border-hairline bg-raised p-5 md:p-6" aria-label="Illustrative mobile app, demo data">
-      <div className="flex items-center justify-between gap-4 border-b border-hairline pb-5">
-        <span className="text-small font-medium">Your property</span><span className="label text-muted">Demo data</span>
-      </div>
-      <p className="mt-5 font-display text-h3">Rental, Sydney</p>
-      <p className="mt-1 text-caption text-muted">Choose the areas for this clean</p>
-      <ul className="mt-6 divide-y divide-hairline border-y border-hairline">
-        {["Driveway", "Solar panels", "Windows"].map((name, i) => (
-          <li key={name} className="flex items-center gap-3 py-4 text-small">
-            <span aria-hidden="true" className={`flex h-4 w-4 items-center justify-center rounded-hard border ${selected && i < 2 ? "bg-ink border-ink text-white" : "border-border-strong"}`}>{selected && i < 2 ? "✓" : ""}</span>
-            <span>{name}</span>
-            {selected && i < 2 ? <span className="ml-auto text-caption text-muted">{complete ? "Complete" : progressing ? (i === 0 ? "31%" : "64%") : "Selected"}</span> : null}
-          </li>
-        ))}
-      </ul>
-      <div className="mt-6 rounded-hard bg-ink px-4 py-3 text-center text-small text-white">{complete ? "Clean complete" : progressing ? "Cleaning in progress" : state === "start" ? "Starting clean…" : selected ? "Start clean" : "Choose surfaces"}</div>
-      <p className="mt-4 text-caption text-muted">Illustrative app interface.</p>
-    </div>
-  );
+function toState(app: string): AppState {
+  const state = STATES.find((s) => s === app);
+  if (!state) throw new Error(`LandlordStory: "${app}" is not an app panel state.`);
+  return state;
 }
 
+// One beat per app panel state, in order: a beat's `app` is the state the panel shows with it.
+const beats = landlordStory.beats.map((beat) => ({ ...beat, state: toState(beat.app) }));
+
+// What the app does, as the strip under the story.
+const strip = homesPage.app.items.map((item) => ({ term: item.title, text: item.body }));
+
+/**
+ * The phone app, told as five beats of one clean (on /homes-and-rentals, id `story`).
+ *
+ * One shared state, the active beat, drives three things: the beat list (PR 9's disclosures: a
+ * button in each h3 with aria-expanded, aria-controls and aria-disabled on the open one, and a
+ * labelled region under it), the app panel's state, and the image. A beat button opens its beat;
+ * the panel's own button advances to the next beat, and "Start again" returns to the first. The
+ * panel's status line announces each change.
+ *
+ * From 1024 one row holds the beat list (columns 1-5), the panel (6-9) and the active beat's image
+ * (10-12), stretched to one height; then 32 and the app's features in four columns (FactList
+ * switches to its columns from 768). Below 1024 the image sits inside the open beat at 4:3, then
+ * 32, the panel, 32, and the features, in one column on phones.
+ */
 export function LandlordStory() {
   const [active, setActive] = useState(0);
   const beat = beats[active];
+  const advance = () => setActive((i) => (i + 1) % beats.length);
+
   return (
-    <section id="story" aria-labelledby="story-heading" className="page-x section-y bg-plaster">
-      <div className="mx-auto max-w-grid">
-        <Reveal className="grid gap-6 md:grid-cols-2 md:gap-16 md:items-end">
-          <h2 id="story-heading" className="max-w-[18ch] text-h2">{landlordStory.headline}</h2>
-          <p className="text-body text-muted">{landlordStory.intro}</p>
-        </Reveal>
-        <div className="mt-12 grid gap-10 lg:mt-16 lg:grid-cols-12 lg:gap-12">
-          <ol className="border-t border-hairline lg:col-span-4">
-            {beats.map((b, i) => (
-              <li key={b.app} className="border-b border-hairline">
-                <h3><button type="button" id={`story-${b.app}`} onClick={() => setActive(i)} aria-expanded={i === active} aria-disabled={i === active} aria-controls={`story-panel-${b.app}`} className="flex min-h-16 w-full items-start gap-4 py-5 text-left">
-                  <span className="readout pt-1 text-caption text-muted" aria-hidden="true">0{i + 1}</span>
-                  <span className="font-display text-h3">{b.title}</span>
-                </button></h3>
-                <div hidden={active !== i} id={`story-panel-${b.app}`} role="region" aria-labelledby={`story-${b.app}`} className="pb-6 pl-8">
-                  <p className="text-small text-muted">{b.body}</p>
-                  <div className="mt-5 lg:hidden"><Picture id={b.imageId} alt={b.title} aspect="4/3" sizes="90vw" /></div>
-                </div>
-              </li>
-            ))}
-          </ol>
-          <div className="lg:col-span-8">
-            <div className="grid gap-6 lg:grid-cols-2 lg:sticky lg:top-[calc(var(--nav-h)+2rem)]">
-              <AppPreview state={beat.app} />
-              <div className="hidden lg:block"><Picture id={beat.imageId} alt={beat.title} aspect="3/4" sizes="30vw" /></div>
-            </div>
+    <Band id="story" tone="raised" labelledBy="story-heading">
+      <Container>
+        <SectionHead id="story-heading" headline={landlordStory.headline} emphasis={landlordStory.emphasis} aside={{ intro: landlordStory.intro }} />
+
+        <div className="mt-[var(--gap-head)] grid gap-y-8 lg:grid-cols-12 lg:gap-x-6 lg:gap-y-0">
+          <div data-col className="lg:col-span-5">
+            <ol className="border-t border-hairline">
+              {beats.map((b, i) => {
+                const open = i === active;
+                return (
+                  <li key={b.app} className="border-b border-hairline">
+                    <h3 className="text-h3">
+                      <button
+                        type="button"
+                        id={`story-${b.app}`}
+                        aria-expanded={open}
+                        aria-controls={`story-panel-${b.app}`}
+                        aria-disabled={open}
+                        onClick={() => setActive(i)}
+                        className={`flex min-h-11 w-full items-baseline gap-4 py-4 transition-colors duration-200 ease-instrument ${
+                          open ? "cursor-default text-ink" : "text-muted hover:text-ink"
+                        }`}
+                      >
+                        <span aria-hidden="true" className="readout w-4 shrink-0 text-caption text-muted">
+                          {`0${i + 1}`}
+                        </span>
+                        <span>{b.title}</span>
+                      </button>
+                    </h3>
+                    <div id={`story-panel-${b.app}`} role="region" aria-labelledby={`story-${b.app}`} hidden={!open} className="pb-5 pl-8">
+                      {/* The body shares one cell with invisible copies of every beat's body, so the
+                          open beat always takes the longest body's height and switching never moves
+                          the rows under it. */}
+                      <div className="grid">
+                        <p className="col-start-1 row-start-1 text-small text-muted">{b.body}</p>
+                        {beats.map((c) => (
+                          <p key={c.app} aria-hidden="true" className="invisible col-start-1 row-start-1 text-small">
+                            {c.body}
+                          </p>
+                        ))}
+                      </div>
+                      <div className="mt-4 lg:hidden">
+                        <Picture id={b.imageId} alt={b.title} aspect="4/3" sizes="(min-width: 768px) 90vw, 84vw" />
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+
+          <div data-col className="lg:col-span-4">
+            <AppPanel mode="control" state={beat.state} onAdvance={advance} />
+          </div>
+
+          <div data-col className="hidden lg:col-span-3 lg:block">
+            <Picture id={beat.imageId} alt={beat.title} fit="fill" minHeight="18rem" sizes="(min-width: 1440px) 330px, 23vw" />
           </div>
         </div>
-      </div>
-    </section>
+
+        <FactList items={strip} columns={4} termStyle="strong" className="mt-8" />
+      </Container>
+    </Band>
   );
 }
