@@ -704,7 +704,11 @@ function judge(route, width, audit, sweeps, overflow) {
   for (const b of blocks) {
     if (b.skipped) continue;
     const states = sweeps.filter((s) => s.block === b.index);
-    const persists = (count) => (!states.length || !count ? "" : count === states.length ? `; persists in all ${count} swept states` : `; persists in ${count} of ${states.length} swept states`);
+    const persists = (count) => {
+      if (!states.length || !count) return "";
+      if (count < states.length) return `; also in ${count} of the ${states.length} other states`;
+      return count === 1 ? "; also in the other state" : `; also in all ${count} other states`;
+    };
     if (b.space.empty) add(2, b.index, `holds no visible content (${fmt(b.space.contentHeight)}px of empty paper)`);
     for (const g of b.space.gaps) add(2, b.index, gapText(g) + persists(states.filter((s) => s.space.gaps.some((h) => sameGap(g, h))).length));
     for (const c of b.columns.failures) add(2, b.index, colText(c) + persists(states.filter((s) => s.columns.failures.some((d) => sameCol(c, d))).length));
