@@ -34,7 +34,11 @@
 //     the window shows its recording with native controls; without it never two videos play at once,
 //     the live window stops drawing off screen, nothing is sticky but the header, nothing moves with
 //     the scroll and no figure counts up.
-// 22  Titles: <title> is the brand name on every route.
+// 22  Titles and links: every route's <title> is its own, "What the page is | Lienry Drones", exactly as
+//     pageTitle in src/lib/site.ts builds it (the owner's 28 September brief). Its one canonical link and
+//     its og:url are its own address, never the home page's; og:title and twitter:title are the title
+//     without the brand; og:description and twitter:description repeat its meta description; the card
+//     has an og:image. No two routes share a title or a description.
 // 23  Placeholders: no "to come", no data-media-placeholder, no empty photo box.
 // 24  Enquiry labels: every link to /register-interest carries the one label of its ?type=.
 //
@@ -51,7 +55,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const ROUTES = ["/", "/platform", "/commercial", "/homes-and-rentals", "/solar", "/company", "/register-interest", "/privacy"];
+const ROUTES = ["/", "/platform", "/commercial", "/homes-and-rentals", "/solar", "/company", "/download", "/register-interest", "/privacy"];
 const VIEWPORTS = {
   1440: { width: 1440, height: 900, mobile: false },
   390: { width: 390, height: 844, mobile: true },
@@ -99,6 +103,7 @@ const SPEC = {
     "/platform": { windows: 1 },
     "/commercial": { windows: 1 },
     "/homes-and-rentals": { apps: 1 },
+    "/download": { windows: 1 },
   },
 };
 
@@ -114,7 +119,7 @@ const CHECKS = {
   13: "coded demos labelled",
   14: "manifest media",
   21: "motion",
-  22: "titles",
+  22: "titles and links",
   23: "no placeholders",
   24: "one label per enquiry route",
 };
@@ -125,7 +130,7 @@ function usage() {
 Runs E2 checks 5-14 and 21-24 of docs/REDESIGN-SPEC.md against a served build.
 
   <baseUrl>          the served build, e.g. http://localhost:3000 (default)
-  route              one or more routes (default: all eight)
+  route              one or more routes (default: all nine)
   --widths 1440,390  viewport widths (1440x900 and 390x844 by default)
   --json <file>      also write the full report as JSON
   --no-sweep         skip the tab and disclosure state sweeps
@@ -199,6 +204,13 @@ function loadChromium() {
 // copy the site renders (pages.ts imports ./home without an extension, which plain Node cannot load).
 function loadContent() {
   const require = createRequire(path.join(ROOT, "package.json"));
+  // The site's address as the build saw it: Next's own .env loading, so a NEXT_PUBLIC_SITE_URL set in
+  // .env.local reaches src/lib/site.ts here too (check 22).
+  try {
+    require("@next/env").loadEnvConfig(ROOT, false, { info() {}, error: console.error });
+  } catch {
+    // No @next/env: the process environment alone.
+  }
   let ts;
   try {
     ts = require("typescript");
@@ -237,7 +249,13 @@ function loadContent() {
         "/company": { h1: pages.companyPage.emphasis, h2: [] },
         "/register-interest": { h1: null, h2: [] },
         "/privacy": { h1: null, h2: [] },
+        "/download": { h1: pages.downloadPage.emphasis, h2: [] },
       },
+      // E2 check 22: every route's tab title, as src/lib/site.ts builds it, its share card's title, and
+      // the site's address.
+      titles: Object.fromEntries(Object.keys(site.pageTitles).map((route) => [route, site.pageTitle(route)])),
+      shareTitles: site.pageTitles,
+      siteUrl: site.siteUrl,
       // E2 check 11: the allowed sentences.
       allowed: [
         ["the FAQ answer to Is Lienry operating yet?", faq("operating")],
@@ -740,7 +758,12 @@ function pageLib() {
     }
     R.emptyBoxes = emptyBoxes();
 
-    return { violations: out, italics, texts, numerals, links: R.enquiryLinks("body"), title: document.title, emptyBoxes: R.emptyBoxes.length };
+    // Check 22: every copy of the canonical link, the description and the share card's tags.
+    const values = (selector, attr) => [...document.querySelectorAll(selector)].map((e) => e.getAttribute(attr));
+    const head = { canonical: values('link[rel="canonical"]', "href") };
+    for (const key of ["description", "og:url", "og:title", "og:description", "og:image", "twitter:title", "twitter:description"]) head[key] = values(`meta[name="${key}"], meta[property="${key}"]`, "content");
+
+    return { violations: out, italics, texts, numerals, links: R.enquiryLinks("body"), title: document.title, head, emptyBoxes: R.emptyBoxes.length };
   };
 
   // Check 24: every link to /register-interest in a scope, hidden states included.
@@ -1174,6 +1197,29 @@ function judgeLinks(links, add) {
   }
 }
 
+// The canonical link and the share card (check 22): one of each tag, with the page's own address and words.
+function judgeHead(route, head, add) {
+  const single = { canonical: "canonical links", description: "meta descriptions", "og:url": "og:url tags", "og:title": "og:title tags", "og:description": "og:description tags", "twitter:title": "twitter:title tags", "twitter:description": "twitter:description tags" };
+  for (const [key, name] of Object.entries(single)) if (head[key].length !== 1) add(22, "page", `${head[key].length} ${name}, not 1`, head[key].join(" | "));
+  if (!head["og:image"].length) add(22, "page", "the share card has no og:image", "");
+  if (content.error) return;
+  const address = route === "/" ? content.siteUrl : `${content.siteUrl}${route}`;
+  for (const [key, name] of [["canonical", "the canonical link"], ["og:url", "og:url"]]) {
+    const [value] = head[key];
+    if (value !== undefined && value !== address) add(22, "page", `${name} is ${value}, not this page's address ${address}`, "");
+  }
+  const title = content.shareTitles[route];
+  for (const key of ["og:title", "twitter:title"]) {
+    const [value] = head[key];
+    if (title && value !== undefined && value !== title) add(22, "page", `${key} is "${value}", not "${title}"`, "");
+  }
+  const [description] = head.description;
+  for (const key of ["og:description", "twitter:description"]) {
+    const [value] = head[key];
+    if (description !== undefined && value !== undefined && value !== description) add(22, "page", `${key} is not the page's meta description`, `"${value.slice(0, 80)}"`);
+  }
+}
+
 const report = { base: opts.base, when: new Date().toISOString(), runs: [], site: [] };
 const siteFailures = [];
 const idsSeen = new Set();
@@ -1181,6 +1227,8 @@ const scripts = new Set();
 const fontsLoaded = new Map();
 const stepsByWidth = new Map();
 const pending = [];
+const titlesSeen = new Map();
+const descriptionsSeen = new Map();
 let totalFailures = 0;
 const byCheck = {};
 
@@ -1259,7 +1307,12 @@ for (const route of opts.routes) {
     judgeItalics(route, pageRes.italics, add);
     judgeClaims(pageRes.texts, pageRes.numerals, add);
     judgeLinks(pageRes.links, add);
-    if (pageRes.title !== cfg.brand) add(22, "page", `<title> is "${pageRes.title}", not "${cfg.brand}"`, "");
+    if (content.error) add(22, "page", "titles not checked", content.error);
+    else if (!content.titles[route]) add(22, "page", "no tab title for this route in pageTitles (src/lib/site.ts)", "");
+    else if (pageRes.title !== content.titles[route]) add(22, "page", `<title> is "${pageRes.title}", not "${content.titles[route]}"`, "");
+    judgeHead(route, pageRes.head, add);
+    titlesSeen.set(route, pageRes.title);
+    descriptionsSeen.set(route, pageRes.head.description[0]);
 
     // Check 14 per state: no id in two frames.
     // A repeat is reported once: in the default state, or in the first state that shows it.
@@ -1390,11 +1443,20 @@ for (const route of opts.routes) {
         const a = await R(page, "draws");
         await page.waitForTimeout(800);
         const b = await R(page, "draws");
-        // Scroll the window fully off screen: below it when the page is long enough, otherwise above it
-        // (a window near the end of the page would stay partly visible at the clamped bottom).
+        // Scroll the window fully off screen: two screens past it when the page is long enough, otherwise
+        // two screens before it (a window near the end of the page would stay partly visible at the
+        // clamped bottom). On a short page with the window near its top (/download) neither fits, so
+        // scroll to the page's end, which still clears the window.
         const docH = await call(page, () => document.documentElement.scrollHeight);
+        const maxScroll = docH - vp.height;
         const below = w.bottom + vp.height * 2;
-        await call(page, (y) => window.scrollTo(0, y), below + vp.height <= docH ? below : Math.max(0, w.top - vp.height * 2));
+        const above = w.top - vp.height * 2;
+        const target = below <= maxScroll ? below : above >= 0 ? above : maxScroll >= w.bottom ? maxScroll : null;
+        if (target === null) {
+          notes.push(`window in block ${w.where}: the page is too short to scroll it off screen, so off-screen drawing was not checked`);
+          continue;
+        }
+        await call(page, (y) => window.scrollTo(0, y), target);
         await page.waitForTimeout(1000);
         const c = await R(page, "draws");
         await page.waitForTimeout(1500);
@@ -1550,6 +1612,13 @@ try {
   for (const f of git(`diff --name-only --diff-filter=A ${base} HEAD -- public/media public/video media-src`).split("\n").filter(Boolean)) siteAdd(14, "a media file added on this branch", f);
 } catch {
   console.log("  note  git is unavailable: the public/video and media-src history was not checked");
+}
+
+// Check 22: no two routes share a tab title or a description.
+for (const [seen, what] of [[titlesSeen, "a tab title"], [descriptionsSeen, "a description"]]) {
+  const byText = new Map();
+  for (const [route, text] of seen) if (text !== undefined) byText.set(text, [...(byText.get(text) ?? []), route]);
+  for (const [text, routes] of byText) if (routes.length > 1) siteAdd(22, `two routes share ${what}`, `"${text}" on ${routes.join(", ")}`);
 }
 
 // Check 6: every font file loaded is one of the three in src/fonts, byte for byte.

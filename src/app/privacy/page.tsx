@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import { privacyPage } from "@/content/pages";
+import { pageMetadata } from "@/lib/site";
 import { Band, Container } from "@/components/ui/Band";
 import { SectionHead } from "@/components/ui/SectionHead";
 
 export const metadata: Metadata = {
-  title: "Lienry Drones",
-  description: "How Lienry Drones handles the details you share through this website.",
-  alternates: { canonical: "/privacy" },
+  ...pageMetadata("/privacy", "How Lienry Drones handles the details you share through this website."),
   robots: { index: false, follow: true },
 };
 

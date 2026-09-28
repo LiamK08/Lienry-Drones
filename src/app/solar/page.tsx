@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { faqSets, platformFaq, solarPage } from "@/content/pages";
 import { solarStats } from "@/content/stats";
+import { pageMetadata } from "@/lib/site";
 import { CtaPanel } from "@/components/sections/CtaPanel";
 import { Faq } from "@/components/sections/Faq";
 import { PageHeroSplit } from "@/components/sections/PageHeroSplit";
@@ -8,11 +9,10 @@ import { SiblingCards } from "@/components/sections/SiblingCards";
 import { CITED_NOTE, StatBand, pickStats } from "@/components/sections/StatBand";
 import { Switcher } from "@/components/sections/Switcher";
 
-export const metadata: Metadata = {
-  title: "Lienry Drones",
-  description: "Dust and grime cost solar owners real energy. Lienry treats a panel as its own material, sets the pressure to match, and cleans on the interval you choose.",
-  alternates: { canonical: "/solar" },
-};
+export const metadata: Metadata = pageMetadata(
+  "/solar",
+  "Dust and grime cost solar owners real energy. Lienry treats a panel as its own material, sets the pressure to match, and cleans on the interval you choose.",
+);
 
 // The page's questions, in the order faqSets gives them.
 const questions = faqSets.solar.map((id) => platformFaq.items.find((item) => item.id === id)).filter((item) => item !== undefined);
