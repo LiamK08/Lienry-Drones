@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { registerPage } from "@/content/pages";
+import { pageTitle } from "@/lib/site";
 import { EnquiryForm } from "@/components/forms/EnquiryForm";
 import { Band, Container } from "@/components/ui/Band";
 import { Picture } from "@/components/ui/Picture";
 
 export const metadata: Metadata = {
-  title: "Lienry Drones",
+  title: pageTitle("/register-interest"),
   description: "Tell us about your property. Homeowners, landlords, commercial pilot buildings and investors.",
   alternates: { canonical: "/register-interest" },
 };

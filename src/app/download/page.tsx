@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { downloadPage } from "@/content/pages";
 import { desktopRelease } from "@/lib/download";
-import { openGraphBase } from "@/lib/site";
+import { openGraphBase, pageTitle, pageTitles } from "@/lib/site";
 import { DownloadActions } from "@/components/download/DownloadActions";
 import { SpecBand } from "@/components/platform/SpecBand";
 import { Faq } from "@/components/sections/Faq";
@@ -15,10 +15,10 @@ const d = downloadPage;
 const description = desktopRelease.available ? d.meta.description.live : d.meta.description.soon;
 
 export const metadata: Metadata = {
-  title: d.meta.title,
+  title: pageTitle("/download"),
   description,
   alternates: { canonical: "/download" },
-  openGraph: { ...openGraphBase, url: "/download", title: d.meta.ogTitle, description },
+  openGraph: { ...openGraphBase, url: "/download", title: pageTitles["/download"], description },
 };
 
 // /download: the ask with the product under it, as a hero. The H1 with the lead and the download

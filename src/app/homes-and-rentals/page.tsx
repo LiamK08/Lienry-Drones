@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { faqSets, homesPage, platformFaq } from "@/content/pages";
 import { australiaStats } from "@/content/stats";
+import { pageTitle } from "@/lib/site";
 import { LandlordStory } from "@/components/home/LandlordStory";
 import { CtaPanel } from "@/components/sections/CtaPanel";
 import { Faq } from "@/components/sections/Faq";
@@ -10,7 +11,7 @@ import { CITED_NOTE, StatBand, pickStats } from "@/components/sections/StatBand"
 import { StepCards } from "@/components/sections/StepCards";
 
 export const metadata: Metadata = {
-  title: "Lienry Drones",
+  title: pageTitle("/homes-and-rentals"),
   description: "A waterproof ground pod, a drone that knows each material, and an app that starts the clean wherever you are. For houses, apartments, rentals and solar farms.",
   alternates: { canonical: "/homes-and-rentals" },
 };

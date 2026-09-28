@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Hero } from "@/components/home/Hero";
 import { PropertyStrip } from "@/components/home/PropertyStrip";
 import { ProductCards } from "@/components/home/ProductCards";
@@ -13,6 +14,12 @@ import { ClosingCta } from "@/components/home/ClosingCta";
 import { filmBand } from "@/content/home";
 import { faqSets, homeFaqLink, platformFaq } from "@/content/pages";
 import { softwareSection } from "@/content/software";
+import { pageTitle } from "@/lib/site";
+
+// The description, canonical and Open Graph fields come from the layout.
+export const metadata: Metadata = {
+  title: pageTitle("/"),
+};
 
 type Question = (typeof platformFaq.items)[number];
 

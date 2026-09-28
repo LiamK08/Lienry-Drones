@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { companyPage } from "@/content/pages";
+import { pageTitle } from "@/lib/site";
 import { FounderList } from "@/components/company/FounderList";
 import { CtaPanel } from "@/components/sections/CtaPanel";
 import { FeatureRow } from "@/components/sections/FeatureRow";
@@ -8,7 +9,7 @@ import { Picture } from "@/components/ui/Picture";
 import { SectionHead } from "@/components/ui/SectionHead";
 
 export const metadata: Metadata = {
-  title: "Lienry Drones",
+  title: pageTitle("/company"),
   description: "Lienry Drones is a Sydney company at concept stage, building a resident cleaning drone and raising a pre-seed round.",
   alternates: { canonical: "/company" },
 };

@@ -270,3 +270,27 @@ All of these are built and reversible:
 
 - The two installer URLs and the version number.
 - Confirmation of the name "Lienry Desktop", the system requirements and the "active software plan" wording.
+
+## Page titles and owner decisions, 28 September 2026
+
+The owner kept the new page title and asked for every page to follow it, which settles decision 1 above. Every route's tab title now says what the page is, then the brand. All nine live in `pageTitles` in `src/lib/site.ts`, and each page sets its title with `pageTitle`, so the format cannot drift.
+
+| Route | Tab title |
+| --- | --- |
+| `/` | Resident cleaning drones for buildings and homes \| Lienry Drones |
+| `/platform` | How the platform works \| Lienry Drones |
+| `/commercial` | Window cleaning for commercial buildings \| Lienry Drones |
+| `/homes-and-rentals` | Exterior cleaning for homes and rentals \| Lienry Drones |
+| `/solar` | Solar panel cleaning \| Lienry Drones |
+| `/company` | About the company \| Lienry Drones |
+| `/download` | Download Lienry Desktop \| Lienry Drones |
+| `/register-interest` | Register interest \| Lienry Drones |
+| `/privacy` | Privacy policy \| Lienry Drones |
+
+A page that does not exist keeps the plain "Lienry Drones".
+
+E2 check 22 now expects each route's own title and fails if two routes share one. In a test, a deliberately wrong entry made it fail as it should.
+
+**Validation.** `npm run typecheck`, `npm run lint`, `npm run build` and `git diff --check` are clean. `npm run check:rules -- --no-sweep --no-motion` passes every check on all 9 routes at 1440 and 390. Only the page head changed; the tab and motion passes above ran on the same page bodies.
+
+**Owner inputs.** The name "Lienry Desktop" and the wording "active software plan" are confirmed. The installer URLs and the version are not ready yet, so `available` stays false.

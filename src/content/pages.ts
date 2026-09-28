@@ -496,13 +496,11 @@ export const privacyPage = {
 
 /**
  * /download: Lienry Desktop for Mac and Windows. Whether the buttons are live, the installer URLs and
- * the version live in src/lib/download.ts; this is the copy around them.
+ * the version live in src/lib/download.ts, and the tab title with the others in src/lib/site.ts; this
+ * is the copy around them.
  */
 export const downloadPage = {
   meta: {
-    // The one route whose tab title is not the brand name alone: the 28 September brief asked for a page title.
-    title: "Download Lienry Desktop | Lienry Drones",
-    ogTitle: "Download Lienry Desktop",
     description: {
       soon: "Lienry Desktop is coming soon for Mac and Windows. See the 3D scan of your building, set cleaning zones and surface pressure, and watch every wash as it happens.",
       live: "Download Lienry Desktop for Mac and Windows. See the 3D scan of your building, set cleaning zones and surface pressure, and watch every wash as it happens.",

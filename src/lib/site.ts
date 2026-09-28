@@ -11,6 +11,28 @@ export const brand = {
 };
 
 /**
+ * Every route's tab title: what the page is, then the brand, as in "Download Lienry Desktop | Lienry
+ * Drones". Each page sets its title with `pageTitle`, so the format cannot drift; the layout's plain
+ * brand name is only the fallback for anything else. scripts/check-rules.mjs (E2 check 22) reads them here.
+ */
+export const pageTitles = {
+  "/": "Resident cleaning drones for buildings and homes",
+  "/platform": "How the platform works",
+  "/commercial": "Window cleaning for commercial buildings",
+  "/homes-and-rentals": "Exterior cleaning for homes and rentals",
+  "/solar": "Solar panel cleaning",
+  "/company": "About the company",
+  "/download": "Download Lienry Desktop",
+  "/register-interest": "Register interest",
+  "/privacy": "Privacy policy",
+} as const;
+
+/** The tab title of `route`: "{what the page is} | Lienry Drones". */
+export function pageTitle(route: keyof typeof pageTitles): string {
+  return `${pageTitles[route]} | ${brand.name}`;
+}
+
+/**
  * The Open Graph fields every route shares. A page that sets its own `openGraph` replaces the
  * layout's whole object (Next merges metadata shallowly), so it spreads these back in.
  */

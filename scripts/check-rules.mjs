@@ -34,8 +34,8 @@
 //     the window shows its recording with native controls; without it never two videos play at once,
 //     the live window stops drawing off screen, nothing is sticky but the header, nothing moves with
 //     the scroll and no figure counts up.
-// 22  Titles: <title> is the brand name on every route but /download, which carries the page title the
-//     28 September brief asked for (read from content).
+// 22  Titles: every route's <title> is its own, "What the page is | Lienry Drones", exactly as pageTitle
+//     in src/lib/site.ts builds it (the owner's 28 September brief), and no two routes share one.
 // 23  Placeholders: no "to come", no data-media-placeholder, no empty photo box.
 // 24  Enquiry labels: every link to /register-interest carries the one label of its ?type=.
 //
@@ -241,8 +241,8 @@ function loadContent() {
         "/privacy": { h1: null, h2: [] },
         "/download": { h1: pages.downloadPage.emphasis, h2: [] },
       },
-      // E2 check 22: a route not listed here is titled with the brand name alone.
-      titles: { "/download": pages.downloadPage.meta.title },
+      // E2 check 22: every route's tab title, as src/lib/site.ts builds it.
+      titles: Object.fromEntries(Object.keys(site.pageTitles).map((route) => [route, site.pageTitle(route)])),
       // E2 check 11: the allowed sentences.
       allowed: [
         ["the FAQ answer to Is Lienry operating yet?", faq("operating")],
@@ -1186,6 +1186,7 @@ const scripts = new Set();
 const fontsLoaded = new Map();
 const stepsByWidth = new Map();
 const pending = [];
+const titlesSeen = new Map();
 let totalFailures = 0;
 const byCheck = {};
 
@@ -1264,8 +1265,10 @@ for (const route of opts.routes) {
     judgeItalics(route, pageRes.italics, add);
     judgeClaims(pageRes.texts, pageRes.numerals, add);
     judgeLinks(pageRes.links, add);
-    const wantTitle = content.titles?.[route] ?? cfg.brand;
-    if (pageRes.title !== wantTitle) add(22, "page", `<title> is "${pageRes.title}", not "${wantTitle}"`, "");
+    if (content.error) add(22, "page", "titles not checked", content.error);
+    else if (!content.titles[route]) add(22, "page", "no tab title for this route in pageTitles (src/lib/site.ts)", "");
+    else if (pageRes.title !== content.titles[route]) add(22, "page", `<title> is "${pageRes.title}", not "${content.titles[route]}"`, "");
+    titlesSeen.set(route, pageRes.title);
 
     // Check 14 per state: no id in two frames.
     // A repeat is reported once: in the default state, or in the first state that shows it.
@@ -1566,6 +1569,11 @@ try {
 } catch {
   console.log("  note  git is unavailable: the public/video and media-src history was not checked");
 }
+
+// Check 22: no two routes share a tab title.
+const byTitle = new Map();
+for (const [route, title] of titlesSeen) byTitle.set(title, [...(byTitle.get(title) ?? []), route]);
+for (const [title, routes] of byTitle) if (routes.length > 1) siteAdd(22, "two routes share a tab title", `"${title}" on ${routes.join(", ")}`);
 
 // Check 6: every font file loaded is one of the three in src/fonts, byte for byte.
 if (!fontsLoaded.size) siteAdd(6, "no font files were loaded", "");

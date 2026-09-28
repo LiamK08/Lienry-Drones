@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { systemExplainer, twoSystems } from "@/content/home";
 import { faqSets, platformFaq, platformPage } from "@/content/pages";
+import { pageTitle } from "@/lib/site";
 import { CtaWithProduct } from "@/components/platform/CtaWithProduct";
 import { SpecBand } from "@/components/platform/SpecBand";
 import { Faq } from "@/components/sections/Faq";
@@ -10,7 +11,7 @@ import { Switcher, type SwitcherItem } from "@/components/sections/Switcher";
 import { SoftwareWindow } from "@/components/software/SoftwareWindow";
 
 export const metadata: Metadata = {
-  title: "Lienry Drones",
+  title: pageTitle("/platform"),
   description: "One drone platform, two systems, six parts: dock, tether, drone, scan, software and automation. Built for buildings under 70 metres.",
   alternates: { canonical: "/platform" },
 };

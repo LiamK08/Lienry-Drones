@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { designFacts } from "@/content/home";
 import { commercialPage, faqSets, platformFaq } from "@/content/pages";
 import { softwareSection } from "@/content/software";
+import { pageTitle } from "@/lib/site";
 import { CtaPanel } from "@/components/sections/CtaPanel";
 import { Faq } from "@/components/sections/Faq";
 import { FeatureRow } from "@/components/sections/FeatureRow";
@@ -12,7 +13,7 @@ import { Switcher } from "@/components/sections/Switcher";
 import { SoftwareBand } from "@/components/software/SoftwareBand";
 
 export const metadata: Metadata = {
-  title: "Lienry Drones",
+  title: pageTitle("/commercial"),
   description: "A weatherproof roof capsule, a tether fed from above, and desktop software that runs the whole building. Window cleaning that lives on the roof.",
   alternates: { canonical: "/commercial" },
 };
