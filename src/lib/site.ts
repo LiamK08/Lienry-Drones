@@ -10,6 +10,17 @@ export const brand = {
   status: "Concept stage. Raising pre-seed. Pilot program in preparation.",
 };
 
+/**
+ * The Open Graph fields every route shares. A page that sets its own `openGraph` replaces the
+ * layout's whole object (Next merges metadata shallowly), so it spreads these back in.
+ */
+export const openGraphBase = {
+  type: "website" as const,
+  siteName: brand.name,
+  locale: "en_AU",
+  images: [{ url: "/og.png", width: 1200, height: 630, alt: "Lienry Drones. Clean exteriors. Nobody on site." }],
+};
+
 export const nav = [
   { href: "/platform", label: "Platform" },
   { href: "/commercial", label: "Commercial" },
@@ -17,6 +28,9 @@ export const nav = [
   { href: "/solar", label: "Solar" },
   { href: "/company", label: "Company" },
 ] as const;
+
+/** The header's utility link, beside the Register interest button, and the last item in the phone menu. */
+export const navUtility = { href: "/download", label: "Download" } as const;
 
 export const footerColumns = [
   {
@@ -28,6 +42,7 @@ export const footerColumns = [
       { href: "/platform#scan", label: "Scan" },
       { href: "/platform#software", label: "Software" },
       { href: "/platform#automation", label: "Automation" },
+      { href: "/download", label: "Download" },
     ],
   },
   {

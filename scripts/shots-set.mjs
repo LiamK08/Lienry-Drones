@@ -9,7 +9,7 @@ try { ({ chromium } = require("playwright")); } catch { ({ chromium } = require(
 const out = path.resolve(process.argv[2] ?? "docs/screenshots/set");
 const base = process.argv[3] ?? "http://localhost:3011";
 mkdirSync(out, { recursive: true });
-const routes = [["home", "/"], ["platform", "/platform"], ["commercial", "/commercial"], ["homes-and-rentals", "/homes-and-rentals"], ["solar", "/solar"], ["company", "/company"], ["register-interest", "/register-interest?type=commercial"], ["privacy", "/privacy"]];
+const routes = [["home", "/"], ["platform", "/platform"], ["commercial", "/commercial"], ["homes-and-rentals", "/homes-and-rentals"], ["solar", "/solar"], ["company", "/company"], ["download", "/download"], ["register-interest", "/register-interest?type=commercial"], ["privacy", "/privacy"]];
 const jpg = (name, extra = {}) => ({ path: path.join(out, `${name}.jpg`), type: "jpeg", quality: 82, ...extra });
 const browser = await chromium.launch({ args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"] });
 for (const [vname, width, height, mobile] of [["1440", 1440, 900, false], ["390", 390, 844, true]]) {

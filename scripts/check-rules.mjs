@@ -34,7 +34,8 @@
 //     the window shows its recording with native controls; without it never two videos play at once,
 //     the live window stops drawing off screen, nothing is sticky but the header, nothing moves with
 //     the scroll and no figure counts up.
-// 22  Titles: <title> is the brand name on every route.
+// 22  Titles: <title> is the brand name on every route but /download, which carries the page title the
+//     28 September brief asked for (read from content).
 // 23  Placeholders: no "to come", no data-media-placeholder, no empty photo box.
 // 24  Enquiry labels: every link to /register-interest carries the one label of its ?type=.
 //
@@ -51,7 +52,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const ROUTES = ["/", "/platform", "/commercial", "/homes-and-rentals", "/solar", "/company", "/register-interest", "/privacy"];
+const ROUTES = ["/", "/platform", "/commercial", "/homes-and-rentals", "/solar", "/company", "/download", "/register-interest", "/privacy"];
 const VIEWPORTS = {
   1440: { width: 1440, height: 900, mobile: false },
   390: { width: 390, height: 844, mobile: true },
@@ -99,6 +100,7 @@ const SPEC = {
     "/platform": { windows: 1 },
     "/commercial": { windows: 1 },
     "/homes-and-rentals": { apps: 1 },
+    "/download": { windows: 1 },
   },
 };
 
@@ -125,7 +127,7 @@ function usage() {
 Runs E2 checks 5-14 and 21-24 of docs/REDESIGN-SPEC.md against a served build.
 
   <baseUrl>          the served build, e.g. http://localhost:3000 (default)
-  route              one or more routes (default: all eight)
+  route              one or more routes (default: all nine)
   --widths 1440,390  viewport widths (1440x900 and 390x844 by default)
   --json <file>      also write the full report as JSON
   --no-sweep         skip the tab and disclosure state sweeps
@@ -237,7 +239,10 @@ function loadContent() {
         "/company": { h1: pages.companyPage.emphasis, h2: [] },
         "/register-interest": { h1: null, h2: [] },
         "/privacy": { h1: null, h2: [] },
+        "/download": { h1: pages.downloadPage.emphasis, h2: [] },
       },
+      // E2 check 22: a route not listed here is titled with the brand name alone.
+      titles: { "/download": pages.downloadPage.meta.title },
       // E2 check 11: the allowed sentences.
       allowed: [
         ["the FAQ answer to Is Lienry operating yet?", faq("operating")],
@@ -1259,7 +1264,8 @@ for (const route of opts.routes) {
     judgeItalics(route, pageRes.italics, add);
     judgeClaims(pageRes.texts, pageRes.numerals, add);
     judgeLinks(pageRes.links, add);
-    if (pageRes.title !== cfg.brand) add(22, "page", `<title> is "${pageRes.title}", not "${cfg.brand}"`, "");
+    const wantTitle = content.titles?.[route] ?? cfg.brand;
+    if (pageRes.title !== wantTitle) add(22, "page", `<title> is "${pageRes.title}", not "${wantTitle}"`, "");
 
     // Check 14 per state: no id in two frames.
     // A repeat is reported once: in the default state, or in the first state that shows it.
@@ -1390,11 +1396,20 @@ for (const route of opts.routes) {
         const a = await R(page, "draws");
         await page.waitForTimeout(800);
         const b = await R(page, "draws");
-        // Scroll the window fully off screen: below it when the page is long enough, otherwise above it
-        // (a window near the end of the page would stay partly visible at the clamped bottom).
+        // Scroll the window fully off screen: two screens past it when the page is long enough, otherwise
+        // two screens before it (a window near the end of the page would stay partly visible at the
+        // clamped bottom). On a short page with the window near its top (/download) neither fits, so
+        // scroll to the page's end, which still clears the window.
         const docH = await call(page, () => document.documentElement.scrollHeight);
+        const maxScroll = docH - vp.height;
         const below = w.bottom + vp.height * 2;
-        await call(page, (y) => window.scrollTo(0, y), below + vp.height <= docH ? below : Math.max(0, w.top - vp.height * 2));
+        const above = w.top - vp.height * 2;
+        const target = below <= maxScroll ? below : above >= 0 ? above : maxScroll >= w.bottom ? maxScroll : null;
+        if (target === null) {
+          notes.push(`window in block ${w.where}: the page is too short to scroll it off screen, so off-screen drawing was not checked`);
+          continue;
+        }
+        await call(page, (y) => window.scrollTo(0, y), target);
         await page.waitForTimeout(1000);
         const c = await R(page, "draws");
         await page.waitForTimeout(1500);

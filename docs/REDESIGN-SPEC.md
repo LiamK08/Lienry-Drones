@@ -4,6 +4,8 @@
 
 **Since the build.** On 26 September 2026 the owner removed the Concept render captions. Every caption line below (B7, the Picture, MediaCard and film anatomies, the stage and row paddings that made room for the caption, and E2 check 12) is superseded: no image or film carries one, and check 12 now fails if one returns.
 
+On 28 September 2026 a ninth route, `/download`, was added for Lienry Desktop (recorded in `docs/DESIGN-QA.md`). The header gains a Download link beside the Register interest button, and the phone menu and the footer's Platform column list it too. That brief asked for a page title, so `/download` is the one route whose `<title>` is not the brand name alone, and E2 check 22 reads its title from content. The checks and screenshot scripts now cover nine routes.
+
 **References.** legora.com and refresh.tech are references for quality, structure and motion only. This document describes their patterns by structure. No code, text, imagery, icons, logos or assets from either site enter the repository, and the site never loads anything from them.
 
 **Which reference each page follows**

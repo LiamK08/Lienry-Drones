@@ -23,6 +23,7 @@ const ROUTES = [
   ["homes-and-rentals", "/homes-and-rentals"],
   ["solar", "/solar"],
   ["company", "/company"],
+  ["download", "/download"],
   ["register-interest", "/register-interest?type=commercial"],
   ["privacy", "/privacy"],
 ];

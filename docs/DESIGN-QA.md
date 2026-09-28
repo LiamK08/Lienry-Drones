@@ -182,3 +182,91 @@ These are unchanged from the 22 September record:
 ## Release
 
 The change reached `main` as `212d522` on 26 September 2026. Vercel built its preview but never started a production deployment for that push, so the live site kept the captions. The next commit on `main` was pushed to start a fresh production build.
+
+# Download page — review record
+
+28 September 2026. Built on the `download` branch from `main` at `80ed265`, and checked on a local production build at 1440 and 390 with the real media (downloaded by the prebuild step, not committed).
+
+## What changed
+
+- **A ninth route, `/download`,** for Lienry Desktop: the desktop software an owner uses to see the 3D scan of the building, set cleaning zones and the pressure for each surface, and watch a wash as it happens. It is made from parts the site already has:
+  - the /company statement's split head, with the H1 on the left and the lead and download buttons as its aside;
+  - the coded software window at full grid width, as on the /platform close, so the product is in the first screen and no image of the interface is needed;
+  - the /commercial software strip, listing the three things it does;
+  - a `SpecBand` for the system requirements, including what signing in needs;
+  - the `Faq`, with three questions.
+
+  Tones run raised, plaster, ink, raised, then the sunken footer.
+- **The button follows the visitor's platform.** It reads "Download for Mac" or "Download for Windows", with the other platform's link underneath. Both sets are in the HTML, and an inline script marks the right one while the page is parsed, so a Windows machine never shows the Mac button first. A client check does the same after an in-site navigation.
+- **Coming soon.** Until the release is live, each control reads "Download for … · Coming soon" with a muted label. It uses `aria-disabled` rather than `disabled`, so it stays in the tab order and screen readers announce it as dimmed. Register interest sits beside it.
+  - `Button` gains this unavailable look on light surfaces: muted text at 6.69:1 on raised, with a border-strong edge at 3.87:1.
+  - Download links render as native anchors, so next/link never prefetches an installer.
+- **One switch.** `src/lib/download.ts` holds the availability, the version and both installer URLs. With the URLs in place, setting `available: true` does three things:
+  - both buttons become download links;
+  - the version shows under them;
+  - the meta description changes from "coming soon" to "Download".
+
+  A platform without a URL stays on Coming soon.
+- **Header and footer.**
+  - The Download link sits hard right beside Register interest, in the nav links' own 13px style, with the hairline underline when it is the current page.
+  - It is the last item in the phone menu.
+  - The footer's Platform column ends with it.
+- **Metadata.** The page has its own title, description, canonical URL and Open Graph and Twitter tags, reusing `og.png`, and it is in the sitemap. The shared Open Graph fields moved to `openGraphBase` in `src/lib/site.ts`, so the layout's output is unchanged.
+- **Checks.**
+  - `check:rules`, `check:layout` and the screenshot scripts now cover nine routes.
+  - Check 22 reads the new page's title from content.
+  - Check 21 used to scroll a window near the top of a short page to the page's top, which tested it on screen. It now scrolls to the page's end, which clears the window.
+  - `contrast-hero.mjs` gates the new header link.
+
+## Validation
+
+| Check | Result |
+| --- | --- |
+| `npm run typecheck`, `npm run lint`, `npm run build` | Clean; `/download` prerenders as static |
+| `git diff --check` | Clean |
+| `npm run check:layout` (E2 checks 2–4, 19) | Every check passes on all 9 routes at 1440 and 390 |
+| `npm run check:rules` (E2 checks 5–14, 21–24) | Every check passes on all 9 routes at 1440 and 390. On /download the live window draws 344 calls in 0.8s on screen and 0 off screen. |
+| `npm run contrast` | All three gates pass. The Download link measures 9.42:1 on the brightest hero frame and 6.02:1 against pure white. |
+| axe-core WCAG 2.0–2.2 A/AA on /download | 0 violations at 1440 and 390, with and without reduced motion, with every question open and with the phone menu open |
+| axe-core on the header of every route at 1440 | 0 violations |
+| Keyboard | Order: skip link, header, Download for Mac (announced dimmed), Download for Windows (dimmed), Register interest. Enter, Space and clicks on an unavailable button do nothing. The 2px glass focus ring shows on each stop. |
+| Platform | A Windows browser sees the Windows set before any script bundle loads, after hydration and after navigating in from /platform. A Mac browser sees the Mac set. |
+| Header geometry | At 1024 the centred mark keeps its 55px clearance from the left links, as before, and the Download link sits 245px to its right. No overflow on any route at 1024, 1099, 1100, 1280 or 1440. |
+| Existing pages | The untouched `main` commit was built on the same machine for comparison. Every band of /, /platform and /company sits at the same y and height; only the shared footer grows, by 33px at 1440 for its new link and not at 390, where it folds. |
+| Live switch | A scratch build with `available: true`, a version and placeholder URLs: both buttons become native download links, the version shows and the description changes (screenshot below). The committed file still says `available: false`. |
+
+## Page heights at 1440 (390)
+
+| Route | Before | After |
+| --- | --- | --- |
+| `/download` | new | 3,019 (3,540) |
+| `/` | 8,554 (10,927) | 8,587 (10,927) |
+| `/platform` | 5,503 (7,131) | 5,536 (7,131) |
+| `/company` | 3,912 (4,317) | 3,945 (4,317) |
+
+"Before" at 1440 is the untouched `main` commit measured on the same machine. At 390 it is the 26 September record, which this change matches exactly. The other routes gain the same 33px at 1440, because the footer is shared. The 8,533 recorded for `/` on 26 September came from a different container with stand-in media.
+
+## Screenshots
+
+| View | Desktop | Mobile |
+| --- | --- | --- |
+| /download, full page | [1440](screenshots/download/download-1440.jpg) | [390](screenshots/download/download-390.jpg) |
+| /download, first screen | [1440](screenshots/download/download-1440-top.jpg) | [390](screenshots/download/download-390-top.jpg) |
+| A Windows visitor | [1440](screenshots/download/download-1440-windows-top.jpg) | |
+| The phone menu | | [390](screenshots/download/download-390-menu.jpg) |
+| The switch set live (scratch build, placeholder URLs and version) | [1440](screenshots/download/download-1440-live-preview.jpg) | |
+| The header on all nine routes, including over the home film, past 80px and with focus on Download | [1440](screenshots/download/header-1440-all-routes.jpg) · [1024](screenshots/download/header-1024-all-routes.jpg) | |
+
+## Decisions for the owner
+
+All of these are built and reversible:
+
+1. **The tab title.** Since 22 September every route has been titled "Lienry Drones" alone. This brief asked for a page title, so /download reads "Download Lienry Desktop | Lienry Drones". To go back to the old rule, set `downloadPage.meta.title` to "Lienry Drones" and drop the page from `titles` in `scripts/check-rules.mjs`.
+2. **Where Download sits in the header.** It sits hard right, as a utility link beside Register interest. As a sixth link on the left it would run into the centred mark at every width below about 1,190px.
+3. **The name "Lienry Desktop"** comes from the coded window's title bar.
+4. **Before release, Register interest is the page's live action.** Once the downloads are live it gives way to the version line.
+
+## Outstanding owner inputs
+
+- The two installer URLs and the version number.
+- Confirmation of the name "Lienry Desktop", the system requirements and the "active software plan" wording.
