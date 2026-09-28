@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { systemExplainer, twoSystems } from "@/content/home";
 import { faqSets, platformFaq, platformPage } from "@/content/pages";
-import { pageTitle } from "@/lib/site";
+import { pageMetadata } from "@/lib/site";
 import { CtaWithProduct } from "@/components/platform/CtaWithProduct";
 import { SpecBand } from "@/components/platform/SpecBand";
 import { Faq } from "@/components/sections/Faq";
@@ -10,11 +10,10 @@ import { PageHeroSplit } from "@/components/sections/PageHeroSplit";
 import { Switcher, type SwitcherItem } from "@/components/sections/Switcher";
 import { SoftwareWindow } from "@/components/software/SoftwareWindow";
 
-export const metadata: Metadata = {
-  title: pageTitle("/platform"),
-  description: "One drone platform, two systems, six parts: dock, tether, drone, scan, software and automation. Built for buildings under 70 metres.",
-  alternates: { canonical: "/platform" },
-};
+export const metadata: Metadata = pageMetadata(
+  "/platform",
+  "One drone platform, two systems, six parts: dock, tether, drone, scan, software and automation. Built for buildings under 70 metres.",
+);
 
 // The platform hub (docs/REDESIGN-SPEC.md C2): split hero, the six-part switcher, the two system
 // rows, the ink specification sheet, the questions, and the ask with the working window under it.

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { downloadPage } from "@/content/pages";
 import { desktopRelease } from "@/lib/download";
-import { openGraphBase, pageTitle, pageTitles } from "@/lib/site";
+import { pageMetadata } from "@/lib/site";
 import { DownloadActions } from "@/components/download/DownloadActions";
 import { SpecBand } from "@/components/platform/SpecBand";
 import { Faq } from "@/components/sections/Faq";
@@ -14,12 +14,7 @@ import { SectionHead } from "@/components/ui/SectionHead";
 const d = downloadPage;
 const description = desktopRelease.available ? d.meta.description.live : d.meta.description.soon;
 
-export const metadata: Metadata = {
-  title: pageTitle("/download"),
-  description,
-  alternates: { canonical: "/download" },
-  openGraph: { ...openGraphBase, url: "/download", title: pageTitles["/download"], description },
-};
+export const metadata: Metadata = pageMetadata("/download", description);
 
 // /download: the ask with the product under it, as a hero. The H1 with the lead and the download
 // buttons as its aside (the /company statement's split), then 48 and the coded software window at

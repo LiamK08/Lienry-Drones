@@ -14,12 +14,9 @@ import { ClosingCta } from "@/components/home/ClosingCta";
 import { filmBand } from "@/content/home";
 import { faqSets, homeFaqLink, platformFaq } from "@/content/pages";
 import { softwareSection } from "@/content/software";
-import { pageTitle } from "@/lib/site";
+import { brand, pageMetadata } from "@/lib/site";
 
-// The description, canonical and Open Graph fields come from the layout.
-export const metadata: Metadata = {
-  title: pageTitle("/"),
-};
+export const metadata: Metadata = pageMetadata("/", brand.description);
 
 type Question = (typeof platformFaq.items)[number];
 

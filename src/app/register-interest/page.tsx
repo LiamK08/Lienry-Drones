@@ -1,16 +1,15 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { registerPage } from "@/content/pages";
-import { pageTitle } from "@/lib/site";
+import { pageMetadata } from "@/lib/site";
 import { EnquiryForm } from "@/components/forms/EnquiryForm";
 import { Band, Container } from "@/components/ui/Band";
 import { Picture } from "@/components/ui/Picture";
 
-export const metadata: Metadata = {
-  title: pageTitle("/register-interest"),
-  description: "Tell us about your property. Homeowners, landlords, commercial pilot buildings and investors.",
-  alternates: { canonical: "/register-interest" },
-};
+export const metadata: Metadata = pageMetadata(
+  "/register-interest",
+  "Tell us about your property. Homeowners, landlords, commercial pilot buildings and investors.",
+);
 
 // /register-interest (docs/REDESIGN-SPEC.md C7): the ask alone on its page, context left and the
 // untouched form right. From 1024 the left column is a flex column whose image takes the space

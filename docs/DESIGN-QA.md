@@ -294,3 +294,42 @@ E2 check 22 now expects each route's own title and fails if two routes share one
 **Validation.** `npm run typecheck`, `npm run lint`, `npm run build` and `git diff --check` are clean. `npm run check:rules -- --no-sweep --no-motion` passes every check on all 9 routes at 1440 and 390. Only the page head changed; the tab and motion passes above ran on the same page bodies.
 
 **Owner inputs.** The name "Lienry Desktop" and the wording "active software plan" are confirmed. The installer URLs and the version are not ready yet, so `available` stays false.
+
+## Share cards and canonical links, 28 September 2026
+
+Until this change only /download had its own share card. The other eight pages used the layout's card: the title "Lienry Drones", the home page's description, and the home page's address as `og:url`. Some apps, Facebook among them, treat `og:url` as a page's real address, so a shared /platform link could show and open the home page. The X card copied the same fields.
+
+Every page now sets its metadata with `pageMetadata` in `src/lib/site.ts`. Each card carries:
+
+- the page's own address;
+- its tab title without "| Lienry Drones", since the card already shows the site's name or address;
+- its meta description, unchanged;
+- `og.png`, the one share image, as before.
+
+| Route | Canonical link and og:url | Share title (og:title and twitter:title) |
+| --- | --- | --- |
+| `/` | https://www.lienrydrones.com | Resident cleaning drones for buildings and homes |
+| `/platform` | https://www.lienrydrones.com/platform | How the platform works |
+| `/commercial` | https://www.lienrydrones.com/commercial | Window cleaning for commercial buildings |
+| `/homes-and-rentals` | https://www.lienrydrones.com/homes-and-rentals | Exterior cleaning for homes and rentals |
+| `/solar` | https://www.lienrydrones.com/solar | Solar panel cleaning |
+| `/company` | https://www.lienrydrones.com/company | About the company |
+| `/download` | https://www.lienrydrones.com/download | Download Lienry Desktop |
+| `/register-interest` | https://www.lienrydrones.com/register-interest | Register interest |
+| `/privacy` | https://www.lienrydrones.com/privacy | Privacy policy |
+
+The canonical links were already correct on all nine pages. The layout no longer sets a fallback canonical link ("/") or `og:url`, so a page that does not exist no longer names the home page as its address.
+
+E2 check 22 now also reads each page's head, on every route at both widths. It fails unless:
+
+- the page has exactly one canonical link, meta description, `og:url`, `og:title`, `og:description`, `twitter:title` and `twitter:description`;
+- the canonical link and `og:url` are the page's own address;
+- the share titles match `pageTitles`;
+- the share descriptions repeat the meta description;
+- the card has an `og:image`.
+
+It also fails if two routes share a description.
+
+**Validation.** `npm run typecheck`, `npm run lint`, `npm run build` and `git diff --check` are clean. The full `npm run check:rules` (with the tab sweeps and the motion passes) and `npm run check:layout` pass every check on all 9 routes at 1440 and 390. A scratch build broke two pages on purpose: /platform's canonical link and `og:url` pointed at the home page, and /solar went back to the old metadata without its own card. Check 22 failed on both, 7 times in all, and passed /company beside them.
+
+**Preview.** [share-platform.jpg](screenshots/download/share-platform.jpg) draws a shared /platform link from the tags each site serves: today's card on www.lienrydrones.com beside this branch's.

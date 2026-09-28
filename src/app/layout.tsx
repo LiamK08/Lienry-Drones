@@ -7,6 +7,8 @@ import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { OrganizationJsonLd } from "@/components/site/JsonLd";
 
+// The fallbacks under every page's own metadata (src/lib/site.ts pageMetadata). They carry no canonical
+// link and no og:url, so a page without its own, such as the 404 page, never claims the home page's address.
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: brand.name,
@@ -25,13 +27,11 @@ export const metadata: Metadata = {
   },
   openGraph: {
     ...openGraphBase,
-    url: siteUrl,
     title: brand.name,
     description: brand.description,
   },
   twitter: { card: "summary_large_image" },
   robots: { index: true, follow: true },
-  alternates: { canonical: "/" },
 };
 
 export const viewport: Viewport = {
