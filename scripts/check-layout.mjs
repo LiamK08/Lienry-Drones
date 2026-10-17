@@ -1,32 +1,52 @@
-// check:layout: the redesign's layout checks (docs/REDESIGN-SPEC.md, E2 checks 2, 3, 4 and 19), run in
-// Playwright against a served build at 1440x900 and 390x844.
+// check:layout: the layout checks of the October 2026 design pass (spec D1; the earlier E2 checks 2, 3,
+// 4 and 19 as rewritten there), run in Playwright against a served build at 1440x900 and 390x844 by
+// default, and at 1024x768 and 768x1024 with --widths 1440,1024,768,390.
 //
 // Usage: npm run check:layout -- <baseUrl> [route ...] [--widths 1440,390] [--json report.json] [--no-sweep]
 //   e.g. npm run build && npm run start, then npm run check:layout -- http://localhost:3000
 //
+// Routes: the nine pages, plus /this-page-does-not-exist, which must answer 404 (check 43).
+//
 //  2  Dead space. For every block in <main> except the film bands, the visible content boxes inside the
 //     block's content box (padding excluded) are projected onto the page's vertical axis: no horizontal
-//     stripe taller than 48px may hold none. Content boxes are the lines of text (Range.getClientRects);
-//     img, video, canvas, svg, button, input, select, textarea and hr; elements with a background other
-//     than the band's or a border on all four sides (the stage sidebar, the app panel, the window); and
-//     the rules drawn by top and bottom borders. Hidden, transparent and clipped content does not count.
-//     Text counts as its line boxes, so a 48px margin under a paragraph measures 48px. Among siblings
-//     marked [data-col] that sit side by side, no column's content may end more than 48px above the
-//     lowest of them. Sub-pixel layout adds up to 1px of noise, so a run or a column fails above 49px.
-//     Every block is measured again with each tab selected and each disclosure open (switcher tabs,
-//     software steps, stage parts and story beats). A grid or flex row of two or three unmarked
-//     blocks whose contents end far apart is reported as a warning: mark such columns with data-col.
-//  3  Band heights. At 1440 no band is taller than 900px, except a band that holds the page's h1 (the
-//     home hero, the split heroes, the company statement, the register and privacy bands) or the
-//     software window (the software bands and the platform close). A band's height never changes when
-//     one of its tabs or stage parts is selected (B6 Switcher, C1 sections 4 and 5).
-//  4  Tones. Adjacent bands never share a tone; at most one ink band and one glass-deep panel on a page;
-//     the band before the footer is never sunken; every boundary between two light tones shows exactly
-//     one 1px hairline; a band's data-tone is the surface it renders. Every block in <main> must be a
-//     Band (data-band, data-tone) or a film band (data-tone="film"), or the checks cannot see it.
+//     stripe taller than the limit may hold none (64px from 1024, 48px below). Content boxes are the lines
+//     of text (Range.getClientRects); img, video, canvas, svg, button, input, select, textarea and hr;
+//     elements with a background other than the band's or a border on all four sides; and the rules
+//     drawn by top and bottom borders. Among siblings marked [data-col] that sit side by side, no
+//     column's content may end more than the limit above the lowest of them. Sub-pixel layout adds up to
+//     1px of noise, so a run or a column fails above limit + 1. Every block is measured again with each
+//     tab selected, each h3 disclosure open and each member of a [data-sweep] group active.
+//  3  Band heights. At 1440 a band taller than twice the viewport is a warning, unless it holds the h1
+//     or the software window. A band's height never changes when one of its tabs or parts is selected
+//     (sweep kinds "tab" and "part", spread 1px at most); the kind is the group's [data-sweep] value, or
+//     "part" / "beat" from a part- / story- id.
+//  4  Tones. (a) Every band's data-tone is plaster, ink or film: raised and sunken are surfaces inside a
+//     section. (b) Adjacent bands alternate light (plaster) and dark (ink, film); the one exception is a
+//     [data-attached] band right after the band holding the h1, in its tone. (c) No glass-deep element of
+//     100x60 or more in <main>. (d) The footer's data-tone is plaster or ink, opposite in lightness to
+//     the last band, and it renders that tone. (e) A band's data-tone is the surface it renders.
 // 19  Overflow. Nothing runs past the viewport's edge, with the phone menu open and closed. The page
 //     clips overflow-x on <html> and <body>, which hides overflow from documentElement.scrollWidth, so
 //     body.scrollWidth and the elements past the edge are checked as well.
+// 30  Section padding. Every non-film band's computed padding matches its data-pad within 0.5px:
+//     section S/S, hero 72+H/S, attached 0/S, with S = 128/96/80 and H = 64/48/40 from 1024 / from 768 /
+//     below. "none" on a non-film band fails. The footer's top padding is S. A band without data-pad is
+//     judged as attached ([data-attached]), hero (it holds the h1) or section, and says so.
+// 31a Computed spacing. In <main> and the footer (not inside [data-ui], svg, .sr-only or the header, and
+//     not an element with an m-auto, mt-auto, mb-auto or my-auto class), margin-top, margin-bottom, the
+//     four paddings, row-gap and column-gap are each within 0.5px of 0, 8, 16, 24, 32, 40, 48, 64, 80, 96,
+//     128 or 160, the negative of one, or 72 plus one.
+// 32  Grid alignment (1440 and 1024). The 12 columns come from the first .max-w-grid in <main> (left L,
+//     width W, gutter 24). The left edges of every .eyebrow, h1, h2, band-level p, figure frame, the
+//     first [data-button] of an action row, [data-calculator], [data-accordion], [data-card] and a
+//     track's first item sit within 1px of a column start; a figure's right edge sits within 1px of a
+//     column end or of L + W. Inside li, [data-card], [data-accordion], form, [data-form-success] and
+//     [data-ui] only the component's own edge is measured. Below 768 every one of those left edges is
+//     the page margin, 16px (within 1px). The home hero is exempt.
+// 43  The unknown route answers 404 with the header and the footer, and checks 2, 4, 19 and 30 pass on it.
+//
+// Markers: every block in <main> must be a Band (data-band, data-tone) or a film band
+// (data-tone="film"), or the checks cannot see it.
 //
 // Playwright is resolved from this project's node_modules, then from a global install. Exit code: 0 when
 // every check passes, 1 when any fails, 2 when the checks could not run.
@@ -36,30 +56,45 @@ import { execSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
 import path from "node:path";
 
-const ROUTES = ["/", "/platform", "/commercial", "/homes-and-rentals", "/solar", "/company", "/download", "/register-interest", "/privacy"];
+const NOT_FOUND = "/this-page-does-not-exist";
+const ROUTES = ["/", "/platform", "/commercial", "/homes-and-rentals", "/solar", "/company", "/download", "/register-interest", "/privacy", NOT_FOUND];
 const VIEWPORTS = {
   1440: { width: 1440, height: 900, mobile: false },
+  1024: { width: 1024, height: 768, mobile: false },
+  768: { width: 768, height: 1024, mobile: true },
   390: { width: 390, height: 844, mobile: true },
 };
-const LIMIT = 48; // the largest empty run inside a block, and the most a column may end short of its neighbour
-const MAX_BAND = 900; // band height limit at 1440
+const viewportFor = (w) => VIEWPORTS[w] ?? { width: w, height: w < 800 ? 844 : 900, mobile: w < 800 };
+// The largest empty run inside a block, and the most a column may end short of its neighbour.
+const limitFor = (w) => (w >= 1024 ? 64 : 48);
+// The spacing scale (spec A1.1) and the section rhythm at each width.
+const SCALE = [0, 8, 16, 24, 32, 40, 48, 64, 80, 96, 128, 160];
+const NAV_H = 72;
+const sectionY = (w) => (w >= 1024 ? 128 : w >= 768 ? 96 : 80);
+const heroGap = (w) => (w >= 1024 ? 64 : w >= 768 ? 48 : 40);
+// The coded demos: [data-ui], and the legacy selectors the window and app panel carry until it lands.
+const UI_SEL = "[data-ui], [data-software-preview], [role='group'][aria-label$='demo window'], [role='group'][aria-label$='demo data']";
 const CHECK_NAMES = {
   markers: "markers (every block in <main> is a Band or a film band)",
   2: "2 dead space and column balance",
   3: "3 band heights",
-  4: "4 tones and hairlines",
+  4: "4 tones",
   19: "19 horizontal overflow",
+  30: "30 section padding",
+  "31a": "31a computed spacing",
+  32: "32 grid alignment",
+  43: "43 the unknown route",
   page: "page errors",
 };
 
 function usage() {
   console.log(`Usage: node scripts/check-layout.mjs <baseUrl> [route ...] [options]
 
-Runs E2 checks 2, 3, 4 and 19 of docs/REDESIGN-SPEC.md against a served build.
+Runs the design pass's layout checks (2, 3, 4, 19, 30, 31a, 32, 43) against a served build.
 
   <baseUrl>          the served build, e.g. http://localhost:3000 (default)
-  route              one or more routes (default: all nine)
-  --widths 1440,390  viewport widths (1440x900 and 390x844 by default)
+  route              one or more routes (default: all nine and ${NOT_FOUND})
+  --widths 1440,390  viewport widths (1440x900 and 390x844 by default; 1024x768 and 768x1024 also known)
   --json <file>      also write the full report as JSON
   --no-sweep         skip the tab and disclosure state sweeps`);
 }
@@ -129,8 +164,9 @@ function loadChromium() {
 // ---------------------------------------------------------------------------------------------------
 // In-page library, installed on every document with addInitScript. Everything it needs is inside it.
 // ---------------------------------------------------------------------------------------------------
-function pageLib() {
+function pageLib(cfg) {
   const P = (window.__p7layout = {});
+  const UI_SEL = cfg.uiSel;
   const num = (v) => parseFloat(v) || 0;
   const px = (v) => Math.round(v);
 
@@ -167,7 +203,7 @@ function pageLib() {
     tokens = {};
     const probe = document.createElement("div");
     document.body.appendChild(probe);
-    for (const name of ["plaster", "raised", "sunken", "ink", "glass-deep", "hairline"]) {
+    for (const name of ["plaster", "raised", "sunken", "ink", "ink-raised", "glass-deep", "hairline"]) {
       probe.style.backgroundColor = `var(--color-${name})`;
       tokens[name] = getComputedStyle(probe).backgroundColor;
     }
@@ -177,7 +213,7 @@ function pageLib() {
   const toneOfColour = (colour) => {
     if (alphaOf(colour) < 0.5) return null;
     const t = P.tokens();
-    for (const name of ["plaster", "raised", "sunken", "ink", "glass-deep"]) if (same(colour, t[name])) return name;
+    for (const name of ["plaster", "raised", "sunken", "ink", "ink-raised", "glass-deep"]) if (same(colour, t[name])) return name;
     const [r, g, b] = rgba(colour);
     return `rgb(${r}, ${g}, ${b})`;
   };
@@ -196,7 +232,7 @@ function pageLib() {
   };
   const mediaId = (el) => {
     const src = el.currentSrc || el.getAttribute("src") || el.getAttribute("poster") || el.querySelector?.("source")?.getAttribute("src") || "";
-    return (src.match(/\/media\/([a-z0-9-]+?)(?:-\d+)?(?:-poster)?\.(?:avif|webp|jpg|png|mp4|webm)/) || [])[1] || null;
+    return (src.match(/\/media\/([a-z0-9]+(?:-[a-z0-9]+)*?)(?:--[a-z0-9]+)?(?:-\d+)?(?:-poster)?\.(?:avif|webp|jpe?g|png|mp4|webm)/) || [])[1] || null;
   };
   P.describe = (el) => {
     if (!el) return "";
@@ -445,19 +481,30 @@ function pageLib() {
   };
   const boxedVisible = (el) => el.getClientRects().length > 0 && getComputedStyle(el).visibility === "visible";
 
-  // The switchable states of a band: tab groups and h3 disclosure groups.
+  // The switchable states of a band: [data-sweep] groups (their value is the kind), tab groups and h3
+  // disclosure groups. A control belongs to the first group that claims it.
+  const initialOf = (els) => Math.max(0, els.findIndex((e) => e.getAttribute("aria-selected") === "true" || e.getAttribute("aria-expanded") === "true"));
+  const sweepKind = (el, fallback) => el.closest("[data-sweep]")?.dataset.sweep || fallback;
   const controlsOf = (band) => {
     const groups = [];
-    for (const list of band.querySelectorAll('[role="tablist"]')) {
-      const tabs = [...list.querySelectorAll('[role="tab"]')].filter(boxedVisible);
-      if (tabs.length < 2) continue;
-      groups.push({ kind: "tab", els: tabs, initial: Math.max(0, tabs.findIndex((t) => t.getAttribute("aria-selected") === "true")) });
+    const claimed = new Set();
+    const take = (els) => {
+      els.forEach((e) => claimed.add(e));
+      return els;
+    };
+    for (const box of band.querySelectorAll("[data-sweep]")) {
+      const els = [...box.querySelectorAll('[role="tab"], button[aria-expanded][aria-controls]')].filter((e) => !claimed.has(e) && boxedVisible(e));
+      if (els.length >= 2) groups.push({ kind: box.dataset.sweep || "disclosure", els: take(els), initial: initialOf(els) });
     }
-    const disclosures = [...band.querySelectorAll("h3 button[aria-expanded][aria-controls]")].filter(boxedVisible);
+    for (const list of band.querySelectorAll('[role="tablist"]')) {
+      const tabs = [...list.querySelectorAll('[role="tab"]')].filter((t) => !claimed.has(t) && boxedVisible(t));
+      if (tabs.length >= 2) groups.push({ kind: sweepKind(list, "tab"), els: take(tabs), initial: initialOf(tabs) });
+    }
+    const disclosures = [...band.querySelectorAll("h3 button[aria-expanded][aria-controls]")].filter((b) => !claimed.has(b) && boxedVisible(b));
     if (disclosures.length >= 2) {
       const id = disclosures[0].id || "";
-      const kind = id.startsWith("part-") ? "part" : id.startsWith("story-") ? "beat" : "disclosure";
-      groups.push({ kind, els: disclosures, initial: Math.max(0, disclosures.findIndex((b) => b.getAttribute("aria-expanded") === "true")) });
+      const kind = sweepKind(disclosures[0], id.startsWith("part-") ? "part" : id.startsWith("story-") ? "beat" : "disclosure");
+      groups.push({ kind, els: take(disclosures), initial: initialOf(disclosures) });
     }
     return groups;
   };
@@ -505,12 +552,19 @@ function pageLib() {
   const edge = (cs, side) => ({ w: num(cs[`border${side}Width`]), style: cs[`border${side}Style`], colour: cs[`border${side}Color`] });
   const hairline = (e) => e.w >= 0.5 && e.style !== "none" && e.style !== "hidden" && alphaOf(e.colour) > 0.05;
 
+  // Relative luminance of a colour, 0 to 1 (WCAG): what makes an unnamed surface light or dark.
+  const luminance = (colour) => {
+    const [r, g, b] = rgba(colour).map((v, i) => (i < 3 ? v / 255 : v));
+    const lin = (c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+    return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+  };
   const blockInfo = (el, index, marked) => {
     const cs = getComputedStyle(el);
     const r = el.getBoundingClientRect();
     const dataTone = el.getAttribute("data-tone");
     const film = isFilm(el);
-    const bgTone = film ? "film" : toneOfColour(effectiveBackground(el));
+    const bg = effectiveBackground(el);
+    const bgTone = film ? "film" : toneOfColour(bg);
     const heading = el.querySelector("h1, h2, h3");
     const top = edge(cs, "Top");
     const bottom = edge(cs, "Bottom");
@@ -530,6 +584,11 @@ function pageLib() {
       height: px(r.height),
       hasH1: !!el.querySelector("h1"),
       hasWindow: !!el.querySelector(windowSelector),
+      pad: el.getAttribute("data-pad"),
+      attached: el.hasAttribute("data-attached"),
+      paddingTop: Math.round(num(cs.paddingTop) * 100) / 100,
+      paddingBottom: Math.round(num(cs.paddingBottom) * 100) / 100,
+      light: film ? false : luminance(bg) > 0.4,
       borderTop: { ...top, visible: hairline(top), isHairline: same(top.colour, t.hairline) },
       borderBottom: { ...bottom, visible: hairline(bottom), isHairline: same(bottom.colour, t.hairline) },
       text: clean(el.textContent, 40),
@@ -566,7 +625,10 @@ function pageLib() {
       blocks,
       footer,
       wrappers: st.wrappers.map((w) => `<${w.tagName.toLowerCase()}${w.id ? `#${w.id}` : ""}>`),
-      glassPanels: panels.map((p) => ({ top: px(p.getBoundingClientRect().top + scrollY), band: st.items.findIndex((it) => it.el.contains(p)) + 1 })),
+      glassPanels: panels.map((p) => {
+        const r = p.getBoundingClientRect();
+        return { top: px(r.top + scrollY), width: px(r.width), height: px(r.height), what: P.describe(p), band: st.items.findIndex((it) => it.el.contains(p)) + 1 };
+      }),
       pageHeight: document.documentElement.scrollHeight,
     };
   };
@@ -621,6 +683,119 @@ function pageLib() {
       bodyScrollWidth: document.body.scrollWidth,
       culprits: culprits.map((c) => ({ what: P.describe(c.el), left: c.left, right: c.right, band: (P.state?.items || []).findIndex((it) => it.el.contains(c.el)) + 1 })),
     };
+  };
+
+  // Check 31a: every computed margin-top, margin-bottom, padding and gap in <main> and the footer that is
+  // not on the 8px scale. Repeats (the same tag, classes, property and value) are folded into one entry.
+  const nameOf = (el) => {
+    const cls = typeof el.className === "string" ? el.className.trim().replace(/\s+/g, " ") : "";
+    return `<${el.tagName.toLowerCase()}${el.id ? `#${el.id}` : ""}${cls ? ` class="${cls.length > 90 ? `${cls.slice(0, 89)}…` : cls}"` : ""}>`;
+  };
+  const AUTO = /(^|:)m[ytb]?-auto$/;
+  P.spacing = (scale, nav) => {
+    const allowed = [...scale, ...scale.map((v) => -v), ...scale.map((v) => nav + v)];
+    const onScale = (v) => allowed.some((a) => Math.abs(a - v) <= 0.5);
+    const footer = P.state?.footer;
+    const roots = [document.querySelector("main"), footer].filter(Boolean);
+    const found = new Map();
+    let checked = 0;
+    for (const root of roots) {
+      for (const el of [root, ...root.querySelectorAll("*")]) {
+        if (["SCRIPT", "STYLE", "TEMPLATE", "NOSCRIPT", "SOURCE", "BR", "WBR"].includes(el.tagName)) continue;
+        if (el.parentElement?.closest(UI_SEL) || el.closest("svg, .sr-only, body > header")) continue;
+        if ([...el.classList].some((c) => AUTO.test(c))) continue;
+        checked++;
+        const cs = getComputedStyle(el);
+        for (const prop of ["marginTop", "marginBottom", "paddingTop", "paddingRight", "paddingBottom", "paddingLeft", "rowGap", "columnGap"]) {
+          const raw = cs[prop];
+          const v = raw === "normal" || raw === "" ? 0 : parseFloat(raw);
+          if (!Number.isFinite(v) || onScale(v)) continue;
+          const css = prop.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
+          // Folded by tag and classes, so a repeated component (six part buttons) reports once.
+          const key = `${el.tagName}|${el.className}|${css}|${raw}`;
+          if (!found.has(key)) found.set(key, { what: nameOf(el), prop: css, value: raw, count: 0, band: footer && footer.contains(el) ? "footer" : (P.state?.items || []).findIndex((it) => it.el.contains(el)) + 1 });
+          found.get(key).count++;
+        }
+      }
+    }
+    return { checked, off: [...found.values()] };
+  };
+
+  // Check 32: left (and figure right) edges against the 12 columns, or the page margin below 768.
+  const COMPONENT = `li, [data-card], [data-accordion], form, [data-form-success], ${UI_SEL}`;
+  const rendered = (el) => el.getClientRects().length > 0 && getComputedStyle(el).visibility === "visible" && !el.closest("[hidden], .sr-only");
+  const isTrack = (el) => /(auto|scroll)/.test(getComputedStyle(el).overflowX);
+  P.grid = (mode, margin) => {
+    const main = document.querySelector("main");
+    if (!main) return { error: "no <main>" };
+    const rail = main.querySelector(".max-w-grid") || document.querySelector(".max-w-grid");
+    if (!rail) return { error: "no .max-w-grid element to take the columns from" };
+    const rr = rail.getBoundingClientRect();
+    const L = rr.left;
+    const W = rr.width;
+    const G = 24;
+    const colW = (W - 11 * G) / 12;
+    const starts = Array.from({ length: 12 }, (_, k) => L + k * (colW + G));
+    const ends = starts.map((s) => s + colW);
+    const h1 = main.querySelector("h1");
+    const homeHero = location.pathname === "/" && h1 ? (P.state?.items || []).find((it) => it.el.contains(h1))?.el ?? null : null;
+    const items = new Map();
+    const add = (el, kind, figure = false) => {
+      if (!el || items.has(el) || !rendered(el) || (homeHero && homeHero.contains(el))) return;
+      const r = el.getBoundingClientRect();
+      if (r.width < 1 || r.height < 1) return;
+      items.set(el, { el, kind, left: r.left, right: r.right, figure });
+    };
+    const free = (el) => !el.closest(COMPONENT);
+    for (const el of main.querySelectorAll(".eyebrow, h1, h2")) if (free(el)) add(el, el.matches(".eyebrow") ? "eyebrow" : el.tagName.toLowerCase());
+    for (const p of main.querySelectorAll("p")) {
+      if (p.closest(COMPONENT) || p.closest("label, button, a, figure, dl, nav, summary, details") || p.matches(".eyebrow")) continue;
+      if (!(p.textContent || "").trim()) continue;
+      add(p, "p");
+    }
+    for (const m of main.querySelectorAll("picture, video, canvas")) {
+      if (m.closest(COMPONENT)) continue;
+      let frame = m.parentElement;
+      while (frame && frame !== main && !/(hidden|clip)/.test(getComputedStyle(frame).overflowX)) frame = frame.parentElement;
+      if (!frame || frame === main) frame = m;
+      if (frame.closest(COMPONENT)) continue;
+      add(frame, "figure frame", true);
+    }
+    for (const b of main.querySelectorAll("[data-button]:not([data-actions] > :not(:first-child))")) if (!b.closest(COMPONENT)) add(b, `[data-button="${b.getAttribute("data-button")}"]`);
+    for (const c of main.querySelectorAll("[data-calculator], [data-accordion]")) if (!c.parentElement?.closest(COMPONENT)) add(c, c.matches("[data-calculator]") ? "[data-calculator]" : "[data-accordion]");
+    const tracks = [...main.querySelectorAll("ul, ol")].filter(isTrack);
+    for (const t of tracks) {
+      const first = [...t.children].find((li) => li.tagName === "LI" && rendered(li));
+      if (first && !t.parentElement?.closest(COMPONENT)) add(first, "a track's first item");
+    }
+    for (const c of main.querySelectorAll("[data-card]")) {
+      if (c.parentElement?.closest("[data-card]") || tracks.some((t) => t.contains(c)) || c.closest(`[data-accordion], form, [data-form-success], ${UI_SEL}`)) continue;
+      add(c, "[data-card]");
+    }
+    const out = [];
+    const near = (x, list) => list.reduce((best, s, k) => (Math.abs(s - x) < Math.abs(best.x - x) ? { x: s, k } : best), { x: list[0], k: 0 });
+    for (const it of items.values()) {
+      const what = P.describe(it.el);
+      if (mode === "margin") {
+        if (Math.abs(it.left - margin) > 1) out.push({ kind: it.kind, what, message: `left edge at x ${Math.round(it.left * 10) / 10}, not the ${margin}px page margin` });
+        continue;
+      }
+      const s = near(it.left, starts);
+      if (Math.abs(s.x - it.left) > 1) out.push({ kind: it.kind, what, message: `left edge at x ${Math.round(it.left * 10) / 10} is ${Math.round(Math.abs(s.x - it.left) * 10) / 10}px off column ${s.k + 1}'s start (x ${Math.round(s.x * 10) / 10})` });
+      if (it.figure) {
+        const e = near(it.right, [...ends, L + W]);
+        if (Math.abs(e.x - it.right) > 1) out.push({ kind: it.kind, what, message: `right edge at x ${Math.round(it.right * 10) / 10} is ${Math.round(Math.abs(e.x - it.right) * 10) / 10}px off the nearest column end (x ${Math.round(e.x * 10) / 10})` });
+      }
+    }
+    return { rail: { left: Math.round(L * 10) / 10, width: Math.round(W * 10) / 10, colW: Math.round(colW * 100) / 100 }, margin, checked: items.size, off: out };
+  };
+
+  // Check 43: the header and the footer are on the page.
+  P.chrome = () => {
+    const header = document.querySelector("body > header");
+    const footer = document.querySelector("body > footer") || [...document.querySelectorAll("footer")].find((f) => !f.closest("main"));
+    const shownBox = (e) => !!e && e.getClientRects().length > 0 && getComputedStyle(e).visibility === "visible";
+    return { header: shownBox(header), footer: shownBox(footer), main: !!document.querySelector("main") };
   };
 
   P.menuButton = () => {
@@ -693,20 +868,28 @@ const blockName = (b) => {
   const what = b.heading ? `"${b.heading}"` : b.label ? `[${b.label}]` : b.text ? `(${b.text})` : "";
   return `${id} ${what}`.trim();
 };
-const LIGHT = new Set(["plaster", "raised", "sunken"]);
+const LIGHT_TONES = new Set(["plaster", "raised", "sunken"]);
+const DARK_TONES = new Set(["ink", "ink-raised", "film"]);
+const BAND_TONES = new Set(["plaster", "ink", "film"]);
+// Light or dark: from the band's tone name, or from the luminance of an unnamed surface.
+const lightness = (b) => (LIGHT_TONES.has(b.tone) ? "light" : DARK_TONES.has(b.tone) ? "dark" : b.light ? "light" : "dark");
 
-function judge(width, audit, sweeps, overflow) {
+function judge(route, width, vp, audit, sweeps, overflow, extra) {
   const failures = [];
   const warnings = [];
   const add = (check, where, message) => failures.push({ check, where, message });
   const warn = (check, where, message) => warnings.push({ check, where, message });
   const blocks = audit.blocks;
+  const limit = limitFor(width);
+  const notFound = route === NOT_FOUND;
+  // The unknown route runs the markers and checks 2, 4, 19, 30 and 43 only.
+  const runs = (check) => !notFound || ["markers", 2, 4, 19, 30, 43, "page"].includes(check);
 
   // Markers.
   for (const b of blocks) {
-    if (!b.marked) add("markers", b.index, `${b.film ? "film band" : "block"} has no data-band or data-tone (background ${b.bgTone ?? "transparent"})${b.height ? `, ${fmt(b.height)}px` : ""}; checks 2-4 cannot see it`);
+    if (!b.marked) add("markers", b.index, `${b.film ? "film band" : "block"} has no data-band or data-tone (background ${b.bgTone ?? "transparent"})${b.height ? `, ${fmt(b.height)}px` : ""}; checks 2-4 and 30 cannot see it`);
   }
-  for (const w of audit.wrappers) add("markers", 0, `${w} wraps bands inside <main>: bands must be direct siblings for the hairline rule`);
+  for (const w of audit.wrappers) add("markers", 0, `${w} wraps bands inside <main>: bands must be direct siblings, or the tone rhythm cannot be read`);
 
   // Check 2, in the default state and every swept state. A failure that persists through swept states
   // is reported once, saying so; a failure that only a state produces is reported with that state.
@@ -714,9 +897,9 @@ function judge(width, audit, sweeps, overflow) {
   const sameCol = (c, d) => c.column === d.column && c.sibling === d.sibling && Math.abs(c.short - d.short) <= 2;
   const gapText = (g) => {
     const where = g.above && g.below ? `between ${g.above} and ${g.below}` : g.below ? `above ${g.below} (top of the content box)` : `below ${g.above} (bottom of the content box)`;
-    return `empty run of ${g.size}px (y ${g.from}-${g.to} in the content box), ${where}`;
+    return `empty run of ${g.size}px (limit ${limit}px; y ${g.from}-${g.to} in the content box), ${where}`;
   };
-  const colText = (c) => `[data-col] ${c.column} of ${c.of} ${c.name} ends ${c.short}px above column ${c.sibling} ${c.siblingName}`;
+  const colText = (c) => `[data-col] ${c.column} of ${c.of} ${c.name} ends ${c.short}px above column ${c.sibling} ${c.siblingName} (limit ${limit}px)`;
   for (const b of blocks) {
     if (b.skipped) continue;
     const states = sweeps.filter((s) => s.block === b.index);
@@ -735,55 +918,62 @@ function judge(width, audit, sweeps, overflow) {
     }
   }
 
-  // Check 3, at 1440 only.
-  if (width === 1440) {
+  // Check 3. At 1440 a band over twice the viewport is a warning (not for the h1's band or the window's).
+  if (runs(3)) {
     for (const b of blocks) {
       const tallest = Math.max(b.height, ...sweeps.filter((s) => s.block === b.index).map((s) => s.height));
       const exempt = b.hasH1 ? "holds the h1" : b.hasWindow ? "holds the software window" : null;
-      if (tallest > MAX_BAND + 0.5 && !exempt) add(3, b.index, `${fmt(tallest)}px tall at 1440 (limit ${MAX_BAND}px)`);
       b.exempt = exempt;
+      if (width === 1440 && tallest > vp.height * 2 + 0.5 && !exempt) warn(3, b.index, `${fmt(tallest)}px tall at 1440, over twice the ${vp.height}px viewport`);
     }
-    // Switching a tab or a stage part never moves the page (B6 Switcher, C1 section 5, software steps).
+    // Switching a tab or a part never moves the page.
     for (const b of blocks) {
-      const states = sweeps.filter((s) => s.block === b.index && (s.kind === "tab" || s.kind === "part"));
-      const heights = [b.height, ...states.map((s) => s.height)];
-      const spread = Math.max(...heights) - Math.min(...heights);
-      if (states.length && spread > 1) add(3, b.index, `height changes by ${fmt(spread)}px across its ${states[0].kind}s (${fmt(Math.min(...heights))}-${fmt(Math.max(...heights))}px): switching must never move the page`);
+      for (const kind of ["tab", "part"]) {
+        const states = sweeps.filter((s) => s.block === b.index && s.kind === kind);
+        if (!states.length) continue;
+        const heights = [b.height, ...states.map((s) => s.height)];
+        const spread = Math.max(...heights) - Math.min(...heights);
+        if (spread > 1) {
+          const tallestState = states.reduce((m, s) => (s.height > m.height ? s : m), states[0]);
+          add(3, b.index, `height changes by ${fmt(spread)}px across its ${kind}s (${fmt(Math.min(...heights))}-${fmt(Math.max(...heights))}px; tallest with ${tallestState.state}): switching must never move the page`);
+        }
+      }
     }
   }
 
-  // Check 4. A band's data-tone must be the surface it renders, or the hairline rule reads it wrong.
-  for (const b of blocks) {
+  // Check 4.
+  const seq = blocks.map((b) => ({ ...b, tone: b.film ? "film" : b.tone }));
+  for (const b of seq) {
+    // (a) A band's tone is plaster, ink or film.
+    if (b.dataTone && !BAND_TONES.has(b.dataTone)) {
+      add(4, b.index, ["raised", "sunken"].includes(b.dataTone) ? `data-tone is ${b.dataTone}: raised and sunken are surfaces inside a section, never a section` : `data-tone is ${b.dataTone}, not plaster, ink or film`);
+    }
+    // (e) data-tone is the surface the band renders.
     if (b.dataTone && b.dataTone !== "film" && b.bgTone && b.dataTone !== b.bgTone) add(4, b.index, `data-tone is ${b.dataTone} but the band renders ${b.bgTone}`);
   }
-  const seq = blocks.map((b) => ({ ...b, tone: b.film ? "film" : b.tone }));
+  // (b) Bands alternate light and dark.
   for (let i = 1; i < seq.length; i++) {
     const a = seq[i - 1];
     const b = seq[i];
-    const why = (x) => (x.dataTone ? "" : " (from its background; no data-tone)");
-    if (a.tone && b.tone && a.tone === b.tone) add(4, b.index, `same tone as the block above: both ${b.tone}${why(b)}`);
-    if (LIGHT.has(a.tone) && LIGHT.has(b.tone)) {
-      const lines = [a.borderBottom.visible ? { at: "bottom of the block above", ...a.borderBottom } : null, b.borderTop.visible ? { at: "top of this block", ...b.borderTop } : null].filter(Boolean);
-      if (!lines.length) add(4, b.index, `no hairline where ${a.tone} meets ${b.tone}`);
-      else if (lines.length > 1) add(4, b.index, `two lines where ${a.tone} meets ${b.tone} (the block above's bottom border and this block's top border)`);
-      else if (Math.abs(lines[0].w - 1) > 0.01 || !lines[0].isHairline) add(4, b.index, `the line where ${a.tone} meets ${b.tone} is ${lines[0].w}px ${lines[0].colour}, not a 1px hairline`);
-    }
+    const la = lightness(a);
+    const lb = lightness(b);
+    if (la !== lb) continue;
+    if (b.attached && a.hasH1 && a.tone === b.tone) continue;
+    const why = (x) => (x.dataTone ? "" : ", from its background (no data-tone)");
+    const hint = b.attached ? (a.hasH1 ? ` ([data-attached] needs the same tone as the band above; it is ${b.tone}, not ${a.tone})` : " ([data-attached] is only allowed right after the band holding the h1)") : "";
+    add(4, b.index, `${b.tone} (${lb}${why(b)}) follows ${a.tone} (${la}${why(a)}) in block ${a.index}: sections alternate plaster and ink (film counts as dark)${hint}`);
   }
-  const inks = seq.filter((b) => b.tone === "ink");
-  if (inks.length > 1) add(4, inks[1].index, `${inks.length} ink bands on the page (at most one): blocks ${inks.map((b) => b.index).join(", ")}`);
-  if (audit.glassPanels.length > 1) add(4, audit.glassPanels[1].band, `${audit.glassPanels.length} glass-deep panels on the page (at most one), in blocks ${audit.glassPanels.map((p) => p.band).join(", ")}`);
+  // (c) No glass-deep panel.
+  for (const g of audit.glassPanels) add(4, g.band || "page", `a glass-deep element of ${g.width}x${g.height} at y ${fmt(g.top)} (${g.what}): the glass-deep panel is gone`);
+  // (d) The footer: plaster or ink, opposite to the last band, rendering its tone.
   const last = seq[seq.length - 1];
-  if (last && last.tone === "sunken") add(4, last.index, "the band before the footer is sunken, the footer's own tone");
-  if (last && audit.footer) {
+  if (audit.footer) {
     const f = audit.footer;
-    if (f.tone !== "sunken") add(4, "footer", `the footer is ${f.tone ?? "transparent"}, not sunken`);
-    if (LIGHT.has(last.tone) && LIGHT.has(f.tone)) {
-      const lines = [last.borderBottom.visible ? last.borderBottom : null, f.borderTop.visible ? f.borderTop : null].filter(Boolean);
-      if (!lines.length) add(4, "footer", `no hairline where ${last.tone} meets the footer`);
-      else if (lines.length > 1) add(4, "footer", "two lines where the last band meets the footer");
-      else if (Math.abs(lines[0].w - 1) > 0.01 || !lines[0].isHairline) add(4, "footer", `the line above the footer is ${lines[0].w}px ${lines[0].colour}, not a 1px hairline`);
-    }
-  }
+    if (!f.dataTone) add(4, "footer", `the footer has no data-tone (it renders ${f.bgTone ?? "transparent"})`);
+    else if (!["plaster", "ink"].includes(f.dataTone)) add(4, "footer", `the footer's data-tone is ${f.dataTone}, not plaster or ink`);
+    if (f.dataTone && f.bgTone && f.dataTone !== f.bgTone) add(4, "footer", `the footer's data-tone is ${f.dataTone} but it renders ${f.bgTone}`);
+    if (last && lightness(last) === lightness(f)) add(4, "footer", `the footer (${f.tone}, ${lightness(f)}) has the lightness of the last band, block ${last.index} (${last.tone}): they must be opposite`);
+  } else add(4, "footer", "no footer on the page");
 
   // Check 19.
   for (const o of overflow) {
@@ -792,7 +982,48 @@ function judge(width, audit, sweeps, overflow) {
     if (o.bodyScrollWidth > o.viewport + 1) add(19, "page", `body scrollWidth ${o.bodyScrollWidth}px > ${o.viewport}px${tail} (hidden by the root's overflow-x: clip)`);
     for (const c of o.culprits) add(19, c.band || "page", `${c.what} runs past the viewport (left ${c.left}, right ${c.right})${tail}`);
   }
-  return { failures, warnings };
+
+  // Check 30. Section padding by data-pad.
+  const S = sectionY(width);
+  const H = heroGap(width);
+  const want = { section: [S, S], hero: [NAV_H + H, S], attached: [0, S] };
+  for (const b of blocks) {
+    if (b.film || !b.marked) continue;
+    const inferred = !b.pad;
+    const pad = b.pad ?? (b.attached ? "attached" : b.hasH1 ? "hero" : "section");
+    const how = inferred ? `pad ${pad}, inferred: no data-pad` : `pad ${pad}`;
+    if (pad === "none") {
+      add(30, b.index, "data-pad is none on a non-film band: every section takes section, hero or attached padding");
+      continue;
+    }
+    const w = want[pad];
+    if (!w) {
+      add(30, b.index, `data-pad is "${pad}", not section, hero, attached or none`);
+      continue;
+    }
+    if (Math.abs(b.paddingTop - w[0]) > 0.5) add(30, b.index, `padding-top ${b.paddingTop}px, not ${w[0]}px (${how}; S ${S}, H ${H} at ${width})`);
+    if (Math.abs(b.paddingBottom - w[1]) > 0.5) add(30, b.index, `padding-bottom ${b.paddingBottom}px, not ${w[1]}px (${how}; S ${S} at ${width})`);
+  }
+  if (audit.footer && Math.abs(audit.footer.paddingTop - S) > 0.5) add(30, "footer", `the footer's padding-top is ${audit.footer.paddingTop}px, not ${S}px (S at ${width})`);
+
+  // Check 31a. Computed spacing on the 8px scale.
+  if (runs("31a") && extra.spacing) {
+    for (const o of extra.spacing.off) add("31a", o.band || "page", `${o.prop} ${o.value} is off the 8px scale on ${o.what}${o.count > 1 ? ` (${o.count} elements)` : ""}`);
+  }
+
+  // Check 32. Grid alignment.
+  if (runs(32) && extra.grid) {
+    if (extra.grid.error) add(32, "page", `grid alignment not measured: ${extra.grid.error}`);
+    else for (const o of extra.grid.off) add(32, "page", `${o.kind} ${o.what}: ${o.message}`);
+  }
+
+  // Check 43. The unknown route.
+  if (notFound) {
+    if (extra.status !== 404) add(43, "page", `${route} answered ${extra.status}, not 404`);
+    if (!extra.chrome.header) add(43, "page", "the 404 page has no visible header (body > header)");
+    if (!extra.chrome.footer) add(43, "page", "the 404 page has no visible footer");
+  }
+  return { failures: failures.filter((f) => runs(f.check)), warnings };
 }
 
 const report = { base: opts.base, when: new Date().toISOString(), runs: [] };
@@ -803,38 +1034,50 @@ const out = (s = "") => {
 };
 
 out(`check:layout  ${opts.base}`);
-out(`E2 checks 2 (dead space, columns), 3 (band heights), 4 (tones), 19 (overflow) at ${opts.widths.map((w) => `${w}x${(VIEWPORTS[w] ?? { height: 900 }).height}`).join(" and ")}${opts.sweep ? ", sweeping tabs, stage parts and story beats" : ""}`);
+out(`Checks 2 (dead space, columns), 3 (band heights), 4 (tones), 19 (overflow), 30 (section padding), 31a (spacing), 32 (grid) and 43 (404) at ${opts.widths.map((w) => `${w}x${viewportFor(w).height}`).join(", ")}${opts.sweep ? ", sweeping tabs, parts, beats and disclosures" : ""}`);
 
 let totalFailures = 0;
 let totalWarnings = 0;
 const byCheck = {};
+const cfg = { uiSel: UI_SEL };
 
 for (const route of opts.routes) {
   for (const width of opts.widths) {
-    const vp = VIEWPORTS[width] ?? { width, height: width < 800 ? 844 : 900, mobile: width < 800 };
+    const vp = viewportFor(width);
+    const limit = limitFor(width);
     const context = await browser.newContext({ viewport: { width: vp.width, height: vp.height }, deviceScaleFactor: 1, isMobile: vp.mobile, hasTouch: vp.mobile });
-    await context.addInitScript(pageLib);
+    await context.addInitScript(pageLib, cfg);
     const page = await context.newPage();
     const errors = [];
+    const pageUrl = opts.base + route;
     page.on("pageerror", (e) => errors.push(`pageerror: ${String(e.message).split("\n")[0]}`));
-    page.on("console", (m) => m.type() === "error" && errors.push(`console: ${m.text().split("\n")[0].slice(0, 160)}`));
+    page.on("console", (m) => {
+      if (m.type() !== "error") return;
+      // The unknown route's own 404 is the expected answer, not a page error.
+      if (route === NOT_FOUND && /status of 404/.test(m.text()) && (m.location()?.url ?? "") === pageUrl) return;
+      errors.push(`console: ${m.text().split("\n")[0].slice(0, 160)}`);
+    });
     let response = null;
     try {
-      response = await page.goto(opts.base + route, { waitUntil: "networkidle", timeout: 60000 });
+      response = await page.goto(pageUrl, { waitUntil: "networkidle", timeout: 60000 });
     } catch (err) {
       errors.push(`navigation: ${String(err.message).split("\n")[0]}`);
     }
     out("");
-    if (!response || response.status() >= 400) {
-      out(`${route} @${width}  FAIL could not load (${response ? `HTTP ${response.status()}` : errors[errors.length - 1]})`);
-      report.runs.push({ route, width, error: response ? response.status() : errors });
+    const status = response ? response.status() : null;
+    // The unknown route must answer exactly 404 (check 43); any page that renders is still measured.
+    const accepted = route === NOT_FOUND ? status === 404 || (status !== null && status < 400) : status !== null && status < 400;
+    if (!accepted) {
+      const check = route === NOT_FOUND ? 43 : "page";
+      out(`${route} @${width}  FAIL [${check}] could not load (${response ? `HTTP ${status}` : errors[errors.length - 1]})`);
+      report.runs.push({ route, width, error: response ? status : errors });
       totalFailures++;
-      byCheck.page = (byCheck.page ?? 0) + 1;
+      byCheck[check] = (byCheck[check] ?? 0) + 1;
       await context.close();
       continue;
     }
     await settlePage(page, vp.height);
-    const audit = await call(page, (limit) => window.__p7layout.audit(limit), LIMIT);
+    const audit = await call(page, (lim) => window.__p7layout.audit(lim), limit);
 
     // State sweeps: every tab selected and every disclosure opened, one at a time, then the default restored.
     const sweeps = [];
@@ -849,7 +1092,7 @@ for (const route of opts.routes) {
             await call(page, ([blk, grp, item]) => window.__p7layout.activate(blk, grp, item), [b.index - 1, gi, i]);
             await page.waitForTimeout(260);
             await call(page, (blk) => window.__p7layout.idle(blk, 1500), b.index - 1);
-            const m = await call(page, ([blk, limit]) => window.__p7layout.measure(blk, limit), [b.index - 1, LIMIT]);
+            const m = await call(page, ([blk, lim]) => window.__p7layout.measure(blk, lim), [b.index - 1, limit]);
             sweeps.push({ block: b.index, kind: g.kind, state: `${g.kind} "${g.labels[i]}" (${i + 1}/${g.labels.length})`, height: m.height, space: m.space, columns: m.columns });
             g.states++;
           }
@@ -859,6 +1102,12 @@ for (const route of opts.routes) {
         }
       }
     }
+
+    // Spacing (31a), grid (32) and the page chrome (43), in the default state.
+    const spacing = await call(page, ([scale, nav]) => window.__p7layout.spacing(scale, nav), [SCALE, NAV_H]);
+    const gridMode = width >= 1024 ? "grid" : width < 768 ? "margin" : null;
+    const grid = gridMode ? await call(page, ([mode, margin]) => window.__p7layout.grid(mode, margin), [gridMode, 16]) : null;
+    const chrome = await call(page, () => window.__p7layout.chrome());
 
     // Overflow, with the phone menu closed and (where there is one) open.
     const overflow = [{ state: "menu closed", ...(await call(page, () => window.__p7layout.overflow())) }];
@@ -873,7 +1122,7 @@ for (const route of opts.routes) {
       } else overflow.push({ state: "menu open", viewport: vp.width, rootScrollWidth: 0, bodyScrollWidth: 0, culprits: [{ what: "the menu did not open", left: 0, right: 0, band: 0 }] });
     }
 
-    const { failures, warnings } = judge(width, audit, sweeps, overflow);
+    const { failures, warnings } = judge(route, width, vp, audit, sweeps, overflow, { spacing, grid, chrome, status });
     for (const e of errors) failures.push({ check: "page", where: "page", message: e });
     totalFailures += failures.length;
     totalWarnings += warnings.length;
@@ -881,7 +1130,7 @@ for (const route of opts.routes) {
 
     // Per band output.
     const marked = audit.blocks.filter((b) => b.marked).length;
-    out(`${route} @${width}  ${fmt(audit.pageHeight)}px, ${audit.blocks.length} blocks in <main> (${marked} marked)  ${failures.length ? `${failures.length} failure${failures.length === 1 ? "" : "s"}` : "all pass"}${warnings.length ? `, ${warnings.length} warning${warnings.length === 1 ? "" : "s"}` : ""}`);
+    out(`${route} @${width}  ${route === NOT_FOUND ? `HTTP ${status}, ` : ""}${fmt(audit.pageHeight)}px, ${audit.blocks.length} blocks in <main> (${marked} marked)  ${failures.length ? `${failures.length} failure${failures.length === 1 ? "" : "s"}` : "all pass"}${warnings.length ? `, ${warnings.length} warning${warnings.length === 1 ? "" : "s"}` : ""}`);
     const where = new Map();
     for (const f of [...failures.map((f) => ({ ...f, level: "FAIL" })), ...warnings.map((w) => ({ ...w, level: "warn" }))]) {
       const key = String(f.where);
@@ -890,24 +1139,30 @@ for (const route of opts.routes) {
     }
     for (const b of audit.blocks) {
       const states = b.controls.map((g) => `${g.labels.length} ${g.kind}s`).join(", ");
-      const extra = [b.skipped ? `skip: ${b.skipped}` : null, b.exempt ? `height exempt: ${b.exempt}` : null, states ? `swept ${states}` : null, !b.skipped && b.space ? `largest empty run ${b.space.largest}px` : null, b.columns?.checked ? `${b.columns.checked} columns balanced` : null].filter(Boolean).join("; ");
-      out(`  ${String(b.index).padStart(2)} ${blockName(b)}  ${b.tone ?? "?"}${b.dataTone ? "" : "*"}  y ${fmt(b.top)}  ${fmt(b.height)}px${extra ? `  (${extra})` : ""}`);
+      const pad = b.film ? null : `pad ${b.pad ?? "?"} ${b.paddingTop}/${b.paddingBottom}`;
+      const info = [b.skipped ? `skip: ${b.skipped}` : null, pad, b.exempt ? `height exempt: ${b.exempt}` : null, states ? `swept ${states}` : null, !b.skipped && b.space ? `largest empty run ${b.space.largest}px` : null, b.columns?.checked ? `${b.columns.checked} columns balanced` : null].filter(Boolean).join("; ");
+      out(`  ${String(b.index).padStart(2)} ${blockName(b)}  ${b.tone ?? "?"}${b.dataTone ? "" : "*"}  y ${fmt(b.top)}  ${fmt(b.height)}px${info ? `  (${info})` : ""}`);
       for (const f of where.get(String(b.index)) ?? []) out(`       ${f.level} [${f.check}] ${f.message}`);
     }
     if (audit.footer) {
-      out(`  -- footer  ${audit.footer.tone ?? "?"}  y ${fmt(audit.footer.top)}  ${fmt(audit.footer.height)}px`);
+      out(`  -- footer  ${audit.footer.tone ?? "?"}${audit.footer.dataTone ? "" : "*"}  y ${fmt(audit.footer.top)}  ${fmt(audit.footer.height)}px  (padding-top ${audit.footer.paddingTop})`);
       for (const f of where.get("footer") ?? []) out(`       ${f.level} [${f.check}] ${f.message}`);
     }
     const pageLevel = [...(where.get("page") ?? []), ...(where.get("0") ?? [])];
     for (const f of pageLevel) out(`  page  ${f.level} [${f.check}] ${f.message}`);
-    report.runs.push({ route, width, audit, sweeps, overflow, failures, warnings });
+    const notes = [`31a: ${spacing.checked} elements measured`];
+    if (!grid) notes.push(`32: not measured at ${width} (1440 and 1024 on the grid, below 768 on the page margin)`);
+    else if (!grid.error) notes.push(`32: ${grid.checked} edges measured ${gridMode === "margin" ? "against the 16px page margin" : `against the rail at x ${grid.rail.left}, ${grid.rail.width} wide (columns ${grid.rail.colW})`}`);
+    if (route === NOT_FOUND) notes.push(`43: HTTP ${status}; header ${chrome.header ? "shown" : "missing"}, footer ${chrome.footer ? "shown" : "missing"}; checks 2, 4, 19 and 30 run here`);
+    for (const n of notes) out(`  note  ${n}`);
+    report.runs.push({ route, width, status, audit, sweeps, overflow, spacing, grid, failures, warnings });
     await context.close();
   }
 }
 await browser.close();
 
 out("");
-out(`Summary: ${totalFailures ? `${totalFailures} failure${totalFailures === 1 ? "" : "s"}` : "every check passes"}${totalWarnings ? `, ${totalWarnings} warning${totalWarnings === 1 ? "" : "s"}` : ""} across ${opts.routes.length} route${opts.routes.length === 1 ? "" : "s"} at ${opts.widths.join(" and ")}.`);
+out(`Summary: ${totalFailures ? `${totalFailures} failure${totalFailures === 1 ? "" : "s"}` : "every check passes"}${totalWarnings ? `, ${totalWarnings} warning${totalWarnings === 1 ? "" : "s"}` : ""} across ${opts.routes.length} route${opts.routes.length === 1 ? "" : "s"} at ${opts.widths.join(", ")}.`);
 for (const [check, n] of Object.entries(byCheck)) out(`  ${CHECK_NAMES[check] ?? check}: ${n}`);
 out("  * after a tone: taken from the background because the block has no data-tone.");
 if (opts.json) {
