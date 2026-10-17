@@ -79,7 +79,7 @@ export const flow = {
     { id: "scan", number: "01", tab: "Scan", line: "The drone maps the building's structure and dimensions." },
     { id: "plan", number: "02", tab: "Plan", line: "Each zone gets its own surface, preset and pressure." },
     { id: "clean", number: "03", tab: "Clean", line: "The clean moves down the facade, two passes per floor." },
-    { id: "check", number: "04", tab: "Check", line: "On its interval the drone re-scans and shades built-up debris." },
+    { id: "check", number: "04", tab: "Check", line: "A re-scan shades where debris has built up." },
     { id: "report", number: "05", tab: "Report", line: "The software shows what was cleaned and when the next clean is due." },
   ] satisfies readonly FlowStep<FlowStepId>[],
   /** The window preset each step applies. */

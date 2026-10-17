@@ -355,7 +355,7 @@ export function SoftwareWindow({ preset, priority = false }: SoftwareWindowProps
                       type="button"
                       onClick={() => fly(z.id)}
                       aria-pressed={selected === z.id}
-                      className={`flex h-full min-h-11 w-full flex-col justify-center px-3 text-left transition-[background-color] duration-200 ease-instrument hover:bg-sunken lg:border-t lg:border-hairline lg:py-2.5 ${
+                      className={`flex h-full min-h-11 w-full flex-col justify-center px-3 text-left focus-visible:-outline-offset-2 transition-[background-color] duration-200 ease-instrument hover:bg-sunken lg:border-t lg:border-hairline lg:py-2.5 ${
                         selected === z.id
                           ? "relative lg:before:absolute lg:before:inset-y-0 lg:before:left-0 lg:before:w-0.5 lg:before:bg-ink max-lg:after:absolute max-lg:after:inset-x-0 max-lg:after:bottom-0 max-lg:after:h-0.5 max-lg:after:bg-ink"
                           : ""
