@@ -17,7 +17,9 @@
 // public/media that no current entry lists are deleted at the end of a run.
 //
 // Every still and film also gets the house grade (scripts/media/grade.mjs). An entry records the
-// key of the grade it was made with, so changing the grade re-processes instead of restoring.
+// key of the grade it was made with, so changing the grade re-processes instead of restoring. A film
+// with `gradeFrom` in the manifest is graded with the measurements of that still, which it was made
+// from, so the two match.
 
 import { cpSync, createWriteStream, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { pipeline } from "node:stream/promises";
@@ -26,7 +28,7 @@ import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import path from "node:path";
 import sharp from "sharp";
-import { applyToSharp, ffmpegFilter, gradeFor, gradeKey, measure } from "./grade.mjs";
+import { gradedSharp, gradeFor, gradeKey, tableFor, writeCube } from "./grade.mjs";
 
 const ROOT = path.resolve(new URL("../..", import.meta.url).pathname);
 const CACHE_DIR = process.env.LIENRY_MEDIA_CACHE
@@ -62,7 +64,7 @@ function readIndex(file) {
 function complete(entry, dir, asset) {
   return (
     entry?.source === asset.url &&
-    entry?.grade === gradeKey(gradeFor(asset)) &&
+    entry?.grade === gradeKey(gradeFor(asset), asset.gradeFrom) &&
     Array.isArray(entry?.files) &&
     entry.files.length > 0 &&
     entry.files.every((f) => existsSync(path.join(dir, f)))
@@ -111,20 +113,21 @@ async function processImage(asset, src) {
   const image = sharp(src, { failOn: "none" });
   const meta = await image.metadata();
   const grade = gradeFor(asset);
-  const t = grade ? await measure(src, grade) : null;
+  const table = grade ? await tableFor(src, grade) : null;
+  const graded = await (await gradedSharp(src, table)).png({ compressionLevel: 1 }).toBuffer();
   const widths = (asset.widths ?? [640, 1280, 2048]).filter((w) => w <= (meta.width ?? 99999));
   if (widths.length === 0) widths.push(meta.width ?? 1280);
   const written = [];
   for (const w of widths) {
     const base = path.join(OUT_DIR, `${asset.id}-${w}`);
-    await applyToSharp(sharp(src).resize({ width: w, withoutEnlargement: true }), t).avif({ quality: 55, effort: 4 }).toFile(`${base}.avif`);
-    await applyToSharp(sharp(src).resize({ width: w, withoutEnlargement: true }), t).webp({ quality: 78, effort: 5 }).toFile(`${base}.webp`);
+    await sharp(graded).resize({ width: w, withoutEnlargement: true }).avif({ quality: 55, effort: 4 }).toFile(`${base}.avif`);
+    await sharp(graded).resize({ width: w, withoutEnlargement: true }).webp({ quality: 78, effort: 5 }).toFile(`${base}.webp`);
     written.push(`${asset.id}-${w}.avif`, `${asset.id}-${w}.webp`);
   }
   // Tiny blur placeholder as a data URI for the blur-up while the real file loads.
-  const blur = await applyToSharp(sharp(src).resize({ width: 24 }), t).webp({ quality: 40 }).toBuffer();
+  const blur = await sharp(graded).resize({ width: 24 }).webp({ quality: 40 }).toBuffer();
   const placeholder = `data:image/webp;base64,${blur.toString("base64")}`;
-  return { width: meta.width, height: meta.height, widths, files: written, placeholder, grade: gradeKey(grade), transform: t };
+  return { width: meta.width, height: meta.height, widths, files: written, placeholder, grade: gradeKey(grade), points: table?.points };
 }
 
 function run(bin, argv) {
@@ -146,16 +149,21 @@ async function processVideo(asset, src, ffmpeg) {
   const webm = path.join(OUT_DIR, `${asset.id}.webm`);
   const poster = path.join(OUT_DIR, `${asset.id}-poster.webp`);
   const posterJpg = path.join(OUT_DIR, `${asset.id}-poster.jpg`);
-  // The grade is measured on the film's own first frame, so the poster and every frame share it.
+  // The grade is measured on the still the film was made from (`gradeFrom`), or else on the film's
+  // own first frame, and applied to every frame and the poster through one 3D colour table.
   const grade = gradeFor(asset);
-  let t = null;
+  let table = null;
+  const cube = path.join(CACHE_DIR, `${asset.id}.cube`);
   if (grade) {
-    const frame = path.join(OUT_DIR, `${asset.id}-measure.png`);
-    run(ffmpeg, ["-y", "-loglevel", "error", "-i", src, "-vf", "select=eq(n\\,0)", "-frames:v", "1", "-update", "1", frame]);
-    t = await measure(frame, grade);
-    rmSync(frame);
+    let measureFrom = gradeSource(asset.gradeFrom);
+    if (!measureFrom) {
+      measureFrom = path.join(CACHE_DIR, `${asset.id}-measure.png`);
+      run(ffmpeg, ["-y", "-loglevel", "error", "-i", src, "-vf", "select=eq(n\\,0)", "-frames:v", "1", "-update", "1", measureFrom]);
+    }
+    table = await tableFor(measureFrom, grade);
+    writeCube(table, cube);
   }
-  const vf = [`scale=-2:${height}:flags=lanczos`, ffmpegFilter(t)].filter(Boolean).join(",");
+  const vf = [`scale=-2:${height}:flags=lanczos`, table ? `format=rgb24,lut3d=file=${cube}:interp=tetrahedral,format=yuv420p` : ""].filter(Boolean).join(",");
   const mp4Bits = Math.min(targetBits, 3_200_000);
   const webmBits = Math.min(Math.floor(targetBits * 0.8), 2_400_000);
   run(ffmpeg, ["-y", "-i", src, "-an", "-vf", vf, "-c:v", "libx264", "-preset", "slow", "-profile:v", "high", "-pix_fmt", "yuv420p", "-b:v", `${mp4Bits}`, "-maxrate", `${mp4Bits}`, "-bufsize", "6000k", "-movflags", "+faststart", mp4]);
@@ -164,10 +172,19 @@ async function processVideo(asset, src, ffmpeg) {
   await sharp(posterJpg).webp({ quality: 74 }).toFile(poster);
   const sizes = { mp4: statSync(mp4).size, webm: statSync(webm).size };
   if (sizes.mp4 > VIDEO_BUDGET_BYTES) console.warn(`WARNING ${asset.id}.mp4 is ${(sizes.mp4 / 1e6).toFixed(2)} MB, over the 4 MB budget`);
-  return { duration, files: [`${asset.id}.mp4`, `${asset.id}.webm`, `${asset.id}-poster.webp`, `${asset.id}-poster.jpg`], sizes, grade: gradeKey(grade), transform: t };
+  return { duration, files: [`${asset.id}.mp4`, `${asset.id}.webm`, `${asset.id}-poster.webp`, `${asset.id}-poster.jpg`], sizes, grade: gradeKey(grade, asset.gradeFrom), points: table?.points };
 }
 
 const manifest = JSON.parse(readFileSync(MANIFEST, "utf8"));
+
+// The downloaded source of a manifest still, for a film graded from it (null when not on disk).
+function gradeSource(id) {
+  const still = id && manifest.assets.find((a) => a.id === id && a.kind === "image");
+  if (!still) return null;
+  const ext = path.extname(new URL(still.url).pathname).slice(1) || "png";
+  const file = path.join(SRC_DIR, `${still.id}-${sourceKey(still.url)}.${ext}`);
+  return existsSync(file) ? file : null;
+}
 const published = readIndex(path.join(OUT_DIR, "index.json"));
 const cached = readIndex(path.join(CACHE_OUT, "index.json"));
 const results = {};

@@ -306,7 +306,8 @@
       "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_092015_a83c481d-8ce0-41d0-8472-251e408404e3.mp4",
       "height": 1080,
       "duration": 8,
-      "placement": "Home hero film"
+      "placement": "Home hero film",
+      "gradeFrom": "h0-hero-still"
     },
     {
       "id": "c2-commercial-clip",
@@ -314,7 +315,8 @@
       "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_092015_257ae3d1-c319-4cd4-bf28-0afc0ec19a55.mp4",
       "height": 1080,
       "duration": 8,
-      "placement": "Home film band, Commercial hero"
+      "placement": "Home film band, Commercial hero",
+      "gradeFrom": "c1-commercial-hero"
     }
   ]
 }

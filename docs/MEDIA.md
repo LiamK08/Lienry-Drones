@@ -8,14 +8,33 @@ Credit balance at the start of this round: 138. Spent: 37 on the design sheet (e
 
 ## House grade (17 October 2026)
 
-Every still and film now passes through one house grade in the pipeline (`scripts/media/grade.mjs`), so the set reads as one shoot: a warm, overcast morning. The sources differed a lot. Some were cold blue-grey (scan, tether, apartments), one was warm interior light (software), and several had washed-out blacks. A single filter would have left those differences in place, so the grade measures each source and corrects it toward common targets:
+Every still and film goes through one house grade in the pipeline (`scripts/media/grade.mjs`), so the set reads as one shoot: an overcast morning, slightly warm in the shadows and mid-tones, with neutral highlights. The sources differed a lot. Some were cold blue-grey (scan, tether, apartments), one was warm interior light (software), several had washed-out blacks and the solar hero was close to grey. A single filter would have left those differences in place, so the grade measures each source in CIE Lab and corrects it toward common targets:
 
-- **White balance:** 60% of the way toward a neutral grey, then a small warm offset (red ×1.025, blue ×0.965).
-- **Black and white points:** the 1.5th and 99.5th luminance percentiles move 70% of the way to 14 and 244. This evens out contrast across the set.
-- **Shadows:** a warm lift of 5, 3 and 0 in RGB at black, fading out by white.
-- **Saturation:** nudged toward a common chroma, within 0.85 to 1.12.
+- **Black and white points:** the 1st and 99th percentiles of L* map to 9 and 94.5. No image is whiter than the plaster ground or blacker than the ink.
+- **Colour cast by tonal band:** shadows go to b* +2.5, mid-tones to b* +2.5 and highlights to neutral. Each band moves 80% of the way, by at most 9 units, so a strongly coloured scene keeps its colour and skies do not turn peach.
+- **Saturation:** mean chroma is scaled toward C* 6, within 0.8 to 1.2.
 
-Stills are graded with sharp and films with ffmpeg (`lutrgb` and `eq`). A film's grade is measured on its own first frame, so its poster and every frame match. Each index entry records the grade it was made with, so changing the grade re-processes everything on the next build. Set `"grade": false` on a manifest asset to leave it ungraded, or override any value with `"grade": { … }`. The source files are untouched.
+The transform for each asset is baked into one 33-point 3D colour table:
+
+- **Stills** go through the table in JavaScript before resizing.
+- **Films** go through the same table with ffmpeg's `lut3d`.
+- **Films made from a still** use that still's measurements (`gradeFrom` in the manifest), so the hero film matches its still and the commercial clip matches the commercial hero.
+
+Each index entry records the grade it was made with, so changing the grade re-processes everything on the next build. Set `"grade": false` on a manifest asset to leave it ungraded, or override any value with `"grade": { … }`. The source files are untouched. No grain is added: it would inflate every AVIF, WebP and film past their size budgets.
+
+Measured on the output, against the ungraded set:
+
+| Measure | Ungraded | Graded |
+| --- | --- | --- |
+| Black point (L* at 1%) | 1.6 to 16.1 | 7.3 to 10.3 |
+| White point (L* at 99%) | 79.6 to 98.7 | 94.0 to 94.7 |
+| Mid-tone b* | -11.8 to +10.1 | -2.6 to +4.1 |
+| Highlight b* | -8.3 to +9.5 | -1.7 to +2.8 (one outlier at +6.9, the wet driveway) |
+| Mean chroma C* | 3.3 to 11.1 | 1.4 to 7.4 |
+| Hero film against its still (mean ΔE) | 0.6 | 1.4 |
+| Commercial clip against its still (mean ΔE) | 0.2 | 1.2 |
+
+Two differences a grade cannot fix need the owner: `co1-company` is a backlit sunrise and `s5-software` is an indoor frame, and neither belongs in an overcast exterior set. The ground pod also appears in two designs across the stills.
 
 ## Approval status
 
