@@ -1,10 +1,11 @@
 // Scroll the home page with real wheel events and report frame rate, long frames,
 // long tasks and the hottest script functions. Usage: node scripts/perf-scroll.mjs [baseUrl] [width]
+// (baseUrl defaults to http://localhost:3000). Kept until integration; perf:motion (check 39) replaces it.
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 let chromium;
 try { ({ chromium } = require("playwright")); } catch { ({ chromium } = require("/opt/node22/lib/node_modules/playwright")); }
-const base = process.argv[2] ?? "http://localhost:3011";
+const base = process.argv[2] ?? "http://localhost:3000";
 const width = Number(process.argv[3] ?? 1440);
 const height = width < 600 ? 844 : 900;
 const browser = await chromium.launch({ args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"] });
