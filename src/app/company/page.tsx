@@ -31,16 +31,17 @@ export default function CompanyPage() {
   return (
     <>
       {/* 1. Statement: a media hero, so nothing in it waits for a reveal. */}
-      <Band id="statement" as="header" tone="raised" pad="page" labelledBy="company-heading">
+      <Band id="statement" as="header" tone="raised" pad="hero" labelledBy="company-heading">
         <Container>
           <SectionHead
             id="company-heading"
             as="h1"
             size="h1"
+            eyebrow="company"
             headline={c.headline}
             emphasis={c.emphasis}
             reveal={false}
-            aside={{ action: <p className="text-lead text-ink">{c.statement}</p> }}
+            action={<p className="text-lead text-fg">{c.statement}</p>}
           />
           <Picture
             id={c.heroImageId}
@@ -48,7 +49,7 @@ export default function CompanyPage() {
             aspect="21/9"
             priority
             sizes="(min-width: 1440px) 1392px, 100vw"
-            className="mt-[var(--gap-head)]"
+            className="mt-(--head-gap)"
           />
         </Container>
       </Band>
@@ -58,8 +59,9 @@ export default function CompanyPage() {
         id="where"
         tone="plaster"
         side="left"
-        title={keepCompounds(c.where.headline)}
-        body={c.where.body}
+        eyebrow="where we are"
+        headline={keepCompounds(c.where.headline)}
+        intro={c.where.body}
         facts={c.where.items.map((i) => ({ term: i.title, text: i.body }))}
         image={c.where.image}
       />
@@ -69,8 +71,9 @@ export default function CompanyPage() {
         id="values"
         tone="raised"
         side="right"
-        title={c.values.headline}
-        body={c.values.body}
+        eyebrow="how we work"
+        headline={c.values.headline}
+        intro={c.values.body}
         facts={c.values.items.map((i) => ({ term: i.title, text: i.body }))}
         termStyle="strong"
         image={c.values.image}
@@ -80,9 +83,9 @@ export default function CompanyPage() {
           the founders heading; the second block is its own section, named by its heading. */}
       <Band id="founders" tone="sunken" labelledBy="founders-heading">
         <Container>
-          <SectionHead id="founders-heading" headline={c.founders.headline} aside={{ action: <FounderList people={c.founders.people} /> }} />
-          <section aria-labelledby="exploring-heading" className="mt-[var(--gap-head)] border-t border-hairline pt-[var(--gap-head)]">
-            <SectionHead id="exploring-heading" headline={c.exploring.headline} aside={{ label: c.exploring.eyebrow, intro: c.exploring.body }} />
+          <SectionHead id="founders-heading" eyebrow="founders" headline={c.founders.headline} action={<FounderList people={c.founders.people} />} />
+          <section aria-labelledby="exploring-heading" className="mt-(--head-gap) border-t border-rule pt-(--head-gap)">
+            <SectionHead id="exploring-heading" eyebrow={c.exploring.eyebrow.toLowerCase()} headline={c.exploring.headline} intro={c.exploring.body} />
           </section>
         </Container>
       </Band>
@@ -90,6 +93,7 @@ export default function CompanyPage() {
       {/* 5. Investors: the closing panel. */}
       <CtaPanel
         id="investors"
+        eyebrow="investors"
         headline={keepCompounds(c.investors.headline)}
         body={`${c.investors.body} ${c.investors.note}`}
         primary={c.investors.cta}

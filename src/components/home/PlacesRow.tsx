@@ -16,10 +16,10 @@ export function PlacesRow() {
   return (
     <Band id="places" tone="plaster" labelledBy="places-heading">
       <Container>
-        <SectionHead id="places-heading" headline={places.headline} emphasis={places.emphasis} aside={{ intro: places.intro }} />
+        <SectionHead id="places-heading" eyebrow="where it works" headline={places.headline} emphasis={places.emphasis} intro={places.intro} />
         {/* The track's own control row (44px, then 16) sits above the cards. From 1024 it takes half
             the heading gap, so the band stays within 900px with the cards still 84px below the head. */}
-        <div className="mt-[var(--gap-head)] lg:mt-6">
+        <div className="mt-(--head-gap) lg:mt-6">
           <SnapTrack
             from="none"
             visible={4}
@@ -31,11 +31,12 @@ export function PlacesRow() {
             {places.cards.map((card) => (
               <RevealItem key={card.id}>
                 <MediaCard
+                  id={`place-${card.id}`}
                   media={{ kind: "image", id: card.id, alt: `${card.title}: ${card.body}`, aspect: "4/5", position: card.position, sizes }}
-                  label={card.system}
+                  eyebrow={card.system.toLowerCase()}
                   title={card.title}
                   body={card.body}
-                  wholeCard={{ href: card.href }}
+                  href={card.href}
                 />
               </RevealItem>
             ))}

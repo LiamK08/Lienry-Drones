@@ -37,18 +37,19 @@ export default function SolarPage() {
       />
       {/* Starts inside the first screen, so nothing in it waits for a reveal. */}
       <StatBand
-        kind="cited"
         id="soiling"
+        tone="ink"
+        eyebrow="industry figures"
         headline={s.statsHeadline}
+        notePosition="foot"
         intro={s.statsIntro}
         items={pickStats(solarStats, ["unsw-soiling", "iea-soiling", "joule-soiling"])}
         note={CITED_NOTE}
-        reveal={false}
       />
-      <Switcher id="how" tone="plaster" headline={s.how.headline} emphasis={s.how.emphasis} intro={s.how.intro} tabsLabel={s.how.tabsLabel} items={s.how.items} />
-      <Faq id="faq" tone="raised" headline={platformFaq.headline} intro={platformFaq.intro} link={s.actions.primary} items={questions} />
+      <Switcher id="how" tone="plaster" eyebrow="how it works" headline={s.how.headline} emphasis={s.how.emphasis} intro={s.how.intro} tabsLabel={s.how.tabsLabel} items={s.how.items} />
+      <Faq id="faq" tone="raised" eyebrow="questions" headline={platformFaq.headline} intro={platformFaq.intro} link={s.actions.primary} items={questions} />
       <SiblingCards current="solar" />
-      <CtaPanel id="register" headline={s.close.headline} body={s.close.body} primary={s.close.primary} links={s.close.links} image={s.close.image} />
+      <CtaPanel id="register" eyebrow="enquiries" headline={s.close.headline} body={s.close.body} primary={s.close.primary} links={s.close.links} image={s.close.image} />
     </>
   );
 }

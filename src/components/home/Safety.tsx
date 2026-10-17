@@ -24,13 +24,13 @@ const cell = [
  */
 export function Safety() {
   return (
-    <Band id="safety" tone="ink" pad="plate" labelledBy="safety-heading">
+    <Band id="safety" tone="ink" labelledBy="safety-heading">
       <Container>
-        <SectionHead id="safety-heading" tone="dark" headline={safety.headline} aside={{ intro: safety.note }} />
+        <SectionHead id="safety-heading" eyebrow="safety" headline={safety.headline} intro={safety.note} />
         {/* The row rises in as one piece so its rules stay continuous. SnapTrack's grid (from 1024)
             has 24px gutters; the ruled cells abut with a rule between them, so the gutter is zeroed. */}
         <Reveal className="mt-8 lg:[&_ul]:gap-0">
-          <SnapTrack tone="dark" columns={4} label={safety.track.label} prevLabel={safety.track.prevLabel} nextLabel={safety.track.nextLabel}>
+          <SnapTrack columns={4} label={safety.track.label} prevLabel={safety.track.prevLabel} nextLabel={safety.track.nextLabel}>
             {safety.items.map((item) => (
               <li key={item.id} className={cell}>
                 <h3 className="text-h3">{item.title}</h3>

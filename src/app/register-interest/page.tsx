@@ -18,7 +18,7 @@ export const metadata: Metadata = pageMetadata(
 export default function RegisterInterestPage() {
   const image = registerPage.image;
   return (
-    <Band id="register" tone="plaster" pad="page" labelledBy="register-heading">
+    <Band id="register" tone="plaster" pad="hero" labelledBy="register-heading">
       <Container className="grid gap-y-10 lg:grid-cols-12 lg:gap-x-6">
         <div data-col className="flex flex-col lg:col-span-5">
           <h1 id="register-heading" className="text-h1">

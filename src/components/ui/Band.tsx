@@ -1,13 +1,14 @@
 import type { ReactNode } from "react";
-import type { Tone } from "@/lib/types";
+import type { BandTone, LegacyTone } from "@/lib/types";
 
-export type BandPad = "band" | "plate" | "hero" | "page" | "attached" | "none";
+export type BandPad = "section" | "hero" | "attached" | "none";
 
 export type BandProps = {
-  /** DOM id; also the band's `data-band` name (defaults to "band"). */
-  id?: string;
-  tone: Tone;
-  /** Default "band". Values in docs/REDESIGN-SPEC.md B3. */
+  /** Required: the DOM id and the band's `data-band` name. */
+  id: string;
+  /** plaster or ink. raised and sunken are accepted until integration (check 4 fails them). */
+  tone: BandTone | LegacyTone;
+  /** Default "section". */
   pad?: BandPad;
   /** Default "section". */
   as?: "section" | "header" | "div";
@@ -26,41 +27,41 @@ export type ContainerProps = {
   children: ReactNode;
 };
 
-const tones: Record<Tone, string> = {
+// The band sets the surface: ink adds .on-dark, so every role token inside resolves for ink.
+const tones = {
   plaster: "bg-plaster text-ink",
-  raised: "bg-raised text-ink",
-  sunken: "bg-sunken text-ink",
   ink: "on-dark bg-ink text-plaster",
-};
+  raised: "bg-raised text-ink", // legacy, deleted at integration
+  sunken: "bg-sunken text-ink", // legacy, deleted at integration
+} as const;
 
-// Top and bottom padding at 1440 / 390:
-//   band      96 / 56                        --band-y
-//   plate     40 / 32                        --plate-y
-//   hero      nav + 32, 48 / nav + 24, 32    the split hero (the second value is --gap-head)
-//   page      nav + 48, 96 / nav + 32, 56    statement, register and privacy
-//   attached  32, 96 / 32, 56                the findings row under the film band
-const pads: Record<BandPad, string> = {
-  band: "py-[var(--band-y)]",
-  plate: "py-[var(--plate-y)]",
-  hero: "pt-[calc(var(--nav-h)_+_1.5rem)] pb-[var(--gap-head)] lg:pt-[calc(var(--nav-h)_+_2rem)]",
-  page: "pt-[calc(var(--nav-h)_+_var(--gap-head))] pb-[var(--band-y)]",
-  attached: "pt-8 pb-[var(--band-y)]",
+// Top and bottom padding (globals.css): --section-y is 128 from 1024, 96 from 768, 80 below;
+// --hero-top is the 72px bar plus --hero-gap (64, 48, 40).
+//   section   S / S          every page section
+//   hero      72 + H / S     the band holding an inner page's h1
+//   attached  0 / S          a strip that continues the band above it in the same tone
+const pads = {
+  section: "py-(--section-y)",
+  hero: "pt-(--hero-top) pb-(--section-y)",
+  attached: "pt-0 pb-(--section-y)",
   none: "",
-};
+} as const;
 
 /**
  * One full-bleed band of the page: its surface, the page margins and its vertical rhythm.
- * Content goes in a `Container`. `data-tone` drives the hairline where two light bands meet
- * (globals.css) and, with `data-band`, the acceptance scripts.
+ * Content goes in a `Container`. `data-tone`, `data-pad` and `data-band` drive the acceptance
+ * scripts; `data-attached` marks a band allowed to share the tone of the band above it.
  */
-export function Band({ id, tone, pad = "band", as: Tag = "section", labelledBy, ariaLabel, className = "", children }: BandProps) {
+export function Band({ id, tone, pad = "section", as: Tag = "section", labelledBy, ariaLabel, className = "", children }: BandProps) {
   return (
     <Tag
       id={id}
+      data-band={id}
+      data-tone={tone}
+      data-pad={pad}
+      data-attached={pad === "attached" ? "" : undefined}
       aria-labelledby={labelledBy}
       aria-label={ariaLabel}
-      data-band={id ?? "band"}
-      data-tone={tone}
       className={`page-x relative ${tones[tone]} ${pads[pad]} ${className}`}
     >
       {children}

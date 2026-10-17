@@ -36,14 +36,14 @@ export default function HomePage() {
       <Hero />
       <PropertyStrip />
       <ProductCards />
-      <SoftwareBand id="software" tone="sunken" headline={softwareSection.headline} body={softwareSection.body} steps />
+      <SoftwareBand id="software" tone="sunken" eyebrow="desktop software" headline={softwareSection.headline} intro={softwareSection.body} />
       <SystemStage />
       <PlacesRow />
       <FilmBand {...filmBand} />
       <FactRow />
       <FounderBand />
       <Safety />
-      <Faq id="faq" tone="raised" headline={platformFaq.headline} intro={platformFaq.intro} link={homeFaqLink} items={questions} />
+      <Faq id="faq" tone="raised" eyebrow="questions" headline={platformFaq.headline} intro={platformFaq.intro} link={homeFaqLink} items={questions} />
       <ClosingCta />
     </>
   );

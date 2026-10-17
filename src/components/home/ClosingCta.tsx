@@ -10,6 +10,7 @@ export function ClosingCta() {
   return (
     <CtaPanel
       id="closing"
+      eyebrow="get involved"
       headline={closing.headline}
       body={closing.body}
       primary={primary}

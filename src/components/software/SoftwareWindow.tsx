@@ -45,8 +45,6 @@ type Paint = "off" | "starting" | "painted" | "settled";
 export type SoftwareWindowProps = {
   /** Applies a step's layers and camera in live mode. Unset: the window's default (the clean). */
   preset?: StepId;
-  /** The band the window sits on; it sets the border. sunken (default): border-strong/40. raised: hairline. */
-  tone?: "raised" | "sunken";
 };
 
 /** Whether the window runs the live WebGL model: a capable device from 768px, and motion allowed. */
@@ -94,8 +92,12 @@ function Stat({ label, value }: { label: string; value: string }) {
  * From 1024: zones 216 | canvas | figures 240, the canvas 34rem tall. From 768 to 1023: the canvas
  * at 16:10, then (live) the four zone buttons as a row, then the figures as a five-column row.
  * Below 768: the tall recording at 4:5 and the figures in two columns.
+ *
+ * The window is always light (`on-light`) and marked `data-ui`, whatever band it sits on; its notes
+ * row underneath takes the band's colours. The recording has no poster attribute: a lazy `<img>`
+ * under the video stands in until its first frame.
  */
-export function SoftwareWindow({ preset, tone = "sunken" }: SoftwareWindowProps) {
+export function SoftwareWindow({ preset }: SoftwareWindowProps) {
   const can3d = useCanRender3d();
   const reduce = useMediaQuery("(prefers-reduced-motion: reduce)");
   const wide = useMediaQuery("(min-width: 768px)");
@@ -273,7 +275,6 @@ export function SoftwareWindow({ preset, tone = "sunken" }: SoftwareWindowProps)
   const done = live ? completed : DEMO.completed;
   const variant = wide ? "wide" : "tall";
   const tall = capture === "tall";
-  const border = tone === "sunken" ? "border-border-strong/40" : "border-hairline";
   const showsPlaying = playing && !reduce;
 
   const pause = (
@@ -282,15 +283,15 @@ export function SoftwareWindow({ preset, tone = "sunken" }: SoftwareWindowProps)
       onClick={() => setPlaying((p) => !p)}
       disabled={reduce}
       aria-label={showsPlaying ? "Pause preview" : "Play preview"}
-      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-hard border border-hairline text-ink hover:bg-sunken disabled:opacity-50"
+      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-hard border border-hairline text-ink hover:bg-sunken disabled:opacity-40"
     >
       <PlayIcon playing={showsPlaying} />
     </button>
   );
 
   return (
-    <div ref={nearRef} data-software-preview data-preset={preset} data-live={live ? "" : undefined} data-painted={live && (paint === "painted" || paint === "settled") ? "" : undefined}>
-      <div role="group" aria-label={`${project.app}, demo window`} className={`overflow-hidden rounded-hard border bg-plaster text-ink ${border}`}>
+    <div ref={nearRef} data-ui="" data-software-preview data-preset={preset} data-live={live ? "" : undefined} data-painted={live && (paint === "painted" || paint === "settled") ? "" : undefined}>
+      <div role="group" aria-label={`${project.app}, demo window`} className="on-light overflow-hidden rounded-hard border border-rule bg-plaster text-fg">
         <div className="flex h-10 items-center justify-between border-b border-hairline px-3 text-small">
           <div className="flex min-w-0 items-center gap-3">
             <span className="whitespace-nowrap font-medium text-ink">{project.app}</span>
@@ -316,7 +317,7 @@ export function SoftwareWindow({ preset, tone = "sunken" }: SoftwareWindowProps)
                     type="button"
                     aria-pressed={on}
                     onClick={() => toggle(l.id)}
-                    className={`h-7 rounded-hard px-2.5 text-small transition-colors duration-150 ease-instrument ${on ? "bg-ink text-plaster" : "text-muted hover:bg-sunken hover:text-ink"}`}
+                    className={`h-7 rounded-hard px-2.5 text-small transition-colors duration-200 ease-instrument ${on ? "bg-ink text-plaster" : "text-muted hover:bg-sunken hover:text-ink"}`}
                   >
                     {l.label}
                   </button>
@@ -343,7 +344,11 @@ export function SoftwareWindow({ preset, tone = "sunken" }: SoftwareWindowProps)
                       type="button"
                       onClick={() => fly(z.id)}
                       aria-pressed={selected === z.id}
-                      className={`flex h-full min-h-11 w-full flex-col justify-center px-3 text-left transition-colors duration-150 ease-instrument hover:bg-sunken lg:border-t lg:border-hairline lg:py-2.5 ${selected === z.id ? "bg-sunken" : ""}`}
+                      className={`flex h-full min-h-11 w-full flex-col justify-center px-3 text-left transition-colors duration-200 ease-instrument hover:bg-sunken lg:border-t lg:border-hairline lg:py-2.5 ${
+                        selected === z.id
+                          ? "relative lg:before:absolute lg:before:inset-y-0 lg:before:left-0 lg:before:w-0.5 lg:before:bg-ink max-lg:after:absolute max-lg:after:inset-x-0 max-lg:after:bottom-0 max-lg:after:h-0.5 max-lg:after:bg-ink"
+                          : ""
+                      }`}
                     >
                       <span className="block text-small text-ink">{z.name}</span>
                       <span className="hidden text-caption text-muted lg:block">
@@ -395,21 +400,33 @@ export function SoftwareWindow({ preset, tone = "sunken" }: SoftwareWindowProps)
                 ) : null}
               </>
             ) : (
-              <video
-                key={variant}
-                ref={videoRef}
-                className="absolute inset-0 h-full w-full object-cover md:object-contain"
-                muted
-                loop
-                playsInline
-                preload="metadata"
-                controls={reduce}
-                poster={`/video/software-view-${variant}-poster.jpg`}
-                aria-label="Recording of the software view: the model of a 12-storey building being scanned and washed"
-              >
-                <source src={`/video/software-view-${variant}.webm`} type="video/webm" />
-                <source src={`/video/software-view-${variant}.mp4`} type="video/mp4" />
-              </video>
+              <>
+                {/* The recording's first frame until the video has one of its own: a lazy image, not a
+                    poster attribute, so it never competes with the page's first screen. */}
+                <img
+                  key={`${variant}-poster`}
+                  src={`/video/software-view-${variant}-poster.jpg`}
+                  alt=""
+                  aria-hidden="true"
+                  loading="lazy"
+                  decoding="async"
+                  className="pointer-events-none absolute inset-0 h-full w-full object-cover md:object-contain"
+                />
+                <video
+                  key={variant}
+                  ref={videoRef}
+                  className="absolute inset-0 h-full w-full object-cover md:object-contain"
+                  muted
+                  loop
+                  playsInline
+                  preload="metadata"
+                  controls={reduce}
+                  aria-label="Recording of the software view: the model of a 12-storey building being scanned and washed"
+                >
+                  <source src={`/video/software-view-${variant}.webm`} type="video/webm" />
+                  <source src={`/video/software-view-${variant}.mp4`} type="video/mp4" />
+                </video>
+              </>
             )}
             {hover ? (
               <div
@@ -464,13 +481,17 @@ export function SoftwareWindow({ preset, tone = "sunken" }: SoftwareWindowProps)
             />
             <span className="readout w-12 text-small text-ink">{Math.round(pct)}%</span>
           </div>
-        ) : null}
+        ) : (
+          // The live timeline's row, held empty from 768 in recording mode (and the server render), so
+          // a capable device's switch to live mode after hydration moves nothing below the window.
+          <div aria-hidden="true" className="hidden h-12 border-t border-rule md:block" />
+        )}
       </div>
 
-      <div className="mt-4 flex flex-col gap-3 md:flex-row md:justify-between">
-        <p className="text-caption text-muted">Model is illustrative. The software will render each property from its scan.</p>
-        <details className="text-caption text-muted md:w-md" onToggle={(e) => setReadoutsOpen(e.currentTarget.open)}>
-          <summary className="cursor-pointer underline underline-offset-4">Inspect panel data</summary>
+      <div className="mt-4 flex flex-col gap-4 md:flex-row md:justify-between">
+        <p className="text-caption text-fg-muted">Model is illustrative. The software will render each property from its scan.</p>
+        <details className="text-caption text-fg-muted md:w-md" onToggle={(e) => setReadoutsOpen(e.currentTarget.open)}>
+          <summary className="link cursor-pointer">Inspect panel data</summary>
           {readoutsOpen ? <PanelReadouts /> : null}
         </details>
       </div>

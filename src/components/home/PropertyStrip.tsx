@@ -11,7 +11,7 @@ import { Band, Container } from "@/components/ui/Band";
  */
 export function PropertyStrip() {
   return (
-    <Band tone="plaster" pad="none" ariaLabel="Property types Lienry is built for" className="py-4 lg:py-3.5">
+    <Band id="built-for" tone="plaster" pad="none" ariaLabel="Property types Lienry is built for" className="py-4 lg:py-3.5">
       <Container className="grid gap-3 lg:grid-cols-12 lg:items-center lg:gap-x-6">
         <p className="label text-muted lg:col-span-2">{propertyStrip.label}</p>
         <ul className="grid grid-cols-2 gap-x-4 md:grid-cols-3 md:gap-x-6 lg:col-span-10 lg:flex lg:justify-between">

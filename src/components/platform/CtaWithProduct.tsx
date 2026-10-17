@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { Action, Tone } from "@/lib/types";
+import type { Action, BandTone, LegacyTone } from "@/lib/types";
 import { Band, Container } from "@/components/ui/Band";
 import { Button } from "@/components/ui/Button";
 import { SectionHead } from "@/components/ui/SectionHead";
@@ -7,7 +7,8 @@ import { SectionHead } from "@/components/ui/SectionHead";
 export type CtaWithProductProps = {
   /** The band's id; the heading is `${id}-heading`. */
   id: string;
-  tone: Tone;
+  tone: BandTone | LegacyTone;
+  eyebrow: string;
   /** Never italic: it is a closing heading. */
   headline: string;
   /** The closing body, at the lead step. */
@@ -25,34 +26,31 @@ export type CtaWithProductProps = {
  * 24 beside it (stacked 16 apart below 768). Then 48 and the children at full grid width. The
  * children never reveal: the software window is not animated in.
  */
-export function CtaWithProduct({ id, tone, headline, body, primary, secondary, children }: CtaWithProductProps) {
-  const dark = tone === "ink";
+export function CtaWithProduct({ id, tone, eyebrow, headline, body, primary, secondary, children }: CtaWithProductProps) {
   return (
     <Band id={id} tone={tone} labelledBy={`${id}-heading`}>
       <Container>
         <SectionHead
           id={`${id}-heading`}
+          eyebrow={eyebrow}
           headline={headline}
-          tone={dark ? "dark" : "light"}
-          aside={{
-            action: (
-              <>
-                <p className={`text-lead ${dark ? "text-muted-on-dark" : "text-muted"}`}>{body}</p>
-                <div className="mt-4 flex flex-col items-start gap-4 md:flex-row md:items-center md:gap-6">
-                  <Button href={primary.href} size="lg" variant={dark ? "inverse" : "primary"}>
-                    {primary.label}
+          action={
+            <>
+              <p className="text-lead text-fg-muted">{body}</p>
+              <div data-actions="" className="mt-4 flex flex-col items-start gap-4 md:flex-row md:items-center md:gap-6">
+                <Button href={primary.href} size="lg">
+                  {primary.label}
+                </Button>
+                {secondary ? (
+                  <Button href={secondary.href} variant="tertiary" arrow>
+                    {secondary.label}
                   </Button>
-                  {secondary ? (
-                    <Button href={secondary.href} variant="tertiary" onDark={dark} arrow>
-                      {secondary.label}
-                    </Button>
-                  ) : null}
-                </div>
-              </>
-            ),
-          }}
+                ) : null}
+              </div>
+            </>
+          }
         />
-        <div className="mt-[var(--gap-head)]">{children}</div>
+        <div className="mt-(--head-gap)">{children}</div>
       </Container>
     </Band>
   );

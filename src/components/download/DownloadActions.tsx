@@ -71,7 +71,7 @@ function Controls({ primary, other, className }: { primary: Platform; other: Pla
           </Button>
         )}
         {url ? (
-          desktopRelease.version ? <p className="text-caption text-muted">{`${copy.version} ${desktopRelease.version}`}</p> : null
+          desktopRelease.version ? <p className="text-caption text-fg-muted">{`${copy.version} ${desktopRelease.version}`}</p> : null
         ) : (
           <Button href={copy.register.href} variant="tertiary" arrow>
             {copy.register.label}

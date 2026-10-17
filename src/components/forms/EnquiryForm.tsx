@@ -5,6 +5,7 @@ import { useId, useState } from "react";
 import { enquirySchema, enquiryTypes, enquiryTypeLabels, propertyCounts, propertyTypes, type EnquiryType } from "@/lib/enquiry-schema";
 import { registerPage } from "@/content/register";
 import { Button } from "@/components/ui/Button";
+import { TextLink } from "@/components/ui/TextLink";
 
 type Errors = Partial<Record<string, string>>;
 
@@ -149,7 +150,7 @@ export function EnquiryForm() {
           {status === "sending" ? "Sending…" : "Register interest"}
         </Button>
         <p id={`${id}-note`} className="text-caption text-muted">
-          We only use your details to reply. See our <a href="/privacy" className="water-link">privacy policy</a>.
+          We only use your details to reply. See our <TextLink href="/privacy">privacy policy</TextLink>.
         </p>
       </div>
       {status === "failed" ? (

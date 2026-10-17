@@ -25,7 +25,7 @@ export function FounderList({ people }: { people: readonly FounderEntry[] }) {
             />
           ) : null}
           <h3 className="text-h3">{p.name}</h3>
-          <p className="mt-1 text-small text-muted">{p.title}</p>
+          <p className="mt-1 text-small text-fg-muted">{p.title}</p>
           <p className="mt-2 text-body">{p.bio}</p>
         </li>
       ))}

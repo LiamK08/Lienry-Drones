@@ -44,14 +44,14 @@ export function FilmBand({ videoId, stillId, headline, body, cta }: FilmBandProp
             </h2>
             <p className="mt-5 text-body text-plaster">{body}</p>
             <div className="mt-8">
-              <Button href={cta.href} variant="tertiary" onDark arrow>
+              <Button href={cta.href} variant="tertiary" arrow>
                 {cta.label}
               </Button>
             </div>
           </Reveal>
         </div>
       </div>
-      <div className="page-x absolute inset-x-0 bottom-4 flex items-center justify-end text-caption text-white">
+      <div className="on-film page-x absolute inset-x-0 bottom-4 flex items-center justify-end text-caption text-white">
         <FilmPause film={film} name="product film" />
       </div>
     </section>

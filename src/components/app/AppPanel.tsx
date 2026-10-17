@@ -62,7 +62,7 @@ function Header({ pad }: { pad: string }) {
  */
 function Fragment() {
   return (
-    <div className="rounded-hard border border-hairline bg-raised py-4 pl-4 pr-10 text-ink">
+    <div data-ui="" className="on-light rounded-hard border border-hairline bg-raised py-4 pl-4 pr-10 text-ink">
       <Header pad="pb-3" />
       <p className="mt-3 text-lead font-medium">{appPanel.property}</p>
       <ul className="mt-3 border-t border-hairline">
@@ -89,7 +89,7 @@ function Control({ state, onAdvance }: { state: AppState; onAdvance: () => void 
   }
 
   return (
-    <div role="group" aria-label="Illustrative mobile app, demo data" className="relative flex h-full flex-col rounded-hard border border-hairline bg-raised p-5 text-ink">
+    <div role="group" aria-label="Illustrative mobile app, demo data" data-ui="" className="on-light relative flex h-full flex-col rounded-hard border border-hairline bg-raised p-5 text-ink">
       <Header pad="pb-4" />
       <p className="mt-4 text-lead font-medium">{appPanel.property}</p>
       <p className="mt-1 text-caption text-muted">{appPanel.prompt}</p>

@@ -141,9 +141,9 @@ export function SystemStage() {
   return (
     <Band id="system" tone="raised" labelledBy="system-heading">
       <Container>
-        <SectionHead id="system-heading" headline={systemExplainer.headline} emphasis={systemExplainer.emphasis} aside={{ intro: systemExplainer.intro }} />
+        <SectionHead id="system-heading" eyebrow="six parts" headline={systemExplainer.headline} emphasis={systemExplainer.emphasis} intro={systemExplainer.intro} />
 
-        <div className="mt-[var(--gap-head)] lg:[--stage-side:calc((100%_-_16.5rem)/12*5_+_6rem)] xl:[--stage-side:calc((100%_-_16.5rem)/12*4_+_4.5rem)]">
+        <div className="mt-(--head-gap) lg:[--stage-side:calc((100%_-_16.5rem)/12*5_+_6rem)] xl:[--stage-side:calc((100%_-_16.5rem)/12*4_+_4.5rem)]">
           <div className="overflow-hidden rounded-hard lg:grid lg:min-h-[30rem] lg:grid-cols-[var(--stage-side)_minmax(0,1fr)]">
             <div className="on-dark flex flex-col bg-ink px-4 py-6 text-plaster lg:p-6">
               <div className="divide-y divide-plaster/15">
@@ -163,7 +163,7 @@ export function SystemStage() {
                     {`${two(active + 1)} / ${two(parts.length)}`}
                   </span>
                 </div>
-                <Button href={systemExplainer.link.href} variant="tertiary" onDark arrow>
+                <Button href={systemExplainer.link.href} variant="tertiary" arrow>
                   {systemExplainer.link.label}
                 </Button>
               </div>

@@ -34,7 +34,9 @@ function HeroFilm({ media }: { media: Extract<PageHeroMedia, { kind: "film" }> }
         <div role="img" aria-label={media.alt} className="relative isolate aspect-video w-full overflow-hidden rounded-hard bg-ink">
           <FilmLayer film={film} videoId={media.videoId} posterId={media.posterId} position={media.position} sizes={mediaSizes} priority />
         </div>
-        <FilmPause film={film} name={media.name} className="absolute bottom-3 right-3" />
+        <div className="on-dark on-film absolute bottom-4 right-4">
+          <FilmPause film={film} name={media.name} />
+        </div>
       </div>
     </figure>
   );

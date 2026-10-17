@@ -21,24 +21,26 @@ export function SiblingCards({ current }: SiblingCardsProps) {
   return (
     <Band id="more" tone="sunken" labelledBy="more-heading">
       <Container>
-        <SectionHead id="more-heading" headline={siblings.headline} aside={{ intro: siblings.intro, link: siblings.link }} />
-        <RevealList className="mt-[var(--gap-head)] grid gap-6 lg:grid-cols-2">
+        <SectionHead id="more-heading" eyebrow="the platform" headline={siblings.headline} intro={siblings.intro} link={siblings.link} />
+        <RevealList className="mt-(--head-gap) grid gap-6 lg:grid-cols-2">
           {cards.map((card) => (
             // The body is one short line (68 characters at most): it runs the card's width rather
             // than wrapping at the 45ch paragraph cap, which is set for running text.
             <RevealItem key={card.href} className="[&_p]:max-w-none">
               <MediaCard
+                id={`more-${card.href.slice(1)}`}
                 media={{
                   kind: "image",
                   id: card.image.id,
                   alt: card.image.alt,
                   position: card.image.position,
-                  aspect: "2/1",
+                  aspect: "16/9",
                   sizes: "(min-width: 1440px) 684px, (min-width: 1024px) 48vw, 100vw",
                 }}
                 title={card.title}
                 body={card.body}
-                wholeCard={{ href: card.href, arrow: true }}
+                href={card.href}
+                arrow
               />
             </RevealItem>
           ))}

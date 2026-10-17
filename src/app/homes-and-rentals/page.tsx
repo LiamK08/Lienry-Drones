@@ -40,28 +40,29 @@ export default function HomesPage() {
       <StepCards
         id="how"
         tone="plaster"
+        eyebrow="four steps"
         headline={h.steps.headline}
         intro={h.steps.intro}
-        numbered
         columns={4}
-        aspect="4/5"
+        aspect="3/4"
         items={h.steps.items}
         track={h.steps.track}
-        reveal={false}
       />
       <LandlordStory />
       <StatBand
-        kind="cited"
         id="australia"
+        tone="ink"
+        eyebrow="why it matters"
         headline={h.statsHeadline}
+        notePosition="foot"
         intro={h.statsIntro}
         items={pickStats(australiaStats, ["abs-renting", "cer-rooftop"])}
         note={CITED_NOTE}
         action={h.statsAction}
       />
-      <Faq id="faq" tone="plaster" headline={platformFaq.headline} intro={platformFaq.intro} link={h.actions.primary} items={questions} />
+      <Faq id="faq" tone="plaster" eyebrow="questions" headline={platformFaq.headline} intro={platformFaq.intro} link={h.actions.primary} items={questions} />
       <SiblingCards current="homes" />
-      <CtaPanel id="register" headline={h.close.headline} body={h.close.body} primary={h.close.primary} links={h.close.links} image={h.close.image} />
+      <CtaPanel id="register" eyebrow="pre-launch" headline={h.close.headline} body={h.close.body} primary={h.close.primary} links={h.close.links} image={h.close.image} />
     </>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
-import type { Action, ImageRef, Tone } from "@/lib/types";
+import type { Action, BandTone, ImageRef, LegacyTone } from "@/lib/types";
 import { Band, Container } from "@/components/ui/Band";
 import { Button } from "@/components/ui/Button";
 import { FactList } from "@/components/ui/FactList";
@@ -24,7 +24,8 @@ export type SwitcherItem = {
 export type SwitcherProps = {
   /** The band's id; the heading is `${id}-heading` and each tab `${id}-tab-${item.id}`. */
   id: string;
-  tone: Tone;
+  tone: BandTone | LegacyTone;
+  eyebrow: string;
   headline: string;
   emphasis?: string;
   intro: string;
@@ -49,7 +50,7 @@ export type SwitcherProps = {
  *
  * Panel ids equal item ids, so `/platform#dock` also works as a plain anchor.
  */
-export function Switcher({ id, tone, headline, emphasis, intro, tabsLabel, items, hashSync = false, reveal = true }: SwitcherProps) {
+export function Switcher({ id, tone, eyebrow, headline, emphasis, intro, tabsLabel, items, hashSync = false, reveal = true }: SwitcherProps) {
   const [active, setActive] = useState(0);
   const tabs = useRef<(HTMLButtonElement | null)[]>([]);
   const ids = items.map((item) => item.id).join(" ");
@@ -108,9 +109,9 @@ export function Switcher({ id, tone, headline, emphasis, intro, tabsLabel, items
   return (
     <Band id={id} tone={tone} labelledBy={`${id}-heading`}>
       <Container>
-        <SectionHead id={`${id}-heading`} headline={headline} emphasis={emphasis} aside={{ intro }} tone={dark ? "dark" : "light"} reveal={reveal} />
+        <SectionHead id={`${id}-heading`} eyebrow={eyebrow} headline={headline} emphasis={emphasis} intro={intro} reveal={reveal} />
 
-        <div role="tablist" aria-label={tabsLabel} className={`mt-[var(--gap-head)] grid ${tabCols} lg:flex lg:gap-8 lg:border-b ${rule}`}>
+        <div role="tablist" aria-label={tabsLabel} className={`mt-(--head-gap) grid ${tabCols} lg:flex lg:gap-8 lg:border-b ${rule}`}>
           {items.map((item, i) => {
             const on = i === active;
             return (
@@ -183,10 +184,10 @@ export function Switcher({ id, tone, headline, emphasis, intro, tabsLabel, items
                     <h3 className="mt-2 text-h3">{item.title}</h3>
                     <p className={`mt-3 text-body ${dark ? "text-muted-on-dark" : "text-muted"}`}>{item.body}</p>
                     <div className="mt-6 lg:mt-auto lg:pt-6">
-                      <FactList items={item.facts} tone={dark ? "dark" : "light"} />
+                      <FactList items={item.facts} />
                       {item.link ? (
                         <div className="mt-4 flex">
-                          <Button href={item.link.href} variant="tertiary" onDark={dark} arrow>
+                          <Button href={item.link.href} variant="tertiary" arrow>
                             {item.link.label}
                           </Button>
                         </div>

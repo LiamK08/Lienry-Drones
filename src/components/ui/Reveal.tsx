@@ -38,6 +38,9 @@ export function Reveal({ children, delay = 0, className = "", as = "div", y = 12
   );
 }
 
+/** The list variants: nothing on the list itself, the stagger for its items (RevealList, SnapTrack). */
+export const revealListVariants = (stagger: number) => ({ hidden: {}, visible: { transition: { staggerChildren: stagger } } });
+
 export function RevealList({ children, className = "", stagger = 0.06, ...rest }: { children: ReactNode; className?: string; stagger?: number } & DataAttributes) {
   const reduce = useReducedMotion();
   return (
@@ -47,7 +50,7 @@ export function RevealList({ children, className = "", stagger = 0.06, ...rest }
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, margin: "0px 0px -10% 0px" }}
-      variants={{ hidden: {}, visible: { transition: { staggerChildren: reduce ? 0 : stagger } } }}
+      variants={revealListVariants(reduce ? 0 : stagger)}
     >
       {children}
     </motion.ul>

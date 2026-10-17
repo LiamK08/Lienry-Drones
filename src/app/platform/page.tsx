@@ -56,6 +56,7 @@ export default function PlatformPage() {
         id="parts"
         reveal={false}
         tone="plaster"
+        eyebrow="six parts"
         headline={partsSection.headline}
         emphasis={partsSection.emphasis}
         intro={systemExplainer.intro}
@@ -67,8 +68,9 @@ export default function PlatformPage() {
         id="commercial-system"
         tone="raised"
         side="left"
-        title={rows.commercial.title}
-        body={rows.commercial.body}
+        eyebrow="roof capsule"
+        headline={rows.commercial.title}
+        intro={rows.commercial.body}
         link={rows.commercial.link}
         facts={commercialSystem.points.map((text) => ({ text }))}
         image={rows.commercial.image}
@@ -77,16 +79,17 @@ export default function PlatformPage() {
         id="home-system"
         tone="sunken"
         side="right"
-        title={rows.home.title}
-        body={rows.home.body}
+        eyebrow="ground pod"
+        headline={rows.home.title}
+        intro={rows.home.body}
         link={rows.home.link}
         facts={homeSystem.points.map((text) => ({ text }))}
         image={rows.home.image}
       />
-      <SpecBand id="specs" headline={specs.headline} intro={specs.intro} rows={specs.rows} />
-      <Faq id="faq" tone="plaster" headline={platformFaq.headline} intro={platformFaq.intro} link={platformFaq.link} items={questions} />
-      <CtaWithProduct id="demo" tone="raised" headline={close.headline} body={close.body} primary={close.primary} secondary={close.secondary}>
-        <SoftwareWindow tone="raised" />
+      <SpecBand id="specs" eyebrow="specification" headline={specs.headline} intro={specs.intro} rows={specs.rows} />
+      <Faq id="faq" tone="plaster" eyebrow="questions" headline={platformFaq.headline} intro={platformFaq.intro} link={platformFaq.link} items={questions} />
+      <CtaWithProduct id="demo" tone="raised" eyebrow="pre-launch" headline={close.headline} body={close.body} primary={close.primary} secondary={close.secondary}>
+        <SoftwareWindow />
       </CtaWithProduct>
     </>
   );

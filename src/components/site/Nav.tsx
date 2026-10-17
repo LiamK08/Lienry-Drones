@@ -114,7 +114,7 @@ export function Nav() {
             <Link href={navUtility.href} aria-current={pathname === navUtility.href ? "page" : undefined} className={linkCls(pathname === navUtility.href)}>
               {navUtility.label}
             </Link>
-            <Button href="/register-interest" size="sm" onDark={dark} arrow>
+            <Button href="/register-interest" size="sm" frozen onDark={dark} arrow>
               Register interest
             </Button>
           </div>
@@ -163,10 +163,10 @@ export function Nav() {
               })}
             </ul>
             <div className="mt-auto flex flex-col gap-4 pb-8 pt-10">
-              <Button href="/register-interest" size="lg" arrow onClick={() => setOpen(false)}>
+              <Button href="/register-interest" size="lg" frozen arrow onClick={() => setOpen(false)}>
                 Register interest
               </Button>
-              <Button href="/register-interest?type=investor" variant="secondary" size="lg" onClick={() => setOpen(false)}>
+              <Button href="/register-interest?type=investor" variant="secondary" size="lg" frozen onClick={() => setOpen(false)}>
                 Investor enquiries
               </Button>
               <p className="label mt-2 text-muted">Concept stage. Sydney, Australia.</p>

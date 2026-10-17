@@ -26,27 +26,26 @@ export default function DownloadPage() {
   return (
     <>
       {/* 1. Hero: first screen, so nothing in it waits for a reveal. */}
-      <Band id="hero" as="header" tone="raised" pad="page" labelledBy="download-heading">
+      <Band id="hero" as="header" tone="raised" pad="hero" labelledBy="download-heading">
         <Container>
           <SectionHead
             id="download-heading"
             as="h1"
             size="h1"
+            eyebrow="lienry desktop"
             headline={d.headline}
             emphasis={d.emphasis}
             breakBefore
             reveal={false}
-            aside={{
-              action: (
-                <>
-                  <p className="text-lead text-muted">{d.lead}</p>
-                  <DownloadActions className="mt-6" />
-                </>
-              ),
-            }}
+            action={
+              <>
+                <p className="text-lead text-fg-muted">{d.lead}</p>
+                <DownloadActions className="mt-6" />
+              </>
+            }
           />
-          <div className="mt-[var(--gap-head)]">
-            <SoftwareWindow tone="raised" />
+          <div className="mt-(--head-gap)">
+            <SoftwareWindow />
           </div>
         </Container>
       </Band>
@@ -54,18 +53,18 @@ export default function DownloadPage() {
       {/* 2. What the software does. */}
       <Band id="features" tone="plaster" labelledBy="features-heading">
         <Container>
-          <SectionHead id="features-heading" headline={d.features.headline} aside={{ intro: d.features.intro }} />
-          <Reveal className="mt-[var(--gap-head)]">
+          <SectionHead id="features-heading" eyebrow="what it does" headline={d.features.headline} intro={d.features.intro} />
+          <Reveal className="mt-(--head-gap)">
             <FactList items={d.features.items} columns={3} termStyle="strong" />
           </Reveal>
         </Container>
       </Band>
 
       {/* 3. System requirements, with what signing in needs. */}
-      <SpecBand id="requirements" headline={d.requirements.headline} intro={d.requirements.intro} rows={d.requirements.rows} />
+      <SpecBand id="requirements" eyebrow="requirements" headline={d.requirements.headline} intro={d.requirements.intro} rows={d.requirements.rows} />
 
       {/* 4. Questions. */}
-      <Faq id="faq" tone="raised" headline={d.faq.headline} intro={d.faq.intro} link={d.faq.link} items={d.faq.items} />
+      <Faq id="faq" tone="raised" eyebrow="questions" headline={d.faq.headline} intro={d.faq.intro} link={d.faq.link} items={d.faq.items} />
     </>
   );
 }

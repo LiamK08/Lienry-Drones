@@ -12,7 +12,7 @@ import { Band, Container } from "@/components/ui/Band";
  */
 export function FactRow() {
   return (
-    <Band id="by-design" tone="plaster" pad="attached" ariaLabel={designFacts.label}>
+    <Band id="by-design" tone="plaster" ariaLabel={designFacts.label}>
       <Container>
         <div className="grid gap-6 lg:grid-cols-12 lg:gap-x-6">
           <div data-col className="lg:col-span-4">

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { commercialPage, designFacts } from "@/content/commercial";
+import { commercialPage } from "@/content/commercial";
 import { faqSets, platformFaq } from "@/content/faq";
 import { softwareSection } from "@/content/software";
 import { pageMetadata } from "@/lib/site";
@@ -8,7 +8,6 @@ import { Faq } from "@/components/sections/Faq";
 import { FeatureRow } from "@/components/sections/FeatureRow";
 import { PageHeroSplit } from "@/components/sections/PageHeroSplit";
 import { SiblingCards } from "@/components/sections/SiblingCards";
-import { StatBand } from "@/components/sections/StatBand";
 import { Switcher } from "@/components/sections/Switcher";
 import { SoftwareBand } from "@/components/software/SoftwareBand";
 
@@ -22,8 +21,8 @@ const questions = faqSets.commercial.map((id) => platformFaq.items.find((item) =
 
 /**
  * /commercial (docs/REDESIGN-SPEC.md C3): the split hero with the commercial film, the four steps,
- * the working software with its strip, the design figures, the running cost, questions, the other
- * product pages and the pilot panel.
+ * the working software, the running cost, questions, the other product pages and the pilot panel.
+ * (The design-figures band went with StatBand's design kind in the design-pass foundation.)
  */
 export default function CommercialPage() {
   const c = commercialPage;
@@ -42,40 +41,27 @@ export default function CommercialPage() {
         id="how"
         reveal={false}
         tone="plaster"
+        eyebrow="four steps"
         headline={c.steps.headline}
         emphasis={c.steps.emphasis}
         intro={c.steps.intro}
         tabsLabel={c.steps.tabsLabel}
         items={c.steps.items}
       />
-      <SoftwareBand
-        id="software"
-        tone="sunken"
-        headline={c.software.headline}
-        body={softwareSection.body}
-        strip={c.software.tiles.map((tile) => ({ term: tile.title, text: tile.body }))}
-      />
-      <StatBand
-        kind="design"
-        id="by-design"
-        headline={c.byDesign.headline}
-        intro={c.byDesign.intro}
-        items={designFacts.items}
-        note={designFacts.note}
-        action={c.pilot.cta}
-      />
+      <SoftwareBand id="software" tone="sunken" eyebrow="desktop software" headline={c.software.headline} intro={softwareSection.body} />
       <FeatureRow
         id="cost"
         tone="raised"
         side="right"
-        title={c.cost.headline}
-        body={c.cost.body}
+        eyebrow="running cost"
+        headline={c.cost.headline}
+        intro={c.cost.body}
         facts={c.cost.points.map((text) => ({ text }))}
         image={c.cost.image}
       />
-      <Faq id="faq" tone="plaster" headline={platformFaq.headline} intro={platformFaq.intro} link={c.pilot.cta} items={questions} />
+      <Faq id="faq" tone="plaster" eyebrow="questions" headline={platformFaq.headline} intro={platformFaq.intro} link={c.pilot.cta} items={questions} />
       <SiblingCards current="commercial" />
-      <CtaPanel id="pilot" headline={c.pilot.headline} body={c.pilot.body} primary={c.pilot.cta} links={c.pilot.links} image={c.pilot.image} />
+      <CtaPanel id="pilot" eyebrow="pilot program" headline={c.pilot.headline} body={c.pilot.body} primary={c.pilot.cta} links={c.pilot.links} image={c.pilot.image} />
     </>
   );
 }

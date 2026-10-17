@@ -14,7 +14,7 @@ import { Picture } from "@/components/ui/Picture";
 export function FounderBand() {
   const { headline, paragraphs, signature, image } = visionLetter;
   return (
-    <Band id="founder" tone="sunken" pad="plate" labelledBy="founder-heading">
+    <Band id="founder" tone="sunken" labelledBy="founder-heading">
       <Container>
         <div className="flex flex-col gap-6 lg:grid lg:grid-cols-12 lg:gap-x-6">
           {/* Below 1024 this column dissolves so its heading and image can sit either side of the letter. */}

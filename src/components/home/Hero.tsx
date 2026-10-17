@@ -34,7 +34,7 @@ export function Hero() {
       aria-labelledby="hero-heading"
       data-band="hero"
       data-tone="film"
-      className="on-dark relative isolate flex min-h-[100svh] flex-col justify-end text-white"
+      className="on-dark on-film relative isolate flex min-h-[100svh] flex-col justify-end text-white"
     >
       <FilmLayer film={film} videoId={hero.videoId} posterId={hero.posterId} priority fadeIn overlays={scrims} />
       <div className="page-x mx-auto flex w-full max-w-grid flex-col items-center pb-24 pt-[calc(var(--nav-h)+8rem)] text-center md:pb-28">
@@ -43,7 +43,7 @@ export function Hero() {
         </h1>
         <div className="mt-7 flex flex-col items-center gap-6 md:flex-row md:gap-8">
           <p className="max-w-[32ch] text-balance text-body text-white md:max-w-[48ch]">{hero.support}</p>
-          <Button href={hero.primary.href} onDark arrow>
+          <Button href={hero.primary.href} arrow>
             {hero.primary.label}
           </Button>
         </div>

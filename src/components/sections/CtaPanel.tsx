@@ -6,43 +6,45 @@ import { Picture } from "@/components/ui/Picture";
 export type CtaPanelProps = {
   /** The band's id; the heading is `${id}-heading`. */
   id: string;
-  /** White, never italic. */
+  eyebrow: string;
+  /** Never italic. */
   headline: string;
   body: string;
-  /** The inverse (plaster) primary. */
+  /** The band's one primary (a plaster fill on the ink panel). */
   primary: Action;
-  /** White tertiary links after the primary: the page's other enquiry routes. */
+  /** Tertiary links after the primary: the page's other enquiry routes. */
   links?: readonly Action[];
   image: ImageRef;
 };
 
 /**
- * The closing card: one glass-deep panel across the full grid on a plaster band. From 1024 the
+ * The closing card: one ink panel across the full grid on a plaster band. From 1024 the
  * text takes columns 1-6 (40px padding) with the heading and body at the top and the actions
  * pinned to the bottom, and the image fills columns 7-12, inset 16px from the panel's top, right
  * and bottom. The panel's height follows the text.
  * Below 1024 (24px padding): heading, body, the image at 16:9, the primary, then the links.
  */
-export function CtaPanel({ id, headline, body, primary, links = [], image }: CtaPanelProps) {
+export function CtaPanel({ id, eyebrow, headline, body, primary, links = [], image }: CtaPanelProps) {
   return (
     <Band id={id} tone="plaster" labelledBy={`${id}-heading`}>
       <Container>
-        <div className="on-dark on-accent flex flex-col gap-6 rounded-hard bg-glass-deep p-6 lg:grid lg:grid-cols-12 lg:gap-x-6 lg:gap-y-0 lg:p-0">
+        <div className="on-dark flex flex-col gap-6 rounded-hard bg-ink p-6 text-plaster lg:grid lg:grid-cols-12 lg:gap-x-6 lg:gap-y-0 lg:p-0">
           <div data-col className="contents lg:col-span-6 lg:flex lg:flex-col lg:p-10">
             <div className="order-1">
-              <h2 id={`${id}-heading`} className="text-h2 text-white">
+              <p className="eyebrow">{eyebrow}</p>
+              <h2 id={`${id}-heading`} className="text-h2 text-fg">
                 {headline}
               </h2>
-              <p className="mt-4 text-lead text-plaster">{body}</p>
+              <p className="mt-4 text-lead text-fg">{body}</p>
             </div>
             <div className="order-3 flex flex-col items-start gap-4 lg:mt-auto lg:pt-8">
-              <Button href={primary.href} variant="inverse" size="lg" arrow>
+              <Button href={primary.href} size="lg" arrow>
                 {primary.label}
               </Button>
               {links.length > 0 ? (
                 <div className="flex flex-col items-start lg:flex-row lg:gap-6">
                   {links.map((l) => (
-                    <Button key={l.href} href={l.href} variant="tertiary" onAccent arrow>
+                    <Button key={l.href} href={l.href} variant="tertiary" arrow>
                       {l.label}
                     </Button>
                   ))}

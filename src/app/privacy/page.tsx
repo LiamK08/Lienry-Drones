@@ -34,32 +34,31 @@ export default function PrivacyPage() {
   const p = privacyPage;
   const sections = p.sections.map((s) => ({ ...s, id: slug(s.title) }));
   return (
-    <Band id="privacy" tone="plaster" pad="page" labelledBy="privacy-heading">
+    <Band id="privacy" tone="plaster" pad="hero" labelledBy="privacy-heading">
       <Container>
         <SectionHead
           id="privacy-heading"
           as="h1"
           size="h1"
+          eyebrow="legal"
           headline={p.headline}
           reveal={false}
           below={<p className="text-caption text-muted">Last updated {p.updated}. Template for legal review before launch.</p>}
-          aside={{
-            action: (
-              <nav aria-label="On this page">
-                <ul className="grid sm:grid-flow-col sm:grid-cols-2 sm:grid-rows-3 sm:gap-x-6">
-                  {sections.map((s) => (
-                    <li key={s.id}>
-                      <a href={`#${s.id}`} className={indexLink}>
-                        {s.title}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
-            ),
-          }}
+          action={
+            <nav aria-label="On this page">
+              <ul className="grid sm:grid-flow-col sm:grid-cols-2 sm:grid-rows-3 sm:gap-x-6">
+                {sections.map((s) => (
+                  <li key={s.id}>
+                    <a href={`#${s.id}`} className={indexLink}>
+                      {s.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          }
         />
-        <div className="mt-[var(--gap-head)] grid gap-y-8 md:grid-cols-2 md:gap-x-6 xl:grid-cols-3">
+        <div className="mt-(--head-gap) grid gap-y-8 md:grid-cols-2 md:gap-x-6 xl:grid-cols-3">
           {sections.map((s) => (
             <section key={s.id}>
               {/* tabIndex -1: fragment navigation focuses the heading it scrolls to, so the index

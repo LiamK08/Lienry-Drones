@@ -38,11 +38,11 @@ export function ProductCards() {
   return (
     <Band id="products" tone="raised" labelledBy="products-heading">
       <Container>
-        <SectionHead id="products-heading" headline={productCards.headline} aside={{ intro: productCards.intro }} />
-        <RevealList className="mt-[var(--gap-head)] grid gap-8 lg:grid-cols-3 lg:gap-6">
-          {productCards.cards.map((card) => (
+        <SectionHead id="products-heading" eyebrow="two systems" headline={productCards.headline} intro={productCards.intro} />
+        <RevealList className="mt-(--head-gap) grid gap-8 lg:grid-cols-3 lg:gap-6">
+          {productCards.cards.map((card, i) => (
             <RevealItem key={card.title}>
-              <MediaCard media={media(card)} meta={card.meta} title={card.title} body={card.body} link={card.link} />
+              <MediaCard id={`product-${i + 1}`} media={media(card)} title={card.title} body={card.body} link={card.link} />
             </RevealItem>
           ))}
         </RevealList>

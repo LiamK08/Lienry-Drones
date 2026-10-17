@@ -44,9 +44,9 @@ export function LandlordStory() {
   return (
     <Band id="story" tone="raised" labelledBy="story-heading">
       <Container>
-        <SectionHead id="story-heading" headline={landlordStory.headline} emphasis={landlordStory.emphasis} aside={{ intro: landlordStory.intro }} />
+        <SectionHead id="story-heading" eyebrow="the app" headline={landlordStory.headline} emphasis={landlordStory.emphasis} intro={landlordStory.intro} />
 
-        <div className="mt-[var(--gap-head)] grid gap-y-8 lg:grid-cols-12 lg:gap-x-6 lg:gap-y-0">
+        <div className="mt-(--head-gap) grid gap-y-8 lg:grid-cols-12 lg:gap-x-6 lg:gap-y-0">
           <div data-col className="lg:col-span-5">
             <ol className="border-t border-hairline">
               {beats.map((b, i) => {
