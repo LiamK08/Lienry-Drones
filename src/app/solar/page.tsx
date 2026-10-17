@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { faqSets, platformFaq, solarPage } from "@/content/pages";
+import { faqSets, platformFaq } from "@/content/faq";
+import { solarPage } from "@/content/solar";
 import { solarStats } from "@/content/stats";
 import { pageMetadata } from "@/lib/site";
 import { CtaPanel } from "@/components/sections/CtaPanel";

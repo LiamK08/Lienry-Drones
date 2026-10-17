@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { faqSets, homesPage, platformFaq } from "@/content/pages";
+import { faqSets, platformFaq } from "@/content/faq";
+import { homesPage } from "@/content/homes";
 import { australiaStats } from "@/content/stats";
 import { pageMetadata } from "@/lib/site";
 import { LandlordStory } from "@/components/home/LandlordStory";

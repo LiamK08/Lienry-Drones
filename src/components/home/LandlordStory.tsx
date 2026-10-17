@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { landlordStory } from "@/content/home";
-import { homesPage } from "@/content/pages";
+import { homesPage, landlordStory } from "@/content/homes";
 import { AppPanel, type AppState } from "@/components/app/AppPanel";
 import { Band, Container } from "@/components/ui/Band";
 import { FactList } from "@/components/ui/FactList";

@@ -1,7 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { downloadPage } from "@/content/pages";
+import { downloadPage } from "@/content/download";
 import { desktopRelease, downloadUrl, type Platform } from "@/lib/download";
 import { Button } from "@/components/ui/Button";
 

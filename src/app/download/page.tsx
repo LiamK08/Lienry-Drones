@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { downloadPage } from "@/content/pages";
+import { downloadPage } from "@/content/download";
 import { desktopRelease } from "@/lib/download";
 import { pageMetadata } from "@/lib/site";
 import { DownloadActions } from "@/components/download/DownloadActions";

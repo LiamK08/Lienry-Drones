@@ -1,4 +1,4 @@
-import { siblings } from "@/content/pages";
+import { siblings } from "@/content/siblings";
 import { Band, Container } from "@/components/ui/Band";
 import { MediaCard } from "@/components/ui/MediaCard";
 import { RevealItem, RevealList } from "@/components/ui/Reveal";

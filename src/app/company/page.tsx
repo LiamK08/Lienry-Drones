@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { companyPage } from "@/content/pages";
+import { companyPage } from "@/content/company";
 import { pageMetadata } from "@/lib/site";
 import { FounderList } from "@/components/company/FounderList";
 import { CtaPanel } from "@/components/sections/CtaPanel";

@@ -3,7 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { useId, useState } from "react";
 import { enquirySchema, enquiryTypes, enquiryTypeLabels, propertyCounts, propertyTypes, type EnquiryType } from "@/lib/enquiry-schema";
-import { registerPage } from "@/content/pages";
+import { registerPage } from "@/content/register";
 import { Button } from "@/components/ui/Button";
 
 type Errors = Partial<Record<string, string>>;

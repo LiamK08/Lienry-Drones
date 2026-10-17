@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { appPanel } from "@/content/home";
+import { appPanel } from "@/content/homes";
 
 export type AppState = "map" | "select" | "start" | "progress" | "done";
 

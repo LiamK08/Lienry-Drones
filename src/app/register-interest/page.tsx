@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { registerPage } from "@/content/pages";
+import { registerPage } from "@/content/register";
 import { pageMetadata } from "@/lib/site";
 import { EnquiryForm } from "@/components/forms/EnquiryForm";
 import { Band, Container } from "@/components/ui/Band";

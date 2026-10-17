@@ -1,4 +1,4 @@
-import { designFacts } from "@/content/home";
+import { designFacts } from "@/content/commercial";
 import { Band, Container } from "@/components/ui/Band";
 
 /**

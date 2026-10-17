@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { designFacts } from "@/content/home";
-import { commercialPage, faqSets, platformFaq } from "@/content/pages";
+import { commercialPage, designFacts } from "@/content/commercial";
+import { faqSets, platformFaq } from "@/content/faq";
 import { softwareSection } from "@/content/software";
 import { pageMetadata } from "@/lib/site";
 import { CtaPanel } from "@/components/sections/CtaPanel";

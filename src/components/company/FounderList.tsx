@@ -1,4 +1,4 @@
-import type { FounderEntry } from "@/content/pages";
+import type { FounderEntry } from "@/content/company";
 
 /**
  * The founders on /company, as text: the name (h3), 4, the title, 8, the bio. Only `published`

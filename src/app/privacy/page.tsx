@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { privacyPage } from "@/content/pages";
+import { privacyPage } from "@/content/privacy";
 import { pageMetadata } from "@/lib/site";
 import { Band, Container } from "@/components/ui/Band";
 import { SectionHead } from "@/components/ui/SectionHead";

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { systemExplainer } from "@/content/home";
+import { systemExplainer } from "@/content/platform";
 import { getImage, largest, srcSet } from "@/lib/media";
 import { Band, Container } from "@/components/ui/Band";
 import { Button } from "@/components/ui/Button";

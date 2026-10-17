@@ -1,4 +1,5 @@
-// Home page copy. Conventions shared with pages.ts:
+// Home page copy, and only the home page's objects (the inner pages' copy is one module per route,
+// re-exported by pages.ts). Conventions shared with every content module:
 // - `emphasis` is always the trailing phrase of its `headline`; `Headline` sets it in the italic.
 // - Images are ImageRef-compatible `{ id, alt, position }`, where `id` is a still in scripts/media/manifest.json.
 // - Links are Action-compatible `{ label, href }`.
@@ -54,109 +55,6 @@ export const productCards = {
   ],
 };
 
-export const systemExplainer = {
-  headline: "Designed to stay. Built to clean.",
-  emphasis: "Built to clean.",
-  intro: "One resident platform for glass, solar panels, walls, roofing and driveways. Explore the six parts of the system.",
-  link: { label: "Explore the platform", href: "/platform" },
-  tabs: [
-    {
-      id: "dock",
-      tab: "Dock",
-      title: "A home on the property",
-      body: "On a commercial building the drone lives in a weatherproof capsule on the roof. On a house or a solar farm it lives in a waterproof ground pod. Either way it is powered, sheltered and ready.",
-      imageId: "s1-dock",
-      alt: "The roof capsule's lid closing over the drone on a wet roof",
-      position: "50% 55%",
-      readout: "Roof capsule or ground pod",
-    },
-    {
-      id: "tether",
-      tab: "Tether",
-      title: "Water and power, always connected",
-      body: "A thin tether feeds the drone water for the whole clean. On the roof it is fed from above; from the ground pod it runs from the same line that powers the pod. Nothing is carried, so nothing runs out.",
-      imageId: "s2-tether",
-      alt: "The drone's tether rising from its fitting past a wet glass facade",
-      position: "50% 60%",
-      readout: "Fed from the dock",
-    },
-    {
-      id: "drone",
-      tab: "Drone",
-      title: "Built to wash, not to fly far",
-      body: "The drone flies short, planned routes across glass, solar panels, walls, roofing and driveways, keeping its tether clear and its sensors on the surface in front of it.",
-      imageId: "m1-drone-master",
-      alt: "The Lienry drone washing a glass wall, its spray bar, pad and rollers on the pane",
-      position: "50% 50%",
-      readout: "Five surfaces",
-    },
-    {
-      id: "scan",
-      tab: "Scan",
-      title: "It maps the building first",
-      body: "Before the first clean the drone scans the property to map its structure and dimensions. On commercial buildings it re-scans every two days and decides whether a clean is needed. You can change the interval in settings.",
-      imageId: "s4-scan",
-      alt: "The drone holding off the corner of a glass building to scan it, with no spray",
-      position: "50% 40%",
-      readout: "Structure and dimensions, mapped first",
-    },
-    {
-      id: "software",
-      tab: "Software",
-      title: "Everything runs from your desk or your phone",
-      body: "The scan uploads to desktop software that runs everything: it sets water pressure and where to wash, shows a 3D model of the building, tracks live wash progress and shades areas of built-up debris. Home owners get a personalised mobile app as well.",
-      imageId: "s5-software",
-      alt: "A laptop on a desk showing the desktop software's shaded 3D building",
-      position: "50% 50%",
-      readout: "3D model, live progress, debris shading",
-    },
-    {
-      id: "automation",
-      tab: "Automation",
-      title: "Nobody has to be there",
-      body: "Once it is set up, the system runs itself. Start a clean from anywhere, or let the re-scan decide. No cleaners to book, no one on site.",
-      imageId: "s6-automation",
-      alt: "The roof capsule open at dawn, the drone rising from its cradle",
-      position: "50% 40%",
-      readout: "Start a clean from anywhere",
-    },
-  ],
-};
-
-export const twoSystems = {
-  headline: "The right system for your property.",
-  systems: [
-    {
-      id: "commercial",
-      name: "Commercial system",
-      subtitle: "For buildings under 70 metres",
-      imageId: "m2-capsule-master",
-      points: [
-        "Weatherproof roof capsule, tether fed from above",
-        "Scan uploads to desktop software that runs everything",
-        "Re-scans every two days and decides if a clean is needed",
-        "A cheaper long-term alternative to outsourced window cleaning",
-      ],
-      href: "/commercial",
-      cta: "Commercial system",
-    },
-    {
-      id: "home",
-      name: "Home system",
-      subtitle: "For houses, apartments, rentals and solar farms",
-      imageId: "m3-pod-master",
-      points: [
-        "Waterproof ground pod powers the drone and feeds it water",
-        "Identifies each material and adjusts its pressure",
-        "Personalised mobile app and desktop software",
-        "Start a clean remotely from anywhere",
-      ],
-      href: "/homes-and-rentals",
-      cta: "Home system",
-    },
-  ],
-};
-
 export const places = {
   headline: "Built around your property.",
   emphasis: "your property.",
@@ -179,43 +77,6 @@ export const filmBand = {
   body: "The capsule stays on the roof between cleans. When the scan says the glass needs it, the drone goes out, washes and comes home. Nobody books it. Nobody attends it.",
   cta: { label: "The commercial system", href: "/commercial" },
 };
-
-/** Design intent, not results or statistics: every figure here renders under "Design intent. Concept stage." */
-export const designFacts = {
-  label: "By design",
-  note: "Design intent. Concept stage.",
-  lead: "Three numbers the commercial system is designed around. They are design intent, not results: Lienry is at concept stage and nothing is in service yet.",
-  items: [
-    { term: "Re-scan interval", value: "2", unit: "days", text: "between re-scans on commercial buildings, and you can change it" },
-    { term: "People on site", value: "0", text: "during a clean" },
-    { term: "Building height", value: "<70", unit: "m", text: "the commercial system is designed for buildings under 70 metres" },
-  ],
-};
-
-export const landlordStory = {
-  headline: "Your property. Wherever you are.",
-  emphasis: "Wherever you are.",
-  intro: "You own a rental in Sydney and live overseas. The driveway and the solar panels need a clean before the next tenant moves in.",
-  beats: [
-    { title: "Open the app.", body: "Your property is already mapped. The app shows every surface the drone can reach.", imageId: "y1-story-before", app: "map" },
-    { title: "Select the driveway and the solar panels.", body: "Choose only what needs cleaning. The drone sets the pressure for each material.", imageId: "y1-story-before", app: "select" },
-    { title: "Tap start.", body: "The pod powers the drone, the tether feeds it water, and the clean begins.", imageId: "y2-story-panels", app: "start" },
-    { title: "The drone cleans while nobody is there.", body: "No cleaners to book, no outsourcing cost, no one on site.", imageId: "y3-story-driveway", app: "progress" },
-    { title: "Ready for the next tenant, sooner.", body: "You get the progress on your phone from wherever you are.", imageId: "y5-story-done", app: "done" },
-  ],
-};
-
-/** Strings for the illustrative app panel. Demo data: nothing here is a real property or a real clean. */
-export const appPanel = {
-  property: "Rental, Sydney",
-  prompt: "Choose the areas for this clean",
-  rows: ["Driveway", "Solar panels", "Windows"],
-  rowState: { select: "Selected", start: "Starting", progress: ["31%", "64%"], done: "Complete" },
-  buttons: { map: "Choose surfaces", select: "Start clean", start: "See progress", progress: "See the finished clean", done: "Start again" },
-  status: { map: "Choose the areas for this clean.", select: "Driveway and solar panels selected.", start: "Clean started.", progress: "Cleaning in progress: driveway 31%, solar panels 64%.", done: "Clean complete." },
-  note: "Illustrative app interface.",
-};
-
 
 export const visionLetter = {
   headline: "Why we are building Lienry.",

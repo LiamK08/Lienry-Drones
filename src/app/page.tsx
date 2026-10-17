@@ -12,7 +12,7 @@ import { Safety } from "@/components/home/Safety";
 import { Faq } from "@/components/sections/Faq";
 import { ClosingCta } from "@/components/home/ClosingCta";
 import { filmBand } from "@/content/home";
-import { faqSets, homeFaqLink, platformFaq } from "@/content/pages";
+import { faqSets, homeFaqLink, platformFaq } from "@/content/faq";
 import { softwareSection } from "@/content/software";
 import { brand, pageMetadata } from "@/lib/site";
 

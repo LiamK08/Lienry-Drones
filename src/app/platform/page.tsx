@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { systemExplainer, twoSystems } from "@/content/home";
-import { faqSets, platformFaq, platformPage } from "@/content/pages";
+import { faqSets, platformFaq } from "@/content/faq";
+import { platformPage, systemExplainer, twoSystems } from "@/content/platform";
 import { pageMetadata } from "@/lib/site";
 import { CtaWithProduct } from "@/components/platform/CtaWithProduct";
 import { SpecBand } from "@/components/platform/SpecBand";
