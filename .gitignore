@@ -28,3 +28,7 @@ media-src/
 # raw before/after capture sets (the compare sheets are committed)
 docs/screenshots/before/
 docs/screenshots/after/
+
+# media written by scripts/media/fetch.mjs (the build fetches and encodes it); only the index is tracked
+public/media/*
+!public/media/index.json
