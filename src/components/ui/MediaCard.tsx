@@ -59,8 +59,10 @@ function TitleArrow() {
  */
 export function MediaCard({ id, media, clip, index, eyebrow, title, body, facts, href, arrow = false, link, layout = "card" }: MediaCardProps) {
   const row = layout === "row-sm";
+  // row-sm: a grid below 768 (thumbnail, text), a card from 768. items-stretch from 768, or the media
+  // (w-full of a shrink-to-fit flex item) collapses to no width in the column.
   const cls = row
-    ? "group relative grid grid-cols-[7rem_minmax(0,1fr)] items-start gap-4 text-fg md:flex md:h-full md:flex-col md:gap-0"
+    ? "group relative grid grid-cols-[7rem_minmax(0,1fr)] items-start gap-4 text-fg md:flex md:h-full md:flex-col md:items-stretch md:gap-0"
     : "group relative flex h-full flex-col text-fg";
 
   return (

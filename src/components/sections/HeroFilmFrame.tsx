@@ -17,17 +17,15 @@ export type HeroFilmMedia = {
   variant?: string;
 };
 
-/** The PageHero frame's widths: the grid at 1440, the page less its margins below. */
-export const HERO_SIZES = "(min-width: 1440px) 1392px, (min-width: 768px) calc(100vw - 48px), calc(100vw - 32px)";
-
 /**
  * PageHero's film frame: a `role="img"` frame named by `alt` (4:3 below 768, 16:9 to 1023, 21:9 from
  * 1024) holding the poster and the looping film, with the pause control beside it (never inside the
  * img role), bottom right, on `on-dark on-film`. The film plays while 20% of it is visible, one video
  * at a time, and its sources are deferred until the page has loaded (the poster is the LCP image).
- * Reduced motion and Save-Data show the poster only.
+ * Reduced motion and Save-Data show the poster only. `sizes` is the frame's widths (PageHero's
+ * HERO_SIZES); the poster multiplies them by its cover factor.
  */
-export function HeroFilmFrame({ media }: { media: HeroFilmMedia }) {
+export function HeroFilmFrame({ media, sizes }: { media: HeroFilmMedia; sizes: string }) {
   const film = useFilm({ videoId: media.videoId, threshold: 0.2 });
   return (
     <div className="relative">
@@ -42,7 +40,7 @@ export function HeroFilmFrame({ media }: { media: HeroFilmMedia }) {
           variant={media.variant}
           frame={{ sm: 4 / 3, md: 16 / 9, lg: 21 / 9 }}
           priority
-          sizes={HERO_SIZES}
+          sizes={sizes}
         />
       </div>
       <div className="on-dark on-film absolute bottom-4 right-4">

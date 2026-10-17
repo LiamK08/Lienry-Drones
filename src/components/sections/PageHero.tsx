@@ -4,9 +4,13 @@ import { Band, Container } from "@/components/ui/Band";
 import { Button } from "@/components/ui/Button";
 import { Picture } from "@/components/ui/Picture";
 import { SectionHead } from "@/components/ui/SectionHead";
-import { HERO_SIZES, HeroFilmFrame, type HeroFilmMedia } from "@/components/sections/HeroFilmFrame";
+import { HeroFilmFrame, type HeroFilmMedia } from "@/components/sections/HeroFilmFrame";
 
-export { HERO_SIZES, HeroFilmFrame };
+export { HeroFilmFrame };
+
+/** The hero frame's widths: the grid at 1440, the page less its margins below. Defined here, in a
+ *  server module: a value imported from a "use client" module is only a reference on the server. */
+export const HERO_SIZES = "(min-width: 1440px) 1392px, (min-width: 768px) calc(100vw - 48px), calc(100vw - 32px)";
 
 export type PageHeroMedia = (
   | { kind: "image"; id: string; alt: string }
@@ -77,7 +81,7 @@ export function PageHero({ id = "hero-heading", eyebrow, headline, emphasis, lea
                 sizes={HERO_SIZES}
               />
             ) : (
-              <HeroFilmFrame media={media} />
+              <HeroFilmFrame media={media} sizes={HERO_SIZES} />
             )}
           </div>
         ) : null}
