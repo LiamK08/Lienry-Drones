@@ -16,7 +16,9 @@
 //
 // Scenarios, per route: scroll (wheel 100px every 16ms; on mobile, touch scroll gestures through CDP),
 // on a fresh load so the reveals fire as a visitor would see them; then, on a second fresh load, every
-// reveal brought into view one at a time; hovering each [data-hover-clip] for 1,200ms; each carousel's
+// reveal brought into view one at a time (with every image already loaded and the page off the top, so
+// a reveal is not charged for an image's first decode or the header's scroll switch); hovering each
+// [data-hover-clip] for 1,200ms; each carousel's
 // next control pressed n-1 times, 700ms apart; every tablist's tabs selected in turn (the band's height
 // must not change); and each FAQ item opened and closed.
 //
@@ -351,6 +353,18 @@ for (const route of opts.routes) {
       els.forEach((e, i) => e.setAttribute("data-p7-reveal", String(i)));
       return els.length;
     });
+    // A reveal is charged for its own work only. Chrome lays out once when a lazy image first decodes
+    // (an image box sized in % rather than fixed px), and the frozen header restyles once when the
+    // page leaves the top; neither belongs to the reveal that happens to scroll into view with them.
+    // So every image is loaded, and the page has left the top, before the reveals are measured.
+    await page.evaluate(async () => {
+      const imgs = [...document.images];
+      for (const img of imgs) if (img.loading === "lazy") img.loading = "eager";
+      const loaded = Promise.all(imgs.map((img) => (img.complete && img.naturalWidth ? null : img.decode().catch(() => null))));
+      await Promise.race([loaded, new Promise((r) => setTimeout(r, 15000))]);
+      window.scrollTo(0, 120);
+    });
+    await page.waitForTimeout(1000);
     let revealLayouts = 0;
     for (let i = 0; i < reveals; i++) {
       const r = await measure(page, cdp, `reveal ${i + 1}`, async () => {
