@@ -293,7 +293,9 @@ function pageLib() {
       const w = parseFloat(c.cs.outlineWidth) || 0;
       if (c.cs.outlineStyle === "solid" && Math.abs(w - 2) < 0.01) {
         const ringBox = c.where === "outline" ? el : c.where === "label outline" ? el.closest("label") || el.labels[0] : el.closest("[data-card]") || el.parentElement;
-        const behind = A.behind(ringBox);
+        // An inset ring (negative offset) is drawn inside the box, over the element's own background.
+        const inset = (parseFloat(c.cs.outlineOffset) || 0) + w <= 0;
+        const behind = inset ? { colour: A.backgroundOf(ringBox) } : A.behind(ringBox);
         return { ok: true, where: c.where, colour: c.cs.outlineColor, offset: c.cs.outlineOffset, bg: behind.colour ?? null, media: !!behind.media, over: behind.what ?? null };
       }
     }
@@ -500,7 +502,8 @@ function pageLib() {
       const tick = () => {
         const el = document.querySelector(sel);
         const busy = !!el && document.getAnimations().some((a) => a.playState === "running" && a.effect?.target && (el.contains(a.effect.target) || a.effect.target.contains(el)) && a.effect.getTiming?.().iterations !== Infinity);
-        const faded = !!el && opacityProduct(el) < 0.99;
+        // A reveal inside the region still fading counts too: axe would measure its text mid-fade.
+        const faded = !!el && (opacityProduct(el) < 0.99 || [...el.querySelectorAll("[data-reveal]")].some((r) => opacityProduct(r) < 0.99));
         if ((!busy && !faded) || performance.now() - t0 > timeout) requestAnimationFrame(() => resolve(!busy && !faded));
         else setTimeout(tick, 50);
       };
@@ -657,6 +660,11 @@ async function axe(page, scope = null) {
     async ([sel, tags]) => {
       const ctx = sel ? document.querySelector(sel) : document;
       if (!ctx) return { violations: [], incomplete: [] };
+      // Wait (up to 3s) until no reveal in scope is mid-fade: axe measures contrast as painted, so a
+      // heading caught halfway through its 640ms reveal would read as low contrast.
+      const op = (e) => { let o = 1; for (let x = e; x; x = x.parentElement) o *= parseFloat(getComputedStyle(x).opacity) || 0; return o; };
+      const fading = () => [...ctx.querySelectorAll("[data-reveal]")].some((e) => { const o = op(e); return o > 0.01 && o < 0.99; });
+      for (const t0 = performance.now(); fading() && performance.now() - t0 < 3000; ) await new Promise((res) => setTimeout(res, 50));
       const r = await window.axe.run(ctx, { runOnly: { type: "tag", values: tags }, resultTypes: ["violations", "incomplete"] });
       const pick = (list) => list.map((v) => ({ id: v.id, impact: v.impact, help: v.help, nodes: v.nodes.slice(0, 6).map((n) => ({ target: n.target.join(" "), html: n.html.slice(0, 120), summary: (n.failureSummary || "").split("\n").slice(0, 2).join(" ") })), count: v.nodes.length }));
       return { violations: pick(r.violations), incomplete: pick(r.incomplete.filter((v) => v.id === "color-contrast")) };

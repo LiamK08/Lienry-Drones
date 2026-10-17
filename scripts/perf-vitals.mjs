@@ -1,13 +1,17 @@
 // perf:vitals: the load checks of the October 2026 design pass (spec D4, checks 38 and 42).
 //
-// Usage: npm run perf:vitals -- <baseUrl> [route ...] [--runs 3] [--profile mobile|desktop] [--json out]
+// Usage: npm run perf:vitals -- <baseUrl> [route ...] [--runs 3] [--profile mobile|desktop]
+//                                 [--throttling devtools|simulate] [--json out]
 //   e.g. npm run build && npm run start, then npm run perf:vitals -- http://localhost:3000
 //
 // 38  The gate. Each route is measured --runs times (3 by default) with Lighthouse 13.5.0
-//     (npx -y lighthouse@13.5.0, performance only, simulated throttling; --form-factor=mobile, or the
-//     desktop preset with --profile desktop). The median largest-contentful-paint must be 2,500ms or
-//     less and the median cumulative-layout-shift 0.1 or less. Lighthouse's benchmarkIndex is printed,
-//     since simulated timings scale with the machine.
+//     (npx -y lighthouse@13.5.0, performance only, APPLIED throttling: --throttling-method=devtools, a
+//     real 4x CPU slowdown on a throttled network; --form-factor=mobile, or the desktop preset with
+//     --profile desktop). The median largest-contentful-paint must be 2,500ms or less and the median
+//     cumulative-layout-shift 0.1 or less. Simulated throttling is not the gate: on a localhost build
+//     every request finishes before the first paint, so its model counts every script and font as
+//     blocking and overstates LCP (pass --throttling simulate to see it). Lighthouse's benchmarkIndex
+//     is printed.
 //     Report only: one Playwright load per route with applied throttling (mobile: 412x823 at DPR 1.75,
 //     CPU 4x, 562.5ms latency, 1.6 Mbps x 0.9 down and 750 kbps x 0.9 up; desktop: 1440x900, no
 //     throttling), with PerformanceObservers for LCP (and its element), layout shifts and long tasks,
@@ -74,7 +78,7 @@ function fail(message, showUsage = false) {
 }
 
 function parseArgs(argv) {
-  const opts = { base: "http://localhost:3000", routes: [], runs: 3, profile: "mobile", json: null };
+  const opts = { base: "http://localhost:3000", routes: [], runs: 3, profile: "mobile", throttling: "devtools", json: null };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     const value = () => {
@@ -89,12 +93,14 @@ function parseArgs(argv) {
     } else if (a.startsWith("--runs")) opts.runs = Number(value());
     else if (a.startsWith("--profile")) opts.profile = value();
     else if (a.startsWith("--json")) opts.json = value();
+    else if (a.startsWith("--throttling")) opts.throttling = value();
     else if (a.startsWith("--")) fail(`Unknown option ${a}.`, true);
     else if (/^https?:\/\//.test(a)) opts.base = a.replace(/\/+$/, "");
     else if (a.startsWith("/")) opts.routes.push(a);
     else fail(`Unexpected argument ${a}: pass a base URL (http://...) and routes starting with /.`, true);
   }
   if (!Number.isInteger(opts.runs) || opts.runs < 1) fail(`--runs must be a whole number of 1 or more.`);
+  if (!["devtools", "simulate"].includes(opts.throttling)) fail(`--throttling must be devtools or simulate.`);
   if (!PROFILES[opts.profile]) fail(`--profile must be mobile or desktop.`);
   if (!opts.routes.length) opts.routes = ROUTES;
   return opts;
@@ -159,7 +165,7 @@ const tmp = mkdtempSync(path.join(os.tmpdir(), "perf-vitals-"));
 function lighthouse(url, n) {
   const out = path.join(tmp, `lh-${n}.json`);
   const [cmd, pre] = lighthouseCommand();
-  const flags = [url, "--quiet", "--only-categories=performance", "--throttling-method=simulate", '--chrome-flags=--headless=new --no-sandbox', "--output=json", `--output-path=${out}`];
+  const flags = [url, "--quiet", "--only-categories=performance", `--throttling-method=${opts.throttling}`, '--chrome-flags=--headless=new --no-sandbox', "--output=json", `--output-path=${out}`];
   if (opts.profile === "desktop") flags.push("--preset=desktop");
   else flags.push("--form-factor=mobile");
   execFileSync(cmd, [...pre, ...flags], { env: { ...process.env, CHROME_PATH: chromePath }, stdio: ["ignore", "ignore", "pipe"], timeout: 300000 });
@@ -244,7 +250,7 @@ async function appliedLoad(browser, route) {
 }
 
 console.log(`perf:vitals  ${opts.base}`);
-console.log(`Check 38 with ${lighthouseVersion ? `Lighthouse ${lighthouseVersion}` : "Lighthouse"} (${process.env.LIGHTHOUSE_BIN ? `LIGHTHOUSE_BIN=${process.env.LIGHTHOUSE_BIN}` : `npx -y ${LIGHTHOUSE}`}), ${opts.runs} run${opts.runs === 1 ? "" : "s"} per route, ${opts.profile} profile, simulated throttling; Chrome ${chromePath}`);
+console.log(`Check 38 with ${lighthouseVersion ? `Lighthouse ${lighthouseVersion}` : "Lighthouse"} (${process.env.LIGHTHOUSE_BIN ? `LIGHTHOUSE_BIN=${process.env.LIGHTHOUSE_BIN}` : `npx -y ${LIGHTHOUSE}`}), ${opts.runs} run${opts.runs === 1 ? "" : "s"} per route, ${opts.profile} profile, ${opts.throttling === "devtools" ? "applied" : "simulated"} throttling; Chrome ${chromePath}`);
 console.log(`Check 42 and the report from one Playwright load per route with applied throttling (${opts.profile === "mobile" ? "412x823 DPR 1.75, CPU 4x, 562.5ms, 1.47 Mbps down" : "1440x900, no throttling"})`);
 
 const browser = await chromium.launch({ args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"] });
