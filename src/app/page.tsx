@@ -1,50 +1,52 @@
 import type { Metadata } from "next";
 import { Hero } from "@/components/home/Hero";
-import { PropertyStrip } from "@/components/home/PropertyStrip";
-import { ProductCards } from "@/components/home/ProductCards";
-import { SoftwareBand } from "@/components/software/SoftwareBand";
-import { SystemStage } from "@/components/home/SystemStage";
+import { Benefits } from "@/components/home/Benefits";
+import { Flow } from "@/components/home/Flow";
 import { PlacesRow } from "@/components/home/PlacesRow";
-import { FilmBand } from "@/components/home/FilmBand";
-import { FactRow } from "@/components/home/FactRow";
-import { FounderBand } from "@/components/home/FounderBand";
-import { Safety } from "@/components/home/Safety";
+import { VisionLetter } from "@/components/home/VisionLetter";
+import { ClosingSection } from "@/components/sections/ClosingSection";
+import { CostCalculator } from "@/components/sections/CostCalculator";
 import { Faq } from "@/components/sections/Faq";
-import { ClosingCta } from "@/components/home/ClosingCta";
-import { filmBand } from "@/content/home";
-import { faqSets, homeFaqLink, platformFaq } from "@/content/faq";
-import { softwareSection } from "@/content/software";
+import { Band, Container } from "@/components/ui/Band";
+import { SectionHead } from "@/components/ui/SectionHead";
+import { closing, cost, faqHead } from "@/content/home";
+import { faqFor, faqIntro, homeFaqLink } from "@/content/faq";
 import { brand, pageMetadata } from "@/lib/site";
 
 export const metadata: Metadata = pageMetadata("/", brand.description);
 
-type Question = (typeof platformFaq.items)[number];
-
-// The home set of the platform questions, in the order faqSets.home gives them.
-const questions = faqSets.home
-  .map((id) => platformFaq.items.find((item) => item.id === id))
-  .filter((item): item is Question => item !== undefined);
-
 /**
- * Home, in the order a buyer needs it: the film, what it is built for, what you buy, the working
- * software, the six parts, where it works, the film that introduces the design facts, the founder,
- * safety, the first questions and the ask (docs/REDESIGN-SPEC.md C1).
+ * Home in eight sections, alternating dark and light: the film, why it is built the way it is, the
+ * five steps of a clean in the desktop software, what outsourced cleaning adds up to, where it works,
+ * the founder's letter, the first questions and the ask. Then the ink footer.
  */
 export default function HomePage() {
   return (
     <>
       <Hero />
-      <PropertyStrip />
-      <ProductCards />
-      <SoftwareBand id="software" tone="sunken" eyebrow="desktop software" headline={softwareSection.headline} intro={softwareSection.body} />
-      <SystemStage />
+      <Benefits />
+      <Flow />
+      <Band id="cost" tone="plaster" labelledBy="cost-heading">
+        <Container>
+          <SectionHead id="cost-heading" eyebrow={cost.eyebrow} headline={cost.headline} intro={cost.intro} />
+          <div className="mt-(--head-gap)">
+            <CostCalculator headingId="cost-heading" noteId="cost-note" />
+          </div>
+        </Container>
+      </Band>
       <PlacesRow />
-      <FilmBand {...filmBand} />
-      <FactRow />
-      <FounderBand />
-      <Safety />
-      <Faq id="faq" tone="raised" eyebrow="questions" headline={platformFaq.headline} intro={platformFaq.intro} link={homeFaqLink} items={questions} />
-      <ClosingCta />
+      <VisionLetter />
+      <Faq id="faq" tone="ink" eyebrow={faqHead.eyebrow} headline={faqHead.headline} intro={faqIntro} link={homeFaqLink} items={faqFor("home")} />
+      <ClosingSection
+        id="closing"
+        eyebrow={closing.eyebrow}
+        headline={closing.headline}
+        emphasis={closing.emphasis}
+        body={closing.body}
+        primary={closing.primary}
+        links={closing.links}
+        media={{ kind: "collage", items: closing.collage }}
+      />
     </>
   );
 }

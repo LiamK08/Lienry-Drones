@@ -31,6 +31,7 @@ const PRESET_LAYERS: Record<StepId, Layers> = {
   plan: { scan: false, wash: false, debris: false, zones: true },
   clean: { ...DEFAULT_LAYERS },
   rescan: { scan: false, wash: false, debris: true, zones: false },
+  report: { scan: false, wash: true, debris: true, zones: false },
 };
 
 type Hover = { info: NonNullable<HoverInfo>; x: number; y: number };
@@ -129,6 +130,12 @@ export function SoftwareWindow({ preset, priority = false }: SoftwareWindowProps
       setLayers({ ...PRESET_LAYERS[preset] });
       setSelected(null);
       if (preset === "clean") setPlaying(true);
+      // The report shows the clean finished: the wash held at 100% with every panel done.
+      if (preset === "report") {
+        setPlaying(false);
+        setWash(100);
+        setCompleted(PANELS_IN_PLAN);
+      }
     }
   }
 
@@ -150,6 +157,7 @@ export function SoftwareWindow({ preset, priority = false }: SoftwareWindowProps
     control.selected = null;
     if (!first) control.flyTo = "overview";
     if (preset === "map") control.scanStartedAt = now();
+    if (preset === "report") control.wash = 1;
     control.requestFrame();
   }, [live, preset]);
 

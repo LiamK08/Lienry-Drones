@@ -3,37 +3,35 @@ import { Band, Container } from "@/components/ui/Band";
 import { MediaCard } from "@/components/ui/MediaCard";
 import { RevealItem } from "@/components/ui/Reveal";
 import { SectionHead } from "@/components/ui/SectionHead";
-import { SnapTrack } from "@/components/ui/SnapTrack";
+import { SnapTrack, SnapTrackControls } from "@/components/ui/SnapTrack";
 
-// 330px at 1440 (four across the grid), a quarter of the grid from 1024, 46% to 1023, 82% below.
-const sizes = "(min-width: 1440px) 330px, (min-width: 1024px) 23vw, (min-width: 768px) 46vw, 82vw";
+// Three tall portraits in view from 1024 (448px at 1440), 46% of the page from 768, 82% below.
+const sizes = "(min-width: 1440px) 448px, (min-width: 1024px) 31vw, (min-width: 768px) 46vw, 82vw";
 
 /**
- * Five kinds of property on a track at every width: four show at once from 1024, the fifth is one
- * step along. Each card is one link to the page of the system that serves it.
+ * Where it works, on ink: five full 2:3 portraits on a track at every width, three in view from 1024
+ * with the rest a step along, the previous and next buttons in the head's aside. Each card is one
+ * link to the page of the system that serves it.
  */
 export function PlacesRow() {
   return (
-    <Band id="places" tone="plaster" labelledBy="places-heading">
+    <Band id="places" tone="ink" labelledBy="places-heading">
       <Container>
-        <SectionHead id="places-heading" eyebrow="where it works" headline={places.headline} emphasis={places.emphasis} intro={places.intro} />
-        {/* The track's own control row (44px, then 16) sits above the cards. From 1024 it takes half
-            the heading gap, so the band stays within 900px with the cards still 84px below the head. */}
-        <div className="mt-(--head-gap) lg:mt-6">
-          <SnapTrack
-            from="none"
-            visible={4}
-            columns={4}
-            label={places.track.label}
-            prevLabel={places.track.prevLabel}
-            nextLabel={places.track.nextLabel}
-          >
+        <SectionHead
+          id="places-heading"
+          eyebrow={places.eyebrow}
+          headline={places.headline}
+          emphasis={places.emphasis}
+          intro={places.intro}
+          action={<SnapTrackControls trackId="places-track" prevLabel={places.track.prevLabel} nextLabel={places.track.nextLabel} />}
+        />
+        <div className="mt-(--head-gap)">
+          <SnapTrack id="places-track" from="none" visible={3} columns={3} controls="external" label={places.track.label} prevLabel={places.track.prevLabel} nextLabel={places.track.nextLabel}>
             {places.cards.map((card) => (
               <RevealItem key={card.id}>
                 <MediaCard
                   id={`place-${card.id}`}
-                  media={{ kind: "image", id: card.id, alt: `${card.title}: ${card.body}`, aspect: "4/5", position: card.position, sizes }}
-                  eyebrow={card.system.toLowerCase()}
+                  media={{ kind: "image", id: card.id, alt: `${card.title}: ${card.body}`, aspect: "2/3", sizes }}
                   title={card.title}
                   body={card.body}
                   href={card.href}

@@ -12,7 +12,8 @@ export const softwareSection = {
  * window; none of them shares a name with a layer toggle (Scan, Wash, Debris, Zones). `short` is the line
  * in the static list shown when the window is a recording (phones, reduced motion, no WebGL).
  */
-export type StepId = "map" | "plan" | "clean" | "rescan";
+/** "report" is the home flow's last step: the clean finished, paused at 100% with debris shaded. */
+export type StepId = "map" | "plan" | "clean" | "rescan" | "report";
 
 export const softwareSteps: { id: StepId; tab: string; caption: string; hint?: string; short: string }[] = [
   {
