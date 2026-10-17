@@ -1,5 +1,5 @@
 // Capture every route at 1440 and 390 (full page plus the first viewport) into a folder.
-// Usage: node scripts/shots-set.mjs <outDir> [baseUrl]
+// Usage: node scripts/shots-set.mjs <outDir> [baseUrl]   (baseUrl defaults to http://localhost:3000)
 import { mkdirSync } from "node:fs";
 import path from "node:path";
 import { createRequire } from "node:module";
@@ -7,7 +7,7 @@ const require = createRequire(import.meta.url);
 let chromium;
 try { ({ chromium } = require("playwright")); } catch { ({ chromium } = require("/opt/node22/lib/node_modules/playwright")); }
 const out = path.resolve(process.argv[2] ?? "docs/screenshots/set");
-const base = process.argv[3] ?? "http://localhost:3011";
+const base = process.argv[3] ?? "http://localhost:3000";
 mkdirSync(out, { recursive: true });
 const routes = [["home", "/"], ["platform", "/platform"], ["commercial", "/commercial"], ["homes-and-rentals", "/homes-and-rentals"], ["solar", "/solar"], ["company", "/company"], ["download", "/download"], ["register-interest", "/register-interest?type=commercial"], ["privacy", "/privacy"]];
 const jpg = (name, extra = {}) => ({ path: path.join(out, `${name}.jpg`), type: "jpeg", quality: 82, ...extra });

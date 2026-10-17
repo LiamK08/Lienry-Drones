@@ -1,0 +1,98 @@
+{
+  "note": "Check 28's copy baseline: the words in <main> per route before the October 2026 design pass. The gate is words at load <= 0.667 x this count. Recorded with node scripts/check-rules.mjs <url> --write-baseline scripts/copy-baseline.json.",
+  "counter": "main.innerText without the outermost [data-ui], [data-prose], form, .sr-only, [aria-hidden=true], [data-software-preview], [role=group][aria-label$='demo window'] and [role=group][aria-label$='demo data'], split on whitespace. 'all' walks textContent instead (closed answers and inactive tabs included) and is reported only.",
+  "recorded": "2026-10-17",
+  "commit": "1f03a14",
+  "routes": {
+    "/": {
+      "390": {
+        "load": 844,
+        "all": 1197
+      },
+      "1440": {
+        "load": 811,
+        "all": 1164
+      }
+    },
+    "/platform": {
+      "390": {
+        "load": 456,
+        "all": 682
+      },
+      "1440": {
+        "load": 456,
+        "all": 682
+      }
+    },
+    "/commercial": {
+      "390": {
+        "load": 480,
+        "all": 675
+      },
+      "1440": {
+        "load": 480,
+        "all": 675
+      }
+    },
+    "/homes-and-rentals": {
+      "390": {
+        "load": 454,
+        "all": 651
+      },
+      "1440": {
+        "load": 454,
+        "all": 651
+      }
+    },
+    "/solar": {
+      "390": {
+        "load": 355,
+        "all": 520
+      },
+      "1440": {
+        "load": 355,
+        "all": 520
+      }
+    },
+    "/company": {
+      "390": {
+        "load": 324,
+        "all": 324
+      },
+      "1440": {
+        "load": 324,
+        "all": 324
+      }
+    },
+    "/download": {
+      "390": {
+        "load": 205,
+        "all": 289
+      },
+      "1440": {
+        "load": 205,
+        "all": 289
+      }
+    },
+    "/register-interest": {
+      "390": {
+        "load": 71,
+        "all": 71
+      },
+      "1440": {
+        "load": 71,
+        "all": 71
+      }
+    },
+    "/privacy": {
+      "390": {
+        "load": 255,
+        "all": 255
+      },
+      "1440": {
+        "load": 255,
+        "all": 255
+      }
+    }
+  }
+}
