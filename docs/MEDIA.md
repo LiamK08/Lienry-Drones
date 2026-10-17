@@ -6,6 +6,17 @@ The whole set was regenerated on 18 September 2026 from an approved design sheet
 
 Credit balance at the start of this round: 138. Spent: 37 on the design sheet (eleven attempts across three models to get a true six-rotor drone), 52 on the 27 stills, 17 on nine regenerations, 24 on the two films. 8 credits remain.
 
+## House grade (17 October 2026)
+
+Every still and film now passes through one house grade in the pipeline (`scripts/media/grade.mjs`), so the set reads as one shoot: a warm, overcast morning. The sources differed a lot. Some were cold blue-grey (scan, tether, apartments), one was warm interior light (software), and several had washed-out blacks. A single filter would have left those differences in place, so the grade measures each source and corrects it toward common targets:
+
+- **White balance:** 60% of the way toward a neutral grey, then a small warm offset (red ×1.025, blue ×0.965).
+- **Black and white points:** the 1.5th and 99.5th luminance percentiles move 70% of the way to 14 and 244. This evens out contrast across the set.
+- **Shadows:** a warm lift of 5, 3 and 0 in RGB at black, fading out by white.
+- **Saturation:** nudged toward a common chroma, within 0.85 to 1.12.
+
+Stills are graded with sharp and films with ffmpeg (`lutrgb` and `eq`). A film's grade is measured on its own first frame, so its poster and every frame match. Each index entry records the grade it was made with, so changing the grade re-processes everything on the next build. Set `"grade": false` on a manifest asset to leave it ungraded, or override any value with `"grade": { … }`. The source files are untouched.
+
 ## Approval status
 
 | Gate | Status |
