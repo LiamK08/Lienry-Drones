@@ -45,7 +45,7 @@ export default function DownloadPage() {
             }
           />
           <div className="mt-(--head-gap)">
-            <SoftwareWindow />
+            <SoftwareWindow priority />
           </div>
         </Container>
       </Band>

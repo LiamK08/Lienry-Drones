@@ -45,6 +45,9 @@ type Paint = "off" | "starting" | "painted" | "settled";
 export type SoftwareWindowProps = {
   /** Applies a step's layers and camera in live mode. Unset: the window's default (the clean). */
   preset?: StepId;
+  /** The window is in the first screen (/download): its stand-in frame is the page's LCP image, so it
+   *  loads eagerly at high priority instead of lazily. */
+  priority?: boolean;
 };
 
 /** Whether the window runs the live WebGL model: a capable device from 768px, and motion allowed. */
@@ -97,7 +100,7 @@ function Stat({ label, value }: { label: string; value: string }) {
  * row underneath takes the band's colours. The recording has no poster attribute: a lazy `<img>`
  * under the video stands in until its first frame.
  */
-export function SoftwareWindow({ preset }: SoftwareWindowProps) {
+export function SoftwareWindow({ preset, priority = false }: SoftwareWindowProps) {
   const can3d = useCanRender3d();
   const reduce = useMediaQuery("(prefers-reduced-motion: reduce)");
   const wide = useMediaQuery("(min-width: 768px)");
@@ -394,7 +397,7 @@ export function SoftwareWindow({ preset }: SoftwareWindowProps) {
                     alt=""
                     aria-hidden="true"
                     decoding="async"
-                    fetchPriority="low"
+                    fetchPriority={priority ? "high" : "low"}
                     className={`pointer-events-none absolute inset-0 h-full w-full object-contain transition-opacity duration-200 ease-instrument ${paint === "painted" ? "opacity-0" : "opacity-100"}`}
                   />
                 ) : null}
@@ -408,7 +411,8 @@ export function SoftwareWindow({ preset }: SoftwareWindowProps) {
                   src={`/video/software-view-${variant}-poster.jpg`}
                   alt=""
                   aria-hidden="true"
-                  loading="lazy"
+                  loading={priority ? "eager" : "lazy"}
+                  fetchPriority={priority ? "high" : "auto"}
                   decoding="async"
                   className="pointer-events-none absolute inset-0 h-full w-full object-cover md:object-contain"
                 />

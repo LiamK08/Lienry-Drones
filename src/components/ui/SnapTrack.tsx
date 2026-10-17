@@ -1,10 +1,10 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useState, type KeyboardEvent, type ReactNode } from "react";
 import { useMediaQuery } from "@/lib/hooks";
 import { ArrowGlyph, IconButton } from "@/components/ui/IconButton";
-import { revealListVariants } from "@/components/ui/Reveal";
+import { revealLabel, revealListVariants, useRevealPhase } from "@/components/ui/Reveal";
 
 export type SnapTrackProps = {
   /** The list's DOM id. Required with controls="external" (SnapTrackControls finds the track by it). */
@@ -138,10 +138,10 @@ export function SnapTrackControls({ trackId, prevLabel, nextLabel, from = "none"
  * Put it at the full width of a grid `Container`: the track bleeds to the right screen edge.
  */
 export function SnapTrack({ id, label, prevLabel, nextLabel, columns, from = "lg", visible = 4, controls = "inline", children }: SnapTrackProps) {
-  const trackRef = useRef<HTMLUListElement>(null);
+  const [trackRef, phase] = useRevealPhase<HTMLUListElement>();
   const reduce = useReducedMotion() ?? false;
   const scrolls = useMediaQuery(from === "none" ? "all" : layout[from].query);
-  const getTrack = useCallback(() => trackRef.current, []);
+  const getTrack = useCallback(() => trackRef.current, [trackRef]);
   const ends = useEnds(getTrack);
   const move = (d: -1 | 1) => {
     if (trackRef.current) moveTrack(trackRef.current, d, reduce);
@@ -173,9 +173,10 @@ export function SnapTrack({ id, label, prevLabel, nextLabel, columns, from = "lg
         aria-label={scrolls ? label : undefined}
         onKeyDown={onKeyDown}
         className={listCls}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "0px 0px -10% 0px" }}
+        // The 60ms stagger of its RevealItems, gated like every reveal: only a track below the fold at
+        // hydration is ever hidden, so nothing in a first screen waits for JavaScript.
+        initial={false}
+        animate={revealLabel(phase)}
         variants={revealListVariants(reduce ? 0 : 0.06)}
       >
         {children}
