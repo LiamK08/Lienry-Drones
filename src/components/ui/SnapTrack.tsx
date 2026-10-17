@@ -4,7 +4,7 @@ import { motion, useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useState, type KeyboardEvent, type ReactNode } from "react";
 import { useMediaQuery } from "@/lib/hooks";
 import { ArrowGlyph, IconButton } from "@/components/ui/IconButton";
-import { revealLabel, revealListVariants, useRevealPhase } from "@/components/ui/Reveal";
+import { RevealListPhase, revealLabel, revealListVariants, useRevealPhase } from "@/components/ui/Reveal";
 
 export type SnapTrackProps = {
   /** The list's DOM id. Required with controls="external" (SnapTrackControls finds the track by it). */
@@ -179,7 +179,7 @@ export function SnapTrack({ id, label, prevLabel, nextLabel, columns, from = "lg
         animate={revealLabel(phase)}
         variants={revealListVariants(reduce ? 0 : 0.06)}
       >
-        {children}
+        <RevealListPhase.Provider value={phase}>{children}</RevealListPhase.Provider>
       </motion.ul>
     </div>
   );

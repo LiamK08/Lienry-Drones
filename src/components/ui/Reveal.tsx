@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
-import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import { settle } from "@/lib/motion";
 
 /** Any `data-*` attribute, forwarded to the rendered element (e.g. `data-section-head`, `data-col`). */
@@ -50,6 +50,20 @@ export function useRevealPhase<T extends Element>(): [RefObject<T | null>, Revea
 /** The motion label for a phase: "shown" renders at the visible values, so it never animates. */
 export const revealLabel = (phase: RevealPhase) => (phase === "hidden" ? "hidden" : "visible");
 
+/**
+ * The transform an element keeps once it has been hidden: `translateY(0px)` at rest instead of
+ * Motion's `none`. A transform makes the element a containing block, so ending the rise on `none`
+ * would hand its positioned children back to an outer box and cost a layout per element (check 39
+ * allows 2 per reveal; a list of three paid three). Holding the transform keeps the rise to opacity
+ * and transform alone. Anything "shown" (the server render, a first screen) keeps Motion's default,
+ * so its markup and box never change.
+ */
+const holdTransform = (_: unknown, generated: string) => generated || "translateY(0px)";
+export const restTransform = (phase: RevealPhase) => (phase === "shown" ? undefined : holdTransform);
+
+/** The phase of the nearest RevealList or SnapTrack, which its RevealItems follow. */
+export const RevealListPhase = createContext<RevealPhase>("shown");
+
 const pick = (props: Record<string, unknown>): DataAttributes =>
   Object.fromEntries(Object.entries(props).filter(([k]) => k.startsWith("data-"))) as DataAttributes;
 
@@ -78,6 +92,7 @@ export function Reveal({ children, delay = 0, className = "", as = "div", y = 12
       data-reveal=""
       initial={false}
       animate={revealLabel(phase)}
+      transformTemplate={restTransform(phase)}
       variants={{
         hidden: { opacity: 0, y, transition: { duration: 0 } },
         visible: { opacity: 1, y: 0, transition: reduce ? { duration: 0 } : { duration: 0.64, ease: settle, delay } },
@@ -101,7 +116,7 @@ export function RevealList({ children, className = "", stagger = 0.06, ...rest }
       animate={revealLabel(phase)}
       variants={revealListVariants(reduce ? 0 : stagger)}
     >
-      {children}
+      <RevealListPhase.Provider value={phase}>{children}</RevealListPhase.Provider>
     </motion.ul>
   );
 }
@@ -112,11 +127,13 @@ export const revealListVariants = (stagger: number) => ({ hidden: {}, visible: {
 /** One item of a RevealList (or of SnapTrack). It follows its list; on its own it simply renders. */
 export function RevealItem({ children, className = "", ...rest }: { children: ReactNode; className?: string } & DataAttributes) {
   const reduce = useReducedMotion();
+  const phase = useContext(RevealListPhase);
   return (
     <motion.li
       className={className}
       {...pick(rest)}
       data-reveal=""
+      transformTemplate={restTransform(phase)}
       variants={{
         hidden: { opacity: 0, y: 12, transition: { duration: 0 } },
         visible: { opacity: 1, y: 0, transition: reduce ? { duration: 0 } : { duration: 0.64, ease: settle } },
