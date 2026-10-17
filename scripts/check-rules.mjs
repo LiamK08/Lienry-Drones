@@ -41,6 +41,12 @@
 //     has an og:image. No two routes share a title or a description.
 // 23  Placeholders: no "to come", no data-media-placeholder, no empty photo box.
 // 24  Enquiry labels: every link to /register-interest carries the one label of its ?type=.
+// 28  Copy budget (docs/DESIGN-PASS.md, spec D2): the words a visitor sees in <main> at load, counted
+//     as main's innerText without the outermost [data-ui], [data-prose], form, .sr-only,
+//     [aria-hidden="true"] and the legacy demo selectors ([data-software-preview] and the demo window
+//     and app panel groups). Words are split on whitespace. The all-states count (textContent, closed
+//     answers and inactive tabs included) is reported alongside.
+//     --write-baseline <file> records both counts per route at 1440 and 390 and runs nothing else.
 //
 // Tabs, stage parts and story beats are swept: every state is audited again. Copy the checks compare
 // against (italics, allowed sentences, stats, design facts, app notes, brand) is read from src/content
@@ -134,7 +140,10 @@ Runs E2 checks 5-14 and 21-24 of docs/REDESIGN-SPEC.md against a served build.
   --widths 1440,390  viewport widths (1440x900 and 390x844 by default)
   --json <file>      also write the full report as JSON
   --no-sweep         skip the tab and disclosure state sweeps
-  --no-motion        skip the motion passes (check 21), which load every route twice more`);
+  --no-motion        skip the motion passes (check 21), which load every route twice more
+  --write-baseline <file>
+                     record check 28's word counts per route (at load and in all states, at each
+                     width) into <file>, e.g. scripts/copy-baseline.json, and run no other check`);
 }
 
 function fail(message, showUsage = false) {
@@ -144,7 +153,7 @@ function fail(message, showUsage = false) {
 }
 
 function parseArgs(argv) {
-  const opts = { base: "http://localhost:3000", routes: [], widths: [1440, 390], json: null, sweep: true, motion: true };
+  const opts = { base: "http://localhost:3000", routes: [], widths: [1440, 390], json: null, sweep: true, motion: true, writeBaseline: null };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     const value = () => {
@@ -158,6 +167,7 @@ function parseArgs(argv) {
       process.exit(0);
     } else if (a.startsWith("--widths")) opts.widths = value().split(",").map((w) => Number(w.trim()));
     else if (a.startsWith("--json")) opts.json = value();
+    else if (a.startsWith("--write-baseline")) opts.writeBaseline = value();
     else if (a === "--no-sweep") opts.sweep = false;
     else if (a === "--no-motion") opts.motion = false;
     else if (a.startsWith("--")) fail(`Unknown option ${a}.`, true);
@@ -817,6 +827,65 @@ function pageLib() {
     );
   };
 
+  // Check 28: the copy budget's counter. Words at load are main's innerText with the outermost
+  // excluded subtrees hidden for the one synchronous read (so nothing they hold is counted and no
+  // observer ever sees the change); words in all states walk the text nodes instead, so closed answers
+  // and inactive tabs count too, with a word break at every element that is not phrasing content.
+  const COPY_EXCLUDE = [
+    "[data-ui]",
+    "[data-prose]",
+    "form",
+    ".sr-only",
+    '[aria-hidden="true"]',
+    "[data-software-preview]",
+    "[role='group'][aria-label$='demo window']",
+    "[role='group'][aria-label$='demo data']",
+  ].join(", ");
+  const INLINE = new Set(["A", "ABBR", "B", "BDI", "BDO", "CITE", "CODE", "DATA", "DFN", "EM", "I", "KBD", "MARK", "Q", "S", "SAMP", "SMALL", "SPAN", "STRONG", "SUB", "SUP", "TIME", "U", "VAR", "WBR"]);
+  const wordsIn = (s) => (s || "").split(/\s+/).filter(Boolean).length;
+  const outermostExcluded = (root) => [...root.querySelectorAll(COPY_EXCLUDE)].filter((e) => {
+    const above = e.parentElement?.closest(COPY_EXCLUDE);
+    return !above || !root.contains(above);
+  });
+  const atLoad = (root) => {
+    if (!root || root.closest(COPY_EXCLUDE)) return 0;
+    const hidden = outermostExcluded(root).map((e) => [e, e.style.getPropertyValue("display"), e.style.getPropertyPriority("display")]);
+    for (const [e] of hidden) e.style.setProperty("display", "none", "important");
+    const text = root.innerText;
+    for (const [e, value, priority] of hidden) {
+      if (value) e.style.setProperty("display", value, priority);
+      else e.style.removeProperty("display");
+    }
+    return wordsIn(text);
+  };
+  const allStates = (root) => {
+    if (!root || root.closest(COPY_EXCLUDE)) return 0;
+    let text = "";
+    const visit = (node) => {
+      for (const c of node.childNodes) {
+        if (c.nodeType === 3) text += c.textContent;
+        else if (c.nodeType === 1) {
+          if (c.matches(COPY_EXCLUDE) || c.matches("script, style, template, noscript")) {
+            text += " ";
+            continue;
+          }
+          const block = !INLINE.has(c.tagName);
+          if (block) text += " ";
+          visit(c);
+          if (block) text += " ";
+        }
+      }
+    };
+    visit(root);
+    return wordsIn(text);
+  };
+  // { load, all, bands: [{ i, id, load }] }: the page's counts and each band's share of the words at load.
+  R.copyWords = () => {
+    const main = document.querySelector("main");
+    const bands = (R.state?.items ?? []).map((it, i) => ({ i: i + 1, id: it.el.getAttribute("data-band") || it.el.id || it.el.tagName.toLowerCase(), load: atLoad(it.el) }));
+    return { load: atLoad(main), all: allStates(main), bands };
+  };
+
   // Check 13: open each window's "Inspect panel data" and read it.
   R.openReadouts = () => {
     const out = [];
@@ -1218,6 +1287,58 @@ function judgeHead(route, head, add) {
     const [value] = head[key];
     if (description !== undefined && value !== undefined && value !== description) add(22, "page", `${key} is not the page's meta description`, `"${value.slice(0, 80)}"`);
   }
+}
+
+// Check 28's counter on one loaded route: after the network settles and the fonts are in, before any
+// scroll or interaction, so it counts what a visitor sees at load.
+async function countCopy(page) {
+  await call(page, () => document.fonts.ready.then(() => true));
+  await page.waitForTimeout(500);
+  await R(page, "discover");
+  return R(page, "copyWords");
+}
+
+// --write-baseline: record the counts per route and width, then stop. No other check runs.
+if (opts.writeBaseline) {
+  const routes = {};
+  console.log(`check:rules  ${opts.base}`);
+  console.log(`check 28 baseline: words in <main> at load and in all states, at ${opts.widths.join(" and ")}`);
+  let failed = 0;
+  for (const route of opts.routes) {
+    routes[route] = {};
+    for (const width of opts.widths) {
+      const { context, page } = await newPage(width);
+      const error = await load(page, route);
+      if (error) {
+        console.log(`  ${route} @${width}  FAIL could not load (${error})`);
+        failed++;
+      } else {
+        const c = await countCopy(page);
+        routes[route][width] = { load: c.load, all: c.all };
+        const top = [...c.bands].sort((a, b) => b.load - a.load).slice(0, 3).map((b) => `#${b.id} ${b.load}`).join(", ");
+        console.log(`  ${route.padEnd(20)} @${width}  ${String(c.load).padStart(4)} words at load, ${String(c.all).padStart(4)} in all states  (most: ${top})`);
+      }
+      await context.close();
+    }
+  }
+  await browser.close();
+  if (failed) fail(`${failed} route${failed === 1 ? "" : "s"} could not load; ${opts.writeBaseline} was not written.`);
+  let commit = null;
+  try {
+    commit = execSync("git rev-parse --short HEAD", { cwd: ROOT, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+  } catch {
+    // Not a git checkout: the baseline is still valid without the commit.
+  }
+  const baseline = {
+    note: "Check 28's copy baseline: the words in <main> per route before the October 2026 design pass. The gate is words at load <= 0.667 x this count. Recorded with node scripts/check-rules.mjs <url> --write-baseline scripts/copy-baseline.json.",
+    counter: "main.innerText without the outermost [data-ui], [data-prose], form, .sr-only, [aria-hidden=true], [data-software-preview], [role=group][aria-label$='demo window'] and [role=group][aria-label$='demo data'], split on whitespace. 'all' walks textContent instead (closed answers and inactive tabs included) and is reported only.",
+    recorded: new Date().toISOString().slice(0, 10),
+    commit,
+    routes,
+  };
+  writeFileSync(path.resolve(opts.writeBaseline), `${JSON.stringify(baseline, null, 2)}\n`);
+  console.log(`Baseline written to ${opts.writeBaseline} (${Object.keys(routes).length} routes).`);
+  process.exit(0);
 }
 
 const report = { base: opts.base, when: new Date().toISOString(), runs: [], site: [] };
