@@ -21,7 +21,7 @@ Stills are graded with sharp and films with ffmpeg (`lutrgb` and `eq`). A film's
 
 | Gate | Status |
 | --- | --- |
-| Design sheet (commercial drone, home drone, roof capsule, ground pod) | Approved (Liam, 18 Sep 2026). Registered as Higgsfield elements (below). The PNGs belong in `docs/references`; this session's container could not reach the Higgsfield CDN to download them, so the table below carries their source URLs until they are added. |
+| Design sheet (commercial drone, home drone, roof capsule, ground pod) | Approved (Liam, 18 Sep 2026). Registered as Higgsfield elements (below). The PNGs are in `docs/references` (added 17 October 2026, recompressed losslessly), with their source URLs in the table below. |
 | 27 stills | Generated from the approved elements, checked scene by scene with Higgsfield's video analysis, seven regenerated (two of them twice) where the read missed the brief (tether direction, spray running during a scan, twilight instead of morning). |
 | 2 films | MiniMax H3, 6 s, first and last frame from the approved hero stills so each loops seamlessly. |
 
@@ -33,7 +33,7 @@ The brief is the source of truth: a compact tethered cleaning drone with water a
 
 ### Master references (`docs/references`)
 
-Download each source into `docs/references` under the file name given (the CDN blocked this session; `npm run media:fetch` is unaffected because it runs on the host).
+Each file below is in `docs/references` under the name given, downloaded from its source URL.
 
 | File | What | Higgsfield source | URL |
 | --- | --- | --- | --- |
