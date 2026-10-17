@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { faqSets, homesPage, platformFaq } from "@/content/pages";
 import { australiaStats } from "@/content/stats";
+import { pageMetadata } from "@/lib/site";
 import { LandlordStory } from "@/components/home/LandlordStory";
 import { CtaPanel } from "@/components/sections/CtaPanel";
 import { Faq } from "@/components/sections/Faq";
@@ -9,11 +10,10 @@ import { SiblingCards } from "@/components/sections/SiblingCards";
 import { CITED_NOTE, StatBand, pickStats } from "@/components/sections/StatBand";
 import { StepCards } from "@/components/sections/StepCards";
 
-export const metadata: Metadata = {
-  title: "Lienry Drones",
-  description: "A waterproof ground pod, a drone that knows each material, and an app that starts the clean wherever you are. For houses, apartments, rentals and solar farms.",
-  alternates: { canonical: "/homes-and-rentals" },
-};
+export const metadata: Metadata = pageMetadata(
+  "/homes-and-rentals",
+  "A waterproof ground pod, a drone that knows each material, and an app that starts the clean wherever you are. For houses, apartments, rentals and solar farms.",
+);
 
 // The page's questions, in the order faqSets gives them.
 const questions = faqSets.homes.map((id) => platformFaq.items.find((item) => item.id === id)).filter((item) => item !== undefined);

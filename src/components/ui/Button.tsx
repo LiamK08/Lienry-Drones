@@ -31,9 +31,19 @@ const tertiary = "h-auto min-h-11 px-0 text-small underline decoration-1 underli
 // plaster measures 6.24:1 against glass-deep. It is only used on those two surfaces.
 //
 // Tertiary on glass-deep is white (7.16:1); glass-on-dark would measure only 4.31:1 there.
+//
+// Not available yet (light surfaces only, the /download buttons before release): the control keeps
+// aria-disabled="true" rather than disabled, so it stays in the tab order and announces its state,
+// and it gives up its fill or underline for a muted label. Muted measures 6.69:1 on raised and the
+// primary's border-strong edge 3.87:1, so it stays legible without reading as live.
+const unavailable = {
+  primary: "aria-disabled:cursor-default aria-disabled:border aria-disabled:border-border-strong aria-disabled:bg-transparent aria-disabled:text-muted aria-disabled:hover:bg-transparent",
+  tertiary: "aria-disabled:cursor-default aria-disabled:text-muted aria-disabled:no-underline aria-disabled:hover:text-muted",
+};
+
 const variants: Record<Variant, { light: string; dark: string; accent: string }> = {
   primary: {
-    light: "bg-ink text-white hover:bg-ink-raised",
+    light: `bg-ink text-white hover:bg-ink-raised ${unavailable.primary}`,
     dark: "bg-ink text-white border border-white/75 hover:bg-ink-raised",
     accent: "bg-ink text-white border border-white/75 hover:bg-ink-raised",
   },
@@ -48,7 +58,7 @@ const variants: Record<Variant, { light: string; dark: string; accent: string }>
     accent: "border border-white/60 text-white hover:bg-ink-raised",
   },
   tertiary: {
-    light: `${tertiary} text-glass hover:text-glass-deep`,
+    light: `${tertiary} text-glass hover:text-glass-deep ${unavailable.tertiary}`,
     dark: `${tertiary} text-glass-on-dark`,
     accent: `${tertiary} text-white`,
   },
@@ -94,8 +104,9 @@ export function Button(props: LinkProps | ButtonProps) {
     const { href, variant: _v, size: _s, onDark: _d, onAccent: _o, arrow: _a, className: _c, children: _ch, ...rest } = props;
     // In-page anchors use a native link: next/link scrolls to the target but leaves focus on the link,
     // so keyboard and screen-reader users never reach the section. Native fragment navigation moves
-    // the focus start point to the target.
-    if (href.startsWith("#")) {
+    // the focus start point to the target. A file download is native too: next/link would treat the
+    // installer as a route and prefetch it.
+    if (href.startsWith("#") || rest.download !== undefined) {
       return (
         <a href={href} className={cls} {...rest}>
           {content}

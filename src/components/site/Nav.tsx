@@ -4,18 +4,26 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useId, useRef, useState } from "react";
-import { nav } from "@/lib/site";
+import { nav, navUtility } from "@/lib/site";
 import { useScrolledPast } from "@/lib/hooks";
 import { Button } from "@/components/ui/Button";
 import { Mark } from "@/components/ui/Wordmark";
 
+// A 13px link in a 30px box, with a hairline underline under the current page (60% on hover). The
+// box's padding sets the gap between links: 20px, and 30px from 1100.
+const linkCls = (active: boolean) =>
+  `relative flex h-[30px] items-center px-[10px] text-caption leading-none transition-opacity duration-200 after:absolute after:inset-x-[10px] after:bottom-[4px] after:h-px after:bg-current after:transition-opacity after:duration-200 hover:after:opacity-60 min-[1100px]:px-[15px] min-[1100px]:after:inset-x-[15px] ${
+    active ? "after:opacity-100" : "after:opacity-0"
+  }`;
+
 /**
- * The header: nav links pinned hard left, the mark centred as the link home, one action hard
- * right. A 72px bar, 13px links in 30px boxes, a 30px button. The full bar needs 1024px: below
- * that the absolutely centred mark would run into the left links, so phones and tablets get the
- * burger. Over the home hero it is transparent
+ * The header: nav links pinned hard left, the mark centred as the link home, and hard right the
+ * Download link beside the one action. A 72px bar, 13px links in 30px boxes, a 30px button. The
+ * full bar needs 1024px: below that the absolutely centred mark would run into the left links, so
+ * phones and tablets get the burger. Over the home hero it is transparent
  * and reads white on the hero's own scrim; past 80px it becomes a solid plaster bar with a
- * hairline and ink text. Phones get the mark centred, a hamburger on the right and a full screen menu.
+ * hairline and ink text. Phones get the mark centred, a hamburger on the right and a full screen
+ * menu, which lists Download after the five nav links.
  */
 export function Nav() {
   const pathname = usePathname();
@@ -91,13 +99,7 @@ export function Nav() {
             const active = pathname === item.href;
             return (
               <li key={item.href}>
-                <Link
-                  href={item.href}
-                  aria-current={active ? "page" : undefined}
-                  className={`relative flex h-[30px] items-center px-[10px] text-caption leading-none transition-opacity duration-200 after:absolute after:inset-x-[10px] after:bottom-[4px] after:h-px after:bg-current after:transition-opacity after:duration-200 hover:after:opacity-60 min-[1100px]:px-[15px] min-[1100px]:after:inset-x-[15px] ${
-                    active ? "after:opacity-100" : "after:opacity-0"
-                  }`}
-                >
+                <Link href={item.href} aria-current={active ? "page" : undefined} className={linkCls(active)}>
                   {item.label}
                 </Link>
               </li>
@@ -108,7 +110,10 @@ export function Nav() {
           <Mark className="h-7 w-auto" />
         </Link>
         <div className="ml-auto flex items-center">
-          <div className="hidden lg:block">
+          <div className="hidden items-center lg:flex">
+            <Link href={navUtility.href} aria-current={pathname === navUtility.href ? "page" : undefined} className={linkCls(pathname === navUtility.href)}>
+              {navUtility.label}
+            </Link>
             <Button href="/register-interest" size="sm" onDark={dark} arrow>
               Register interest
             </Button>
@@ -143,7 +148,7 @@ export function Nav() {
             transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
           >
             <ul className="border-t border-hairline">
-              {nav.map((item) => {
+              {[...nav, navUtility].map((item) => {
                 const active = pathname === item.href;
                 return (
                   <li key={item.href} className="border-b border-hairline">

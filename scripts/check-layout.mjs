@@ -36,7 +36,7 @@ import { execSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
 import path from "node:path";
 
-const ROUTES = ["/", "/platform", "/commercial", "/homes-and-rentals", "/solar", "/company", "/register-interest", "/privacy"];
+const ROUTES = ["/", "/platform", "/commercial", "/homes-and-rentals", "/solar", "/company", "/download", "/register-interest", "/privacy"];
 const VIEWPORTS = {
   1440: { width: 1440, height: 900, mobile: false },
   390: { width: 390, height: 844, mobile: true },
@@ -58,7 +58,7 @@ function usage() {
 Runs E2 checks 2, 3, 4 and 19 of docs/REDESIGN-SPEC.md against a served build.
 
   <baseUrl>          the served build, e.g. http://localhost:3000 (default)
-  route              one or more routes (default: all eight)
+  route              one or more routes (default: all nine)
   --widths 1440,390  viewport widths (1440x900 and 390x844 by default)
   --json <file>      also write the full report as JSON
   --no-sweep         skip the tab and disclosure state sweeps`);

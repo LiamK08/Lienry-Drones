@@ -4,6 +4,8 @@
 
 **Since the build.** On 26 September 2026 the owner removed the Concept render captions. Every caption line below (B7, the Picture, MediaCard and film anatomies, the stage and row paddings that made room for the caption, and E2 check 12) is superseded: no image or film carries one, and check 12 now fails if one returns.
 
+On 28 September 2026 a ninth route, `/download`, was added for Lienry Desktop (recorded in `docs/DESIGN-QA.md`). The header gains a Download link beside the Register interest button, and the phone menu and the footer's Platform column list it too. The owner then asked for a descriptive title on every route, in the format "What the page is | Lienry Drones". The titles live in `pageTitles` in `src/lib/site.ts`, and E2 check 22 reads them from there. Every page then got its own share card and canonical link from `pageMetadata` in the same file, which check 22 also covers. The checks and screenshot scripts now cover nine routes.
+
 **References.** legora.com and refresh.tech are references for quality, structure and motion only. This document describes their patterns by structure. No code, text, imagery, icons, logos or assets from either site enter the repository, and the site never loads anything from them.
 
 **Which reference each page follows**
@@ -1643,7 +1645,7 @@ Each check passes on all eight routes at 1440×900 and 390×844 unless it says o
     - With reduced motion: no video autoplays; no reveal, crossfade or smooth snap runs; the window shows its recording.
     - Without it: scrolling from the hero to the film band never has two videos playing, and `control.active` turns false when the window leaves the screen.
     - No sticky element other than the header, no pinning, no count-up.
-22. **Titles.** `<title>` is "Lienry Drones" on every route.
+22. **Titles and links.** Every route's `<title>` is its own, in the format "What the page is | Lienry Drones", as `pageTitles` in `src/lib/site.ts` sets it, and no two routes share one. Until 28 September it was "Lienry Drones" alone. Each route has exactly one canonical link and one `og:url`, both its own address and never the home page's. Its `og:title` and `twitter:title` are its title without the brand. Its `og:description` and `twitter:description` repeat its meta description, no two routes share a description, and the card has an `og:image`.
 23. **No placeholders.** No "to come", no empty photo box and no `data-media-placeholder` in production output.
 24. **One label per enquiry route.** The link text for each destination is identical everywhere:
 

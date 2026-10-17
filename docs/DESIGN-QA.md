@@ -182,3 +182,154 @@ These are unchanged from the 22 September record:
 ## Release
 
 The change reached `main` as `212d522` on 26 September 2026. Vercel built its preview but never started a production deployment for that push, so the live site kept the captions. The next commit on `main` was pushed to start a fresh production build.
+
+# Download page — review record
+
+28 September 2026. Built on the `download` branch from `main` at `80ed265`, and checked on a local production build at 1440 and 390 with the real media (downloaded by the prebuild step, not committed).
+
+## What changed
+
+- **A ninth route, `/download`,** for Lienry Desktop: the desktop software an owner uses to see the 3D scan of the building, set cleaning zones and the pressure for each surface, and watch a wash as it happens. It is made from parts the site already has:
+  - the /company statement's split head, with the H1 on the left and the lead and download buttons as its aside;
+  - the coded software window at full grid width, as on the /platform close, so the product is in the first screen and no image of the interface is needed;
+  - the /commercial software strip, listing the three things it does;
+  - a `SpecBand` for the system requirements, including what signing in needs;
+  - the `Faq`, with three questions.
+
+  Tones run raised, plaster, ink, raised, then the sunken footer.
+- **The button follows the visitor's platform.** It reads "Download for Mac" or "Download for Windows", with the other platform's link underneath. Both sets are in the HTML, and an inline script marks the right one while the page is parsed, so a Windows machine never shows the Mac button first. A client check does the same after an in-site navigation.
+- **Coming soon.** Until the release is live, each control reads "Download for … · Coming soon" with a muted label. It uses `aria-disabled` rather than `disabled`, so it stays in the tab order and screen readers announce it as dimmed. Register interest sits beside it.
+  - `Button` gains this unavailable look on light surfaces: muted text at 6.69:1 on raised, with a border-strong edge at 3.87:1.
+  - Download links render as native anchors, so next/link never prefetches an installer.
+- **One switch.** `src/lib/download.ts` holds the availability, the version and both installer URLs. With the URLs in place, setting `available: true` does three things:
+  - both buttons become download links;
+  - the version shows under them;
+  - the meta description changes from "coming soon" to "Download".
+
+  A platform without a URL stays on Coming soon.
+- **Header and footer.**
+  - The Download link sits hard right beside Register interest, in the nav links' own 13px style, with the hairline underline when it is the current page.
+  - It is the last item in the phone menu.
+  - The footer's Platform column ends with it.
+- **Metadata.** The page has its own title, description, canonical URL and Open Graph and Twitter tags, reusing `og.png`, and it is in the sitemap. The shared Open Graph fields moved to `openGraphBase` in `src/lib/site.ts`, so the layout's output is unchanged.
+- **Checks.**
+  - `check:rules`, `check:layout` and the screenshot scripts now cover nine routes.
+  - Check 22 reads the new page's title from content.
+  - Check 21 used to scroll a window near the top of a short page to the page's top, which tested it on screen. It now scrolls to the page's end, which clears the window.
+  - `contrast-hero.mjs` gates the new header link.
+
+## Validation
+
+| Check | Result |
+| --- | --- |
+| `npm run typecheck`, `npm run lint`, `npm run build` | Clean; `/download` prerenders as static |
+| `git diff --check` | Clean |
+| `npm run check:layout` (E2 checks 2–4, 19) | Every check passes on all 9 routes at 1440 and 390 |
+| `npm run check:rules` (E2 checks 5–14, 21–24) | Every check passes on all 9 routes at 1440 and 390. On /download the live window draws 344 calls in 0.8s on screen and 0 off screen. |
+| `npm run contrast` | All three gates pass. The Download link measures 9.42:1 on the brightest hero frame and 6.02:1 against pure white. |
+| axe-core WCAG 2.0–2.2 A/AA on /download | 0 violations at 1440 and 390, with and without reduced motion, with every question open and with the phone menu open |
+| axe-core on the header of every route at 1440 | 0 violations |
+| Keyboard | Order: skip link, header, Download for Mac (announced dimmed), Download for Windows (dimmed), Register interest. Enter, Space and clicks on an unavailable button do nothing. The 2px glass focus ring shows on each stop. |
+| Platform | A Windows browser sees the Windows set before any script bundle loads, after hydration and after navigating in from /platform. A Mac browser sees the Mac set. |
+| Header geometry | At 1024 the centred mark keeps its 55px clearance from the left links, as before, and the Download link sits 245px to its right. No overflow on any route at 1024, 1099, 1100, 1280 or 1440. |
+| Existing pages | The untouched `main` commit was built on the same machine for comparison. Every band of /, /platform and /company sits at the same y and height; only the shared footer grows, by 33px at 1440 for its new link and not at 390, where it folds. |
+| Live switch | A scratch build with `available: true`, a version and placeholder URLs: both buttons become native download links, the version shows and the description changes (screenshot below). The committed file still says `available: false`. |
+
+## Page heights at 1440 (390)
+
+| Route | Before | After |
+| --- | --- | --- |
+| `/download` | new | 3,019 (3,540) |
+| `/` | 8,554 (10,927) | 8,587 (10,927) |
+| `/platform` | 5,503 (7,131) | 5,536 (7,131) |
+| `/company` | 3,912 (4,317) | 3,945 (4,317) |
+
+"Before" at 1440 is the untouched `main` commit measured on the same machine. At 390 it is the 26 September record, which this change matches exactly. The other routes gain the same 33px at 1440, because the footer is shared. The 8,533 recorded for `/` on 26 September came from a different container with stand-in media.
+
+## Screenshots
+
+| View | Desktop | Mobile |
+| --- | --- | --- |
+| /download, full page | [1440](screenshots/download/download-1440.jpg) | [390](screenshots/download/download-390.jpg) |
+| /download, first screen | [1440](screenshots/download/download-1440-top.jpg) | [390](screenshots/download/download-390-top.jpg) |
+| A Windows visitor | [1440](screenshots/download/download-1440-windows-top.jpg) | |
+| The phone menu | | [390](screenshots/download/download-390-menu.jpg) |
+| The switch set live (scratch build, placeholder URLs and version) | [1440](screenshots/download/download-1440-live-preview.jpg) | |
+| The header on all nine routes, including over the home film, past 80px and with focus on Download | [1440](screenshots/download/header-1440-all-routes.jpg) · [1024](screenshots/download/header-1024-all-routes.jpg) | |
+
+## Decisions for the owner
+
+All of these are built and reversible:
+
+1. **The tab title.** Since 22 September every route has been titled "Lienry Drones" alone. This brief asked for a page title, so /download reads "Download Lienry Desktop | Lienry Drones". To go back to the old rule, set `downloadPage.meta.title` to "Lienry Drones" and drop the page from `titles` in `scripts/check-rules.mjs`.
+2. **Where Download sits in the header.** It sits hard right, as a utility link beside Register interest. As a sixth link on the left it would run into the centred mark at every width below about 1,190px.
+3. **The name "Lienry Desktop"** comes from the coded window's title bar.
+4. **Before release, Register interest is the page's live action.** Once the downloads are live it gives way to the version line.
+
+## Outstanding owner inputs
+
+- The two installer URLs and the version number.
+- Confirmation of the name "Lienry Desktop", the system requirements and the "active software plan" wording.
+
+## Page titles and owner decisions, 28 September 2026
+
+The owner kept the new page title and asked for every page to follow it, which settles decision 1 above. Every route's tab title now says what the page is, then the brand. All nine live in `pageTitles` in `src/lib/site.ts`, and each page sets its title with `pageTitle`, so the format cannot drift.
+
+| Route | Tab title |
+| --- | --- |
+| `/` | Resident cleaning drones for buildings and homes \| Lienry Drones |
+| `/platform` | How the platform works \| Lienry Drones |
+| `/commercial` | Window cleaning for commercial buildings \| Lienry Drones |
+| `/homes-and-rentals` | Exterior cleaning for homes and rentals \| Lienry Drones |
+| `/solar` | Solar panel cleaning \| Lienry Drones |
+| `/company` | About the company \| Lienry Drones |
+| `/download` | Download Lienry Desktop \| Lienry Drones |
+| `/register-interest` | Register interest \| Lienry Drones |
+| `/privacy` | Privacy policy \| Lienry Drones |
+
+A page that does not exist keeps the plain "Lienry Drones".
+
+E2 check 22 now expects each route's own title and fails if two routes share one. In a test, a deliberately wrong entry made it fail as it should.
+
+**Validation.** `npm run typecheck`, `npm run lint`, `npm run build` and `git diff --check` are clean. `npm run check:rules -- --no-sweep --no-motion` passes every check on all 9 routes at 1440 and 390. Only the page head changed; the tab and motion passes above ran on the same page bodies.
+
+**Owner inputs.** The name "Lienry Desktop" and the wording "active software plan" are confirmed. The installer URLs and the version are not ready yet, so `available` stays false.
+
+## Share cards and canonical links, 28 September 2026
+
+Until this change only /download had its own share card. The other eight pages used the layout's card: the title "Lienry Drones", the home page's description, and the home page's address as `og:url`. Some apps, Facebook among them, treat `og:url` as a page's real address, so a shared /platform link could show and open the home page. The X card copied the same fields.
+
+Every page now sets its metadata with `pageMetadata` in `src/lib/site.ts`. Each card carries:
+
+- the page's own address;
+- its tab title without "| Lienry Drones", since the card already shows the site's name or address;
+- its meta description, unchanged;
+- `og.png`, the one share image, as before.
+
+| Route | Canonical link and og:url | Share title (og:title and twitter:title) |
+| --- | --- | --- |
+| `/` | https://www.lienrydrones.com | Resident cleaning drones for buildings and homes |
+| `/platform` | https://www.lienrydrones.com/platform | How the platform works |
+| `/commercial` | https://www.lienrydrones.com/commercial | Window cleaning for commercial buildings |
+| `/homes-and-rentals` | https://www.lienrydrones.com/homes-and-rentals | Exterior cleaning for homes and rentals |
+| `/solar` | https://www.lienrydrones.com/solar | Solar panel cleaning |
+| `/company` | https://www.lienrydrones.com/company | About the company |
+| `/download` | https://www.lienrydrones.com/download | Download Lienry Desktop |
+| `/register-interest` | https://www.lienrydrones.com/register-interest | Register interest |
+| `/privacy` | https://www.lienrydrones.com/privacy | Privacy policy |
+
+The canonical links were already correct on all nine pages. The layout no longer sets a fallback canonical link ("/") or `og:url`, so a page that does not exist no longer names the home page as its address.
+
+E2 check 22 now also reads each page's head, on every route at both widths. It fails unless:
+
+- the page has exactly one canonical link, meta description, `og:url`, `og:title`, `og:description`, `twitter:title` and `twitter:description`;
+- the canonical link and `og:url` are the page's own address;
+- the share titles match `pageTitles`;
+- the share descriptions repeat the meta description;
+- the card has an `og:image`.
+
+It also fails if two routes share a description.
+
+**Validation.** `npm run typecheck`, `npm run lint`, `npm run build` and `git diff --check` are clean. The full `npm run check:rules` (with the tab sweeps and the motion passes) and `npm run check:layout` pass every check on all 9 routes at 1440 and 390. A scratch build broke two pages on purpose: /platform's canonical link and `og:url` pointed at the home page, and /solar went back to the old metadata without its own card. Check 22 failed on both, 7 times in all, and passed /company beside them.
+
+**Preview.** [share-platform.jpg](screenshots/download/share-platform.jpg) draws a shared /platform link from the tags each site serves: today's card on www.lienrydrones.com beside this branch's.

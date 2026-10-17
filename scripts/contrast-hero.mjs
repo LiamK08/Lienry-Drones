@@ -39,6 +39,7 @@ const scrimAt = (y) =>
 const ELEMENTS = [
   { name: "Nav links, white text", box: [9, 21, 493, 51], need: 4.5, gate: true, fg: [255, 255, 255] },
   { name: "Centred mark, white fill", box: [710, 21, 730, 50], need: 3, gate: true, fg: [255, 255, 255] },
+  { name: "Download link, white text", box: [1173, 21, 1264, 51], need: 4.5, gate: true, fg: [255, 255, 255] },
   { name: "Button boundary, white hairline", box: [1265, 20, 1416, 51], need: 3, gate: true, alpha: 0.75, overFill: INK },
   { name: "Button fill vs hero (informational)", box: [1265, 20, 1416, 51], need: 3, gate: false, fg: INK },
 ];
