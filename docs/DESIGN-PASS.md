@@ -19,10 +19,23 @@ The owner asked to ship what was done. What is on `main`:
 - **Content:** the copy split into one module per route.
 - **FAQ bank:** rewritten from `docs/SITE-PLAN.md` facts.
 - **Calculator:** its logic and copy.
-- **Loading:** first screens no longer wait for JavaScript.
+- **Loading:** first screens no longer wait for JavaScript, and the mobile load gate uses Lighthouse with applied throttling. On localhost, simulated throttling counts every script and font as blocking.
 - **Checks:** the rewritten check scripts (`check:layout`, `check:rules`) and the new ones (`check:a11y`, `perf:vitals`, `perf:motion`).
 
-The existing pages run on that system. They are not rebuilt yet: the home sections in section 5 (benefit cards, the 01 to 05 flow, the calculator on the page, the portrait carousel, the serif letter, the collage close) and the inner-page plans in section 10 are specified but not built. Until they are, `npm run check:layout` and `npm run check:rules` report the old sections' failures (tones, eyebrows, copy budgets, line counts) by design.
+The home page is rebuilt in eight sections that alternate dark and light:
+
+1. the film hero with one button;
+2. four benefit cards, the first playing the commercial clip on hover or focus;
+3. the 01 Scan to 05 Report flow driving the coded software window;
+4. the cost calculator;
+5. five 2:3 portraits on a carousel;
+6. the founder letter in the serif;
+7. the FAQ;
+8. the closing collage.
+
+On the home page, `check:layout`, `check:rules`, `check:a11y` and `perf:vitals` all pass. On a throttled phone, the main content now appears at 1.8 s (Lighthouse with applied throttling), against 7.9 s before.
+
+The inner pages run on the new system but keep their old layouts. Their plans in section 10 are specified but not built. Until they are, `npm run check:layout` and `npm run check:rules` report the old sections' failures by design: tones, eyebrows, copy budgets and line counts.
 
 Sections 5 to 13 describe the build spec of 17 October. Where the research draft and the spec disagreed about what Lienry will do, the spec won.
 
