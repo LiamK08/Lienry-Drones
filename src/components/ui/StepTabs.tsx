@@ -60,7 +60,7 @@ export function StepTabs<T extends string>({ id, label, steps, value, onChange, 
               tabIndex={on ? 0 : -1}
               onClick={() => onChange(step.id)}
               onKeyDown={(e) => onKeyDown(e, i)}
-              className={`relative flex min-h-14 flex-col items-start gap-1 border-t border-rule py-2 text-left transition-colors duration-200 ease-instrument motion-reduce:transition-none md:flex-row md:items-baseline md:gap-2 md:py-4 lg:col-span-2 ${
+              className={`relative flex min-h-14 flex-col items-start gap-2 border-t border-rule py-2 text-left transition-colors duration-200 ease-instrument motion-reduce:transition-none md:flex-row md:items-baseline md:py-4 lg:col-span-2 ${
                 on ? "text-fg after:absolute after:inset-x-0 after:-top-px after:h-0.5 after:bg-current" : "text-fg-muted hover:text-fg"
               }`}
             >
