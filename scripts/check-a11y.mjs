@@ -248,8 +248,9 @@ function pageLib() {
   // Chromium hides with content-visibility but still lays out when asked).
   const visible = (el) => {
     if (el.getClientRects().length === 0 || getComputedStyle(el).visibility !== "visible") return false;
+    // A closed details hides its body, not itself or its summary (so its Enter test still runs).
     const closed = el.closest("details:not([open])");
-    if (closed && !(el.tagName === "SUMMARY" && el.parentElement === closed) && !el.closest("details:not([open]) > summary")) return false;
+    if (closed && closed !== el && !(el.tagName === "SUMMARY" && el.parentElement === closed) && !el.closest("details:not([open]) > summary")) return false;
     if (typeof el.checkVisibility === "function" && !el.checkVisibility({ contentVisibilityAuto: true, visibilityProperty: true })) return false;
     return true;
   };

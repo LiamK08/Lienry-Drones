@@ -11,6 +11,9 @@
 //     block's content box (padding excluded) are projected onto the page's vertical axis: no horizontal
 //     stripe taller than the limit may hold none (64px from 1024, 48px below). Content boxes are the lines
 //     of text (Range.getClientRects); img, video, canvas, svg, button, input, select, textarea and hr;
+//     controls by their box, as a button is (a [data-button] or [data-icon-button] rendered as a link,
+//     and a link laid out as a box 64px tall at most, so a tertiary link's 44px target is content, not
+//     empty paper; a taller link is a container and is measured by what it holds);
 //     elements with a background other than the band's or a border on all four sides; and the rules
 //     drawn by top and bottom borders. Among siblings marked [data-col] that sit side by side, no
 //     column's content may end more than the limit above the lowest of them. Sub-pixel layout adds up to
@@ -35,7 +38,8 @@
 // 31a Computed spacing. In <main> and the footer (not inside [data-ui], svg, .sr-only or the header, and
 //     not an element with an m-auto, mt-auto, mb-auto or my-auto class), margin-top, margin-bottom, the
 //     four paddings, row-gap and column-gap are each within 0.5px of 0, 8, 16, 24, 32, 40, 48, 64, 80, 96,
-//     128 or 160, the negative of one, or 72 plus one.
+//     128 or 160, the negative of one, or 72 plus one. A [data-ui] root is measured by its margins only:
+//     its padding and gaps are the inside of the coded UI, which keeps its own spacing.
 // 32  Grid alignment (1440 and 1024). The 12 columns come from the first .max-w-grid in <main> (left L,
 //     width W, gutter 24). The left edges of every .eyebrow, h1, h2, band-level p, figure frame, the
 //     first [data-button] of an action row, [data-calculator], [data-accordion], [data-card] and a
@@ -326,7 +330,13 @@ function pageLib(cfg) {
       const tag = el.tagName.toLowerCase();
       if (el.closest("svg") && tag !== "svg") continue;
       const cs = getComputedStyle(el);
-      let whole = REPLACED.has(tag);
+      // A control is measured by its box, as a <button> is: a Button or IconButton rendered as a link,
+      // and a link laid out as a control-sized box (a 44px tertiary target, a list link). Its target is
+      // content. A taller link is a container (a whole card) and is measured by what it holds.
+      const control =
+        el.matches("[data-button], [data-icon-button]") ||
+        (tag === "a" && el.hasAttribute("href") && !/^(inline|contents|none)$/.test(cs.display) && el.getBoundingClientRect().height <= 64);
+      let whole = REPLACED.has(tag) || control;
       if (!whole) {
         const bg = cs.backgroundColor;
         if ((alphaOf(bg) > 0.02 && !same(bg, bandBg)) || (cs.backgroundImage && cs.backgroundImage !== "none")) whole = true;
@@ -339,7 +349,7 @@ function pageLib(cfg) {
       if (r.width < 1 || r.height < 1) continue;
       if (whole) {
         const c = clip(r, el.parentElement, root);
-        if (c) out.push({ ...c, what: el, rank: REPLACED.has(tag) ? 1 : 2 });
+        if (c) out.push({ ...c, what: el, rank: REPLACED.has(tag) || control ? 1 : 2 });
         continue;
       }
       // A rule drawn by a top or bottom border: the line itself is content, not the box under it.
@@ -444,6 +454,8 @@ function pageLib(cfg) {
       if (!/grid|flex/.test(cs.display)) continue;
       const kids = [...parent.children].filter((k) => shown(k, band) && k.getBoundingClientRect().height > 0);
       if (kids.length < 2 || kids.length > 3 || kids.some((k) => k.hasAttribute("data-col"))) continue;
+      // The FAQ's head and list (B17) are unmarked by design: the list runs long beside a short head.
+      if (kids.some((k) => k.matches("[data-accordion]") || k.querySelector("[data-accordion]"))) continue;
       if (parent.closest("[data-col]") && parent.closest("[data-col]") !== parent) continue;
       const pr = parent.getBoundingClientRect();
       if (pr.height < 150) continue;
@@ -706,7 +718,9 @@ function pageLib(cfg) {
         if ([...el.classList].some((c) => AUTO.test(c))) continue;
         checked++;
         const cs = getComputedStyle(el);
-        for (const prop of ["marginTop", "marginBottom", "paddingTop", "paddingRight", "paddingBottom", "paddingLeft", "rowGap", "columnGap"]) {
+        // A coded UI's root: its margins place it on the page; its padding and gaps are its inside.
+        const props = el.matches(UI_SEL) ? ["marginTop", "marginBottom"] : ["marginTop", "marginBottom", "paddingTop", "paddingRight", "paddingBottom", "paddingLeft", "rowGap", "columnGap"];
+        for (const prop of props) {
           const raw = cs[prop];
           const v = raw === "normal" || raw === "" ? 0 : parseFloat(raw);
           if (!Number.isFinite(v) || onScale(v)) continue;
@@ -843,22 +857,27 @@ async function settlePage(page, vh) {
   await call(page, () => window.scrollTo(0, document.documentElement.scrollHeight));
   await page.waitForTimeout(200);
   // A quick scroll-through can pass a reveal between two slow headless frames (the 3D window slows
-  // them), leaving it hidden until it is next on screen. Bring each one still hidden into view.
-  const hidden = await call(page, () =>
-    [...document.querySelectorAll("[data-reveal]")].filter((e) => Number(getComputedStyle(e).opacity) < 0.99).length,
-  );
-  for (let i = 0; i < hidden; i++) {
-    const left = await call(page, () => {
-      const e = [...document.querySelectorAll("[data-reveal]")].find((x) => Number(getComputedStyle(x).opacity) < 0.99);
-      if (!e) return false;
-      e.scrollIntoView({ block: "center" });
-      return true;
-    });
-    if (!left) break;
-    await page.waitForTimeout(750);
+  // them), leaving it hidden until it is next on screen; and a page that hydrates late (a cold
+  // server) hides what is below the fold only then. Bring each one still hidden into view, and look
+  // again once back at the top, so the audit never measures a reveal that has not run.
+  const countHidden = () =>
+    call(page, () => [...document.querySelectorAll("[data-reveal]")].filter((e) => Number(getComputedStyle(e).opacity) < 0.99).length);
+  for (let round = 0; round < 3; round++) {
+    const hidden = await countHidden();
+    if (round > 0 && !hidden) break;
+    for (let i = 0; i < hidden; i++) {
+      const left = await call(page, () => {
+        const e = [...document.querySelectorAll("[data-reveal]")].find((x) => Number(getComputedStyle(x).opacity) < 0.99);
+        if (!e) return false;
+        e.scrollIntoView({ block: "center" });
+        return true;
+      });
+      if (!left) break;
+      await page.waitForTimeout(750);
+    }
+    await call(page, () => window.scrollTo(0, 0));
+    await page.waitForTimeout(900);
   }
-  await call(page, () => window.scrollTo(0, 0));
-  await page.waitForTimeout(900);
   await call(page, () => window.__p7layout.idle(null, 3000));
 }
 
