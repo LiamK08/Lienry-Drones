@@ -63,6 +63,47 @@ function compute3d() {
 export function useCanRender3d(): boolean {
   const wide = useMediaQuery("(min-width: 768px)");
   const reduce = useMediaQuery("(prefers-reduced-motion: reduce)");
-  const capable = useSyncExternalStore(noop, compute3d, () => false);
+  // The probe creates a WebGL context, so it only runs where the answer can matter: from 768 with
+  // motion allowed. On phones and under reduced motion no context is ever created.
+  const capable = useSyncExternalStore(noop, wide && !reduce ? compute3d : never, never);
   return wide && !reduce && capable;
+}
+
+const never = () => false;
+
+/** A fine pointer that can hover: where hover clips may play. */
+export const useHoverCapable = () => useMediaQuery("(hover: hover) and (pointer: fine)");
+
+export const usePrefersReducedMotion = () => useMediaQuery("(prefers-reduced-motion: reduce)");
+
+const saveDataOn = () => (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
+
+/** The visitor asked for less data (Save-Data). */
+export const useSaveData = () => useSyncExternalStore(noop, saveDataOn, () => false);
+
+type IdleWindow = Window & { requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number; cancelIdleCallback?: (id: number) => void };
+
+/**
+ * Runs `cb` once the page has loaded (the load event) and the main thread is next idle, so work
+ * that is not part of the first screen never competes with it. Returns a cancel function.
+ */
+export function afterLoadIdle(cb: () => void, timeout = 2000): () => void {
+  const w = window as IdleWindow;
+  let idle = 0;
+  let timer = 0;
+  let done = false;
+  const run = () => {
+    if (done) return;
+    if (w.requestIdleCallback) idle = w.requestIdleCallback(() => !done && cb(), { timeout });
+    else timer = window.setTimeout(() => !done && cb(), 1);
+  };
+  const onLoad = () => run();
+  if (document.readyState === "complete") run();
+  else window.addEventListener("load", onLoad, { once: true });
+  return () => {
+    done = true;
+    window.removeEventListener("load", onLoad);
+    if (idle) w.cancelIdleCallback?.(idle);
+    window.clearTimeout(timer);
+  };
 }

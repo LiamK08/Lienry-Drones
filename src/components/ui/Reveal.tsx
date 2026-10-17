@@ -4,24 +4,27 @@ import { motion, useReducedMotion } from "motion/react";
 import type { ReactNode } from "react";
 import { settle } from "@/lib/motion";
 
-export function Reveal({
-  children,
-  delay = 0,
-  className = "",
-  as = "div",
-  y = 12,
-}: {
+/** Any `data-*` attribute, forwarded to the rendered element (e.g. `data-section-head`, `data-col`). */
+export type DataAttributes = { [key: `data-${string}`]: string | undefined };
+
+const pick = (props: Record<string, unknown>): DataAttributes =>
+  Object.fromEntries(Object.entries(props).filter(([k]) => k.startsWith("data-"))) as DataAttributes;
+
+type RevealProps = {
   children: ReactNode;
   delay?: number;
   className?: string;
   as?: "div" | "li" | "section" | "figure" | "article";
   y?: number;
-}) {
+} & DataAttributes;
+
+export function Reveal({ children, delay = 0, className = "", as = "div", y = 12, ...rest }: RevealProps) {
   const reduce = useReducedMotion();
   const Tag = motion[as];
   return (
     <Tag
       className={className}
+      {...pick(rest)}
       data-reveal=""
       // The server cannot know the visitor's motion preference, so the first render is always the hidden
       // state; under reduced motion the reveal then completes instantly instead of fading.
@@ -35,11 +38,12 @@ export function Reveal({
   );
 }
 
-export function RevealList({ children, className = "", stagger = 0.06 }: { children: ReactNode; className?: string; stagger?: number }) {
+export function RevealList({ children, className = "", stagger = 0.06, ...rest }: { children: ReactNode; className?: string; stagger?: number } & DataAttributes) {
   const reduce = useReducedMotion();
   return (
     <motion.ul
       className={className}
+      {...pick(rest)}
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, margin: "0px 0px -10% 0px" }}
@@ -50,11 +54,12 @@ export function RevealList({ children, className = "", stagger = 0.06 }: { child
   );
 }
 
-export function RevealItem({ children, className = "" }: { children: ReactNode; className?: string }) {
+export function RevealItem({ children, className = "", ...rest }: { children: ReactNode; className?: string } & DataAttributes) {
   const reduce = useReducedMotion();
   return (
     <motion.li
       className={className}
+      {...pick(rest)}
       data-reveal=""
       variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0, transition: reduce ? { duration: 0 } : { duration: 0.64, ease: settle } } }}
     >

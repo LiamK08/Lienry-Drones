@@ -7,6 +7,10 @@
   --color-sunken: #e9e3d8;
   --color-ink: #1c1a17;
   --color-ink-raised: #26221d;
+  /* Primary hover on light: white label 11.60:1, a 1.50:1 step from ink. */
+  --color-ink-hover: #3d3832;
+  /* Primary hover on ink: ink label 10.35:1, a 1.46:1 step from plaster. */
+  --color-plaster-hover: #cfc7b8;
   --color-muted: #5e584f;
   --color-muted-on-dark: #a9a197;
   --color-glass: #0f6a7c;
@@ -15,6 +19,8 @@
   --color-water: #187566;
   --color-debris: #b9721c;
   --color-debris-text: #8a5210;
+  /* Error text on ink 6.10:1, on ink-raised 5.55:1. */
+  --color-debris-on-dark: #d08a3a;
   --color-hairline: #dcd5c8;
   --color-border-strong: #857d70;
   --color-white: #ffffff;
@@ -59,7 +65,7 @@
   --text-numeral--line-height: 1;
   --text-numeral--letter-spacing: -0.02em;
 
-  /* 1,392px: at 1440 the content starts at x=24, the edge the header links already use. */
+  /* 1,392px: 12 columns of 94px with 24px gutters at 1440. */
   --container-grid: 87rem;
   /* The 68-character cap, set in characters rather than zeroes. CSS ch is the advance of "0",
      which Inter renders at 0.65em with optical sizing on, while a character of this site's own
@@ -74,11 +80,35 @@
   --container-form: 40rem;
 }
 
-/* next/font sets these variables on <html>; inline so the utilities resolve them there. */
+/* next/font sets the font variables on <html>; inline so the utilities resolve them there. */
 @theme inline {
   --font-display: var(--font-instrument), "Iowan Old Style", "Palatino Linotype", Georgia, serif;
   --font-display-italic: var(--font-instrument-italic), "Iowan Old Style", "Palatino Linotype", Georgia, serif;
   --font-sans: var(--font-inter), "Helvetica Neue", Arial, sans-serif;
+  /* Role colours: each resolves at the element to the nearest surface's --s-* value. `inline` is
+     required: the utility must emit var(--s-*) itself, or :root would freeze the value. */
+  --color-fg: var(--s-fg);
+  --color-fg-muted: var(--s-muted);
+  --color-surface: var(--s-bg);
+  --color-rule: var(--s-rule);
+  --color-control: var(--s-control);
+  --color-field: var(--s-field);
+  --color-link: var(--s-link);
+  --color-link-hover: var(--s-link-hover);
+  --color-focus: var(--s-focus);
+  --color-action: var(--s-action);
+  --color-action-fg: var(--s-action-fg);
+  --color-action-hover: var(--s-action-hover);
+  --color-action-edge: var(--s-action-edge);
+  --color-error: var(--s-error);
+  --color-media: var(--s-media);
+}
+
+/* Twelve columns. Used as lg:grid-12 only: below 1024 every layout is composed on purpose. */
+@utility grid-12 {
+  display: grid;
+  column-gap: var(--gutter);
+  grid-template-columns: repeat(12, minmax(0, 1fr));
 }
 
 @layer base {
@@ -87,18 +117,73 @@
     /* Preflight aims code, kbd, samp and pre at a monospace stack. There is no mono family in
        this project, so they resolve to Inter like every other run of text. */
     --default-mono-font-family: var(--font-sans);
-    --page-margin: 1rem;                              /* 16px below 768px */
-    --band-y: clamp(3.5rem, 2rem + 4.5vw, 6rem);      /* band padding: 56px at 390, 96px at 1440 */
-    --plate-y: clamp(2rem, 1rem + 2vw, 2.5rem);       /* plate padding: 32px at 390, 40px at 1440 */
-    --gap-head: clamp(2rem, 1.25rem + 2.5vw, 3rem);   /* heading row to content: 32px at 390, 48px at 1440 */
-    --nav-h: 4.5rem;
+    --nav-h: 4.5rem;          /* 72, the frozen header */
+    --page-margin: 1rem;      /* 16 below 768 */
+    --gutter: 1rem;           /* 16 below 768 */
+    --section-y: 5rem;        /* 80 below 768 */
+    --head-gap: 2.5rem;       /* 40 below 1024 */
+    --hero-gap: 2.5rem;       /* 40 below 768 */
+    --hero-top: calc(var(--nav-h) + var(--hero-gap));
+    --bleed: max(var(--page-margin), calc((100vw - 87rem) / 2));
+  }
+  @media (min-width: 48rem) {
+    :root { --page-margin: 1.5rem; --gutter: 1.5rem; --section-y: 6rem; --hero-gap: 3rem; }
+  }
+  @media (min-width: 64rem) {
+    :root { --section-y: 8rem; --head-gap: 4rem; --hero-gap: 4rem; }
   }
 
-  /* 24px from 768px: the header's own edge. */
-  @media (min-width: 48rem) {
-    :root {
-      --page-margin: 1.5rem;
-    }
+  /* Light surfaces. .on-light, .surface-raised and .surface-sunken restore light inside an ink band. */
+  :root, .on-light, .surface-raised, .surface-sunken {
+    --s-bg: var(--color-plaster);
+    --s-fg: var(--color-ink);                /* 15.14 on plaster */
+    --s-muted: var(--color-muted);           /* 6.14 plaster, 6.69 raised, 5.51 sunken */
+    --s-rule: var(--color-hairline);         /* decorative rules only */
+    --s-control: var(--color-border-strong); /* control edges: 3.55 plaster, 3.86 raised, 3.18 sunken */
+    --s-field: var(--color-raised);
+    --s-link: var(--color-glass);            /* 5.43 plaster, 5.92 raised, 4.88 sunken */
+    --s-link-hover: var(--color-glass-deep);
+    --s-focus: var(--color-glass);
+    --s-action: var(--color-ink);
+    --s-action-fg: var(--color-white);       /* 17.36 */
+    --s-action-hover: var(--color-ink-hover);/* white on it 11.60 */
+    --s-action-edge: transparent;
+    --s-error: var(--color-debris-text);     /* 5.56 plaster, 6.06 raised */
+    --s-media: var(--color-sunken);
+  }
+  .surface-raised { --s-bg: var(--color-raised); background-color: var(--color-raised); color: var(--s-fg); }
+  .surface-sunken { --s-bg: var(--color-sunken); --s-media: var(--color-plaster); background-color: var(--color-sunken); color: var(--s-fg); }
+
+  .on-dark, .surface-ink-raised {
+    --s-bg: var(--color-ink);
+    --s-fg: var(--color-plaster);            /* 15.14 ink, 13.78 ink-raised */
+    --s-muted: var(--color-muted-on-dark);   /* 6.81 ink, 6.19 ink-raised */
+    --s-rule: rgb(243 239 231 / 0.2);
+    --s-control: var(--color-muted-on-dark); /* 6.81 / 6.19 */
+    --s-field: var(--color-ink-raised);
+    --s-link: var(--color-glass-on-dark);    /* 10.45 / 9.51 */
+    --s-link-hover: var(--color-plaster);
+    --s-focus: var(--color-glass-on-dark);
+    --s-action: var(--color-plaster);
+    --s-action-fg: var(--color-ink);         /* 15.14 */
+    --s-action-hover: var(--color-plaster-hover); /* ink on it 10.35 */
+    --s-action-edge: transparent;
+    --s-error: var(--color-debris-on-dark);  /* 6.10 / 5.55 */
+    --s-media: var(--color-ink-raised);
+  }
+  .surface-ink-raised { --s-bg: var(--color-ink-raised); background-color: var(--color-ink-raised); color: var(--s-fg); }
+
+  /* Over film (the home hero, the /commercial film frame's controls). Must follow .on-dark. */
+  .on-film {
+    --s-fg: var(--color-white);
+    --s-muted: var(--color-white);
+    --s-link: var(--color-white);
+    --s-link-hover: var(--color-white);
+    --s-control: rgb(255 255 255 / 0.75);
+    --s-action: var(--color-ink);
+    --s-action-fg: var(--color-white);
+    --s-action-hover: var(--color-ink-hover);
+    --s-action-edge: rgb(255 255 255 / 0.75); /* composites to rgb(198,198,197): 3.51:1 on the brightest frame, 10.16:1 on ink */
   }
 
   /* The UA centres button text. Button labels centre by flex instead, so no text is centred
@@ -159,14 +244,17 @@
     text-wrap: pretty;
   }
 
+  /* One focus ring everywhere: 2px in the surface's focus colour, 2px out. */
   :focus-visible {
-    outline: 2px solid var(--color-glass);
+    outline: 2px solid var(--s-focus);
     outline-offset: 2px;
     border-radius: var(--radius-hard);
   }
 
-  .on-dark :focus-visible {
-    outline-color: var(--color-glass-on-dark);
+  @media (forced-colors: active) {
+    :focus-visible {
+      outline-color: Highlight;
+    }
   }
 
   button, input, select, textarea {
@@ -187,11 +275,17 @@
       transition-delay: 0s !important;
       scroll-behavior: auto !important;
     }
-    /* Reveals render their hidden state on the server, which cannot know this preference. Show them
-       outright instead, so nothing appears or moves as it scrolls in (the inline styles are overridden). */
+    /* Nothing appears or moves as it scrolls in (any inline reveal style is overridden). */
     [data-reveal] {
       opacity: 1 !important;
       transform: none !important;
+    }
+    /* Hover clips never render under reduced motion; this is the belt to HoverClip's braces. */
+    [data-hover-clip] video {
+      display: none !important;
+    }
+    [data-zoom] {
+      scale: none !important;
     }
   }
 }
@@ -205,25 +299,90 @@
     padding-right: var(--page-margin);
   }
 
-
-  /* The glass-deep closing panel: white text, and a focus ring that holds 3:1 on glass-deep
-     (glass-on-dark measures 4.31:1 there). */
-  .on-accent {
-    color: var(--color-white);
+  /* The lowercase line above every section heading: Inter 14px, weight 500, the surface's muted colour. */
+  .eyebrow {
+    font-family: var(--font-sans);
+    font-size: var(--text-small);
+    line-height: var(--text-small--line-height);
+    font-weight: 500;
+    letter-spacing: normal;
+    text-transform: none;
+    color: var(--s-muted);
+    max-width: none;
   }
 
-  .on-accent :focus-visible {
-    outline-color: var(--color-glass-on-dark);
+  /* The one eyebrow-to-heading gap: 16. */
+  .eyebrow + :is(h1, h2) {
+    margin-top: 1rem;
   }
 
-  /* A hairline where two light tones meet: plaster, raised and sunken differ by only 1.09 to 1.21:1.
-     Bands carry data-tone (ui/Band.tsx); :where keeps this at zero specificity. */
-  :where([data-tone="plaster"], [data-tone="raised"], [data-tone="sunken"])
-    + :where([data-tone="plaster"], [data-tone="raised"], [data-tone="sunken"]) {
-    border-top: 1px solid var(--color-hairline);
+  /* The founder letter: the serif at the H3 step, the one run of serif text. */
+  .letter {
+    font-family: var(--font-display);
+    font-size: var(--text-h3);
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    font-weight: 400;
+    color: var(--s-fg);
   }
 
-  /* Small labels: Inter, uppercase, 12px, 0.12em. The only uppercase on the site. */
+  .letter p {
+    max-width: none;
+    text-wrap: pretty;
+  }
+
+  .letter p + p {
+    margin-top: 1.5rem;
+  }
+
+  /* An inline text link: the surface's link colour, a 1px underline that thickens on hover. */
+  .link {
+    color: var(--s-link);
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+    transition: color 200ms var(--ease-instrument), text-decoration-thickness 200ms var(--ease-instrument);
+  }
+
+  @media (hover: hover) {
+    .link:hover {
+      color: var(--s-link-hover);
+      text-decoration-thickness: 2px;
+    }
+  }
+
+  .link:active {
+    color: var(--s-link-hover);
+  }
+
+  /* A link in a list (the footer, the privacy index): the text colour, underlined at 40% at rest. */
+  .link-list {
+    color: var(--s-fg);
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+    text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+    transition: text-decoration-thickness 200ms var(--ease-instrument), text-decoration-color 200ms var(--ease-instrument);
+  }
+
+  @media (hover: hover) {
+    .link-list:hover {
+      text-decoration-thickness: 2px;
+      text-decoration-color: currentColor;
+    }
+  }
+
+  .link-list[aria-current="page"] {
+    text-decoration-color: currentColor;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .link, .link-list {
+      transition: none;
+    }
+  }
+
+  /* Data labels inside [data-ui] and the frozen header only (check 29). The only uppercase. */
   .label {
     font-family: var(--font-sans);
     font-size: var(--text-label);
@@ -234,7 +393,7 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* Live numbers: tabular figures so nothing jumps while a value animates. */
+  /* Live numbers: tabular figures so nothing jumps while a value changes. */
   .readout {
     font-family: var(--font-sans);
     font-weight: 500;
@@ -250,30 +409,6 @@
     line-height: var(--text-numeral--line-height);
     letter-spacing: var(--text-numeral--letter-spacing);
     font-variant-numeric: tabular-nums;
-  }
-
-  .water-link {
-    color: var(--color-glass);
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.2em;
-    transition: color 160ms var(--ease-instrument);
-  }
-
-  .water-link:hover {
-    color: var(--color-glass-deep);
-    text-decoration-thickness: 2px;
-  }
-
-  .caption {
-    font-family: var(--font-sans);
-    font-size: var(--text-caption);
-    line-height: var(--text-caption--line-height);
-    color: var(--color-muted);
-  }
-
-  .on-dark .caption {
-    color: var(--color-muted-on-dark);
   }
 
   .no-scrollbar {

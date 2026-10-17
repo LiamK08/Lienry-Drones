@@ -74,35 +74,53 @@ export const nav = [
 /** The header's utility link, beside the Register interest button, and the last item in the phone menu. */
 export const navUtility = { href: "/download", label: "Download" } as const;
 
-export const footerColumns = [
-  {
-    heading: "Platform",
-    links: [
-      { href: "/platform#dock", label: "Dock" },
-      { href: "/platform#tether", label: "Tether" },
-      { href: "/platform#drone", label: "Drone" },
-      { href: "/platform#scan", label: "Scan" },
-      { href: "/platform#software", label: "Software" },
-      { href: "/platform#automation", label: "Automation" },
-      { href: "/download", label: "Download" },
-    ],
-  },
-  {
-    heading: "Systems",
-    links: [
-      { href: "/commercial", label: "Commercial system" },
-      { href: "/homes-and-rentals", label: "Home system" },
-      { href: "/solar", label: "Solar" },
-    ],
-  },
-  {
-    heading: "Company",
-    links: [
-      { href: "/company", label: "About Lienry" },
-      { href: "/register-interest", label: "Register interest" },
-      { href: "/register-interest?type=commercial", label: "Book a pilot conversation" },
-      { href: "/register-interest?type=investor", label: "Investor enquiries" },
-      { href: "/privacy", label: "Privacy" },
-    ],
-  },
-] as const;
+/**
+ * The footer (src/components/site/Footer.tsx): the statement, four groups of links under lowercase
+ * eyebrows, and the legal line. Every enquiry label is the one label that route has everywhere.
+ */
+export const footer = {
+  statement: ["Resident cleaning.", "Designed in Sydney."],
+  groups: [
+    {
+      id: "platform",
+      heading: "platform",
+      links: [
+        { href: "/platform#dock", label: "Dock" },
+        { href: "/platform#tether", label: "Tether" },
+        { href: "/platform#drone", label: "Drone" },
+        { href: "/platform#scan", label: "Scan" },
+        { href: "/platform#software", label: "Software" },
+        { href: "/platform#automation", label: "Automation" },
+        { href: "/download", label: "Download" },
+      ],
+    },
+    {
+      id: "systems",
+      heading: "systems",
+      links: [
+        { href: "/commercial", label: "Commercial system" },
+        { href: "/homes-and-rentals", label: "Home system" },
+        { href: "/solar", label: "Solar" },
+      ],
+    },
+    {
+      id: "company",
+      heading: "company",
+      links: [
+        { href: "/company", label: "About Lienry" },
+        { href: "/privacy", label: "Privacy" },
+      ],
+    },
+    {
+      id: "contact",
+      heading: "get in touch",
+      links: [
+        { href: "/register-interest", label: "Register interest" },
+        { href: "/register-interest?type=commercial", label: "Book a pilot conversation" },
+        { href: "/register-interest?type=investor", label: "Investor enquiries" },
+        { href: "/register-interest?type=landlord", label: "I own rentals" },
+      ],
+    },
+  ],
+  legal: "© 2026 Lienry Drones. Sydney, Australia.",
+} as const;
