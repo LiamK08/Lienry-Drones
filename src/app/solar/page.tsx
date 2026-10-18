@@ -26,9 +26,9 @@ export default function SolarPage() {
         eyebrow={hero.eyebrow}
         headline={hero.headline}
         emphasis={hero.emphasis}
+        breakBefore
         lead={hero.lead}
         primary={hero.primary}
-        secondary={hero.secondary}
         media={{ kind: "image", ...hero.image }}
       />
       <StatBand
@@ -50,7 +50,6 @@ export default function SolarPage() {
         emphasis={closing.emphasis}
         body={closing.body}
         primary={closing.primary}
-        links={closing.links}
         media={{ kind: "image", image: closing.image }}
       />
     </>

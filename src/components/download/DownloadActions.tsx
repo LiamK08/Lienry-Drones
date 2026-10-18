@@ -60,7 +60,7 @@ function Controls({ primary, other, className }: { primary: Platform; other: Pla
           <Soon platform={primary} />
         </Button>
       )}
-      <div className="mt-2 flex flex-col items-start md:flex-row md:items-center md:gap-6">
+      <div data-actions="" className="mt-2 flex flex-col items-start md:flex-row md:items-center md:gap-6">
         {otherUrl ? (
           <Button href={otherUrl} variant="tertiary" download="">
             {name(other)}

@@ -24,6 +24,8 @@ export type PageHeroProps = {
   headline: string;
   /** The trailing phrase of `headline`, in the italic. */
   emphasis?: string;
+  /** From 768, break the line before the italic. */
+  breakBefore?: boolean;
   lead: string;
   primary?: Action;
   /** A tertiary link beside the primary. */
@@ -43,7 +45,7 @@ export type PageHeroProps = {
  * `--head-gap` and the media across the full grid: 21:9 from 1024, 16:9 from 768, 4:3 below, as the
  * page's LCP image (priority). Nothing in it reveals: it is the first screen.
  */
-export function PageHero({ id = "hero-heading", eyebrow, headline, emphasis, lead, primary, secondary, actions, media, after }: PageHeroProps) {
+export function PageHero({ id = "hero-heading", eyebrow, headline, emphasis, breakBefore, lead, primary, secondary, actions, media, after }: PageHeroProps) {
   const action =
     actions ??
     (primary || secondary ? (
@@ -63,7 +65,7 @@ export function PageHero({ id = "hero-heading", eyebrow, headline, emphasis, lea
   return (
     <Band id="hero" as="header" tone="plaster" pad="hero" labelledBy={id}>
       <Container>
-        <SectionHead id={id} as="h1" size="h1" eyebrow={eyebrow} headline={headline} emphasis={emphasis} reveal={false} intro={lead} action={action} />
+        <SectionHead id={id} as="h1" size="h1" eyebrow={eyebrow} headline={headline} emphasis={emphasis} breakBefore={breakBefore} reveal={false} intro={lead} action={action} />
         {media ? (
           <div className="mt-(--head-gap)">
             {media.kind === "image" ? (

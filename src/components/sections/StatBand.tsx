@@ -67,7 +67,7 @@ export function StatBand({ id, tone, eyebrow, headline, items, note, notePositio
             </RevealItem>
           ))}
         </RevealList>
-        {foot ? <p className="mt-8 text-caption text-fg-muted">{note}</p> : null}
+        {foot ? <p className="mt-8 max-w-[96ch] text-caption text-fg-muted">{note}</p> : null}
         {action ? (
           <div data-actions="" className="mt-8">
             <Button href={action.href} arrow>

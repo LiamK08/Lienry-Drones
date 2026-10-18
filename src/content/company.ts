@@ -38,7 +38,7 @@ export const companyPage = {
   founders: {
     eyebrow: "founders",
     headline: "Who is building it.",
-    intro: "Liam leads Lienry Drones from Sydney with a co-founder.",
+    intro: "Two founders, based in Sydney.",
     // The co-founder stays unpublished, with no name or title, until the owner supplies them.
     people: [
       { name: "Liam Kennedy", title: "Founder and CEO", bio: "", photo: null, published: true },

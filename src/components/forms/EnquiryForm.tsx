@@ -5,7 +5,7 @@ import { useId, useState } from "react";
 import { enquirySchema, enquiryTypes, enquiryTypeLabels, propertyCounts, propertyTypes, type EnquiryType } from "@/lib/enquiry-schema";
 import { registerPage } from "@/content/register";
 import { Button } from "@/components/ui/Button";
-import { Field, SelectField, choiceBox, choiceInput, describedBy, fieldArea, fieldControl, radioCard } from "@/components/ui/Field";
+import { Field, SelectField, checkInput, choiceBox, choiceInput, describedBy, fieldArea, fieldControl, radioCard } from "@/components/ui/Field";
 import { TextLink } from "@/components/ui/TextLink";
 
 type Errors = Partial<Record<string, string>>;
@@ -120,9 +120,9 @@ export function EnquiryForm() {
         </div>
       </div>
 
-      <label className="flex cursor-pointer items-start gap-4 text-small text-fg-muted">
+      <label className="flex cursor-pointer items-start gap-4 text-small text-fg-muted transition-[color] duration-200 ease-instrument hover:text-fg motion-reduce:transition-none">
         <span className={choiceBox}>
-          <input type="checkbox" name="updates" className={choiceInput} />
+          <input type="checkbox" name="updates" className={checkInput} />
         </span>
         <span className="max-w-prose">Keep me posted as the pilot program takes shape. No marketing lists, and you can stop any time.</span>
       </label>

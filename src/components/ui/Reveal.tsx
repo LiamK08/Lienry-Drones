@@ -12,7 +12,7 @@ export type DataAttributes = { [key: `data-${string}`]: string | undefined };
  * - "shown": the server render, and anything on screen or above it when the page hydrates. It never
  *   animates, so nothing in a first screen ever waits for JavaScript or a reveal.
  * - "hidden": wholly below the fold at hydration. It is hidden there, out of sight, until it scrolls in.
- * - "visible": it entered the viewport (less its bottom 10%) and rises in once.
+ * - "visible": it entered the viewport (less its bottom 10%), or focus moved into it, and rises in once.
  * Without JavaScript, and under reduced motion, everything stays "shown".
  */
 export type RevealPhase = "shown" | "hidden" | "visible";
@@ -42,7 +42,16 @@ export function useRevealPhase<T extends Element>(): [RefObject<T | null>, Revea
       { rootMargin: "0px 0px -10% 0px" },
     );
     io.observe(el);
-    return () => io.disconnect();
+    // Keyboard focus landing inside a hidden reveal shows it at once, whatever the observer's timing.
+    const onFocus = () => {
+      setPhase((p) => (p === "hidden" ? "visible" : p));
+      io.disconnect();
+    };
+    el.addEventListener("focusin", onFocus);
+    return () => {
+      io.disconnect();
+      el.removeEventListener("focusin", onFocus);
+    };
   }, [reduce]);
   return [ref, phase];
 }

@@ -14,12 +14,16 @@ export const fieldControl =
 /** The textarea: the same control, at least 128px tall, resizable vertically. */
 export const fieldArea = fieldControl.replace("h-12", "min-h-32 py-4 resize-y");
 
-/** A radio choice drawn as a card (wrap the input in this `label`). */
+/** A radio choice drawn as a card (wrap the input in this `label`): the edge darkens when chosen, and
+ *  hover fills the card, so a chosen card still answers the pointer. */
 export const radioCard =
-  "relative flex cursor-pointer items-start gap-4 rounded-hard border border-control p-4 transition-[border-color,background-color] duration-200 ease-instrument motion-reduce:transition-none hover:border-fg has-[:checked]:border-fg has-[:checked]:bg-field has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-solid has-[:focus-visible]:outline-focus";
+  "relative flex cursor-pointer items-start gap-4 rounded-hard border border-control p-4 transition-[border-color,background-color] duration-200 ease-instrument motion-reduce:transition-none hover:border-fg hover:bg-field has-[:checked]:border-fg has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-solid has-[:focus-visible]:outline-focus";
 
-/** A radio or checkbox input: put it inside `<span className={choiceBox}>` so it centres on the first text line. */
+/** A radio inside a radioCard (the card draws the focus ring): put it inside `<span className={choiceBox}>` so it centres on the first text line. */
 export const choiceInput = "size-4 accent-ink focus-visible:outline-none";
+
+/** A standalone checkbox, which draws its own focus ring. */
+export const checkInput = "size-4 accent-ink";
 export const choiceBox = "flex h-[1.3125rem] items-center";
 
 /** The aria-describedby for a control: its help line and its error, when present. */
