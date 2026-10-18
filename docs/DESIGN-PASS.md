@@ -9,7 +9,7 @@ This is the record of the design pass of 17 October 2026. It covers:
 - the page plans, the copy budget and the commands;
 - what we still need from the owner.
 
-## Status (17 October 2026)
+## Status (18 October 2026)
 
 The owner asked to ship what was done. What is on `main`:
 
@@ -35,7 +35,21 @@ The home page is rebuilt in eight sections that alternate dark and light:
 
 On the home page, `check:layout`, `check:rules`, `check:a11y` and `perf:vitals` all pass. On a throttled phone, the main content now appears at 1.8 s (Lighthouse with applied throttling), against 7.9 s before.
 
-The inner pages run on the new system but keep their old layouts. Their plans in section 10 are specified but not built. Until they are, `npm run check:layout` and `npm run check:rules` report the old sections' failures by design: tones, eyebrows, copy budgets and line counts.
+### Inner pages (18 October 2026)
+
+Every inner page now opens on `PageHero` and closes on `ClosingSection` (or the questions, on /download), with plaster and ink alternating down to the ink footer:
+
+- **/platform:** hero, the six parts as a card grid on ink (each card is the anchor the footer's `/platform#dock` to `#automation` links land on), the two systems, the questions, the ask.
+- **/commercial:** the commercial film hero with the four steps continuing it on plaster, the software window on ink, the calculator (opening on Commercial building), the questions, the pilot ask with a collage.
+- **/homes-and-rentals:** hero, the app told as five beats of one clean on ink, two cited figures, the questions, the ask.
+- **/solar:** hero, three cited soiling figures on ink, three cards (p5, y2, y1), the questions, the ask. No copy names the system that serves solar farms.
+- **/company:** hero, where the company is, the three rules (Honest by default among them), the founders and the hose-free idea, the investor ask.
+- **/download:** hero with the buttons and the working window, what it does, the questions. System requirements are a question; the "active software plan" and automatic update claims are now "still being finalised".
+- **/register-interest:** one band, the head and image beside the form, every control a `Field`; success replaces the form and takes the focus.
+- **/privacy:** one band, the six sections in `[data-prose]`.
+- **404:** a `PageHero` with the way home.
+
+The uncited savings copy ("a cheaper long-term alternative", "Why it costs less over time") is gone. Switcher, CtaPanel, SiblingCards, PageHeroSplit, SpecBand and CtaWithProduct are deleted. `check:layout`, `check:rules` and `check:a11y` pass on all routes.
 
 Sections 5 to 13 describe the build spec of 17 October. Where the research draft and the spec disagreed about what Lienry will do, the spec won.
 
