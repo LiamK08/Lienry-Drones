@@ -49,7 +49,7 @@ Every inner page now opens on `PageHero` and closes on `ClosingSection` (or the 
 - **/privacy:** one band, the six sections in `[data-prose]`.
 - **404:** a `PageHero` with the way home.
 
-The uncited savings copy ("a cheaper long-term alternative", "Why it costs less over time") is gone. Switcher, CtaPanel, SiblingCards, PageHeroSplit, SpecBand and CtaWithProduct are deleted. `check:layout`, `check:rules` and `check:a11y` pass on all routes.
+The uncited savings copy ("a cheaper long-term alternative", "Why it costs less over time") is gone. Switcher, CtaPanel, SiblingCards, PageHeroSplit, SpecBand and CtaWithProduct are deleted. `check:layout`, `check:rules` and `check:a11y` pass on all routes. `perf:vitals` (mobile, applied throttling, three runs) passes on all nine: median LCP from 1.6 s (/privacy, /register-interest) to 2.42 s (/commercial), CLS at most 0.08 (/solar).
 
 Sections 5 to 13 describe the build spec of 17 October. Where the research draft and the spec disagreed about what Lienry will do, the spec won.
 
