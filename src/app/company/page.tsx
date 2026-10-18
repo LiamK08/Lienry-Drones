@@ -2,10 +2,12 @@ import type { Metadata } from "next";
 import { companyPage } from "@/content/company";
 import { pageMetadata } from "@/lib/site";
 import { FounderList } from "@/components/company/FounderList";
-import { CtaPanel } from "@/components/sections/CtaPanel";
+import { ClosingSection } from "@/components/sections/ClosingSection";
 import { FeatureRow } from "@/components/sections/FeatureRow";
+import { PageHero } from "@/components/sections/PageHero";
 import { Band, Container } from "@/components/ui/Band";
-import { Picture } from "@/components/ui/Picture";
+import { FactList } from "@/components/ui/FactList";
+import { Reveal } from "@/components/ui/Reveal";
 import { SectionHead } from "@/components/ui/SectionHead";
 
 export const metadata: Metadata = pageMetadata(
@@ -16,89 +18,62 @@ export const metadata: Metadata = pageMetadata(
 /**
  * Keeps a hyphenated compound whole in a display heading: a word joiner (U+2060, zero width and
  * silent) after the hyphen removes the line break the hyphen allows, so a balanced heading never
- * ends a line on "pre-". The fonts have no non-breaking hyphen (U+2011), which would fall back to
- * another typeface.
+ * ends a line on "pre-". The fonts have no non-breaking hyphen (U+2011).
  */
 function keepCompounds(text: string) {
-  return text.replace(/(\w)-(?=\w)/g, "$1-\u2060");
+  return text.replace(/(\w)-(?=\w)/g, "$1-⁠");
 }
 
-// /company (docs/REDESIGN-SPEC.md C6): the statement over one wide image, the two narrative rows,
-// the founders with what is next, then the investor panel. Tones: raised, plaster, raised, sunken,
-// plaster (with the glass-deep panel), then the sunken footer.
+/**
+ * /company in five bands, alternating light and dark: the hero, where the company is, the rules it
+ * builds by, the founders, and the investor ask. Then the ink footer.
+ */
 export default function CompanyPage() {
-  const c = companyPage;
+  const { hero, where, values, founders, closing } = companyPage;
   return (
     <>
-      {/* 1. Statement: a media hero, so nothing in it waits for a reveal. */}
-      <Band id="statement" as="header" tone="raised" pad="hero" labelledBy="company-heading">
-        <Container>
-          <SectionHead
-            id="company-heading"
-            as="h1"
-            size="h1"
-            eyebrow="company"
-            headline={c.headline}
-            emphasis={c.emphasis}
-            reveal={false}
-            action={<p className="text-lead text-fg">{c.statement}</p>}
-          />
-          <Picture
-            id={c.heroImageId}
-            alt={c.heroAlt}
-            aspect="21/9"
-            priority
-            sizes="(min-width: 1440px) 1392px, 100vw"
-            className="mt-(--head-gap)"
-          />
-        </Container>
-      </Band>
-
-      {/* 2. Where we are. */}
+      <PageHero eyebrow={hero.eyebrow} headline={hero.headline} emphasis={hero.emphasis} lead={hero.lead} media={{ kind: "image", ...hero.image }} />
       <FeatureRow
         id="where"
-        tone="plaster"
+        tone="ink"
         side="left"
-        eyebrow="where we are"
-        headline={keepCompounds(c.where.headline)}
-        intro={c.where.body}
-        facts={c.where.items.map((i) => ({ term: i.title, text: i.body }))}
-        image={c.where.image}
+        eyebrow={where.eyebrow}
+        headline={keepCompounds(where.headline)}
+        intro={where.body}
+        facts={where.items.map((i) => ({ term: i.title, text: i.body }))}
+        image={where.image}
       />
-
-      {/* 3. How we work. */}
       <FeatureRow
         id="values"
-        tone="raised"
+        tone="plaster"
         side="right"
-        eyebrow="how we work"
-        headline={c.values.headline}
-        intro={c.values.body}
-        facts={c.values.items.map((i) => ({ term: i.title, text: i.body }))}
+        eyebrow={values.eyebrow}
+        headline={values.headline}
+        intro={values.body}
+        facts={values.items.map((i) => ({ term: i.title, text: i.body }))}
         termStyle="strong"
-        image={c.values.image}
+        image={values.image}
       />
-
-      {/* 4. Founders and what is next: two split blocks divided by a hairline. The band is named by
-          the founders heading; the second block is its own section, named by its heading. */}
-      <Band id="founders" tone="sunken" labelledBy="founders-heading">
+      <Band id="founders" tone="ink" labelledBy="founders-heading">
         <Container>
-          <SectionHead id="founders-heading" eyebrow="founders" headline={c.founders.headline} action={<FounderList people={c.founders.people} />} />
-          <section aria-labelledby="exploring-heading" className="mt-(--head-gap) border-t border-rule pt-(--head-gap)">
-            <SectionHead id="exploring-heading" eyebrow={c.exploring.eyebrow.toLowerCase()} headline={c.exploring.headline} intro={c.exploring.body} />
-          </section>
+          <div className="lg:grid-12">
+            <SectionHead id="founders-heading" layout="stack" eyebrow={founders.eyebrow} headline={founders.headline} intro={founders.intro} className="lg:col-span-5" />
+            <Reveal className="mt-(--head-gap) lg:col-span-6 lg:col-start-7 lg:mt-0">
+              <FounderList people={founders.people} />
+              <FactList items={[{ term: founders.exploring.title, text: founders.exploring.body }]} className="mt-8" />
+            </Reveal>
+          </div>
         </Container>
       </Band>
-
-      {/* 5. Investors: the closing panel. */}
-      <CtaPanel
-        id="investors"
-        eyebrow="investors"
-        headline={keepCompounds(c.investors.headline)}
-        body={`${c.investors.body} ${c.investors.note}`}
-        primary={c.investors.cta}
-        links={c.investors.links}
-        image={c.investors.image}
+      <ClosingSection
+        id="closing"
+        eyebrow={closing.eyebrow}
+        headline={keepCompounds(closing.headline)}
+        emphasis={keepCompounds(closing.emphasis)}
+        body={closing.body}
+        primary={closing.primary}
+        links={closing.links}
+        media={{ kind: "image", image: closing.image }}
       />
     </>
   );

@@ -125,11 +125,12 @@ export function RevealList({ children, className = "", stagger = 0.06, ...rest }
 export const revealListVariants = (stagger: number) => ({ hidden: {}, visible: { transition: { staggerChildren: stagger } } });
 
 /** One item of a RevealList (or of SnapTrack). It follows its list; on its own it simply renders. */
-export function RevealItem({ children, className = "", ...rest }: { children: ReactNode; className?: string } & DataAttributes) {
+export function RevealItem({ children, id, className = "", ...rest }: { children: ReactNode; id?: string; className?: string } & DataAttributes) {
   const reduce = useReducedMotion();
   const phase = useContext(RevealListPhase);
   return (
     <motion.li
+      id={id}
       className={className}
       {...pick(rest)}
       data-reveal=""

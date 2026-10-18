@@ -1,5 +1,5 @@
 import type { BandTone, ClipRef, ImageRef, LegacyTone } from "@/lib/types";
-import { Band, Container } from "@/components/ui/Band";
+import { Band, Container, type BandPad } from "@/components/ui/Band";
 import { MediaCard } from "@/components/ui/MediaCard";
 import { RevealItem } from "@/components/ui/Reveal";
 import { SectionHead } from "@/components/ui/SectionHead";
@@ -29,6 +29,8 @@ export type StepCardsProps = {
   track: { label: string; prevLabel: string; nextLabel: string };
   /** Cards in a row from 1024. Default 3 (448px at 1440). */
   columns?: 3 | 4;
+  /** "attached" continues the hero band above it in the same tone. Default "section". */
+  pad?: BandPad;
 };
 
 // Three columns are 448px at 1440 and four 330px; a track item is 46% from 768 and 82% below.
@@ -42,9 +44,9 @@ const SIZES = {
  * and a snap track with previous and next buttons below it. Each card is its image, its number, the
  * title and the body; the cards are not links, so they neither zoom nor underline.
  */
-export function StepCards({ id, tone, eyebrow, headline, emphasis, intro, aspect, items, track, columns = 3 }: StepCardsProps) {
+export function StepCards({ id, tone, eyebrow, headline, emphasis, intro, aspect, items, track, columns = 3, pad = "section" }: StepCardsProps) {
   return (
-    <Band id={id} tone={tone} labelledBy={`${id}-heading`}>
+    <Band id={id} tone={tone} pad={pad} labelledBy={`${id}-heading`}>
       <Container>
         <SectionHead id={`${id}-heading`} eyebrow={eyebrow} headline={headline} emphasis={emphasis} intro={intro} />
         <div className="mt-(--head-gap)">

@@ -1,96 +1,47 @@
 import type { Metadata } from "next";
-import { faqSets, platformFaq } from "@/content/faq";
-import { platformPage, systemExplainer, twoSystems } from "@/content/platform";
+import { faqFor, faqIntro } from "@/content/faq";
+import { platformPage } from "@/content/platform";
 import { pageMetadata } from "@/lib/site";
-import { CtaWithProduct } from "@/components/platform/CtaWithProduct";
-import { SpecBand } from "@/components/platform/SpecBand";
+import { CardGrid } from "@/components/sections/CardGrid";
+import { ClosingSection } from "@/components/sections/ClosingSection";
 import { Faq } from "@/components/sections/Faq";
-import { FeatureRow } from "@/components/sections/FeatureRow";
-import { PageHeroSplit } from "@/components/sections/PageHeroSplit";
-import { Switcher, type SwitcherItem } from "@/components/sections/Switcher";
-import { SoftwareWindow } from "@/components/software/SoftwareWindow";
+import { PageHero } from "@/components/sections/PageHero";
 
 export const metadata: Metadata = pageMetadata(
   "/platform",
   "One drone platform, two systems, six parts: dock, tether, drone, scan, software and automation. Built for buildings under 70 metres.",
 );
 
-// The platform hub (docs/REDESIGN-SPEC.md C2): split hero, the six-part switcher, the two system
-// rows, the ink specification sheet, the questions, and the ask with the working window under it.
-// Tones run raised, plaster, raised, sunken, ink, plaster, raised, then the sunken footer.
-// Each part's panel id is its part id (dock ... automation), so the footer's /platform#part links
-// open it; no other element on this page may take one of those ids.
-
-const parts: SwitcherItem[] = systemExplainer.tabs.map((part, i) => {
-  const { facts, link } = platformPage.partFacts[part.id];
-  return {
-    id: part.id,
-    tab: part.tab,
-    label: `${String(i + 1).padStart(2, "0")} · ${part.tab}`,
-    title: part.title,
-    body: part.body,
-    image: { id: part.imageId, alt: part.alt, position: part.position },
-    facts,
-    link,
-  };
-});
-
-const [commercialSystem, homeSystem] = twoSystems.systems;
-
-const questions = faqSets.platform.flatMap((id) => platformFaq.items.filter((item) => item.id === id));
-
+/**
+ * The platform in five bands, alternating light and dark: the hero, the six parts (each card is the
+ * anchor the footer links to), the two systems, the questions and the ask. Then the ink footer.
+ */
 export default function PlatformPage() {
-  const { actions, partsSection, rows, specs, close } = platformPage;
+  const { hero, parts, systems, faq, closing } = platformPage;
   return (
     <>
-      <PageHeroSplit
-        id="hero-heading"
-        headline={platformPage.headline}
-        emphasis={platformPage.emphasis}
-        lead={platformPage.lead}
-        primary={actions.primary}
-        secondary={actions.secondary}
-        media={{ kind: "image", id: platformPage.heroImageId, alt: platformPage.heroAlt }}
+      <PageHero
+        eyebrow={hero.eyebrow}
+        headline={hero.headline}
+        emphasis={hero.emphasis}
+        lead={hero.lead}
+        primary={hero.primary}
+        secondary={hero.secondary}
+        media={{ kind: "image", ...hero.image }}
       />
-      <Switcher
-        id="parts"
-        reveal={false}
-        tone="plaster"
-        eyebrow="six parts"
-        headline={partsSection.headline}
-        emphasis={partsSection.emphasis}
-        intro={systemExplainer.intro}
-        tabsLabel={partsSection.tabsLabel}
-        items={parts}
-        hashSync
+      <CardGrid id="parts" tone="ink" eyebrow={parts.eyebrow} headline={parts.headline} emphasis={parts.emphasis} intro={parts.intro} columns={3} aspect="4/3" items={parts.items} />
+      <CardGrid id="systems" tone="plaster" eyebrow={systems.eyebrow} headline={systems.headline} emphasis={systems.emphasis} intro={systems.intro} columns={2} aspect="3/2" items={systems.items} />
+      <Faq id="faq" tone="ink" eyebrow={faq.eyebrow} headline={faq.headline} intro={faqIntro} link={faq.link} items={faqFor("platform")} />
+      <ClosingSection
+        id="closing"
+        eyebrow={closing.eyebrow}
+        headline={closing.headline}
+        emphasis={closing.emphasis}
+        body={closing.body}
+        primary={closing.primary}
+        links={closing.links}
+        media={{ kind: "image", image: closing.image }}
       />
-      <FeatureRow
-        id="commercial-system"
-        tone="raised"
-        side="left"
-        eyebrow="roof capsule"
-        headline={rows.commercial.title}
-        intro={rows.commercial.body}
-        link={rows.commercial.link}
-        facts={commercialSystem.points.map((text) => ({ text }))}
-        image={rows.commercial.image}
-      />
-      <FeatureRow
-        id="home-system"
-        tone="sunken"
-        side="right"
-        eyebrow="ground pod"
-        headline={rows.home.title}
-        intro={rows.home.body}
-        link={rows.home.link}
-        facts={homeSystem.points.map((text) => ({ text }))}
-        image={rows.home.image}
-      />
-      <SpecBand id="specs" eyebrow="specification" headline={specs.headline} intro={specs.intro} rows={specs.rows} />
-      <Faq id="faq" tone="plaster" eyebrow="questions" headline={platformFaq.headline} intro={platformFaq.intro} link={platformFaq.link} items={questions} />
-      <CtaWithProduct id="demo" tone="raised" eyebrow="pre-launch" headline={close.headline} body={close.body} primary={close.primary} secondary={close.secondary}>
-        <SoftwareWindow />
-      </CtaWithProduct>
     </>
   );
 }

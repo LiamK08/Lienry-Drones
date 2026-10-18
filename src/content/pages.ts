@@ -11,4 +11,3 @@ export * from "./register";
 export * from "./privacy";
 export * from "./download";
 export * from "./notFound";
-export * from "./siblings";

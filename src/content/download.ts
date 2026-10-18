@@ -15,9 +15,12 @@ export const downloadPage = {
       live: "Download Lienry Desktop for Mac and Windows. See the 3D scan of your building, set cleaning zones and surface pressure, and watch every wash as it happens.",
     },
   },
-  headline: "Your building, on your desk.",
-  emphasis: "on your desk.",
-  lead: "In Lienry Desktop you see the 3D scan of your building, set the cleaning zones and the pressure for each surface, and watch every wash as it happens.",
+  hero: {
+    eyebrow: "lienry desktop",
+    headline: "Your building, on your desk.",
+    emphasis: "on your desk.",
+    lead: "See the 3D scan of your building, set zones and pressure, and watch every wash live.",
+  },
   actions: {
     platforms: { mac: "Mac", windows: "Windows" },
     download: "Download for",
@@ -26,43 +29,25 @@ export const downloadPage = {
     register: { label: "Register interest", href: "/register-interest" },
   },
   features: {
+    eyebrow: "what it does",
     headline: "What the software does.",
-    intro: "Every clean is planned and followed on a model of your own building, made from the drone's scan.",
+    intro: "Every clean is planned on a model of your own building.",
     items: [
-      { term: "3D building view", text: "Your building as a 3D model, made from the drone's scan of its structure and dimensions." },
-      { term: "Cleaning zones and surface pressure", text: "Group the building into zones and set the pressure for each surface, from glass to solar panels." },
-      { term: "Live wash progress", text: "Watch the clean move across the building as it happens, and see what is left to wash." },
+      { term: "3D building view", text: "A model of your building from the drone's scan." },
+      { term: "Zones and pressure", text: "Group surfaces into zones and set each pressure." },
+      { term: "Live wash progress", text: "Watch the clean move across the building." },
     ],
   },
-  requirements: {
-    headline: "System requirements.",
-    intro: "What your computer needs to run Lienry Desktop, and what you need to sign in.",
-    rows: [
-      ["Mac", "macOS 13 or later, on Apple silicon or Intel"],
-      ["Windows", "Windows 10 or 11, 64-bit"],
-      ["Signing in", "Requires a Lienry drone and an active software plan"],
-    ] as const,
-  },
   faq: {
+    eyebrow: "questions",
     headline: "Before you download.",
-    intro: "Straight answers about Lienry Desktop, including what is not ready yet.",
+    intro: "Including what is still being finalised.",
     link: { label: "Register interest", href: "/register-interest" },
     items: [
-      {
-        id: "drone",
-        q: "Do I need a drone to use it?",
-        a: "Yes. Signing in requires a Lienry drone and an active software plan, because everything the software shows comes from your drone's scan of your building.",
-      },
-      {
-        id: "mobile",
-        q: "Is there a mobile app?",
-        a: "An iPhone app is coming later. Until then, Lienry Desktop on a Mac or Windows computer is where you plan a clean and watch it happen.",
-      },
-      {
-        id: "updates",
-        q: "How do updates work?",
-        a: "Lienry Desktop updates itself. When a new version is ready it installs automatically, so you only need to download it once.",
-      },
+      { id: "drone", q: "Do I need a drone to use it?", a: "Yes. Everything it shows comes from your drone's scan. What signing in needs is still being finalised." },
+      { id: "requirements", q: "What does my computer need?", a: "macOS 13 or later on Apple silicon or Intel, or 64-bit Windows 10 or 11." },
+      { id: "mobile", q: "Is there a mobile app?", a: "The home system has a mobile app. Its release is still being finalised." },
+      { id: "updates", q: "How do updates work?", a: "How Lienry Desktop is updated is still being finalised." },
     ],
   },
 };

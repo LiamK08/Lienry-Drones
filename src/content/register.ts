@@ -1,11 +1,11 @@
-// /register-interest copy. Moved verbatim from pages.ts (registerPage) by the design-pass foundation;
-// the /register-interest page package owns this module. Conventions: `emphasis` is the trailing phrase of its
-// `headline`, images are ImageRef-compatible `{ id, alt, position }` with manifest still ids, and links
-// are Action-compatible `{ label, href }`.
+// /register-interest copy. Conventions shared with every content module: `emphasis` is the trailing
+// phrase of its `headline`; links are Action-compatible `{ label, href }`.
 
 export const registerPage = {
+  eyebrow: "register interest",
   headline: "Tell us about your property.",
-  lead: "Whether you own a home, manage a building, hold rentals or invest, we would like to hear from you. Lienry is pre-launch, and we reply personally.",
+  emphasis: "your property.",
+  lead: "Homes, buildings, rentals or investment. Lienry is pre-launch, and we reply personally.",
   image: { id: "h0-hero-still", alt: "The Lienry drone washing a glass curtain wall, its tether rising to the roof", position: "60% 50%" },
   success: {
     headline: "Thanks, we have your details.",

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { appPanel } from "@/content/homes";
+import { Button } from "@/components/ui/Button";
 
 export type AppState = "map" | "select" | "start" | "progress" | "done";
 
@@ -99,13 +100,9 @@ function Control({ state, onAdvance }: { state: AppState; onAdvance: () => void 
         ))}
       </ul>
       <div className="mt-auto pt-6">
-        <button
-          type="button"
-          onClick={onAdvance}
-          className="flex h-11 w-full items-center justify-center rounded-hard bg-ink text-small font-medium text-white transition-colors duration-150 ease-instrument hover:bg-ink-raised"
-        >
+        <Button onClick={onAdvance} className="w-full">
           {appPanel.buttons[state]}
-        </button>
+        </Button>
         <p className="mt-3 text-caption text-muted">{appPanel.note}</p>
       </div>
       <p role="status" aria-live="polite" className="sr-only">

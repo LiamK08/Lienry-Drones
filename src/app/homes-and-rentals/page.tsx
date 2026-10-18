@@ -1,68 +1,59 @@
 import type { Metadata } from "next";
-import { faqSets, platformFaq } from "@/content/faq";
+import { faqFor, faqIntro } from "@/content/faq";
 import { homesPage } from "@/content/homes";
 import { australiaStats } from "@/content/stats";
 import { pageMetadata } from "@/lib/site";
 import { LandlordStory } from "@/components/home/LandlordStory";
-import { CtaPanel } from "@/components/sections/CtaPanel";
+import { ClosingSection } from "@/components/sections/ClosingSection";
 import { Faq } from "@/components/sections/Faq";
-import { PageHeroSplit } from "@/components/sections/PageHeroSplit";
-import { SiblingCards } from "@/components/sections/SiblingCards";
+import { PageHero } from "@/components/sections/PageHero";
 import { CITED_NOTE, StatBand, pickStats } from "@/components/sections/StatBand";
-import { StepCards } from "@/components/sections/StepCards";
 
 export const metadata: Metadata = pageMetadata(
   "/homes-and-rentals",
-  "A waterproof ground pod, a drone that knows each material, and an app that starts the clean wherever you are. For houses, apartments, rentals and solar farms.",
+  "A waterproof ground pod, a drone that knows each material, and an app that starts the clean wherever you are. For houses, apartments and rentals.",
 );
 
-// The page's questions, in the order faqSets gives them.
-const questions = faqSets.homes.map((id) => platformFaq.items.find((item) => item.id === id)).filter((item) => item !== undefined);
-
 /**
- * /homes-and-rentals (docs/REDESIGN-SPEC.md C4): the split hero, the four setup steps as cards,
- * the app story, two cited figures, questions, the other product pages and the register panel.
+ * /homes-and-rentals in five bands, alternating light and dark: the hero, the app told as one clean,
+ * two cited figures, the questions and the ask. Then the ink footer.
  */
 export default function HomesPage() {
-  const h = homesPage;
+  const { hero, stats, faq, closing } = homesPage;
   return (
     <>
-      <PageHeroSplit
-        id="hero-heading"
-        headline={h.headline}
-        emphasis={h.emphasis}
-        lead={h.lead}
-        primary={h.actions.primary}
-        secondary={h.actions.secondary}
-        media={{ kind: "image", id: h.heroImageId, alt: h.heroAlt, position: h.heroPosition }}
-      />
-      {/* Starts inside the first screen, so nothing in it waits for a reveal. */}
-      <StepCards
-        id="how"
-        tone="plaster"
-        eyebrow="four steps"
-        headline={h.steps.headline}
-        intro={h.steps.intro}
-        columns={4}
-        aspect="3/4"
-        items={h.steps.items}
-        track={h.steps.track}
+      <PageHero
+        eyebrow={hero.eyebrow}
+        headline={hero.headline}
+        emphasis={hero.emphasis}
+        lead={hero.lead}
+        primary={hero.primary}
+        secondary={hero.secondary}
+        media={{ kind: "image", ...hero.image }}
       />
       <LandlordStory />
       <StatBand
         id="australia"
-        tone="ink"
-        eyebrow="why it matters"
-        headline={h.statsHeadline}
+        tone="plaster"
+        eyebrow={stats.eyebrow}
+        headline={stats.headline}
         notePosition="foot"
-        intro={h.statsIntro}
+        intro={stats.intro}
         items={pickStats(australiaStats, ["abs-renting", "cer-rooftop"])}
         note={CITED_NOTE}
-        action={h.statsAction}
+        action={stats.action}
       />
-      <Faq id="faq" tone="plaster" eyebrow="questions" headline={platformFaq.headline} intro={platformFaq.intro} link={h.actions.primary} items={questions} />
-      <SiblingCards current="homes" />
-      <CtaPanel id="register" eyebrow="pre-launch" headline={h.close.headline} body={h.close.body} primary={h.close.primary} links={h.close.links} image={h.close.image} />
+      <Faq id="faq" tone="ink" eyebrow={faq.eyebrow} headline={faq.headline} intro={faqIntro} link={faq.link} items={faqFor("homes")} />
+      <ClosingSection
+        id="closing"
+        eyebrow={closing.eyebrow}
+        headline={closing.headline}
+        emphasis={closing.emphasis}
+        body={closing.body}
+        primary={closing.primary}
+        links={closing.links}
+        media={{ kind: "image", image: closing.image }}
+      />
     </>
   );
 }

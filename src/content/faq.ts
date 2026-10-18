@@ -40,8 +40,5 @@ export const faqSets = {
 /** A page's questions from the bank, in its set's order. */
 export const faqFor = (set: keyof typeof faqSets): FaqEntry[] => faqSets[set].map((id) => faqItems.find((i) => i.id === id)!);
 
-/** @deprecated compat for unrebuilt pages; deleted at integration. */
-export const platformFaq = { headline: "What people ask first.", intro: faqIntro, link: { label: "Register interest", href: "/register-interest" }, items: faqItems };
-
-/** @deprecated deleted at integration. */
+/** The home FAQ's link to the full set on /platform. */
 export const homeFaqLink = { label: "All questions", href: "/platform#faq" };

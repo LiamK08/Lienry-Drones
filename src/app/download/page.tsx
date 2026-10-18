@@ -3,8 +3,8 @@ import { downloadPage } from "@/content/download";
 import { desktopRelease } from "@/lib/download";
 import { pageMetadata } from "@/lib/site";
 import { DownloadActions } from "@/components/download/DownloadActions";
-import { SpecBand } from "@/components/platform/SpecBand";
 import { Faq } from "@/components/sections/Faq";
+import { PageHero } from "@/components/sections/PageHero";
 import { SoftwareWindow } from "@/components/software/SoftwareWindow";
 import { Band, Container } from "@/components/ui/Band";
 import { FactList } from "@/components/ui/FactList";
@@ -16,55 +16,32 @@ const description = desktopRelease.available ? d.meta.description.live : d.meta.
 
 export const metadata: Metadata = pageMetadata("/download", description);
 
-// /download: the ask with the product under it, as a hero. The H1 with the lead and the download
-// buttons as its aside (the /company statement's split), then 48 and the coded software window at
-// full grid width (the /platform close), so the product is in the first screen and no image of the
-// interface is needed. Then what the software does as a three-column strip (the /commercial software
-// strip), the system requirements on the page's one ink band (SpecBand), and the questions.
-// Tones run raised, plaster, ink, raised, then the sunken footer.
+/**
+ * /download in three bands, light, dark, light: the hero with the download buttons and the working
+ * window under it (the product in the first screen), what the software does, and the questions,
+ * system requirements among them. Then the ink footer.
+ */
 export default function DownloadPage() {
+  const { hero, features, faq } = d;
   return (
     <>
-      {/* 1. Hero: first screen, so nothing in it waits for a reveal. */}
-      <Band id="hero" as="header" tone="raised" pad="hero" labelledBy="download-heading">
+      <PageHero
+        eyebrow={hero.eyebrow}
+        headline={hero.headline}
+        emphasis={hero.emphasis}
+        lead={hero.lead}
+        actions={<DownloadActions />}
+        after={<SoftwareWindow priority />}
+      />
+      <Band id="features" tone="ink" labelledBy="features-heading">
         <Container>
-          <SectionHead
-            id="download-heading"
-            as="h1"
-            size="h1"
-            eyebrow="lienry desktop"
-            headline={d.headline}
-            emphasis={d.emphasis}
-            breakBefore
-            reveal={false}
-            action={
-              <>
-                <p className="text-lead text-fg-muted">{d.lead}</p>
-                <DownloadActions className="mt-6" />
-              </>
-            }
-          />
-          <div className="mt-(--head-gap)">
-            <SoftwareWindow priority />
-          </div>
-        </Container>
-      </Band>
-
-      {/* 2. What the software does. */}
-      <Band id="features" tone="plaster" labelledBy="features-heading">
-        <Container>
-          <SectionHead id="features-heading" eyebrow="what it does" headline={d.features.headline} intro={d.features.intro} />
+          <SectionHead id="features-heading" eyebrow={features.eyebrow} headline={features.headline} intro={features.intro} />
           <Reveal className="mt-(--head-gap)">
-            <FactList items={d.features.items} columns={3} termStyle="strong" />
+            <FactList items={features.items} columns={3} termStyle="strong" />
           </Reveal>
         </Container>
       </Band>
-
-      {/* 3. System requirements, with what signing in needs. */}
-      <SpecBand id="requirements" eyebrow="requirements" headline={d.requirements.headline} intro={d.requirements.intro} rows={d.requirements.rows} />
-
-      {/* 4. Questions. */}
-      <Faq id="faq" tone="raised" eyebrow="questions" headline={d.faq.headline} intro={d.faq.intro} link={d.faq.link} items={d.faq.items} />
+      <Faq id="faq" tone="plaster" eyebrow={faq.eyebrow} headline={faq.headline} intro={faq.intro} link={faq.link} items={faq.items} />
     </>
   );
 }

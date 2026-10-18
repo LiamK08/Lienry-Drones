@@ -1,67 +1,63 @@
 import type { Metadata } from "next";
 import { commercialPage } from "@/content/commercial";
-import { faqSets, platformFaq } from "@/content/faq";
-import { softwareSection } from "@/content/software";
+import { faqFor, faqIntro } from "@/content/faq";
 import { pageMetadata } from "@/lib/site";
-import { CtaPanel } from "@/components/sections/CtaPanel";
+import { ClosingSection } from "@/components/sections/ClosingSection";
+import { CostCalculator } from "@/components/sections/CostCalculator";
 import { Faq } from "@/components/sections/Faq";
-import { FeatureRow } from "@/components/sections/FeatureRow";
-import { PageHeroSplit } from "@/components/sections/PageHeroSplit";
-import { SiblingCards } from "@/components/sections/SiblingCards";
-import { Switcher } from "@/components/sections/Switcher";
+import { PageHero } from "@/components/sections/PageHero";
+import { StepCards } from "@/components/sections/StepCards";
 import { SoftwareBand } from "@/components/software/SoftwareBand";
+import { Band, Container } from "@/components/ui/Band";
+import { SectionHead } from "@/components/ui/SectionHead";
 
 export const metadata: Metadata = pageMetadata(
   "/commercial",
   "A weatherproof roof capsule, a tether fed from above, and desktop software that runs the whole building. Window cleaning that lives on the roof.",
 );
 
-// The page's questions, in the order faqSets gives them.
-const questions = faqSets.commercial.map((id) => platformFaq.items.find((item) => item.id === id)).filter((item) => item !== undefined);
-
 /**
- * /commercial (docs/REDESIGN-SPEC.md C3): the split hero with the commercial film, the four steps,
- * the working software, the running cost, questions, the other product pages and the pilot panel.
- * (The design-figures band went with StatBand's design kind in the design-pass foundation.)
+ * /commercial: the hero with the commercial film, the four steps continuing it on plaster, the
+ * working software on ink, the visitor's own numbers, the questions and the pilot ask.
  */
 export default function CommercialPage() {
-  const c = commercialPage;
+  const { hero, steps, software, cost, faq, closing } = commercialPage;
   return (
     <>
-      <PageHeroSplit
-        id="hero-heading"
-        headline={c.headline}
-        emphasis={c.emphasis}
-        lead={c.lead}
-        primary={c.actions.primary}
-        secondary={c.actions.secondary}
-        media={{ kind: "film", videoId: c.heroVideoId, posterId: c.heroImageId, alt: c.heroAlt, name: "commercial film" }}
-      />
-      <Switcher
+      <PageHero eyebrow={hero.eyebrow} headline={hero.headline} emphasis={hero.emphasis} lead={hero.lead} primary={hero.primary} secondary={hero.secondary} media={hero.film} />
+      <StepCards
         id="how"
-        reveal={false}
         tone="plaster"
-        eyebrow="four steps"
-        headline={c.steps.headline}
-        emphasis={c.steps.emphasis}
-        intro={c.steps.intro}
-        tabsLabel={c.steps.tabsLabel}
-        items={c.steps.items}
+        pad="attached"
+        eyebrow={steps.eyebrow}
+        headline={steps.headline}
+        emphasis={steps.emphasis}
+        intro={steps.intro}
+        columns={4}
+        aspect="4/3"
+        items={steps.items}
+        track={steps.track}
       />
-      <SoftwareBand id="software" tone="sunken" eyebrow="desktop software" headline={c.software.headline} intro={softwareSection.body} />
-      <FeatureRow
-        id="cost"
-        tone="raised"
-        side="right"
-        eyebrow="running cost"
-        headline={c.cost.headline}
-        intro={c.cost.body}
-        facts={c.cost.points.map((text) => ({ text }))}
-        image={c.cost.image}
+      <SoftwareBand id="software" tone="ink" eyebrow={software.eyebrow} headline={software.headline} emphasis={software.emphasis} intro={software.intro} />
+      <Band id="cost" tone="plaster" labelledBy="cost-heading">
+        <Container>
+          <SectionHead id="cost-heading" eyebrow={cost.eyebrow} headline={cost.headline} emphasis={cost.emphasis} intro={cost.intro} />
+          <div className="mt-(--head-gap)">
+            <CostCalculator headingId="cost-heading" noteId="cost-note" defaultType="Commercial building" />
+          </div>
+        </Container>
+      </Band>
+      <Faq id="faq" tone="ink" eyebrow={faq.eyebrow} headline={faq.headline} intro={faqIntro} link={faq.link} items={faqFor("commercial")} />
+      <ClosingSection
+        id="closing"
+        eyebrow={closing.eyebrow}
+        headline={closing.headline}
+        emphasis={closing.emphasis}
+        body={closing.body}
+        primary={closing.primary}
+        links={closing.links}
+        media={{ kind: "collage", items: closing.collage }}
       />
-      <Faq id="faq" tone="plaster" eyebrow="questions" headline={platformFaq.headline} intro={platformFaq.intro} link={c.pilot.cta} items={questions} />
-      <SiblingCards current="commercial" />
-      <CtaPanel id="pilot" eyebrow="pilot program" headline={c.pilot.headline} body={c.pilot.body} primary={c.pilot.cta} links={c.pilot.links} image={c.pilot.image} />
     </>
   );
 }

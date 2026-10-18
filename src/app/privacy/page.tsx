@@ -22,14 +22,12 @@ function slug(title: string) {
 // handler). The browser's own fragment navigation scrolls to the section and runs the focusing
 // steps on its heading (tabIndex -1), so keyboard and screen reader users land on the section too.
 const indexLink =
-  "inline-flex min-h-11 items-center whitespace-nowrap rounded-hard font-sans text-small font-medium text-glass underline decoration-1 underline-offset-[6px] transition-[color] duration-200 ease-instrument hover:text-glass-deep hover:decoration-2";
+  "inline-flex min-h-11 items-center whitespace-nowrap rounded-hard font-sans text-small font-medium text-link underline decoration-1 underline-offset-[6px] transition-[color,text-decoration-thickness] duration-200 ease-instrument hover:text-fg hover:decoration-2 motion-reduce:transition-none";
 
-// /privacy (docs/REDESIGN-SPEC.md C8, rebalanced): one band. The head is split so the H1 never
-// sits beside an empty half: the H1 and the note on the left, the in-page index of the six
-// sections as the aside (nothing sticky). The six sections follow as a grid of 4-column cells,
-// three across from 1280 and two from 768, so no column ends far short of its neighbour; one
-// 45ch column beside the index would leave about 600px of empty paper under the index at 1440.
-// Below 768 everything stacks in C8's order: H1, note, index, prose.
+// /privacy: one plaster band. The head is split: the H1 and the note on the left, the in-page index
+// of the six sections as the aside (nothing sticky). The six sections follow in [data-prose] as
+// 4-column cells, three across from 1024 and two from 768, so no column ends far short of its
+// neighbour. Below 768 everything stacks: H1, note, index, prose.
 export default function PrivacyPage() {
   const p = privacyPage;
   const sections = p.sections.map((s) => ({ ...s, id: slug(s.title) }));
@@ -43,7 +41,7 @@ export default function PrivacyPage() {
           eyebrow="legal"
           headline={p.headline}
           reveal={false}
-          below={<p className="text-caption text-muted">Last updated {p.updated}. Template for legal review before launch.</p>}
+          below={<p className="text-caption text-fg-muted">Last updated {p.updated}. Template for legal review before launch.</p>}
           action={
             <nav aria-label="On this page">
               <ul className="grid sm:grid-flow-col sm:grid-cols-2 sm:grid-rows-3 sm:gap-x-6">
@@ -58,15 +56,15 @@ export default function PrivacyPage() {
             </nav>
           }
         />
-        <div className="mt-(--head-gap) grid gap-y-8 md:grid-cols-2 md:gap-x-6 xl:grid-cols-3">
+        <div data-prose="" className="mt-(--head-gap) grid gap-y-10 md:grid-cols-2 md:gap-x-6 lg:grid-12">
           {sections.map((s) => (
-            <section key={s.id}>
+            <section key={s.id} className="lg:col-span-4">
               {/* tabIndex -1: fragment navigation focuses the heading it scrolls to, so the index
                   moves keyboard and screen reader focus to the section it names. */}
               <h2 id={s.id} tabIndex={-1} className="scroll-mt-6 text-h3">
                 {s.title}
               </h2>
-              <p className="mt-2 text-body text-muted lg:mt-3">{s.body}</p>
+              <p className="mt-4 text-body text-fg-muted">{s.body}</p>
             </section>
           ))}
         </div>

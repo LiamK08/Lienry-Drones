@@ -1,82 +1,58 @@
-// /homes-and-rentals copy. Moved verbatim from pages.ts (homesPage) and home.ts (landlordStory, appPanel) by the design-pass foundation;
-// the /homes-and-rentals page package owns this module. Conventions: `emphasis` is the trailing phrase of its
-// `headline`, images are ImageRef-compatible `{ id, alt, position }` with manifest still ids, and links
-// are Action-compatible `{ label, href }`.
+// /homes-and-rentals copy. Conventions shared with every content module: `emphasis` is the trailing
+// phrase of its `headline`; images are ImageRef-compatible `{ id, alt, position }` with manifest still
+// ids; links are Action-compatible `{ label, href }`. Facts come from docs/SITE-PLAN.md only.
 
 export const homesPage = {
-  headline: "Your property, cleaned from anywhere.",
-  emphasis: "from anywhere.",
-  lead: "A waterproof ground pod, a drone that knows each material, and an app that starts the clean wherever you are. For houses, apartments, rental properties and solar farms.",
-  heroImageId: "ho1-homes-hero",
-  heroAlt: "The Lienry ground pod beside a house at first light, the drone washing a window",
-  // The render is 21:9 and the split hero shows it at 16:9: the crop position for that frame (C4 section 1).
-  heroPosition: "60% 50%",
-  actions: {
+  hero: {
+    eyebrow: "home system",
+    headline: "Your property, cleaned from anywhere.",
+    emphasis: "from anywhere.",
+    lead: "A ground pod that powers the drone and feeds it water, and an app that starts each clean.",
     primary: { label: "Register interest", href: "/register-interest?type=homeowner" },
     secondary: { label: "I own rentals", href: "/register-interest?type=landlord" },
+    image: { id: "ho1-homes-hero", alt: "The Lienry ground pod beside a house at first light, the drone washing a window", position: "42% 50%" },
   },
-  steps: {
-    headline: "Set up once. Start from anywhere.",
-    intro: "Four steps from a new pod to a clean you start from your phone.",
-    track: { label: "Setup steps. Use left and right arrow keys to browse.", prevLabel: "Previous step", nextLabel: "Next step" },
-    items: [
-      {
-        n: "01",
-        title: "The pod goes in",
-        body: "A waterproof ground pod powers the drone and feeds it water through the tether.",
-        image: { id: "m3-pod-master", alt: "The ground pod open beside a garden tap", position: "30% 50%" },
-      },
-      {
-        n: "02",
-        title: "The property is mapped",
-        body: "A detailed scan maps the property so the drone knows every surface it can reach.",
-        image: { id: "p3-house", alt: "The home drone washing the front windows of a suburban house", position: "50% 50%" },
-      },
-      {
-        n: "03",
-        title: "Choose what to clean",
-        body: "Pick the surfaces in your personalised app. The drone identifies each material and adjusts its pressure; you can change it if you want to.",
-        image: { id: "p4-rental", alt: "The home drone over rooftop solar panels on a rental townhouse", position: "50% 40%" },
-      },
-      {
-        n: "04",
-        title: "Start from anywhere",
-        body: "Tap start from wherever you are and follow the progress on your phone or the desktop software.",
-        image: { id: "p5-solar-farm", alt: "The home drone low over a solar farm row, its tether running back to the pod", position: "50% 60%" },
-      },
-    ],
+  stats: {
+    eyebrow: "why it matters",
+    headline: "Why it matters in Australia.",
+    intro: "Two cited figures about the homes it is designed for.",
+    action: { label: "I own rentals", href: "/register-interest?type=landlord" },
   },
-  app: {
-    items: [
-      { title: "Start a clean remotely", body: "From another suburb or another country." },
-      { title: "Choose the areas", body: "The driveway before an inspection, the panels after a dusty week." },
-      { title: "Pressure by material", body: "Glass, panels, render, roofing and concrete each get the pressure they should." },
-      { title: "Desktop software too", body: "The same control on a bigger screen, with the scan and the progress side by side." },
-    ],
+  faq: {
+    eyebrow: "questions",
+    headline: "What home owners ask first.",
+    link: { label: "Register interest", href: "/register-interest?type=homeowner" },
   },
-  statsHeadline: "Why it matters in Australia.",
-  statsIntro: "Two cited figures about the homes the system is designed for.",
-  statsAction: { label: "I own rentals", href: "/register-interest?type=landlord" },
-  close: {
+  closing: {
+    eyebrow: "pre-launch",
     headline: "Tell us about your property.",
-    body: "Homes, apartments, rental properties and solar farms. We are pre-launch and reply personally.",
+    emphasis: "your property.",
+    body: "Homes, apartments and rentals. We are pre-launch and reply personally.",
     primary: { label: "Register interest", href: "/register-interest?type=homeowner" },
     links: [{ label: "I own rentals", href: "/register-interest?type=landlord" }],
-    image: { id: "so2-solar-closeup", alt: "Water beading on a clean solar panel", position: "50% 50%" },
+    image: { id: "m3-pod-master", alt: "The Lienry ground pod open beside a garden tap, the home drone inside", position: "35% 50%" },
   },
 };
 
+/** The app, told as five beats of one clean. A beat's `app` is the state the app panel shows with it. */
 export const landlordStory = {
+  eyebrow: "the app",
   headline: "Your property. Wherever you are.",
   emphasis: "Wherever you are.",
-  intro: "You own a rental in Sydney and live overseas. The driveway and the solar panels need a clean before the next tenant moves in.",
+  intro: "You own a rental in Sydney and live overseas. It needs a clean before the next tenant.",
   beats: [
-    { title: "Open the app.", body: "Your property is already mapped. The app shows every surface the drone can reach.", imageId: "y1-story-before", app: "map" },
-    { title: "Select the driveway and the solar panels.", body: "Choose only what needs cleaning. The drone sets the pressure for each material.", imageId: "y1-story-before", app: "select" },
-    { title: "Tap start.", body: "The pod powers the drone, the tether feeds it water, and the clean begins.", imageId: "y2-story-panels", app: "start" },
-    { title: "The drone cleans while nobody is there.", body: "No cleaners to book, no outsourcing cost, no one on site.", imageId: "y3-story-driveway", app: "progress" },
-    { title: "Ready for the next tenant, sooner.", body: "You get the progress on your phone from wherever you are.", imageId: "y5-story-done", app: "done" },
+    { title: "Open the app.", body: "The property is already mapped, every surface in reach.", imageId: "y1-story-before", app: "map" },
+    { title: "Choose the areas.", body: "Only the driveway and the panels. The drone sets each pressure.", imageId: "y1-story-before", app: "select" },
+    { title: "Tap start.", body: "The pod powers the drone and the tether feeds it water.", imageId: "y2-story-panels", app: "start" },
+    { title: "It cleans. Nobody is there.", body: "No cleaners to book and no one on site.", imageId: "y3-story-driveway", app: "progress" },
+    { title: "Ready for the next tenant.", body: "The progress reaches your phone, wherever you are.", imageId: "y5-story-done", app: "done" },
   ],
+  alts: {
+    "y1-story-before": "A rental house before its clean, the ground pod closed beside the garden tap",
+    "y2-story-panels": "The drone washing the rooftop solar panels, half the array clean and wet",
+    "y3-story-driveway": "The drone washing the concrete driveway of the rental house",
+    "y5-story-done": "The rental house after its clean, the ground pod open by the garden tap",
+  } as Record<string, string>,
 };
 
 /** Strings for the illustrative app panel. Demo data: nothing here is a real property or a real clean. */
