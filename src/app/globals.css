@@ -58,10 +58,10 @@
   --text-h2: clamp(1.9375rem, 1.45rem + 2vw, 3rem);
   --text-h2--line-height: 1.1;
   --text-h2--letter-spacing: -0.05em;
-  --text-h2s: clamp(1.875rem, 1.75rem + 0.5vw, 2.25rem);
+  --text-h2s: clamp(1.875rem, 1.5rem + 0.9vw, 2.25rem);
   --text-h2s--line-height: 1.1;
   --text-h2s--letter-spacing: -0.02em;
-  --text-h3: clamp(1.625rem, 1.5rem + 0.5vw, 2rem);
+  --text-h3: clamp(1.625rem, 1.25rem + 0.85vw, 2rem);
   --text-h3--line-height: 1.1;
   --text-h3--letter-spacing: -0.01em;
   --text-lead: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
@@ -136,20 +136,20 @@
     /* Preflight aims code, kbd, samp and pre at a monospace stack. There is no mono family in
        this project, so they resolve to Inter like every other run of text. */
     --default-mono-font-family: var(--font-sans);
-    --nav-h: 4.5rem;          /* 72, the frozen header */
-    --page-margin: 1rem;      /* 16 below 768 */
+    --nav-h: 3.5rem;          /* 56, the frozen header */
+    --page-margin: 1.25rem;   /* 20 below 768 */
     --gutter: 1rem;           /* 16 below 768 */
     --section-y: 4rem;        /* 64 below 768 */
     --head-gap: 2.5rem;       /* 40 below 1024 */
-    --hero-gap: 2.5rem;       /* 40 below 768 */
+    --hero-gap: 3.5rem;       /* 56 below 768 */
     --hero-top: calc(var(--nav-h) + var(--hero-gap));
     --bleed: max(var(--page-margin), calc((100vw - 87rem) / 2));
   }
   @media (min-width: 48rem) {
-    :root { --page-margin: 1.5rem; --gutter: 1.5rem; --section-y: 5rem; --hero-gap: 3rem; }
+    :root { --page-margin: 1.5rem; --gutter: 1.5rem; --section-y: 5rem; --hero-gap: 4rem; }
   }
   @media (min-width: 64rem) {
-    :root { --section-y: 6rem; --head-gap: 3rem; --hero-gap: 4rem; }
+    :root { --section-y: 6rem; --head-gap: 3rem; --hero-gap: 5rem; }
   }
 
   /* Light surfaces. .on-light, .surface-raised and .surface-sunken restore light inside an ink band. */
@@ -330,11 +330,11 @@
   .eyebrow {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.375rem;
     font-family: var(--font-sans);
     font-size: var(--text-label);
-    line-height: 1.2;
-    font-weight: 500;
+    line-height: 1.4;
+    font-weight: 400;
     letter-spacing: 0.04em;
     text-transform: uppercase;
     color: var(--s-fg);
@@ -352,11 +352,11 @@
 
   .eyebrow::before {
     content: "";
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
     flex: none;
     border-radius: 9999px;
-    background: var(--s-accent);
+    background: color-mix(in srgb, var(--s-accent) 45%, transparent);
   }
 
   /* The one eyebrow-to-heading gap: 16. */
@@ -402,8 +402,19 @@
     from { width: 0%; }
     to { width: 100%; }
   }
+  /* The closing panel's wash: two soft glows that drift slowly behind the heading. */
+  @keyframes glow-drift {
+    0%, 100% { translate: 0 0; }
+    50% { translate: 6% -8%; }
+  }
+  .glow-drift {
+    animation: glow-drift 14s ease-in-out infinite;
+  }
+  .glow-drift-alt {
+    animation: glow-drift 18s ease-in-out infinite reverse;
+  }
   @media (prefers-reduced-motion: reduce) {
-    .marquee { animation: none; }
+    .marquee, .glow-drift, .glow-drift-alt { animation: none; }
   }
 
   /* The founder letter: the serif at the H3 step, the one run of serif text. */

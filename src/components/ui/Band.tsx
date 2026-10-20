@@ -40,14 +40,14 @@ const tones = {
 } as const;
 
 // Top and bottom padding (globals.css): --section-y is 128 from 1024, 96 from 768, 80 below;
-// --hero-top is the 72px bar plus --hero-gap (64, 48, 40).
+// --hero-top is the 56px bar plus --hero-gap (80, 64, 56).
 //   section   S / S          every page section
-//   hero      72 + H / S     the band holding an inner page's h1
+//   hero      56 + H / S     the band holding an inner page's h1
 //   attached  0 / S          a strip that continues the band above it in the same tone
 const pads = {
   section: "py-(--section-y)",
   hero: "pt-(--hero-top) pb-(--section-y)",
-  split: "pt-(--hero-top) pb-(--section-y) lg:pt-[calc(var(--nav-h)+0.5rem)] lg:pb-14",
+  split: "pt-(--hero-top) pb-(--section-y) lg:pt-[calc(var(--nav-h)+1.5rem)] lg:pb-14",
   attached: "pt-0 pb-(--section-y)",
   compact: "py-16 lg:py-[4.375rem]",
   feature: "py-16 lg:py-[5.5rem]",

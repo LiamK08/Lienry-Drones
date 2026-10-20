@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { coverSizes, focusOf, getImage, largest, ratio, srcSet, variantSrcSet } from "@/lib/media";
 
-export type PictureAspect = "21/9" | "16/9" | "2/1" | "3/2" | "4/3" | "5/4" | "7/6" | "1/1" | "4/5" | "3/4" | "2/3";
+export type PictureAspect = "21/9" | "16/9" | "2/1" | "3/2" | "7/5" | "4/3" | "9/7" | "5/4" | "7/6" | "1/1" | "7/8" | "4/5" | "3/4" | "2/3";
 
 export type PictureProps = {
   /** A manifest still id (public/media). */
@@ -38,8 +38,8 @@ export type PictureProps = {
   overlay?: ReactNode;
   /** The page's LCP image: eager, sync decode, fetchpriority high. */
   priority?: boolean;
-  /** The frame's corners: "hard" (4px, default), "card" (16px) or "none". */
-  rounded?: "hard" | "card" | "none";
+  /** The frame's corners: "hard" (4px, default), "card" (16px), "image" (12px, 8px from 1024), "media" (10px) or "none". */
+  rounded?: "hard" | "card" | "image" | "media" | "none";
   className?: string;
   imgClassName?: string;
 };
@@ -90,6 +90,8 @@ export function stillSources(id: string, sizes: string, frame: FrameAspects | nu
     imgSizes,
   };
 }
+
+const corners = { hard: "rounded-hard", card: "rounded-card", image: "rounded-[0.75rem] lg:rounded-[0.5rem]", media: "rounded-[0.625rem]", none: "" } as const;
 
 /**
  * A manifest still in a 4px frame with object-fit cover. It carries no caption.
@@ -146,7 +148,7 @@ export function Picture({
     ...(maxHeight ? { "--pic-max": maxHeight } : null),
     ...positionVars(id, position, positionMd, positionSm),
   } as CSSProperties;
-  const frame = `relative w-full overflow-hidden ${rounded === "card" ? "rounded-card" : rounded === "none" ? "" : "rounded-hard"} bg-media ${frameCls}`;
+  const frame = `relative w-full overflow-hidden ${corners[rounded]} bg-media ${frameCls}`;
 
   if (!asset) {
     // The build fetches every asset first (prebuild), so this only shows in a local tree without
