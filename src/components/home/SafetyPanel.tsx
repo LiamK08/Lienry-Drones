@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/Button";
 /** Safety by design: one black panel inset on white, the head left and six tiles right (3 by 2). */
 export function SafetyPanel() {
   return (
-    <Band id="safety" tone="plaster" labelledBy="safety-heading">
+    <Band id="safety" tone="plaster" pad="compact" labelledBy="safety-heading">
       <Container>
         <div className="on-dark grid gap-10 rounded-panel bg-night p-8 text-white md:p-12 lg:grid-cols-[1fr_1.4fr] lg:items-center">
           <div>

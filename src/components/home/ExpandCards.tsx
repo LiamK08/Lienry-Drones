@@ -15,7 +15,7 @@ export function ExpandCards() {
   return (
     <Band id="why" tone="plaster" labelledBy="benefits-heading">
       <Container>
-        <SectionHead id="benefits-heading" layout="center" eyebrow={benefits.eyebrow} headline={benefits.headline} intro={benefits.intro} />
+        <SectionHead id="benefits-heading" layout="center" size="h1" eyebrow={benefits.eyebrow} headline={benefits.headline} intro={benefits.intro} />
       </Container>
       <ul
         tabIndex={0}
@@ -26,7 +26,7 @@ export function ExpandCards() {
           e.preventDefault();
           e.currentTarget.scrollTo({ left: e.key === "End" ? e.currentTarget.scrollWidth : 0 });
         }}
-        className="no-scrollbar -mx-(--page-margin) mt-(--head-gap) flex snap-x snap-mandatory gap-2 overflow-x-auto px-(--page-margin) lg:mx-auto lg:max-w-grid lg:gap-1 lg:overflow-visible lg:px-0">
+        className="no-scrollbar -mx-(--page-margin) mt-(--head-gap) flex snap-x snap-mandatory gap-2 overflow-x-auto px-(--page-margin) lg:mx-4 lg:gap-1 lg:overflow-visible lg:px-0">
         {benefits.cards.map((c) => (
           <li
             key={c.title}

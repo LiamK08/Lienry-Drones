@@ -5,6 +5,7 @@ import { FaqRows } from "@/components/blocks/FaqRows";
 import { EnquiryForm } from "@/components/forms/EnquiryForm";
 import { Band, Container } from "@/components/ui/Band";
 import { Headline } from "@/components/ui/SectionHead";
+import { Reveal } from "@/components/ui/Reveal";
 
 /**
  * The questions on paper, beside the ask: the head and the rows on the left, and on the right a card
@@ -12,14 +13,16 @@ import { Headline } from "@/components/ui/SectionHead";
  */
 export function FaqForm() {
   return (
-    <Band id="faq" tone="paper" labelledBy="faq-heading">
+    <Band id="faq" tone="paper" pad="compact" labelledBy="faq-heading">
       <Container>
         <div className="grid gap-12 lg:grid-cols-[1fr_1fr] lg:gap-16">
           <div>
-            <p className="eyebrow">{faq.eyebrow}</p>
-            <h2 id="faq-heading" className="em-accent text-h2s">
-              <Headline text={faq.headline} emphasis={faq.emphasis} />
-            </h2>
+            <Reveal animate y={10}>
+              <p className="eyebrow">{faq.eyebrow}</p>
+              <h2 id="faq-heading" className="em-accent text-h2s">
+                <Headline text={faq.headline} emphasis={faq.emphasis} />
+              </h2>
+            </Reveal>
             <div className="mt-8">
               <FaqRows id="faq" items={faqFor("platform")} />
             </div>

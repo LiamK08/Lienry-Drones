@@ -8,11 +8,11 @@ import { Picture } from "@/components/ui/Picture";
 import { SectionHead } from "@/components/ui/SectionHead";
 import { useOnScreen } from "@/lib/hooks";
 
-const STEP_MS = 5000;
+const STEP_MS = 6000;
 
 /**
  * How it works: five tabs over one large picture. Each tab carries a 3px rule that fills while its step
- * is shown; after five seconds the next step takes over, looping, while the band is on screen. Picking a
+ * is shown; after six seconds the next step takes over, looping, while the band is on screen. Picking a
  * tab shows it and restarts the timer from there. Under reduced motion nothing advances on its own.
  * The picture crossfades, with the step's title and line on a scrim at its foot.
  */
@@ -65,7 +65,7 @@ export function StepTimer() {
                   <span aria-hidden="true" className="relative block h-[3px] overflow-hidden rounded-pill bg-line">
                     <span
                       key={`${s.id}-${on ? cycle : "off"}-${on ? active : ""}`}
-                      className={`absolute inset-y-0 left-0 rounded-pill bg-accent ${on ? (running ? "animate-[fill_5s_linear_forwards]" : "w-full") : "w-0"}`}
+                      className={`absolute inset-y-0 left-0 rounded-pill bg-accent ${on ? (running ? "animate-[fill_6s_linear_forwards]" : "w-full") : "w-0"}`}
                     />
                   </span>
                   <span className="mt-3 block text-label uppercase tracking-[0.08em] text-muted">

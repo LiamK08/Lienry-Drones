@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import type { BandTone, LegacyTone } from "@/lib/types";
 
-export type BandPad = "section" | "hero" | "attached" | "none";
+export type BandPad = "section" | "hero" | "attached" | "compact" | "none";
 
 export type BandProps = {
   /** Required: the DOM id and the band's `data-band` name. */
@@ -47,6 +47,7 @@ const pads = {
   section: "py-(--section-y)",
   hero: "pt-(--hero-top) pb-(--section-y)",
   attached: "pt-0 pb-(--section-y)",
+  compact: "py-16 lg:py-[4.375rem]",
   none: "",
 } as const;
 

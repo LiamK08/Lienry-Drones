@@ -17,14 +17,18 @@ export type DataAttributes = { [key: `data-${string}`]: string | undefined };
  */
 export type RevealPhase = "shown" | "hidden" | "visible";
 
-/** The reveal gate shared by Reveal, RevealList and SnapTrack's list. IntersectionObserver only. */
-export function useRevealPhase<T extends Element>(): [RefObject<T | null>, RevealPhase] {
+/**
+ * The reveal gate shared by Reveal, RevealList and SnapTrack's list. IntersectionObserver only.
+ * Like the reference site, sections do not fade in as they scroll: a reveal runs only where it is
+ * asked for (`enabled`), which today is the questions' heading.
+ */
+export function useRevealPhase<T extends Element>(enabled = false): [RefObject<T | null>, RevealPhase] {
   const ref = useRef<T>(null);
   const [phase, setPhase] = useState<RevealPhase>("shown");
   const reduce = useReducedMotion();
   useEffect(() => {
     const el = ref.current;
-    if (!el || reduce) return;
+    if (!el || reduce || !enabled) return;
     let first = true;
     const io = new IntersectionObserver(
       ([e]) => {
@@ -52,7 +56,7 @@ export function useRevealPhase<T extends Element>(): [RefObject<T | null>, Revea
       io.disconnect();
       el.removeEventListener("focusin", onFocus);
     };
-  }, [reduce]);
+  }, [reduce, enabled]);
   return [ref, phase];
 }
 
@@ -78,6 +82,8 @@ const pick = (props: Record<string, unknown>): DataAttributes =>
 
 type RevealProps = {
   children: ReactNode;
+  /** Rise in as it enters the viewport. Off by default: the site holds still as it scrolls. */
+  animate?: boolean;
   delay?: number;
   className?: string;
   as?: "div" | "li" | "section" | "figure" | "article";
@@ -88,9 +94,9 @@ type RevealProps = {
  * Opacity and a 12px rise over 640ms (ease-settle), once, as the element enters the viewport.
  * Only what is below the fold when the page hydrates is ever hidden (see RevealPhase).
  */
-export function Reveal({ children, delay = 0, className = "", as = "div", y = 12, ...rest }: RevealProps) {
+export function Reveal({ children, animate = false, delay = 0, className = "", as = "div", y = 12, ...rest }: RevealProps) {
   const reduce = useReducedMotion();
-  const [ref, phase] = useRevealPhase<HTMLElement>();
+  const [ref, phase] = useRevealPhase<HTMLElement>(animate);
   // One element type for the ref: every `as` option is an HTMLElement, and the ref is only observed.
   const Tag = motion[as] as typeof motion.div;
   return (
@@ -104,7 +110,7 @@ export function Reveal({ children, delay = 0, className = "", as = "div", y = 12
       transformTemplate={restTransform(phase)}
       variants={{
         hidden: { opacity: 0, y, transition: { duration: 0 } },
-        visible: { opacity: 1, y: 0, transition: reduce ? { duration: 0 } : { duration: 0.64, ease: settle, delay } },
+        visible: { opacity: 1, y: 0, transition: reduce ? { duration: 0 } : { duration: 0.4, ease: settle, delay } },
       }}
     >
       {children}

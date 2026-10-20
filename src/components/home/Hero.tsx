@@ -22,13 +22,13 @@ const scrims = (
 export function Hero() {
   const film = useFilm({ videoId: hero.videoId, threshold: 0.1 });
   return (
-    <section aria-labelledby="hero-heading" data-band="hero" data-tone="film" className="on-dark on-film relative isolate flex min-h-[100svh] flex-col justify-end text-white">
+    <section aria-labelledby="hero-heading" data-band="hero" data-tone="film" className="on-dark on-film relative isolate flex min-h-[100svh] flex-col justify-end text-white md:h-[45rem] md:min-h-0">
       <FilmLayer film={film} videoId={hero.videoId} posterId={hero.posterId} priority fadeIn overlays={scrims} />
-      <div className="page-x mx-auto flex w-full max-w-grid flex-col items-center pb-20 pt-[calc(var(--nav-h)+8rem)] text-center md:pb-24">
+      <div className="page-x mx-auto flex w-full max-w-grid flex-col items-center pb-20 pt-[calc(var(--nav-h)+8rem)] text-center md:pb-9">
         <h1 id="hero-heading" className="max-w-none text-balance text-[2.0625rem] leading-[1.2] tracking-[-0.06em] md:text-[2.5rem]">
           <Headline text={hero.headline} emphasis={hero.emphasis} />
         </h1>
-        <p className="mt-5 max-w-[34rem] text-balance text-body text-white/90 md:text-lead">{hero.support}</p>
+        <p className="mt-5 max-w-[34rem] text-balance text-body text-white/90 md:max-w-[46rem] md:text-lead">{hero.support}</p>
         <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row">
           <Button href={hero.secondary.href} variant="secondary" arrow>
             {hero.secondary.label}

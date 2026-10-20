@@ -66,6 +66,11 @@ NODE_USE_ENV_PROXY=1 node scripts/perf-vitals.mjs http://localhost:3000 [routes]
   over the 2.5 s LCP budget.
 - **Font swap:** a heading can wrap one line differently in the fallback font at phone widths. Give
   each hero its `mobileLines` (the larger of the two wraps from 360 to 412) or the page shifts.
+- **Motion:** like the reference, sections do not fade in as they scroll; `Reveal` only animates with
+  `animate` (the questions' heading). The home step timer runs 6 s a step; the reason cards widen over
+  700 ms (the owner asked for half the reference's speed).
+- **Logo strip:** the home strip shows what the system is designed for, set as marks. Never put real
+  companies' logos there or anywhere as customers, partners or backers.
 - **Transitions:** use `transition-[background-color,border-color,color]`, not `transition-colors`,
   on anything focusable: the latter animates the outline colour and the focus ring fails contrast.
 - **Media:** no new or replacement imagery without the owner's say. Never pair a closed ground pod

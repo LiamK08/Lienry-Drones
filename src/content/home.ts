@@ -19,7 +19,18 @@ export const hero = {
 /** The slow strip of words under the hero: what the system is designed for. */
 export const strip = {
   label: "Designed for",
-  items: ["Glass facades", "Solar panels", "Rendered walls", "Metal roofing", "Driveways", "Office buildings", "Apartment blocks", "Rental homes", "Solar farms"],
+  // Not customers or partners: the kinds of property and surface the system is designed for, set as marks.
+  items: [
+    { label: "Glass facades", icon: "building" },
+    { label: "Solar panels", icon: "sun" },
+    { label: "Rendered walls", icon: "layers" },
+    { label: "Metal roofing", icon: "home" },
+    { label: "Driveways", icon: "grid" },
+    { label: "Office towers", icon: "building" },
+    { label: "Apartment blocks", icon: "apartments" },
+    { label: "Rental homes", icon: "key" },
+    { label: "Solar farms", icon: "sun" },
+  ],
 };
 
 export const why = {
@@ -134,11 +145,14 @@ export const systems = {
   headline: "Built for the buildings you own.",
   intro: "One platform on a roof, beside a house or along a solar row. Figures are design intent at concept stage, not results.",
   link: { label: "See the platform", href: "/platform" },
+  // Each card's statement is Lienry's own design intent, attributed to the design brief: these are not
+  // testimonials, and the figures are design intent (commercial, homes) or cited (solar).
+  source: { name: "Lienry design brief", role: "Concept stage, not a result" },
   cards: [
     {
       id: "commercial",
       name: "Commercial",
-      sub: "Office and apartment buildings",
+      sub: "Office and apartment buildings · Roof capsule",
       statement: "A capsule on the roof feeds the drone from above, and the desktop software runs the whole building.",
       figures: [
         { value: "<70 m", label: "Building height" },
@@ -150,7 +164,7 @@ export const systems = {
     {
       id: "homes",
       name: "Homes and rentals",
-      sub: "Houses, townhouses and rentals",
+      sub: "Houses, townhouses and rentals · Ground pod",
       statement: "A ground pod powers the drone and feeds it water. You start the clean from your phone.",
       figures: [
         { value: "5", label: "Surface types" },
@@ -162,7 +176,7 @@ export const systems = {
     {
       id: "solar",
       name: "Solar",
-      sub: "Rooftop arrays and solar farm rows",
+      sub: "Rooftop arrays and solar farm rows · Cited figures",
       statement: "Panels are cleaned at the pressure set for solar glass, on the interval you choose.",
       // Cited figures from src/content/stats.ts, by id.
       cited: ["unsw-soiling", "iea-soiling", "cer-rooftop"],
