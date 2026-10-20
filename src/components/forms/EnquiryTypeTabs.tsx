@@ -102,7 +102,7 @@ function TabsView({ type, onSelect }: { type: EnquiryType; onSelect: (t: Enquiry
             >
               <p className="mx-auto max-w-[36.5rem] font-display text-[1.0625rem] leading-[1.35] text-fg/80">{t.items[k].line}</p>
               <p className="mx-auto mt-3 text-small">
-                <TextLink href={t.items[k].link.href}>{t.items[k].link.label}</TextLink>
+                <TextLink href={t.items[k].link.href} className="inline-block py-1">{t.items[k].link.label}</TextLink>
               </p>
             </div>
           );

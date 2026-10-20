@@ -103,14 +103,16 @@ export function Button(props: ButtonProps) {
   const { variant = "primary", size = "md", arrow = false, className = "", children } = props;
   const badge = arrow && variant !== "tertiary";
   const cls = `${base} ${variant === "tertiary" ? "" : `${sizes[size]} ${pad[badge ? "badge" : "plain"][size]}`} ${variants[variant]} ${off[variant]} ${className}`;
-  // Pills roll their label up on hover: two stacked copies in a clipped line, the second aria-hidden.
+  // Pills roll their label up on hover: two copies in one clipped grid cell, the second (aria-hidden)
+  // waiting a line below. Nothing is positioned, so contrast tools read the label against the pill.
+  const roll = "[grid-area:1/1] transition-transform duration-300 ease-instrument motion-reduce:transition-none";
   const label =
     variant === "tertiary" ? (
       children
     ) : (
-      <span className="relative inline-flex overflow-hidden">
-        <span className="block transition-transform duration-300 ease-instrument group-hover/btn:-translate-y-full motion-reduce:transition-none motion-reduce:group-hover/btn:translate-y-0">{children}</span>
-        <span aria-hidden="true" className="absolute inset-x-0 top-full block transition-transform duration-300 ease-instrument group-hover/btn:-translate-y-full motion-reduce:hidden">
+      <span className="[display:inline-grid] overflow-hidden">
+        <span className={`${roll} group-hover/btn:-translate-y-full motion-reduce:group-hover/btn:translate-y-0`}>{children}</span>
+        <span aria-hidden="true" className={`${roll} translate-y-full group-hover/btn:translate-y-0 motion-reduce:hidden`}>
           {children}
         </span>
       </span>
