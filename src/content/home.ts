@@ -60,7 +60,7 @@ export const fitCheck = {
   panel: {
     label: "Your fit",
     answered: "{n} of 7 answered",
-    empty: "Answer the seven questions to see how well your building matches the design.",
+    empty: "Your result appears here as you answer.",
     verdicts: [
       { min: 6, title: "A strong fit", body: "Your building matches the design closely. Register interest and we will be in touch about the pilot." },
       { min: 4, title: "A likely fit", body: "Most of it matches. The points below are worth a conversation before a pilot." },
@@ -192,7 +192,7 @@ export const explore = {
 export const safety = {
   eyebrow: "Safety by design",
   headline: "Built so nobody works at height.",
-  body: "What a safety or facilities team will ask first, in one place.",
+  body: "The safety questions owners and facilities managers raise, answered up front.",
   link: { label: "Read about the tether", href: "/platform#tether" },
   tiles: [
     { icon: "tether", title: "Tether", note: "Water and power, always connected" },

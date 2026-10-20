@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
-import { faqFor, faqIntro } from "@/content/faq";
+import { faqFor } from "@/content/faq";
 import { homesPage } from "@/content/homes";
 import { australiaStats } from "@/content/stats";
 import { pageMetadata } from "@/lib/site";
+import { AccentPanel } from "@/components/blocks/AccentPanel";
+import { CenterHero } from "@/components/blocks/CenterHero";
+import { FaqCentered } from "@/components/blocks/FaqCentered";
+import { FeatureRows } from "@/components/blocks/FeatureRows";
+import { SafetyBlock } from "@/components/blocks/SafetyBlock";
+import { WordStrip } from "@/components/blocks/WordStrip";
 import { LandlordStory } from "@/components/home/LandlordStory";
-import { ClosingSection } from "@/components/sections/ClosingSection";
-import { Faq } from "@/components/sections/Faq";
-import { PageHero } from "@/components/sections/PageHero";
 import { CITED_NOTE, StatBand, pickStats } from "@/components/sections/StatBand";
 
 export const metadata: Metadata = pageMetadata(
@@ -14,24 +17,16 @@ export const metadata: Metadata = pageMetadata(
   "A waterproof ground pod, a drone that knows each material, and an app that starts the clean wherever you are. For houses, apartments and rentals.",
 );
 
-/**
- * /homes-and-rentals in five bands, alternating light and dark: the hero, the app told as one clean,
- * two cited figures, the questions and the ask. Then the ink footer.
- */
+/** /homes-and-rentals: the solutions template, with the app story and two cited figures. */
 export default function HomesPage() {
-  const { hero, stats, faq, closing } = homesPage;
+  const { hero, strip, rows, stats, safety, close } = homesPage;
   return (
     <>
-      <PageHero
-        eyebrow={hero.eyebrow}
-        headline={hero.headline}
-        emphasis={hero.emphasis}
-        lead={hero.lead}
-        primary={hero.primary}
-        secondary={hero.secondary}
-        media={{ kind: "image", ...hero.image }}
-      />
+      <CenterHero eyebrow={hero.eyebrow} headline={hero.headline} emphasis={hero.emphasis} lead={hero.lead} primary={hero.primary} />
+      <WordStrip label={strip.label} items={strip.items} />
+      <FeatureRows id="features" items={rows} />
       <LandlordStory />
+      <SafetyBlock {...safety} />
       <StatBand
         id="australia"
         tone="plaster"
@@ -43,17 +38,8 @@ export default function HomesPage() {
         note={CITED_NOTE}
         action={stats.action}
       />
-      <Faq id="faq" tone="ink" eyebrow={faq.eyebrow} headline={faq.headline} intro={faqIntro} link={faq.link} items={faqFor("homes")} />
-      <ClosingSection
-        id="closing"
-        eyebrow={closing.eyebrow}
-        headline={closing.headline}
-        emphasis={closing.emphasis}
-        body={closing.body}
-        primary={closing.primary}
-        links={closing.links}
-        media={{ kind: "image", image: closing.image }}
-      />
+      <FaqCentered tone="paper" items={faqFor("homes")} />
+      <AccentPanel id="closing" headline={close.headline} action={close.action} />
     </>
   );
 }
