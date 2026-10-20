@@ -23,12 +23,19 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
   card listing) and /privacy (legal tab strip, contents beside the policy). Shared: a 56px header
   that is a soft white veil at the top of inner pages, 20px phone margins, 42px pills whose label
   rolls up on hover, softer image corners, restyled FAQ rows, pause controls on both word strips.
-- Gates at `a847829`: typecheck, lint and build pass; `check:a11y` passes on all 12 routes;
-  `perf:vitals` (three runs each) passes on all 11 pages, LCP 1.8 to 2.4 s. `check:layout` and
-  `check:rules` encode the October 4px, left-aligned system and fail by design on shape, alignment,
-  eyebrow and headline length; read only their honesty checks (11, 12, 22, 24) and the calculator
-  check (33), which pass. Check 14 flags the footer's looping pictures as duplicates and check 23 the
-  blurred glows; both are by design now.
+- Third pass (20 October, PR #15): `check:layout` and `check:rules` were rewritten to this system and
+  gate again (spec and probe data were in the session scratchpad; the scripts' header comments are now
+  the spec). Retired: tone alternation, the 8px spacing scale (31a, 31b), headline length (25),
+  paragraph lines (27) and the copy budget (28). New: check 44, refresh.tech and Legora never load and
+  are never named. The honesty checks 11, 12, 22, 24 and 33 are unchanged. Site fixes the new checks
+  found: sentence-case eyebrows on /download, three one-word last lines, the platform part tabs share
+  one grid cell (switching no longer moves the page on phones) and the Drone part got a "See the
+  surfaces" pill, the bleed AccentPanel keeps the 20px phone margin, /calculator's featured row sits
+  80px under the lead below 1024, the 404 drops its 70svh floor from 768 to 1023, and the bubble hero
+  stops popping in under reduced motion.
+- Gates: typecheck, lint and build pass; `check:layout` passes on all 12 routes at 1440, 390, 1024 and
+  768; `check:rules` (with motion) passes on all 12 routes at 1440 and 390; `check:a11y` passes on all
+  12 routes; `perf:vitals` (three runs each) passes on all 11 pages.
 - The owner said the imagery is not good enough yet and will be redone in Higgsfield later. Until
   they say so, keep the current stills and film in the new layouts.
 
@@ -59,7 +66,13 @@ NODE_USE_ENV_PROXY=1 node scripts/perf-vitals.mjs http://localhost:3000 [routes]
   own shell. Find the `next-server` pid with `ps -eo pid,args | grep next-server` and kill that.
 - **Run order:** run `perf-vitals` alone. Run `check-a11y` alone, or with at most one other check:
   under heavy load it times out mid-transition on the home carousel and step tabs.
-- **Rules check [14]:** it fails while anything in `public/video` is uncommitted.
+- **Rules check [14]:** it fails while anything in `public/video` is uncommitted. `c2-commercial-clip`
+  is in the manifest but on no page since the refresh layout dropped hover clips; `SPEC.unplaced` in
+  `scripts/check-rules.mjs` lists it with that reason, and check 14 fails if it is placed again while
+  still listed.
+- **Run time:** a full `check:rules` run with motion takes about 25 minutes; iterate with `--no-motion`
+  and a few routes. Both checks take `--inject <file.js>`, an init script added to every page, to break a
+  rule on purpose and prove the check fails on it.
 - **Proxy:** Chromium does not trust the proxy CA. The scripts route requests through Playwright
   (`scripts/media/lib.mjs` `routed()`), and Node needs `NODE_USE_ENV_PROXY=1`.
 
@@ -121,18 +134,23 @@ NODE_USE_ENV_PROXY=1 node scripts/perf-vitals.mjs http://localhost:3000 [routes]
 4. What contact email should /privacy give?
 5. Lienry Desktop: the installer URLs and version for `src/lib/download.ts`, and whether signing in
    needs a software plan.
+6. `c2-commercial-clip`: show it on a page again, or retire it from the manifest?
 
 ## Owner's calls left open by the second pass
 
 - The reference sets some headings at 36px on phones; CLAUDE.md says 30, so they stay 30.
 - /company's hero fades to white later than the reference (an extra stop at 72%) so the lead keeps
   4.5:1; delete that stop to match the reference exactly.
+- Check 8 lets a centred run be 6 lines below 768 (4 from 768): the reference's centred hero and tab
+  leads run 5 to 6 lines in the phone column. Lower `SPEC.maxCentredLines.phone` to 4 and those leads
+  need cutting or left-aligning on phones.
+- The Drone part's new pill reads "See the surfaces" and links to #features; reword it if wanted.
 
 ## Possible next steps
 
 - Swap in the owner's Higgsfield imagery and films when they have the account (the layouts take
   them as they are: tall 2:3 or 1:1.83 portraits for the expanding cards, 1200x483 for the step panel,
   4:3 for feature rows).
-- Update `check:layout` and `check:rules` to the new system (pills, card radius, centred heads,
-  dotted capitals eyebrows) so they gate again instead of failing by design.
-- Answer any of the five questions above as the owner replies.
+- Turn the mutation files used to prove the checks (`--inject`) into a committed self-test, so a
+  later edit to either script cannot quietly stop a rule from failing.
+- Answer any of the six questions above as the owner replies.

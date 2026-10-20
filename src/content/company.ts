@@ -30,7 +30,7 @@ export const companyPage = {
     {
       id: "why",
       layout: "wide" as StoryRowLayout,
-      title: "We think cleaning a building\u2019s exterior shouldn\u2019t need anyone at height.",
+      title: "We think cleaning a building\u2019s exterior shouldn\u2019t need anyone at\u00a0height.",
       paragraphs: ["Lienry Drones is a Sydney company at concept stage. We are building a resident cleaning drone that lives on a property and keeps its exterior clean with nobody on site. We start with the buildings people own: offices, apartments, homes and rentals."],
       image: { id: "co1-company", alt: "A harbour-side street of mid-rise buildings at dawn", position: "50% 50%" },
     },

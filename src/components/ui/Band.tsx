@@ -6,7 +6,7 @@ export type BandPad = "section" | "hero" | "split" | "attached" | "compact" | "f
 export type BandProps = {
   /** Required: the DOM id and the band's `data-band` name. */
   id: string;
-  /** plaster or ink. raised and sunken are accepted until integration (check 4 fails them). */
+  /** plaster, paper, tint or mist (light), ink or night (dark). raised and sunken are retired (check 4 fails them). */
   tone: BandTone | LegacyTone;
   /** Default "section". */
   pad?: BandPad;
@@ -39,11 +39,16 @@ const tones = {
   sunken: "bg-sunken text-ink", // legacy, deleted at integration
 } as const;
 
-// Top and bottom padding (globals.css): --section-y is 128 from 1024, 96 from 768, 80 below;
-// --hero-top is the 56px bar plus --hero-gap (80, 64, 56).
+// Top and bottom padding (globals.css): --section-y is 96 from 1024, 80 from 768, 64 below;
+// --hero-top is the 56px bar plus --hero-gap (80, 64, 56). check:layout 30 holds each named pad to
+// these values; a band that sets its own measured padding declares "none".
 //   section   S / S          every page section
 //   hero      56 + H / S     the band holding an inner page's h1
+//   split     56 + H / S     the split hero; 80 / 56 from 1024
 //   attached  0 / S          a strip that continues the band above it in the same tone
+//   compact   64 / 64        70 / 70 from 1024
+//   feature   64 / 64        88 / 88 from 1024
+//   tabs      56 / 56        61 / 61 from 1024
 const pads = {
   section: "py-(--section-y)",
   hero: "pt-(--hero-top) pb-(--section-y)",

@@ -417,7 +417,7 @@
     animation: glow-drift 18s ease-in-out infinite reverse;
   }
   @media (prefers-reduced-motion: reduce) {
-    .marquee, .glow-drift, .glow-drift-alt { animation: none; }
+    .marquee, .glow-drift, .glow-drift-alt, .bubble-pop, .bubble-drift { animation: none; }
   }
 
   /* The founder letter: the serif at the H3 step, the one run of serif text. */

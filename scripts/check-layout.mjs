@@ -1,63 +1,103 @@
-// check:layout: the layout checks of the October 2026 design pass (spec D1; the earlier E2 checks 2, 3,
-// 4 and 19 as rewritten there), run in Playwright against a served build at 1440x900 and 390x844 by
-// default, and at 1024x768 and 768x1024 with --widths 1440,1024,768,390.
+// check:layout: the layout checks of the 20 October 2026 system (CLAUDE.md "Layout" and "Shape": refresh.tech's
+// page templates in Lienry's own words, fonts, colours and media), run in Playwright against a served build at
+// 1440x900 and 390x844 by default, and at 1024x768 and 768x1024 with --widths 1440,1024,768,390.
 //
 // Usage: npm run check:layout -- <baseUrl> [route ...] [--widths 1440,390] [--json report.json] [--no-sweep]
+//          [--inject mutation.js]
 //   e.g. npm run build && npm run start, then npm run check:layout -- http://localhost:3000
 //
-// Routes: the nine pages, plus /this-page-does-not-exist, which must answer 404 (check 43).
+// Routes: the eleven pages, plus /this-page-does-not-exist, which must answer 404 (check 43).
 //
-//  2  Dead space. For every block in <main> except the film bands, the visible content boxes inside the
-//     block's content box (padding excluded) are projected onto the page's vertical axis: no horizontal
-//     stripe taller than the limit may hold none (64px from 1024, 48px below). Content boxes are the lines
-//     of text (Range.getClientRects); img, video, canvas, svg, button, input, select, textarea and hr;
-//     controls by their box, as a button is (a [data-button] or [data-icon-button] rendered as a link,
-//     and a link laid out as a box 64px tall at most, so a tertiary link's 44px target is content, not
-//     empty paper; a taller link is a container and is measured by what it holds);
-//     elements with a background other than the band's or a border on all four sides; and the rules
-//     drawn by top and bottom borders. Among siblings marked [data-col] that sit side by side, no
-//     column's content may end more than the limit above the lowest of them. Sub-pixel layout adds up to
-//     1px of noise, so a run or a column fails above limit + 1. Every block is measured again with each
-//     tab selected, each h3 disclosure open and each member of a [data-sweep] group active.
+//  2  Dead space. For every block in <main> except the film bands and the composed heroes (below), the
+//     visible content boxes inside the block's content box (padding excluded) are projected onto the page's
+//     vertical axis: no horizontal stripe taller than the limit may hold none (112px from 1024, 88px below:
+//     the reference's 100px / 80px feature-row rhythm plus slack). A band filled by a full-bleed panel
+//     (check 4's surface is the panel's) is measured inside the panel's content box against the panel's
+//     colour. Content boxes are the lines of text (Range.getClientRects); img, video, canvas, svg, button,
+//     input, select, textarea and hr; controls by their box, as a button is (a [data-button] or
+//     [data-icon-button] rendered as a link, and a link laid out as a box 64px tall at most, so a tertiary
+//     link's 44px target is content, not empty paper; a taller link is a container and is measured by what
+//     it holds); elements with a background other than the band's or a border on all four sides; and the
+//     rules drawn by top and bottom borders. A blurred glow (a blur() filter) is light, not content, and so
+//     is a box at a negative z-index buried under the band's own background. Among siblings marked
+//     [data-col] that sit side by side, no column's content may end more than the limit above the lowest
+//     of them; unmarked side-by-side columns that end further apart are a warning.
+//     Sub-pixel layout adds up to 1px of noise, so a run or a column fails above limit + 1. Every block is
+//     measured again with each tab selected, each h3 disclosure open and each member of a [data-sweep]
+//     group active. A film band is one a video or picture covers (90% of it or more); a composed hero is a
+//     [data-scatter] band holding 3 or more absolutely placed pictures, and [data-scatter] on a band without
+//     them fails ("skip: scatter hero" is earned, not declared). The page is measured once every Reveal has
+//     hydrated and risen in; a reveal still hidden after that is a warning (rerun the route alone).
 //  3  Band heights. At 1440 a band taller than twice the viewport is a warning, unless it holds the h1
 //     or the software window. A band's height never changes when one of its tabs or parts is selected
 //     (sweep kinds "tab" and "part", spread 1px at most); the kind is the group's [data-sweep] value, or
-//     "part" / "beat" from a part- / story- id.
-//  4  Tones. (a) Every band's data-tone is plaster, ink or film: raised and sunken are surfaces inside a
-//     section. (b) Adjacent bands alternate light (plaster) and dark (ink, film); the one exception is a
-//     [data-attached] band right after the band holding the h1, in its tone. (c) No glass-deep element of
-//     100x60 or more in <main>. (d) The footer's data-tone is plaster or ink, opposite in lightness to
-//     the last band, and it renders that tone. (e) A band's data-tone is the surface it renders.
+//     "part" / "beat" from a part- / story- id. A "form" group (the enquiry tabs choose the form's fields),
+//     beats and disclosures may change it; they are still swept for check 2. A [data-sweep] value is one of
+//     tab, part, beat, disclosure, form, and a "form" group sits in a band that holds a <form>.
+//  4  Tones. (a) Every band has a data-tone, and it is plaster, paper, tint, mist, ink, night or film; raised
+//     and sunken are retired surface names. data-tone="film" holds a film or picture covering 90% of the
+//     band (else it fails, and the band is measured like any other). (b) A band's surface is composited
+//     bottom to top on what shows through from behind it (alpha and opacity included): its own background
+//     colour, its gradients, its ::before, then each box covering 90% of it or more (98% over a band that
+//     paints its own background: a layer laid over all of it) with that box's ::before and ::after, in
+//     document order, then its ::after. A blurred glow is not a surface. (c) Light tones (plaster, paper,
+//     tint, mist) render a light surface, relative luminance 0.8 or more at every colour stop (white, warm
+//     paper, the pale accent tint); dark tones (ink, night) a near-black one, 0.02 or less at every stop. A
+//     composed hero's gradient wash is judged by its first stop: under 0.4 for a dark tone (the /company
+//     wash starts at the accent), 0.8 or more for a light one. A film band is not judged.
+//     (d) The footer's data-tone is ink or night and it renders near-black (0.02 or less), by the same model.
 // 19  Overflow. Nothing runs past the viewport's edge, with the phone menu open and closed. The page
 //     clips overflow-x on <html> and <body>, which hides overflow from documentElement.scrollWidth, so
 //     body.scrollWidth and the elements past the edge are checked as well.
-// 30  Section padding. Every non-film band's computed padding matches its data-pad within 0.5px:
-//     section S/S, hero 72+H/S, attached 0/S, with S = 128/96/80 and H = 64/48/40 from 1024 / from 768 /
-//     below. "none" on a non-film band fails. The footer's top padding is S. A band without data-pad is
-//     judged as attached ([data-attached]), hero (it holds the h1) or section, and says so.
-// 31a Computed spacing. In <main> and the footer (not inside [data-ui], svg, .sr-only or the header, and
-//     not an element with an m-auto, mt-auto, mb-auto or my-auto class), margin-top, margin-bottom, the
-//     four paddings, row-gap and column-gap are each within 0.5px of 0, 8, 16, 24, 32, 40, 48, 64, 80, 96,
-//     128 or 160, the negative of one, or 72 plus one. A [data-ui] root is measured by its margins only:
-//     its padding and gaps are the inside of the coded UI, which keeps its own spacing.
-// 32  Grid alignment (1440 and 1024). The 12 columns come from the first .max-w-grid in <main> (left L,
-//     width W, gutter 24). The left edges of every .eyebrow, h1, h2, band-level p, figure frame, the
-//     first [data-button] of an action row, [data-calculator], [data-accordion], [data-card] and a
-//     track's first item sit within 1px of a column start; a figure's right edge sits within 1px of a
-//     column end or of L + W. Inside li, [data-card], [data-accordion], form, [data-form-success] and
-//     [data-ui] only the component's own edge is measured. Below 768 every one of those left edges is
-//     the page margin, 16px (within 1px). The home hero is exempt.
+// 30  Section padding (Band.tsx's pads). (a) data-pad, when present, is section, hero, split, attached,
+//     compact, feature, tabs or none; a band without one is none. (b) A named pad's computed padding is,
+//     within 0.5px, with S = --section-y (96 from 1024, 80 from 768, 64 below), H = --hero-gap (80, 64, 56)
+//     and the 56px bar: section S/S; hero 56+H/S; attached 0/S; split 56+H/S, 80/56 from 1024; compact
+//     64/64, 70/70 from 1024; feature 64/64, 88/88 from 1024; tabs 56/56, 61/61 from 1024. "none" sets its
+//     own measured padding and is not compared to a pad. (c) At scroll 0 the page's h1 starts at least
+//     --nav-h + 16 (72 with the 56px bar; never less) below the top of the page, on every route, the film
+//     hero's included. (d) A "none" band's padding is at most S plus check 2's limit at each edge (padding
+//     check 2 does not measure), plus the bar on the top of the page's first band; film bands and composed
+//     heroes are exempt. The note counts the pads compared and the none bands bounded on each route.
+// 32  Rail containment (1440 and 1024; below 768). The rail is the first .max-w-grid in <main> outside the
+//     exempt bands (left L, width W). Every .eyebrow, h1, h2 and band-level p (by its content box: padding
+//     holds no text), figure frame and first [data-button] of an action row, and the outermost li, [data-card],
+//     [data-accordion], [data-calculator], form and [data-form-success] (by its own box; nothing inside one
+//     is measured) lies within L-1 to L+W+1. Below 768 the same edges lie within the 20px page margins (19 to
+//     viewport - 19). An in-flow centred h1 or h2 (computed text-align center) outside li and [data-card] is
+//     centred where the flow places it, within 1px, and so is each box above it that centres it (centred
+//     text, or a flex column centring its items), up to its band: a centred head block held to one side
+//     fails. Where the flow places a box is its containing block's content box when that is a block
+//     container, a flex column, a flex row holding only that box, or a one-column grid; a grid cell or a
+//     shared flex row gives it an area of its own, so it is not judged there. Exempt: film bands, composed
+//     heroes, [data-ui], full-bleed media (a figure frame 98% of the viewport wide or more) and anything in a
+//     track: a box that scrolls on x, or clips x with in-flow content wider than itself (a marquee row, a
+//     carousel). A band, a rail, or a box holding a rail, an h1 or an h2 is never a track, so a band that
+//     clips cannot hide its own content sliding off the page. Not measured from 768 to 1023.
 // 43  The unknown route answers 404 with the header and the footer, and checks 2, 4, 19 and 30 pass on it.
 //
 // Markers: every block in <main> must be a Band (data-band, data-tone) or a film band
-// (data-tone="film"), or the checks cannot see it.
+// (data-tone="film"), or the checks cannot see it; check 4 then needs its data-tone.
+//
+// Retired 20 Oct 2026:
+//  4   plaster/ink alternation: retired 20 Oct 2026: the reference runs white, paper and tint bands back to back.
+//  4   the glass-deep panel ban: retired 20 Oct 2026: CLAUDE.md allows accent panels (the closing panel is teal).
+//  4   exact token matching: retired 20 Oct 2026: bands paint measured colours (#141a1c, #0f0d0e, washes).
+//  30  the footer's padding-top S: retired 20 Oct 2026: the footer follows the reference's measured spacing.
+//  30  "none fails on a non-film band": retired 20 Oct 2026: pad="none" bands set the reference's own padding
+//      (bounded by 30 (d)).
+//  31a computed spacing: retired 20 Oct 2026: the reference's measured spacing is not on an 8px scale.
+//  32  column starts and ends: retired 20 Oct 2026: centred heads and the reference's offsets sit off columns.
+//
+// --inject <file.js> adds the file's source to every page after the page library (addInitScript), so a
+// self-test can break a rule on purpose and see the check fail.
 //
 // Playwright is resolved from this project's node_modules, then from a global install. Exit code: 0 when
 // every check passes, 1 when any fails, 2 when the checks could not run.
 
 import { createRequire } from "node:module";
 import { execSync } from "node:child_process";
-import { writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 const NOT_FOUND = "/this-page-does-not-exist";
@@ -69,13 +109,31 @@ const VIEWPORTS = {
   390: { width: 390, height: 844, mobile: true },
 };
 const viewportFor = (w) => VIEWPORTS[w] ?? { width: w, height: w < 800 ? 844 : 900, mobile: w < 800 };
-// The largest empty run inside a block, and the most a column may end short of its neighbour.
-const limitFor = (w) => (w >= 1024 ? 64 : 48);
-// The spacing scale (spec A1.1) and the section rhythm at each width.
-const SCALE = [0, 8, 16, 24, 32, 40, 48, 64, 80, 96, 128, 160];
-const NAV_H = 72;
-const sectionY = (w) => (w >= 1024 ? 128 : w >= 768 ? 96 : 80);
-const heroGap = (w) => (w >= 1024 ? 64 : w >= 768 ? 48 : 40);
+// The largest empty run inside a block, and the most a column may end short of its neighbour: the
+// reference's feature rows run 100px apart from 1024 and 80px below, plus slack.
+const limitFor = (w) => (w >= 1024 ? 112 : 88);
+// Band.tsx's pads at each width (globals.css: --nav-h, --section-y, --hero-gap).
+const NAV_H = 56;
+const sectionY = (w) => (w >= 1024 ? 96 : w >= 768 ? 80 : 64);
+const heroGap = (w) => (w >= 1024 ? 80 : w >= 768 ? 64 : 56);
+const PADS = ["section", "hero", "split", "attached", "compact", "feature", "tabs", "none"];
+// [top, bottom] and how each is made, for a named pad at a width.
+const padFor = (pad, w) => {
+  const S = sectionY(w);
+  const H = heroGap(w);
+  const lg = w >= 1024;
+  return {
+    section: [S, S, "S / S"],
+    hero: [NAV_H + H, S, "56 + H / S"],
+    attached: [0, S, "0 / S"],
+    split: lg ? [NAV_H + 24, 56, "56 + 24 / 56 from 1024"] : [NAV_H + H, S, "56 + H / S below 1024"],
+    compact: lg ? [70, 70, "70 / 70 from 1024"] : [64, 64, "64 / 64 below 1024"],
+    feature: lg ? [88, 88, "88 / 88 from 1024"] : [64, 64, "64 / 64 below 1024"],
+    tabs: lg ? [61, 61, "61 / 61 from 1024"] : [56, 56, "56 / 56 below 1024"],
+  }[pad];
+};
+// The page margin below 768 (globals.css --page-margin).
+const PAGE_MARGIN = 20;
 // The coded demos: [data-ui], and the legacy selectors the window and app panel carry until it lands.
 const UI_SEL = "[data-ui], [data-software-preview], [role='group'][aria-label$='demo window'], [role='group'][aria-label$='demo data']";
 const CHECK_NAMES = {
@@ -85,8 +143,7 @@ const CHECK_NAMES = {
   4: "4 tones",
   19: "19 horizontal overflow",
   30: "30 section padding",
-  "31a": "31a computed spacing",
-  32: "32 grid alignment",
+  32: "32 rail containment",
   43: "43 the unknown route",
   page: "page errors",
 };
@@ -94,17 +151,19 @@ const CHECK_NAMES = {
 function usage() {
   console.log(`Usage: node scripts/check-layout.mjs <baseUrl> [route ...] [options]
 
-Runs the design pass's layout checks (2, 3, 4, 19, 30, 31a, 32, 43) against a served build.
+Runs the layout checks (markers, 2, 3, 4, 19, 30, 32, 43) of the 20 October 2026 system against a served build.
 
   <baseUrl>          the served build, e.g. http://localhost:3000 (default)
-  route              one or more routes (default: all nine and ${NOT_FOUND})
+  route              one or more routes (default: all eleven and ${NOT_FOUND})
   --widths 1440,390  viewport widths (1440x900 and 390x844 by default; 1024x768 and 768x1024 also known)
   --json <file>      also write the full report as JSON
-  --no-sweep         skip the tab and disclosure state sweeps`);
+  --no-sweep         skip the tab and disclosure state sweeps
+  --inject <file.js> add the file's source to every page after the page library (context.addInitScript),
+                     to break a rule on purpose and prove the check fails`);
 }
 
 function parseArgs(argv) {
-  const opts = { base: "http://localhost:3000", routes: [], widths: [1440, 390], json: null, sweep: true };
+  const opts = { base: "http://localhost:3000", routes: [], widths: [1440, 390], json: null, sweep: true, inject: null };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     const value = () => {
@@ -118,6 +177,7 @@ function parseArgs(argv) {
       process.exit(0);
     } else if (a.startsWith("--widths")) opts.widths = value().split(",").map((w) => Number(w.trim()));
     else if (a.startsWith("--json")) opts.json = value();
+    else if (a.startsWith("--inject")) opts.inject = value();
     else if (a === "--no-sweep") opts.sweep = false;
     else if (a.startsWith("--")) fail(`Unknown option ${a}.`, true);
     else if (/^https?:\/\//.test(a)) opts.base = a.replace(/\/+$/, "");
@@ -126,6 +186,13 @@ function parseArgs(argv) {
   }
   for (const w of opts.widths) if (!Number.isFinite(w) || w < 200) fail(`Bad width ${w}.`);
   if (!opts.routes.length) opts.routes = ROUTES;
+  if (opts.inject) {
+    try {
+      opts.injectSource = readFileSync(opts.inject, "utf8");
+    } catch (err) {
+      fail(`Cannot read --inject ${opts.inject}: ${err.message}`);
+    }
+  }
   return opts;
 }
 
@@ -201,33 +268,24 @@ function pageLib(cfg) {
     return Math.abs(x[0] - y[0]) <= 2 && Math.abs(x[1] - y[1]) <= 2 && Math.abs(x[2] - y[2]) <= 2 && Math.abs(x[3] - y[3]) <= 0.02;
   };
 
-  let tokens = null;
-  P.tokens = () => {
-    if (tokens) return tokens;
-    tokens = {};
-    const probe = document.createElement("div");
-    document.body.appendChild(probe);
-    for (const name of ["plaster", "raised", "sunken", "ink", "ink-raised", "glass-deep", "hairline"]) {
-      probe.style.backgroundColor = `var(--color-${name})`;
-      tokens[name] = getComputedStyle(probe).backgroundColor;
-    }
-    probe.remove();
-    return tokens;
+  // Source-over: [r, g, b, a] `top` painted on `bottom`.
+  const over = (top, bottom) => {
+    const a = top[3] + bottom[3] * (1 - top[3]);
+    if (a <= 0) return [0, 0, 0, 0];
+    const mix = (i) => Math.round((top[i] * top[3] + bottom[i] * bottom[3] * (1 - top[3])) / a);
+    return [mix(0), mix(1), mix(2), a];
   };
-  const toneOfColour = (colour) => {
-    if (alphaOf(colour) < 0.5) return null;
-    const t = P.tokens();
-    for (const name of ["plaster", "raised", "sunken", "ink", "ink-raised", "glass-deep"]) if (same(colour, t[name])) return name;
-    const [r, g, b] = rgba(colour);
-    return `rgb(${r}, ${g}, ${b})`;
-  };
-  // The first opaque background at or above an element: what shows through a transparent block.
-  const effectiveBackground = (el) => {
+  const textOf = ([r, g, b, a]) => (a < 0.995 ? `rgba(${r}, ${g}, ${b}, ${Math.round(a * 100) / 100})` : `rgb(${r}, ${g}, ${b})`);
+  // What shows through from behind an element: its ancestors' background colours composited on the
+  // white canvas, from the nearest opaque one down.
+  const backdrop = (el) => {
+    const chain = [];
     for (let e = el; e; e = e.parentElement) {
-      const bg = getComputedStyle(e).backgroundColor;
-      if (alphaOf(bg) >= 0.5) return bg;
+      const c = rgba(getComputedStyle(e).backgroundColor);
+      if (c[3] > 0) chain.push(c);
+      if (c[3] >= 0.995) break;
     }
-    return "rgb(255, 255, 255)";
+    return chain.reverse().reduce((b, c) => over(c, b), [255, 255, 255, 1]);
   };
 
   const clean = (s, n = 60) => {
@@ -268,6 +326,11 @@ function pageLib(cfg) {
     return true;
   };
   P.shown = shown;
+  // Under a blur() filter, from `el` up to (not including) `root`: a glow.
+  const glow = (el, root) => {
+    for (let e = el; e && e !== root; e = e.parentElement) if (/blur\(/.test(getComputedStyle(e).filter)) return true;
+    return false;
+  };
 
   // Clip a rectangle by every ancestor (from `from` up to and including `root`) that clips overflow.
   // A rule is 1px tall, so its minimum height is lower than a box's.
@@ -326,10 +389,29 @@ function pageLib(cfg) {
         if (c) out.push({ ...c, what: n, rank: 0 });
       }
     }
+    // Not content: a blurred glow (CLAUDE.md: soft accent glows behind heroes and panels) is light, and a
+    // box at a negative z-index under a root that paints its own background (with no stacking context
+    // between) is buried under that background.
+    const rootCs = getComputedStyle(root);
+    const rootPaints = alphaOf(rootCs.backgroundColor) > 0.02 || rootCs.backgroundImage !== "none";
+    const buried = (el) => {
+      if (!rootPaints) return false;
+      for (let e = el.parentElement; e; e = e.parentElement) {
+        if (stackingContext(getComputedStyle(e))) return false;
+        if (e === root) return true;
+      }
+      return false;
+    };
+    const notContent = [];
     for (const el of root.querySelectorAll("*")) {
       const tag = el.tagName.toLowerCase();
       if (el.closest("svg") && tag !== "svg") continue;
+      if (notContent.some((g) => g.contains(el))) continue;
       const cs = getComputedStyle(el);
+      if (/blur\(/.test(cs.filter) || (cs.position !== "static" && num(cs.zIndex) < 0 && buried(el))) {
+        notContent.push(el);
+        continue;
+      }
       // A control is measured by its box, as a <button> is: a Button or IconButton rendered as a link,
       // and a link laid out as a control-sized box (a 44px tertiary target, a list link). Its target is
       // content. A taller link is a container (a whole card) and is measured by what it holds.
@@ -521,16 +603,29 @@ function pageLib(cfg) {
     return groups;
   };
 
+  // A film band is one a film or picture fills: a video or img from the media set covering 90% of it.
+  // data-tone="film" claims it; only this evidence earns the film skips (check 4 fails a bare claim).
   const isFilm = (el) => {
-    if (el.getAttribute("data-tone") === "film") return true;
     const r = el.getBoundingClientRect();
+    if (r.height <= 200) return false;
     for (const m of el.querySelectorAll("video, img")) {
       if (!mediaId(m)) continue;
       const mr = m.getBoundingClientRect();
-      if (mr.width >= r.width * 0.9 && mr.height >= r.height * 0.9 && r.height > 200) return true;
+      if (mr.width >= r.width * 0.9 && mr.height >= r.height * 0.9) return true;
     }
     return false;
   };
+  // A composed hero (the /company bubble hero): its text sits in a scatter of pictures, not in rows.
+  // data-scatter claims it; it is one when it holds SCATTER_MIN pictures placed absolutely (check 2
+  // fails a bare claim and measures the band).
+  const SCATTER_MIN = 3;
+  const scatterPictures = (el) =>
+    [...el.querySelectorAll("img, video")].filter((m) => {
+      if (!m.getClientRects().length) return false;
+      for (let e = m; e && e !== el; e = e.parentElement) if (/^(absolute|fixed)$/.test(getComputedStyle(e).position)) return true;
+      return false;
+    }).length;
+  const isScatter = (el) => el.hasAttribute("data-scatter") && scatterPictures(el) >= SCATTER_MIN;
   const windowSelector = "[data-software-preview], [role='group'][aria-label$='demo window']";
 
   P.discover = () => {
@@ -561,35 +656,145 @@ function pageLib(cfg) {
     return P.state;
   };
 
-  const edge = (cs, side) => ({ w: num(cs[`border${side}Width`]), style: cs[`border${side}Style`], colour: cs[`border${side}Color`] });
-  const hairline = (e) => e.w >= 0.5 && e.style !== "none" && e.style !== "hidden" && alphaOf(e.colour) > 0.05;
-
-  // Relative luminance of a colour, 0 to 1 (WCAG): what makes an unnamed surface light or dark.
-  const luminance = (colour) => {
-    const [r, g, b] = rgba(colour).map((v, i) => (i < 3 ? v / 255 : v));
-    const lin = (c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+  // Relative luminance of an opaque [r, g, b, a], 0 to 1 (WCAG): what makes a surface light or dark.
+  const luminance = ([r, g, b]) => {
+    const lin = (c) => (c / 255 <= 0.03928 ? c / 255 / 12.92 : ((c / 255 + 0.055) / 1.055) ** 2.4);
     return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
   };
-  const blockInfo = (el, index, marked) => {
+
+  // Check 4: the surface a band (or the footer) renders, composited bottom to top on what shows through
+  // from behind it: the band's own background colour, then its gradients, then its ::before, then every
+  // box covering 90% of it or more (clipped by the boxes between) with that box's ::before and ::after, in
+  // document order, then its ::after. Alpha and opacity are composited, so a half-transparent near-black
+  // over white renders grey. A box with a negative z-index under a band that is no stacking context paints
+  // below the band's own background. A blurred glow is light, not a surface. A gradient layer keeps every
+  // stop; `first` is its first stop over what lies below it.
+  const STOPS = /(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\([^()]*\)|#[0-9a-f]{3,8}\b/gi;
+  const stackingContext = (cs) =>
+    cs.isolation === "isolate" || (cs.position !== "static" && cs.zIndex !== "auto") || num(cs.opacity) < 1 || cs.transform !== "none" || cs.filter !== "none" || cs.mixBlendMode !== "normal";
+  const opacityTo = (node, el) => {
+    let o = 1;
+    for (let e = node; e; e = e.parentElement) {
+      o *= num(getComputedStyle(e).opacity);
+      if (e === el) break;
+    }
+    return o;
+  };
+  const surfaceOf = (el) => {
+    const r = el.getBoundingClientRect();
+    const area = r.width * r.height;
+    let stack = [backdrop(el.parentElement)];
+    let top = { what: "the background behind it (it paints nothing)", gradient: false, first: stack[0], node: null, cover: null };
+    const paint = (cs, whose, node, alpha, cover = null) => {
+      const layers = [];
+      if (alphaOf(cs.backgroundColor) > 0.02) layers.push({ stops: [cs.backgroundColor], gradient: false });
+      if (/gradient\(/.test(cs.backgroundImage)) {
+        const stops = cs.backgroundImage.match(STOPS) || [];
+        if (stops.length) layers.push({ stops, gradient: true });
+      }
+      for (const layer of layers) {
+        const paintOver = (s, b) => {
+          const c = rgba(s);
+          return over([c[0], c[1], c[2], c[3] * alpha], b);
+        };
+        const first = paintOver(layer.stops[0], stack[0]);
+        const next = [];
+        for (const s of layer.stops) for (const b of stack) {
+          const c = paintOver(s, b);
+          if (!next.some((n) => same(textOf(n), textOf(c)))) next.push(c);
+        }
+        // A box that paints what is already there changes nothing (the band stays the surface's owner).
+        if (node !== el && next.length === stack.length && next.every((c, i) => same(textOf(c), textOf(stack[i])))) continue;
+        stack = next.slice(0, 24);
+        top = { what: `${whose} ${layer.gradient ? "gradient" : "background colour"}`, gradient: layer.gradient, first, node, cover };
+      }
+    };
+    // Over a band that paints its own background, a layer counts only when it is laid over all of it (98%
+    // or more: it hides that background); over a transparent band, from 90% (a full-bleed panel).
+    const cs = getComputedStyle(el);
+    const ownPaint = alphaOf(cs.backgroundColor) > 0.02 || /gradient\(/.test(cs.backgroundImage);
+    const least = ownPaint ? 0.98 : 0.9;
+    // A ::before or ::after whose box covers `least` of the band.
+    const pseudo = (node, which, whose, alpha) => {
+      const p = getComputedStyle(node, which);
+      if (p.content === "none" || p.content === "normal" || p.display === "none" || p.visibility !== "visible" || /blur\(/.test(p.filter)) return;
+      const w = Math.min(num(p.width), r.width);
+      const h = Math.min(num(p.height), r.height);
+      if (area <= 0 || (w * h) / area < least) return;
+      paint(p, `${whose} ${which}'s`, null, alpha * num(p.opacity), Math.round(((w * h) / area) * 100));
+    };
+    const covering = [];
+    if (area > 0) {
+      for (const d of el.querySelectorAll("*")) {
+        if (d.closest("svg") || glow(d, el) || !shown(d, el)) continue;
+        const c = clip(d.getBoundingClientRect(), d.parentElement, el);
+        if (!c) continue;
+        const w = Math.min(c.right, r.right) - Math.max(c.left, r.left);
+        const h = Math.min(c.bottom - scrollY, r.bottom) - Math.max(c.top - scrollY, r.top);
+        if (w <= 0 || h <= 0 || (w * h) / area < least) continue;
+        const dcs = getComputedStyle(d);
+        covering.push({ d, cs: dcs, cover: Math.round(((w * h) / area) * 100), below: dcs.position !== "static" && num(dcs.zIndex) < 0 });
+      }
+    }
+    const own = opacityTo(el, el);
+    const lay = (list) => {
+      for (const { d, cs: dcs, cover } of list) {
+        const alpha = opacityTo(d, el);
+        const whose = `the full-bleed <${d.tagName.toLowerCase()}>'s`;
+        paint(dcs, whose, d, alpha, cover);
+        pseudo(d, "::before", `the full-bleed <${d.tagName.toLowerCase()}>`, alpha);
+        pseudo(d, "::after", `the full-bleed <${d.tagName.toLowerCase()}>`, alpha);
+      }
+    };
+    const context = stackingContext(cs);
+    if (!context) lay(covering.filter((c) => c.below));
+    paint(cs, "its", el, own);
+    pseudo(el, "::before", "its", own);
+    lay(context ? covering : covering.filter((c) => !c.below));
+    pseudo(el, "::after", "its", own);
+    const shownColour = top.gradient ? top.first : stack[0];
+    const lums = stack.map(luminance);
+    // Check 2 measures the band through its surface: a full-bleed panel laid out in the flow is measured
+    // by its own content box, against its own colour.
+    const inFlow = top.node && top.node !== el && !/^(absolute|fixed)$/.test(getComputedStyle(top.node).position);
+    return {
+      info: {
+        colour: textOf(shownColour),
+        stops: top.gradient ? stack.map(textOf) : null,
+        gradient: top.gradient,
+        what: top.what,
+        cover: top.cover,
+        luminance: luminance(shownColour),
+        lightest: Math.max(...lums),
+        darkest: Math.min(...lums),
+        lightestStop: textOf(stack[lums.indexOf(Math.max(...lums))]),
+        darkestStop: textOf(stack[lums.indexOf(Math.min(...lums))]),
+      },
+      root: inFlow ? top.node : el,
+      bg: textOf(stack[0]),
+    };
+  };
+
+  const blockInfo = (el, index, marked, surfaced = surfaceOf(el)) => {
     const cs = getComputedStyle(el);
     const r = el.getBoundingClientRect();
     const dataTone = el.getAttribute("data-tone");
     const film = isFilm(el);
-    const bg = effectiveBackground(el);
-    const bgTone = film ? "film" : toneOfColour(bg);
+    const surface = surfaced.info;
     const heading = el.querySelector("h1, h2, h3");
-    const top = edge(cs, "Top");
-    const bottom = edge(cs, "Bottom");
-    const t = P.tokens();
     return {
       index,
       marked,
       tag: el.tagName.toLowerCase(),
       id: el.getAttribute("data-band") || el.id || "",
       dataTone,
-      bgTone,
-      tone: dataTone || bgTone,
+      surface,
+      tone: dataTone || (film ? "film" : surface.colour),
       film,
+      scatter: isScatter(el),
+      scatterClaim: el.hasAttribute("data-scatter"),
+      scatterPictures: el.hasAttribute("data-scatter") ? scatterPictures(el) : 0,
+      hasForm: !!el.querySelector("form"),
       heading: heading ? clean(heading.textContent, 50) : "",
       label: el.getAttribute("aria-label") || "",
       top: px(r.top + scrollY),
@@ -597,51 +802,55 @@ function pageLib(cfg) {
       hasH1: !!el.querySelector("h1"),
       hasWindow: !!el.querySelector(windowSelector),
       pad: el.getAttribute("data-pad"),
-      attached: el.hasAttribute("data-attached"),
       paddingTop: Math.round(num(cs.paddingTop) * 100) / 100,
       paddingBottom: Math.round(num(cs.paddingBottom) * 100) / 100,
-      light: film ? false : luminance(bg) > 0.4,
-      borderTop: { ...top, visible: hairline(top), isHairline: same(top.colour, t.hairline) },
-      borderBottom: { ...bottom, visible: hairline(bottom), isHairline: same(bottom.colour, t.hairline) },
       text: clean(el.textContent, 40),
     };
   };
 
-  // One block, measured: dead space, column balance, unmarked columns.
+  // One block, measured: dead space, column balance, unmarked columns. A band filled by a full-bleed panel
+  // is measured inside the panel's content box, against the panel's colour (the panel is not content).
   P.measure = (index, limit) => {
     const it = P.state.items[index];
     if (!it) return null;
     const el = it.el;
-    const info = blockInfo(el, index + 1, it.marked);
-    if (info.film) return { ...info, skipped: "film band" };
-    const bandBg = effectiveBackground(el);
-    return { ...info, space: gaps(el, bandBg, limit), columns: columns(el, bandBg, limit), unmarkedColumns: unmarkedColumns(el, bandBg, limit) };
+    const surfaced = surfaceOf(el);
+    const info = blockInfo(el, index + 1, it.marked, surfaced);
+    const hiddenReveals = [...el.querySelectorAll("[data-reveal]")].filter((e) => e.getClientRects().length && num(getComputedStyle(e).opacity) < 0.99).length;
+    if (info.film) return { ...info, hiddenReveals, skipped: "film band" };
+    if (info.scatter) return { ...info, hiddenReveals, skipped: "scatter hero" };
+    const root = surfaced.root;
+    const bandBg = surfaced.bg;
+    const panel = root !== el ? nameOf(root) : null;
+    return { ...info, hiddenReveals, panel, space: gaps(root, bandBg, limit), columns: columns(el, bandBg, limit), unmarkedColumns: unmarkedColumns(el, bandBg, limit) };
+  };
+
+  const rendered = (el) => el.getClientRects().length > 0 && getComputedStyle(el).visibility === "visible" && !el.closest("[hidden], .sr-only");
+
+  // Check 30 (c): where the page's h1 starts, against the header bar's height (--nav-h).
+  P.hero = () => {
+    const probe = document.createElement("div");
+    probe.style.cssText = "position:absolute;visibility:hidden;width:1px;height:var(--nav-h)";
+    document.body.appendChild(probe);
+    const navH = probe.getBoundingClientRect().height;
+    probe.remove();
+    const h1 = [...document.querySelectorAll("main h1")].find(rendered);
+    if (!h1) return { navH, h1: null };
+    const r = h1.getBoundingClientRect();
+    return { navH, h1: { top: Math.round((r.top + scrollY) * 10) / 10, what: P.describe(h1), band: (P.state?.items || []).findIndex((it) => it.el.contains(h1)) + 1 } };
   };
 
   P.audit = (limit) => {
     const st = P.discover();
     const blocks = st.items.map((_, i) => ({ ...P.measure(i, limit), controls: st.controls[i].map((g) => ({ kind: g.kind, labels: g.els.map(labelOf), initial: g.initial })) }));
     const footer = st.footer ? blockInfo(st.footer, 0, true) : null;
-    if (footer) footer.tone = footer.dataTone || footer.bgTone;
-    // Glass-deep panels: outermost visible elements filled with glass-deep.
-    const t = P.tokens();
-    const panels = [];
-    for (const el of document.querySelectorAll("main *")) {
-      if (!same(getComputedStyle(el).backgroundColor, t["glass-deep"]) || !shown(el, null)) continue;
-      if (panels.some((p) => p.contains(el))) continue;
-      const r = el.getBoundingClientRect();
-      if (r.width < 100 || r.height < 60) continue;
-      panels.push(el);
-    }
     return {
       blocks,
       footer,
+      hero: P.hero(),
       wrappers: st.wrappers.map((w) => `<${w.tagName.toLowerCase()}${w.id ? `#${w.id}` : ""}>`),
-      glassPanels: panels.map((p) => {
-        const r = p.getBoundingClientRect();
-        return { top: px(r.top + scrollY), width: px(r.width), height: px(r.height), what: P.describe(p), band: st.items.findIndex((it) => it.el.contains(p)) + 1 };
-      }),
       pageHeight: document.documentElement.scrollHeight,
+      hiddenReveals: blocks.reduce((n, b) => n + (b.hiddenReveals || 0), 0),
     };
   };
 
@@ -697,75 +906,113 @@ function pageLib(cfg) {
     };
   };
 
-  // Check 31a: every computed margin-top, margin-bottom, padding and gap in <main> and the footer that is
-  // not on the 8px scale. Repeats (the same tag, classes, property and value) are folded into one entry.
+  // Check 32: every measured element inside the rail (1440, 1024) or the page margins (below 768), and
+  // every centred h1 or h2, and each centred box holding it, centred where the flow places it.
+  const COMPONENT = `li, [data-card], [data-accordion], form, [data-form-success], ${UI_SEL}`;
+  const r1 = (v) => Math.round(v * 10) / 10;
+  const positioned = (el) => /^(absolute|fixed)$/.test(getComputedStyle(el).position);
+  // A track: a row longer than its window that slides or scrolls sideways. A box that scrolls on x, or
+  // clips x with in-flow content wider than itself (a marquee row, a carousel). A band, a rail
+  // (.max-w-grid), or a box holding a rail, an h1 or an h2 is never a track: its content sliding off the
+  // page is what this check measures, and a clip would only hide it.
+  const trackCache = new Map();
+  const isTrack = (el, bandSet) => {
+    if (trackCache.has(el)) return trackCache.get(el);
+    let track = false;
+    const structural = bandSet.has(el) || el.matches(".max-w-grid") || !!el.querySelector(".max-w-grid, h1, h2");
+    const ox = getComputedStyle(el).overflowX;
+    if (!structural && /(auto|scroll)/.test(ox)) track = true;
+    else if (!structural && /(hidden|clip)/.test(ox)) {
+      const r = el.getBoundingClientRect();
+      let lo = Infinity;
+      let hi = -Infinity;
+      for (const k of el.children) {
+        if (positioned(k) || !k.getClientRects().length) continue;
+        const kr = k.getBoundingClientRect();
+        if (kr.width < 1) continue;
+        lo = Math.min(lo, kr.left);
+        hi = Math.max(hi, kr.right);
+      }
+      track = hi - lo > r.width + 1;
+    }
+    trackCache.set(el, track);
+    return track;
+  };
+  const inTrack = (el, main, bandSet) => {
+    for (let e = el.parentElement; e && e !== main; e = e.parentElement) if (isTrack(e, bandSet)) return true;
+    return false;
+  };
+  // Where the flow places an in-flow box: its containing block's content box, when that block is a block
+  // container, a flex column, a flex row holding only this box, or a one-column grid (display: contents
+  // and inline boxes defer to theirs). A grid cell or a flex row shared with other items gives the box an
+  // area of its own, and a positioned box is placed by its offsets: neither is judged.
+  const placedIn = (el) => {
+    if (positioned(el)) return null;
+    let p = el.parentElement;
+    while (p && /^(contents|inline)$/.test(getComputedStyle(p).display)) p = p.parentElement;
+    if (!p) return null;
+    const cs = getComputedStyle(p);
+    if (/flex/.test(cs.display)) {
+      if (/column/.test(cs.flexDirection)) return p;
+      const inFlow = [...p.children].filter((k) => !positioned(k) && k.getClientRects().length);
+      return inFlow.length === 1 ? p : null;
+    }
+    if (/grid/.test(cs.display)) return cs.gridTemplateColumns.trim().split(/\s+/).length === 1 ? p : null;
+    return p;
+  };
+  // A box that centres what it holds: centred text, or a flex column that centres its items.
+  const centring = (el) => {
+    const cs = getComputedStyle(el);
+    return /center/.test(cs.textAlign) || (/flex/.test(cs.display) && /column/.test(cs.flexDirection) && /center/.test(cs.alignItems));
+  };
   const nameOf = (el) => {
     const cls = typeof el.className === "string" ? el.className.trim().replace(/\s+/g, " ") : "";
-    return `<${el.tagName.toLowerCase()}${el.id ? `#${el.id}` : ""}${cls ? ` class="${cls.length > 90 ? `${cls.slice(0, 89)}…` : cls}"` : ""}>`;
+    return `<${el.tagName.toLowerCase()}${el.id ? `#${el.id}` : ""}${cls ? ` class="${cls.length > 60 ? `${cls.slice(0, 59)}…` : cls}"` : ""}>`;
   };
-  const AUTO = /(^|:)m[ytb]?-auto$/;
-  P.spacing = (scale, nav) => {
-    const allowed = [...scale, ...scale.map((v) => -v), ...scale.map((v) => nav + v)];
-    const onScale = (v) => allowed.some((a) => Math.abs(a - v) <= 0.5);
-    const footer = P.state?.footer;
-    const roots = [document.querySelector("main"), footer].filter(Boolean);
-    const found = new Map();
-    let checked = 0;
-    for (const root of roots) {
-      for (const el of [root, ...root.querySelectorAll("*")]) {
-        if (["SCRIPT", "STYLE", "TEMPLATE", "NOSCRIPT", "SOURCE", "BR", "WBR"].includes(el.tagName)) continue;
-        if (el.parentElement?.closest(UI_SEL) || el.closest("svg, .sr-only, body > header")) continue;
-        if ([...el.classList].some((c) => AUTO.test(c))) continue;
-        checked++;
-        const cs = getComputedStyle(el);
-        // A coded UI's root: its margins place it on the page; its padding and gaps are its inside.
-        const props = el.matches(UI_SEL) ? ["marginTop", "marginBottom"] : ["marginTop", "marginBottom", "paddingTop", "paddingRight", "paddingBottom", "paddingLeft", "rowGap", "columnGap"];
-        for (const prop of props) {
-          const raw = cs[prop];
-          const v = raw === "normal" || raw === "" ? 0 : parseFloat(raw);
-          if (!Number.isFinite(v) || onScale(v)) continue;
-          const css = prop.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
-          // Folded by tag and classes, so a repeated component (six part buttons) reports once.
-          const key = `${el.tagName}|${el.className}|${css}|${raw}`;
-          if (!found.has(key)) found.set(key, { what: nameOf(el), prop: css, value: raw, count: 0, band: footer && footer.contains(el) ? "footer" : (P.state?.items || []).findIndex((it) => it.el.contains(el)) + 1 });
-          found.get(key).count++;
-        }
-      }
-    }
-    return { checked, off: [...found.values()] };
-  };
-
-  // Check 32: left (and figure right) edges against the 12 columns, or the page margin below 768.
-  const COMPONENT = `li, [data-card], [data-accordion], form, [data-form-success], ${UI_SEL}`;
-  const rendered = (el) => el.getClientRects().length > 0 && getComputedStyle(el).visibility === "visible" && !el.closest("[hidden], .sr-only");
-  const isTrack = (el) => /(auto|scroll)/.test(getComputedStyle(el).overflowX);
-  P.grid = (mode, margin) => {
+  P.rail = (mode, margin) => {
+    trackCache.clear();
     const main = document.querySelector("main");
     if (!main) return { error: "no <main>" };
-    const rail = main.querySelector(".max-w-grid") || document.querySelector(".max-w-grid");
-    if (!rail) return { error: "no .max-w-grid element to take the columns from" };
+    const vw = document.documentElement.clientWidth;
+    const bands = P.state?.items || [];
+    const bandSet = new Set(bands.map((it) => it.el));
+    const exemptBands = bands.filter((it) => isFilm(it.el) || isScatter(it.el)).map((it) => it.el);
+    const inExemptBand = (el) => exemptBands.some((b) => b.contains(el));
+    const exempt = (el) => inExemptBand(el) || !!el.closest(UI_SEL) || inTrack(el, main, bandSet);
+    const bandOf = (el) => bands.findIndex((it) => it.el.contains(el)) + 1;
+    const rails = [...main.querySelectorAll(".max-w-grid")];
+    const rail = rails.find((e) => rendered(e) && !inExemptBand(e)) || rails[0] || document.querySelector(".max-w-grid");
+    if (!rail) return { error: "no .max-w-grid element to take the rail from" };
     const rr = rail.getBoundingClientRect();
-    const L = rr.left;
-    const W = rr.width;
-    const G = 24;
-    const colW = (W - 11 * G) / 12;
-    const starts = Array.from({ length: 12 }, (_, k) => L + k * (colW + G));
-    const ends = starts.map((s) => s + colW);
-    const h1 = main.querySelector("h1");
-    const homeHero = location.pathname === "/" && h1 ? (P.state?.items || []).find((it) => it.el.contains(h1))?.el ?? null : null;
+    const lo = mode === "margin" ? margin : rr.left;
+    const hi = mode === "margin" ? vw - margin : rr.right;
     const items = new Map();
-    const add = (el, kind, figure = false) => {
-      if (!el || items.has(el) || !rendered(el) || (homeHero && homeHero.contains(el))) return;
+    const skipped = { exempt: 0, fullBleed: 0, list: [] };
+    // A text element (an eyebrow, a heading, a paragraph) is measured by its content box: its padding
+    // holds no text (the home strip's label pads its text in from the page edge over its own colour).
+    const add = (el, kind, { figure = false, text = false } = {}) => {
+      if (!el || items.has(el) || !rendered(el)) return;
+      if (exempt(el)) {
+        skipped.exempt++;
+        skipped.list.push(`${kind} ${P.describe(el)}`);
+        return;
+      }
       const r = el.getBoundingClientRect();
       if (r.width < 1 || r.height < 1) return;
-      items.set(el, { el, kind, left: r.left, right: r.right, figure });
+      if (figure && r.width >= vw * 0.98) {
+        skipped.fullBleed++;
+        skipped.list.push(`full-bleed ${kind} ${P.describe(el)}`);
+        return;
+      }
+      const box = text ? contentBox(el) : r;
+      items.set(el, { el, kind, left: box.left, right: box.right });
     };
     const free = (el) => !el.closest(COMPONENT);
-    for (const el of main.querySelectorAll(".eyebrow, h1, h2")) if (free(el)) add(el, el.matches(".eyebrow") ? "eyebrow" : el.tagName.toLowerCase());
+    for (const el of main.querySelectorAll(".eyebrow, h1, h2")) if (free(el)) add(el, el.matches(".eyebrow") ? "eyebrow" : el.tagName.toLowerCase(), { text: true });
     for (const p of main.querySelectorAll("p")) {
       if (p.closest(COMPONENT) || p.closest("label, button, a, figure, dl, nav, summary, details") || p.matches(".eyebrow")) continue;
       if (!(p.textContent || "").trim()) continue;
-      add(p, "p");
+      add(p, "p", { text: true });
     }
     for (const m of main.querySelectorAll("picture, video, canvas")) {
       if (m.closest(COMPONENT)) continue;
@@ -773,35 +1020,52 @@ function pageLib(cfg) {
       while (frame && frame !== main && !/(hidden|clip)/.test(getComputedStyle(frame).overflowX)) frame = frame.parentElement;
       if (!frame || frame === main) frame = m;
       if (frame.closest(COMPONENT)) continue;
-      add(frame, "figure frame", true);
+      add(frame, "figure frame", { figure: true });
     }
     for (const b of main.querySelectorAll("[data-button]:not([data-actions] > :not(:first-child))")) if (!b.closest(COMPONENT)) add(b, `[data-button="${b.getAttribute("data-button")}"]`);
-    for (const c of main.querySelectorAll("[data-calculator], [data-accordion]")) if (!c.parentElement?.closest(COMPONENT)) add(c, c.matches("[data-calculator]") ? "[data-calculator]" : "[data-accordion]");
-    const tracks = [...main.querySelectorAll("ul, ol")].filter(isTrack);
-    for (const t of tracks) {
-      const first = [...t.children].find((li) => li.tagName === "LI" && rendered(li));
-      if (first && !t.parentElement?.closest(COMPONENT)) add(first, "a track's first item");
-    }
-    for (const c of main.querySelectorAll("[data-card]")) {
-      if (c.parentElement?.closest("[data-card]") || tracks.some((t) => t.contains(c)) || c.closest(`[data-accordion], form, [data-form-success], ${UI_SEL}`)) continue;
-      add(c, "[data-card]");
+    // Components by their own box: the outermost of each (a list item, a card, an accordion, a form or
+    // its success panel, the calculator). Inside one, only the component's edges are measured.
+    for (const c of main.querySelectorAll("li, [data-card], [data-accordion], [data-calculator], form, [data-form-success]")) {
+      if (c.parentElement?.closest(COMPONENT)) continue;
+      const kind = c.matches("li") ? "li" : c.matches("[data-card]") ? "[data-card]" : c.matches("[data-accordion]") ? "[data-accordion]" : c.matches("[data-calculator]") ? "[data-calculator]" : c.matches("form") ? "form" : "[data-form-success]";
+      add(c, kind);
     }
     const out = [];
-    const near = (x, list) => list.reduce((best, s, k) => (Math.abs(s - x) < Math.abs(best.x - x) ? { x: s, k } : best), { x: list[0], k: 0 });
+    const span = mode === "margin" ? `the ${margin}px page margins (x ${r1(lo)} to ${r1(hi)})` : `the rail (x ${r1(lo)} to ${r1(hi)})`;
     for (const it of items.values()) {
       const what = P.describe(it.el);
-      if (mode === "margin") {
-        if (Math.abs(it.left - margin) > 1) out.push({ kind: it.kind, what, message: `left edge at x ${Math.round(it.left * 10) / 10}, not the ${margin}px page margin` });
-        continue;
-      }
-      const s = near(it.left, starts);
-      if (Math.abs(s.x - it.left) > 1) out.push({ kind: it.kind, what, message: `left edge at x ${Math.round(it.left * 10) / 10} is ${Math.round(Math.abs(s.x - it.left) * 10) / 10}px off column ${s.k + 1}'s start (x ${Math.round(s.x * 10) / 10})` });
-      if (it.figure) {
-        const e = near(it.right, [...ends, L + W]);
-        if (Math.abs(e.x - it.right) > 1) out.push({ kind: it.kind, what, message: `right edge at x ${Math.round(it.right * 10) / 10} is ${Math.round(Math.abs(e.x - it.right) * 10) / 10}px off the nearest column end (x ${Math.round(e.x * 10) / 10})` });
+      if (it.left < lo - 1) out.push({ kind: it.kind, what, band: bandOf(it.el), message: `left edge at x ${r1(it.left)} is ${r1(lo - it.left)}px outside ${span}` });
+      if (it.right > hi + 1) out.push({ kind: it.kind, what, band: bandOf(it.el), message: `right edge at x ${r1(it.right)} is ${r1(it.right - hi)}px outside ${span}` });
+    }
+    // Centred heads: the box itself is centred, not only its lines inside a box held to one side. From the
+    // head up to its band, the head and each box that centres it are centred where the flow places them.
+    let centred = 0;
+    const judged = new Set();
+    for (const h of main.querySelectorAll("h1, h2")) {
+      if (!rendered(h) || exempt(h) || h.closest("li, [data-card]")) continue;
+      if (!/center/.test(getComputedStyle(h).textAlign)) continue;
+      centred++;
+      const band = bands.find((it) => it.el.contains(h))?.el || main;
+      for (let e = h; e && e !== band && e !== main; e = e.parentElement) {
+        if (e !== h && !centring(e)) break;
+        if (/^(contents|inline)$/.test(getComputedStyle(e).display)) continue;
+        if (positioned(e)) break;
+        if (judged.has(e)) break;
+        judged.add(e);
+        const cb = placedIn(e);
+        if (!cb) continue;
+        const er = e.getBoundingClientRect();
+        const box = contentBox(cb);
+        const offset = (er.left + er.right) / 2 - (box.left + box.right) / 2;
+        if (Math.abs(offset) > 1) {
+          const at = r1((er.left + er.right) / 2);
+          const whose = e === h ? `its box's centre (x ${at}) is` : `the centred box holding it, ${nameOf(e)}, is centred at x ${at},`;
+          out.push({ kind: `centred ${h.tagName.toLowerCase()}`, what: P.describe(h), band: bandOf(h), message: `${whose} ${r1(Math.abs(offset))}px ${offset > 0 ? "right" : "left"} of its containing block's content-box centre (x ${r1((box.left + box.right) / 2)}, ${nameOf(cb)})` });
+          break;
+        }
       }
     }
-    return { rail: { left: Math.round(L * 10) / 10, width: Math.round(W * 10) / 10, colW: Math.round(colW * 100) / 100 }, margin, checked: items.size, off: out };
+    return { rail: { left: r1(rr.left), width: r1(rr.width), what: nameOf(rail) }, mode, margin, checked: items.size, centred, skipped, off: out };
   };
 
   // Check 43: the header and the footer are on the page.
@@ -847,8 +1111,52 @@ try {
 
 const call = (page, fn, arg) => page.evaluate(fn, arg);
 
+// A Reveal is hidden (opacity 0) when it is below the fold as the page hydrates, and rises in once it is
+// on screen. Under load, hydration can land after a quick scroll-through, hiding a reveal that the scroll
+// already passed; measuring then would count the space it holds as empty. So wait until every reveal is
+// hydrated (React has attached its fiber), then bring each one still hidden into view and wait for it to
+// finish rising, and look again from the top.
+const hiddenReveals = (page) =>
+  call(page, () => [...document.querySelectorAll("[data-reveal]")].filter((e) => e.getClientRects().length && Number(getComputedStyle(e).opacity) < 0.99).length);
+
+async function waitHydrated(page, timeout = 15000) {
+  const t0 = Date.now();
+  while (Date.now() - t0 < timeout) {
+    const done = await call(page, () => [...document.querySelectorAll("[data-reveal]")].every((e) => Object.keys(e).some((k) => k.startsWith("__reactFiber"))));
+    if (done) break;
+    await page.waitForTimeout(100);
+  }
+  // The reveal's effect and its observer's first callback run a frame or two after hydration.
+  await call(page, () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(() => resolve(true), 150)))));
+}
+
+async function showReveals(page, rounds = 4) {
+  for (let round = 0; round < rounds; round++) {
+    const hidden = await hiddenReveals(page);
+    if (!hidden) break;
+    for (let i = 0; i < hidden; i++) {
+      const left = await call(page, () => {
+        const e = [...document.querySelectorAll("[data-reveal]")].find((x) => x.getClientRects().length && Number(getComputedStyle(x).opacity) < 0.99);
+        if (!e) return false;
+        window.__p7layout.revealing = e;
+        e.scrollIntoView({ block: "center" });
+        return true;
+      });
+      if (!left) break;
+      // Wait for it to rise in (up to 4s under load), not a fixed beat.
+      for (let t = 0; t < 40; t++) {
+        await page.waitForTimeout(100);
+        if (await call(page, () => Number(getComputedStyle(window.__p7layout.revealing).opacity) >= 0.99)) break;
+      }
+    }
+    await call(page, () => window.scrollTo(0, 0));
+    await page.waitForTimeout(600);
+  }
+}
+
 async function settlePage(page, vh) {
   await call(page, () => document.fonts.ready.then(() => true));
+  await waitHydrated(page);
   const height = await call(page, () => document.documentElement.scrollHeight);
   for (let y = 0; y < height; y += Math.round(vh * 0.6)) {
     await call(page, (v) => window.scrollTo(0, v), y);
@@ -856,28 +1164,9 @@ async function settlePage(page, vh) {
   }
   await call(page, () => window.scrollTo(0, document.documentElement.scrollHeight));
   await page.waitForTimeout(200);
-  // A quick scroll-through can pass a reveal between two slow headless frames (the 3D window slows
-  // them), leaving it hidden until it is next on screen; and a page that hydrates late (a cold
-  // server) hides what is below the fold only then. Bring each one still hidden into view, and look
-  // again once back at the top, so the audit never measures a reveal that has not run.
-  const countHidden = () =>
-    call(page, () => [...document.querySelectorAll("[data-reveal]")].filter((e) => Number(getComputedStyle(e).opacity) < 0.99).length);
-  for (let round = 0; round < 3; round++) {
-    const hidden = await countHidden();
-    if (round > 0 && !hidden) break;
-    for (let i = 0; i < hidden; i++) {
-      const left = await call(page, () => {
-        const e = [...document.querySelectorAll("[data-reveal]")].find((x) => Number(getComputedStyle(x).opacity) < 0.99);
-        if (!e) return false;
-        e.scrollIntoView({ block: "center" });
-        return true;
-      });
-      if (!left) break;
-      await page.waitForTimeout(750);
-    }
-    await call(page, () => window.scrollTo(0, 0));
-    await page.waitForTimeout(900);
-  }
+  await call(page, () => window.scrollTo(0, 0));
+  await page.waitForTimeout(300);
+  await showReveals(page);
   await call(page, () => window.__p7layout.idle(null, 3000));
 }
 
@@ -887,11 +1176,21 @@ const blockName = (b) => {
   const what = b.heading ? `"${b.heading}"` : b.label ? `[${b.label}]` : b.text ? `(${b.text})` : "";
   return `${id} ${what}`.trim();
 };
-const LIGHT_TONES = new Set(["plaster", "raised", "sunken"]);
-const DARK_TONES = new Set(["ink", "ink-raised", "film"]);
-const BAND_TONES = new Set(["plaster", "ink", "film"]);
-// Light or dark: from the band's tone name, or from the luminance of an unnamed surface.
-const lightness = (b) => (LIGHT_TONES.has(b.tone) ? "light" : DARK_TONES.has(b.tone) ? "dark" : b.light ? "light" : "dark");
+const BAND_TONES = ["plaster", "paper", "tint", "mist", "ink", "night", "film"];
+const LIGHT_TONES = new Set(["plaster", "paper", "tint", "mist"]);
+const DARK_TONES = new Set(["ink", "night"]);
+// Relative luminance: a light surface is 0.8 or more, a near-black one 0.02 or less, and a composed
+// hero's wash ([data-scatter], the /company hero) starts under 0.4.
+const LIGHT_MIN = 0.8;
+const NEAR_BLACK = 0.02;
+const DARK_STOP = 0.4;
+// The sweep kinds a [data-sweep] group may name.
+const SWEEP_KINDS = ["tab", "part", "beat", "disclosure", "form"];
+const lum = (s) => s.luminance.toFixed(3);
+const surfaceText = (s) => `${s.what}${s.gradient ? "'s first stop" : ""} ${s.colour}${s.cover ? ` (${s.cover}% of the band)` : ""}, luminance ${lum(s)}`;
+// A gradient is judged by every stop it renders (a flat grey written as a gradient is grey), except a
+// composed hero's wash, judged by its first stop.
+const stopText = (s, which) => `${s.what} (stops ${s.stops.join(", ")}), whose ${which === "dark" ? "darkest" : "lightest"} stop ${which === "dark" ? s.darkestStop : s.lightestStop} has luminance ${(which === "dark" ? s.darkest : s.lightest).toFixed(3)}`;
 
 function judge(route, width, vp, audit, sweeps, overflow, extra) {
   const failures = [];
@@ -906,9 +1205,9 @@ function judge(route, width, vp, audit, sweeps, overflow, extra) {
 
   // Markers.
   for (const b of blocks) {
-    if (!b.marked) add("markers", b.index, `${b.film ? "film band" : "block"} has no data-band or data-tone (background ${b.bgTone ?? "transparent"})${b.height ? `, ${fmt(b.height)}px` : ""}; checks 2-4 and 30 cannot see it`);
+    if (!b.marked) add("markers", b.index, `${b.film ? "film band" : "block"} has no data-band or data-tone (it renders ${b.surface ? b.surface.colour : "film"})${b.height ? `, ${fmt(b.height)}px` : ""}; checks 4 and 30 cannot judge it`);
   }
-  for (const w of audit.wrappers) add("markers", 0, `${w} wraps bands inside <main>: bands must be direct siblings, or the tone rhythm cannot be read`);
+  for (const w of audit.wrappers) add("markers", 0, `${w} wraps bands inside <main>: bands must be direct siblings, or the checks cannot read them`);
 
   // Check 2, in the default state and every swept state. A failure that persists through swept states
   // is reported once, saying so; a failure that only a state produces is reported with that state.
@@ -920,6 +1219,7 @@ function judge(route, width, vp, audit, sweeps, overflow, extra) {
   };
   const colText = (c) => `[data-col] ${c.column} of ${c.of} ${c.name} ends ${c.short}px above column ${c.sibling} ${c.siblingName} (limit ${limit}px)`;
   for (const b of blocks) {
+    if (b.scatterClaim && !b.scatter) add(2, b.index, `[data-scatter] claims a composed hero, but it holds ${b.scatterPictures} absolutely placed picture${b.scatterPictures === 1 ? "" : "s"}, not 3 or more: it is measured as a band`);
     if (b.skipped) continue;
     const states = sweeps.filter((s) => s.block === b.index);
     const persists = (count) => {
@@ -945,7 +1245,16 @@ function judge(route, width, vp, audit, sweeps, overflow, extra) {
       b.exempt = exempt;
       if (width === 1440 && tallest > vp.height * 2 + 0.5 && !exempt) warn(3, b.index, `${fmt(tallest)}px tall at 1440, over twice the ${vp.height}px viewport`);
     }
-    // Switching a tab or a part never moves the page.
+    // A [data-sweep] group names a known kind (a typo would slip it past the height rule), and a "form"
+    // group sits in a band that holds the form it chooses the fields of.
+    for (const b of blocks) {
+      for (const g of b.controls || []) {
+        if (!SWEEP_KINDS.includes(g.kind)) add(3, b.index, `a [data-sweep="${g.kind}"] group (${g.labels.length} controls): the kind is ${SWEEP_KINDS.join(", ")}; an unknown kind escapes the height rule`);
+        else if (g.kind === "form" && !b.hasForm) add(3, b.index, `a [data-sweep="form"] group in a band with no <form>: only tabs that choose a form's fields may change the band's height`);
+      }
+    }
+    // Switching a tab or a part never moves the page. A "form" group (the enquiry tabs choose the form's
+    // fields), beats and disclosures may change the band's height.
     for (const b of blocks) {
       for (const kind of ["tab", "part"]) {
         const states = sweeps.filter((s) => s.block === b.index && s.kind === kind);
@@ -961,37 +1270,44 @@ function judge(route, width, vp, audit, sweeps, overflow, extra) {
   }
 
   // Check 4.
-  const seq = blocks.map((b) => ({ ...b, tone: b.film ? "film" : b.tone }));
-  for (const b of seq) {
-    // (a) A band's tone is plaster, ink or film.
-    if (b.dataTone && !BAND_TONES.has(b.dataTone)) {
-      add(4, b.index, ["raised", "sunken"].includes(b.dataTone) ? `data-tone is ${b.dataTone}: raised and sunken are surfaces inside a section, never a section` : `data-tone is ${b.dataTone}, not plaster, ink or film`);
+  const judgeSurface = (b, tone, where, whose) => {
+    const s = b.surface;
+    if (!s) return;
+    const wash = s.gradient && b.scatter;
+    if (LIGHT_TONES.has(tone)) {
+      if (wash && s.luminance < LIGHT_MIN) add(4, where, `${whose} is ${tone} (light) but it renders ${surfaceText(s)}: a light tone renders ${LIGHT_MIN} or more`);
+      else if (!wash && s.darkest < LIGHT_MIN) add(4, where, `${whose} is ${tone} (light) but it renders ${s.gradient ? stopText(s, "dark") : surfaceText(s)}: a light tone renders ${LIGHT_MIN} or more`);
     }
-    // (e) data-tone is the surface the band renders.
-    if (b.dataTone && b.dataTone !== "film" && b.bgTone && b.dataTone !== b.bgTone) add(4, b.index, `data-tone is ${b.dataTone} but the band renders ${b.bgTone}`);
+    if (DARK_TONES.has(tone)) {
+      if (wash && s.luminance >= DARK_STOP) add(4, where, `${whose} is ${tone} (dark) but it renders ${surfaceText(s)}: a composed hero's wash starts under ${DARK_STOP}`);
+      else if (!wash && s.lightest > NEAR_BLACK) add(4, where, `${whose} is ${tone} (dark) but it renders ${s.gradient ? stopText(s, "light") : surfaceText(s)}: a dark tone renders near-black (${NEAR_BLACK} or less)`);
+    }
+  };
+  for (const b of blocks) {
+    if (!b.marked) continue; // markers reports it
+    // (a) A band's tone is one of the seven; film is earned by the film itself.
+    if (!b.dataTone) {
+      add(4, b.index, `data-tone is missing (it renders ${surfaceText(b.surface)}): a band is ${BAND_TONES.join(", ")}`);
+      continue;
+    }
+    if (!BAND_TONES.includes(b.dataTone)) {
+      add(4, b.index, ["raised", "sunken"].includes(b.dataTone) ? `data-tone is ${b.dataTone}: raised and sunken are retired surface names (a band is ${BAND_TONES.join(", ")})` : `data-tone is ${b.dataTone}, not ${BAND_TONES.join(", ")}`);
+      continue;
+    }
+    if (b.dataTone === "film") {
+      if (!b.film) add(4, b.index, `data-tone is film, but no film or picture covers 90% of it (it renders ${surfaceText(b.surface)}): it is measured as a band, and its tone names the surface it paints`);
+      continue;
+    }
+    // (b, c) The surface it renders matches the tone's lightness.
+    judgeSurface(b, b.dataTone, b.index, "data-tone");
   }
-  // (b) Bands alternate light and dark.
-  for (let i = 1; i < seq.length; i++) {
-    const a = seq[i - 1];
-    const b = seq[i];
-    const la = lightness(a);
-    const lb = lightness(b);
-    if (la !== lb) continue;
-    if (b.attached && a.hasH1 && a.tone === b.tone) continue;
-    const why = (x) => (x.dataTone ? "" : ", from its background (no data-tone)");
-    const hint = b.attached ? (a.hasH1 ? ` ([data-attached] needs the same tone as the band above; it is ${b.tone}, not ${a.tone})` : " ([data-attached] is only allowed right after the band holding the h1)") : "";
-    add(4, b.index, `${b.tone} (${lb}${why(b)}) follows ${a.tone} (${la}${why(a)}) in block ${a.index}: sections alternate plaster and ink (film counts as dark)${hint}`);
-  }
-  // (c) No glass-deep panel.
-  for (const g of audit.glassPanels) add(4, g.band || "page", `a glass-deep element of ${g.width}x${g.height} at y ${fmt(g.top)} (${g.what}): the glass-deep panel is gone`);
-  // (d) The footer: plaster or ink, opposite to the last band, rendering its tone.
-  const last = seq[seq.length - 1];
+  // (d) The footer: ink or night, rendering near-black.
   if (audit.footer) {
     const f = audit.footer;
-    if (!f.dataTone) add(4, "footer", `the footer has no data-tone (it renders ${f.bgTone ?? "transparent"})`);
-    else if (!["plaster", "ink"].includes(f.dataTone)) add(4, "footer", `the footer's data-tone is ${f.dataTone}, not plaster or ink`);
-    if (f.dataTone && f.bgTone && f.dataTone !== f.bgTone) add(4, "footer", `the footer's data-tone is ${f.dataTone} but it renders ${f.bgTone}`);
-    if (last && lightness(last) === lightness(f)) add(4, "footer", `the footer (${f.tone}, ${lightness(f)}) has the lightness of the last band, block ${last.index} (${last.tone}): they must be opposite`);
+    if (!f.dataTone) add(4, "footer", `the footer has no data-tone (it renders ${surfaceText(f.surface)})`);
+    else if (!["ink", "night"].includes(f.dataTone)) add(4, "footer", `the footer's data-tone is ${f.dataTone}, not ink or night`);
+    const s = f.surface;
+    if (s.lightest > NEAR_BLACK) add(4, "footer", `the footer renders ${s.gradient ? stopText(s, "light") : surfaceText(s)}: it is near-black (${NEAR_BLACK} or less)`);
   } else add(4, "footer", "no footer on the page");
 
   // Check 19.
@@ -1002,38 +1318,47 @@ function judge(route, width, vp, audit, sweeps, overflow, extra) {
     for (const c of o.culprits) add(19, c.band || "page", `${c.what} runs past the viewport (left ${c.left}, right ${c.right})${tail}`);
   }
 
-  // Check 30. Section padding by data-pad.
+  // Check 30. Section padding by data-pad, and the h1 below the header bar.
   const S = sectionY(width);
   const H = heroGap(width);
-  const want = { section: [S, S], hero: [NAV_H + H, S], attached: [0, S] };
+  // The bar is --nav-h as measured, never less than the designed 56 (a missing token cannot slacken it).
+  const hero = audit.hero;
+  const bar = Math.max(hero.navH, NAV_H);
+  let namedPads = 0;
+  let noneBands = 0;
   for (const b of blocks) {
-    if (b.film || !b.marked) continue;
-    const inferred = !b.pad;
-    const pad = b.pad ?? (b.attached ? "attached" : b.hasH1 ? "hero" : "section");
-    const how = inferred ? `pad ${pad}, inferred: no data-pad` : `pad ${pad}`;
+    if (!b.marked) continue;
+    const pad = b.pad ?? "none";
+    if (!PADS.includes(pad)) {
+      add(30, b.index, `data-pad is "${pad}", not ${PADS.join(", ")}`);
+      continue;
+    }
     if (pad === "none") {
-      add(30, b.index, "data-pad is none on a non-film band: every section takes section, hero or attached padding");
+      // The band sets its own measured padding: never more than a section's padding plus one allowed empty
+      // run (S + the check 2 limit), and the header bar on top of the page's first band. A film band and a
+      // composed hero are their own pictures, padding included.
+      if (b.film || b.scatter) continue;
+      noneBands++;
+      const most = S + limit;
+      const mostTop = most + (b.index === 1 ? bar : 0);
+      const why = `pad none: at most S + ${limit} (the dead-space limit)${b.index === 1 ? ` + the ${bar}px bar on the first band` : ""}; S ${S} at ${width}`;
+      if (b.paddingTop > mostTop + 0.5) add(30, b.index, `padding-top ${b.paddingTop}px, over ${mostTop}px (${why})`);
+      if (b.paddingBottom > most + 0.5) add(30, b.index, `padding-bottom ${b.paddingBottom}px, over ${most}px (${why})`);
       continue;
     }
-    const w = want[pad];
-    if (!w) {
-      add(30, b.index, `data-pad is "${pad}", not section, hero, attached or none`);
-      continue;
-    }
-    if (Math.abs(b.paddingTop - w[0]) > 0.5) add(30, b.index, `padding-top ${b.paddingTop}px, not ${w[0]}px (${how}; S ${S}, H ${H} at ${width})`);
-    if (Math.abs(b.paddingBottom - w[1]) > 0.5) add(30, b.index, `padding-bottom ${b.paddingBottom}px, not ${w[1]}px (${how}; S ${S} at ${width})`);
+    namedPads++;
+    const [top, bottom, how] = padFor(pad, width);
+    const why = `pad ${pad}, ${how}; S ${S}, H ${H} at ${width}`;
+    if (Math.abs(b.paddingTop - top) > 0.5) add(30, b.index, `padding-top ${b.paddingTop}px, not ${top}px (${why})`);
+    if (Math.abs(b.paddingBottom - bottom) > 0.5) add(30, b.index, `padding-bottom ${b.paddingBottom}px, not ${bottom}px (${why})`);
   }
-  if (audit.footer && Math.abs(audit.footer.paddingTop - S) > 0.5) add(30, "footer", `the footer's padding-top is ${audit.footer.paddingTop}px, not ${S}px (S at ${width})`);
+  if (!hero.h1) add(30, "page", "no visible h1 in <main>: its clearance under the header bar cannot be measured");
+  else if (hero.h1.top < bar + 16 - 0.5) add(30, hero.h1.band || "page", `the h1 ${hero.h1.what} starts at y ${hero.h1.top} at scroll 0: it starts at least ${bar + 16}px down (the ${bar}px header bar plus 16) so the bar never covers it`);
 
-  // Check 31a. Computed spacing on the 8px scale.
-  if (runs("31a") && extra.spacing) {
-    for (const o of extra.spacing.off) add("31a", o.band || "page", `${o.prop} ${o.value} is off the 8px scale on ${o.what}${o.count > 1 ? ` (${o.count} elements)` : ""}`);
-  }
-
-  // Check 32. Grid alignment.
-  if (runs(32) && extra.grid) {
-    if (extra.grid.error) add(32, "page", `grid alignment not measured: ${extra.grid.error}`);
-    else for (const o of extra.grid.off) add(32, "page", `${o.kind} ${o.what}: ${o.message}`);
+  // Check 32. Rail containment and centred heads.
+  if (runs(32) && extra.rail) {
+    if (extra.rail.error) add(32, "page", `rail containment not measured: ${extra.rail.error}`);
+    else for (const o of extra.rail.off) add(32, o.band || "page", `${o.kind} ${o.what}: ${o.message}`);
   }
 
   // Check 43. The unknown route.
@@ -1042,18 +1367,18 @@ function judge(route, width, vp, audit, sweeps, overflow, extra) {
     if (!extra.chrome.header) add(43, "page", "the 404 page has no visible header (body > header)");
     if (!extra.chrome.footer) add(43, "page", "the 404 page has no visible footer");
   }
-  return { failures: failures.filter((f) => runs(f.check)), warnings };
+  return { failures: failures.filter((f) => runs(f.check)), warnings, pads: { named: namedPads, none: noneBands, bar } };
 }
 
-const report = { base: opts.base, when: new Date().toISOString(), runs: [] };
+const report = { base: opts.base, when: new Date().toISOString(), inject: opts.inject, runs: [] };
 const lines = [];
 const out = (s = "") => {
   lines.push(s);
   console.log(s);
 };
 
-out(`check:layout  ${opts.base}`);
-out(`Checks 2 (dead space, columns), 3 (band heights), 4 (tones), 19 (overflow), 30 (section padding), 31a (spacing), 32 (grid) and 43 (404) at ${opts.widths.map((w) => `${w}x${viewportFor(w).height}`).join(", ")}${opts.sweep ? ", sweeping tabs, parts, beats and disclosures" : ""}`);
+out(`check:layout  ${opts.base}${opts.inject ? `  (injecting ${opts.inject})` : ""}`);
+out(`Checks 2 (dead space, columns), 3 (band heights), 4 (tones), 19 (overflow), 30 (section padding, h1 clearance), 32 (rail containment) and 43 (404) at ${opts.widths.map((w) => `${w}x${viewportFor(w).height}`).join(", ")}${opts.sweep ? ", sweeping tabs, parts, beats, disclosures and forms" : ""}`);
 
 let totalFailures = 0;
 let totalWarnings = 0;
@@ -1066,6 +1391,7 @@ for (const route of opts.routes) {
     const limit = limitFor(width);
     const context = await browser.newContext({ viewport: { width: vp.width, height: vp.height }, deviceScaleFactor: 1, isMobile: vp.mobile, hasTouch: vp.mobile });
     await context.addInitScript(pageLib, cfg);
+    if (opts.injectSource) await context.addInitScript({ content: opts.injectSource });
     const page = await context.newPage();
     const errors = [];
     const pageUrl = opts.base + route;
@@ -1096,7 +1422,13 @@ for (const route of opts.routes) {
       continue;
     }
     await settlePage(page, vp.height);
-    const audit = await call(page, (lim) => window.__p7layout.audit(lim), limit);
+    let audit = await call(page, (lim) => window.__p7layout.audit(lim), limit);
+    // A reveal still hidden at the audit (a late hydration under load): show it and measure again.
+    if (audit.hiddenReveals) {
+      await showReveals(page);
+      await call(page, () => window.__p7layout.idle(null, 3000));
+      audit = await call(page, (lim) => window.__p7layout.audit(lim), limit);
+    }
 
     // State sweeps: every tab selected and every disclosure opened, one at a time, then the default restored.
     const sweeps = [];
@@ -1122,10 +1454,10 @@ for (const route of opts.routes) {
       }
     }
 
-    // Spacing (31a), grid (32) and the page chrome (43), in the default state.
-    const spacing = await call(page, ([scale, nav]) => window.__p7layout.spacing(scale, nav), [SCALE, NAV_H]);
-    const gridMode = width >= 1024 ? "grid" : width < 768 ? "margin" : null;
-    const grid = gridMode ? await call(page, ([mode, margin]) => window.__p7layout.grid(mode, margin), [gridMode, 16]) : null;
+    // Rail containment (32) and the page chrome (43), in the default state.
+    // Not on the unknown route: check 43 runs checks 2, 4, 19 and 30 there.
+    const railMode = route === NOT_FOUND ? null : width >= 1024 ? "rail" : width < 768 ? "margin" : null;
+    const rail = railMode ? await call(page, ([mode, margin]) => window.__p7layout.rail(mode, margin), [railMode, PAGE_MARGIN]) : null;
     const chrome = await call(page, () => window.__p7layout.chrome());
 
     // Overflow, with the phone menu closed and (where there is one) open.
@@ -1141,8 +1473,9 @@ for (const route of opts.routes) {
       } else overflow.push({ state: "menu open", viewport: vp.width, rootScrollWidth: 0, bodyScrollWidth: 0, culprits: [{ what: "the menu did not open", left: 0, right: 0, band: 0 }] });
     }
 
-    const { failures, warnings } = judge(route, width, vp, audit, sweeps, overflow, { spacing, grid, chrome, status });
+    const { failures, warnings, pads } = judge(route, width, vp, audit, sweeps, overflow, { rail, chrome, status });
     for (const e of errors) failures.push({ check: "page", where: "page", message: e });
+    if (audit.hiddenReveals) warnings.push({ check: 2, where: "page", message: `${audit.hiddenReveals} reveal${audit.hiddenReveals === 1 ? " is" : "s are"} still hidden after settling: check 2 counts the space a hidden reveal holds as empty, so rerun this route alone before trusting its dead-space figures` });
     totalFailures += failures.length;
     totalWarnings += warnings.length;
     for (const f of failures) byCheck[f.check] = (byCheck[f.check] ?? 0) + 1;
@@ -1158,32 +1491,38 @@ for (const route of opts.routes) {
     }
     for (const b of audit.blocks) {
       const states = b.controls.map((g) => `${g.labels.length} ${g.kind}s`).join(", ");
-      const pad = b.film ? null : `pad ${b.pad ?? "?"} ${b.paddingTop}/${b.paddingBottom}`;
-      const info = [b.skipped ? `skip: ${b.skipped}` : null, pad, b.exempt ? `height exempt: ${b.exempt}` : null, states ? `swept ${states}` : null, !b.skipped && b.space ? `largest empty run ${b.space.largest}px` : null, b.columns?.checked ? `${b.columns.checked} columns balanced` : null].filter(Boolean).join("; ");
+      const pad = `pad ${b.pad ?? "none (unset)"} ${b.paddingTop}/${b.paddingBottom}`;
+      const surface = b.surface ? `surface ${b.surface.colour}${b.surface.gradient ? ` (gradient, L ${b.surface.darkest.toFixed(3)} to ${b.surface.lightest.toFixed(3)})` : ""}${b.surface.cover ? ` (panel ${b.surface.cover}%)` : ""} L ${lum(b.surface)}${b.panel ? `, measured inside ${b.panel}` : ""}` : null;
+      const info = [b.skipped ? `skip: ${b.skipped}` : null, pad, surface, b.exempt ? `height exempt: ${b.exempt}` : null, states ? `swept ${states}` : null, !b.skipped && b.space ? `largest empty run ${b.space.largest}px` : null, b.columns?.checked ? `${b.columns.checked} columns balanced` : null].filter(Boolean).join("; ");
       out(`  ${String(b.index).padStart(2)} ${blockName(b)}  ${b.tone ?? "?"}${b.dataTone ? "" : "*"}  y ${fmt(b.top)}  ${fmt(b.height)}px${info ? `  (${info})` : ""}`);
       for (const f of where.get(String(b.index)) ?? []) out(`       ${f.level} [${f.check}] ${f.message}`);
     }
     if (audit.footer) {
-      out(`  -- footer  ${audit.footer.tone ?? "?"}${audit.footer.dataTone ? "" : "*"}  y ${fmt(audit.footer.top)}  ${fmt(audit.footer.height)}px  (padding-top ${audit.footer.paddingTop})`);
+      out(`  -- footer  ${audit.footer.tone ?? "?"}${audit.footer.dataTone ? "" : "*"}  y ${fmt(audit.footer.top)}  ${fmt(audit.footer.height)}px  (surface ${audit.footer.surface.colour} L ${lum(audit.footer.surface)})`);
       for (const f of where.get("footer") ?? []) out(`       ${f.level} [${f.check}] ${f.message}`);
     }
     const pageLevel = [...(where.get("page") ?? []), ...(where.get("0") ?? [])];
     for (const f of pageLevel) out(`  page  ${f.level} [${f.check}] ${f.message}`);
-    const notes = [`31a: ${spacing.checked} elements measured`];
-    if (!grid) notes.push(`32: not measured at ${width} (1440 and 1024 on the grid, below 768 on the page margin)`);
-    else if (!grid.error) notes.push(`32: ${grid.checked} edges measured ${gridMode === "margin" ? "against the 16px page margin" : `against the rail at x ${grid.rail.left}, ${grid.rail.width} wide (columns ${grid.rail.colW})`}`);
+    const notes = [];
+    notes.push(`30: ${pads.named} named pad${pads.named === 1 ? "" : "s"} compared, ${pads.none} pad="none" band${pads.none === 1 ? "" : "s"} bounded${audit.hero.h1 ? `; the h1 starts at y ${audit.hero.h1.top} (at least ${pads.bar + 16}: the ${pads.bar}px bar plus 16)` : ""}`);
+    if (!rail) {
+      if (route !== NOT_FOUND) notes.push(`32: not measured at ${width} (1440 and 1024 against the rail, below 768 against the page margins)`);
+    } else if (!rail.error) {
+      const against = railMode === "margin" ? `against the ${PAGE_MARGIN}px page margins` : `against the rail at x ${rail.rail.left}, ${rail.rail.width} wide (${rail.rail.what})`;
+      notes.push(`32: ${rail.checked} elements measured ${against}, ${rail.centred} centred heads; ${rail.skipped.exempt} exempt (film or scatter hero, track, [data-ui]), ${rail.skipped.fullBleed} full-bleed`);
+    }
     if (route === NOT_FOUND) notes.push(`43: HTTP ${status}; header ${chrome.header ? "shown" : "missing"}, footer ${chrome.footer ? "shown" : "missing"}; checks 2, 4, 19 and 30 run here`);
     for (const n of notes) out(`  note  ${n}`);
-    report.runs.push({ route, width, status, audit, sweeps, overflow, spacing, grid, failures, warnings });
+    report.runs.push({ route, width, status, audit, sweeps, overflow, rail, failures, warnings });
     await context.close();
   }
 }
 await browser.close();
 
 out("");
-out(`Summary: ${totalFailures ? `${totalFailures} failure${totalFailures === 1 ? "" : "s"}` : "every check passes"}${totalWarnings ? `, ${totalWarnings} warning${totalWarnings === 1 ? "" : "s"}` : ""} across ${opts.routes.length} route${opts.routes.length === 1 ? "" : "s"} at ${opts.widths.join(", ")}.`);
+out(`Summary: ${totalFailures ? `${totalFailures} failure${totalFailures === 1 ? "" : "s"}` : "every check passes"}${totalWarnings ? `, ${totalWarnings} warning${totalWarnings === 1 ? "" : "s"}` : ""} across ${opts.routes.length} route${opts.routes.length === 1 ? "" : "s"} at ${opts.widths.join(", ")}${opts.inject ? ` with ${opts.inject} injected` : ""}.`);
 for (const [check, n] of Object.entries(byCheck)) out(`  ${CHECK_NAMES[check] ?? check}: ${n}`);
-out("  * after a tone: taken from the background because the block has no data-tone.");
+out("  * after a tone: the block has no data-tone; it shows the colour it renders.");
 if (opts.json) {
   writeFileSync(opts.json, JSON.stringify(report, null, 1));
   out(`Report written to ${opts.json}`);

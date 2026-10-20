@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function NotFound() {
   const p = notFoundPage;
   return (
-    <Band id="hero" as="header" tone="paper" pad="hero" labelledBy="hero-heading" className="flex min-h-[70svh] items-center">
+    <Band id="hero" as="header" tone="paper" pad="hero" labelledBy="hero-heading" className="flex min-h-[70svh] items-center md:max-lg:min-h-0">
       <Container>
         <div className="flex flex-col items-center text-center">
           <p className="eyebrow">{p.eyebrow}</p>

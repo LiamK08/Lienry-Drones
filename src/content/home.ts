@@ -110,7 +110,7 @@ export const benefits = {
     },
     {
       icon: "phone",
-      title: "Started from anywhere",
+      title: "Started from\u00a0anywhere",
       body: "On the home system, start a clean from the app wherever you are.",
       image: { id: "p4-rental", alt: "The home drone over rooftop solar panels on a rental townhouse", position: "50% 40%" },
     },

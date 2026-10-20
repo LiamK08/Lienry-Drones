@@ -47,7 +47,7 @@ export function AccentPanel({
           <div aria-hidden="true" className="glow-drift pointer-events-none absolute left-1/3 top-1/2 -z-10 h-56 w-[28rem] -rotate-[20deg] rounded-pill bg-accent-hover/40 blur-[60px] [animation-delay:-7s]" />
         </>
       )}
-      <div className={`mx-auto flex w-full flex-col items-center text-center ${bleed ? "max-w-3xl px-4" : ""}`}>
+      <div className={`mx-auto flex w-full flex-col items-center text-center ${bleed ? "max-w-3xl px-5 md:px-4" : ""}`}>
         <h2 id={`${id}-heading`} className={`mx-auto text-h2s ${bleed ? "" : "max-w-[35rem]"}`}>
           {headline}
         </h2>
