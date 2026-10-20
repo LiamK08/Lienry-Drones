@@ -9,6 +9,7 @@ import { useScrolledPast } from "@/lib/hooks";
 import { Button } from "@/components/ui/Button";
 import { Mark } from "@/components/ui/Wordmark";
 import { MenuPanel } from "@/components/site/MenuPanel";
+import { Icon } from "@/components/blocks/Icon";
 
 type MenuId = string;
 
@@ -36,13 +37,17 @@ function Logo({ className = "" }: { className?: string }) {
  * The header: the logo left, the menus centred (Platform, Solutions and Resources open a panel of
  * links on hover or click; About is a plain link), and on the right a white Download pill beside the
  * Register interest pill. Over the home film it is transparent with white text; anywhere else, or
- * once scrolled, it is a white bar with a hairline. Below 1024 a burger opens a full-screen menu.
+ * once scrolled, it is a white bar with a hairline. Below 1024 the bar holds the logo, a Register
+ * interest pill and the burger, which drops a short white sheet under the bar: the four sections (each
+ * opens its links in place), then Download and Register interest side by side. The page stays in view
+ * below; a tap outside or Escape closes it.
  */
 export function Nav() {
   const pathname = usePathname();
   const scrolled = useScrolledPast(40);
   const [open, setOpen] = useState(false);
   const [menu, setMenu] = useState<MenuId | null>(null);
+  const [sub, setSub] = useState<MenuId | null>(null);
   const reduce = useReducedMotion();
   const panelId = useId();
   const headerRef = useRef<HTMLElement>(null);
@@ -157,6 +162,9 @@ export function Nav() {
               Register interest
             </Button>
           </div>
+          <Button href="/register-interest" size="sm" className="lg:hidden" onClick={() => setOpen(false)}>
+            Register interest
+          </Button>
           <button
             ref={menuButtonRef}
             type="button"
@@ -193,40 +201,66 @@ export function Nav() {
 
       <AnimatePresence>
         {open ? (
-          <motion.div
-            id={panelId}
-            className="fixed inset-x-0 bottom-0 top-[var(--nav-h)] z-40 flex flex-col overflow-y-auto bg-white px-4 pb-8 text-ink md:px-6 lg:hidden"
-            initial={reduce ? false : { opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.24, ease: [0.4, 0, 0.2, 1] }}
-          >
-            {menus.map((m) => (
-              <div key={m.id} className="border-b border-line py-6">
-                <p className="eyebrow">{m.label}</p>
-                <ul className="mt-3">
-                  {m.groups.flatMap((g) => g.links).filter((l, i, all) => all.findIndex((x) => x.href === l.href) === i).map((l) => (
-                    <li key={l.href}>
-                      <Link href={l.href} onClick={() => setOpen(false)} className="flex min-h-11 items-center text-body">
-                        {l.label}
-                      </Link>
+          <>
+            {/* The page stays in view under the sheet; a tap outside the sheet closes it. */}
+            <button type="button" aria-label="Close menu" tabIndex={-1} onClick={() => setOpen(false)} className="fixed inset-x-0 bottom-0 top-[var(--nav-h)] z-30 cursor-default lg:hidden" />
+            <motion.div
+              id={panelId}
+              className="absolute inset-x-0 top-[var(--nav-h)] z-40 max-h-[calc(100svh-var(--nav-h))] overflow-y-auto border-b border-line bg-white px-4 pb-6 pt-2 text-ink shadow-[0_24px_40px_-24px_rgb(0_0_0/0.25)] md:px-6 lg:hidden"
+              initial={reduce ? false : { opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
+            >
+              <ul>
+                {menus.map((m) => {
+                  const expanded = sub === m.id;
+                  const links = m.groups.flatMap((g) => g.links.map((l) => ({ ...l, tone: g.tone }))).filter((l, i, all) => all.findIndex((x) => x.href === l.href) === i);
+                  return (
+                    <li key={m.id}>
+                      <button
+                        type="button"
+                        aria-expanded={expanded}
+                        aria-controls={`m-${m.id}`}
+                        onClick={() => setSub((v) => (v === m.id ? null : m.id))}
+                        className={`flex h-11 w-full items-center justify-between text-small font-medium transition-[color] duration-200 ${expanded ? "text-muted" : "text-ink"}`}
+                      >
+                        {m.label}
+                        <Chevron open={expanded} />
+                      </button>
+                      {expanded ? (
+                        <ul id={`m-${m.id}`} className="pb-2">
+                          {links.map((l) => (
+                            <li key={`${l.href}-${l.label}`}>
+                              <Link href={l.href} onClick={() => setOpen(false)} className="flex items-center gap-3 rounded-[0.625rem] py-2 pr-2">
+                                <span aria-hidden="true" className={`flex size-9 shrink-0 items-center justify-center rounded-[0.5rem] ${l.tone === "sand" ? "bg-[#f4ecdd] text-[#8a5210]" : l.tone === "green" ? "bg-[#e3f0ea] text-[#187566]" : "bg-tint text-accent"}`}>
+                                  <Icon name={l.icon} className="size-[1.125rem]" />
+                                </span>
+                                <span className="font-display text-[0.9375rem]">{l.label}</span>
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : null}
                     </li>
-                  ))}
-                </ul>
+                  );
+                })}
+                <li>
+                  <Link href={navAbout.href} onClick={() => setOpen(false)} aria-current={pathname === navAbout.href ? "page" : undefined} className="flex h-11 items-center text-small font-medium">
+                    {navAbout.label}
+                  </Link>
+                </li>
+              </ul>
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <Button href={navUtility.href} variant="secondary" size="lg" className="w-full" onClick={() => setOpen(false)}>
+                  {navUtility.label}
+                </Button>
+                <Button href="/register-interest" size="lg" className="w-full" onClick={() => setOpen(false)}>
+                  Register interest
+                </Button>
               </div>
-            ))}
-            <Link href={navAbout.href} onClick={() => setOpen(false)} className="flex min-h-14 items-center border-b border-line text-body">
-              {navAbout.label}
-            </Link>
-            <div className="mt-8 flex flex-col gap-3">
-              <Button href="/register-interest" size="lg" arrow onClick={() => setOpen(false)}>
-                Register interest
-              </Button>
-              <Button href={navUtility.href} variant="secondary" size="lg" onClick={() => setOpen(false)}>
-                {navUtility.label}
-              </Button>
-            </div>
-          </motion.div>
+            </motion.div>
+          </>
         ) : null}
       </AnimatePresence>
     </header>
