@@ -52,7 +52,7 @@ export function TitleHero({ eyebrow, headline, emphasis, lead, mobileLines, feat
         {lead ? <p className="mt-[1.125rem] max-w-[36rem] text-[0.875rem] leading-[1.2] text-fg-muted">{lead}</p> : null}
       </div>
       {feature ? (
-        <div className="relative mx-auto mt-24 w-full max-w-[68.75rem] max-lg:px-5 md:grid md:grid-cols-[2fr_3fr] md:items-center md:gap-8 lg:mt-[4.4375rem] lg:grid-cols-[450px_1fr] lg:gap-[50px]">
+        <div className="relative mx-auto mt-20 w-full max-w-[68.75rem] max-lg:px-5 md:grid md:grid-cols-[2fr_3fr] md:items-center md:gap-8 lg:mt-[4.4375rem] lg:grid-cols-[450px_1fr] lg:gap-[50px]">
           <div className="h-[250px]">
             <Picture
               id={feature.image.id}

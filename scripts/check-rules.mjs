@@ -1,31 +1,52 @@
-// check:rules: the rule checks of the October 2026 design pass (spec D2; the earlier E2 checks 5-14 and
-// 21-24 as rewritten there), run in Playwright against a served build at 1440x900 and 390x844 by
-// default, plus the source and file checks they name.
+// check:rules: the rule checks of the refresh.tech-based system (CLAUDE.md "Layout", "Type" and "Shape",
+// 20 October 2026) and the owner's honesty checks, run in Playwright against a served build at 1440x900
+// and 390x844 by default, on the eleven routes and the 404 page, plus the source and file checks they
+// name.
 //
 // Usage: npm run check:rules -- <baseUrl> [route ...] [--widths 1440,390] [--json report.json]
-//                                [--no-sweep] [--no-motion] [--baseline scripts/copy-baseline.json]
+//                                [--no-sweep] [--no-motion] [--inject mutation.js]
 //   e.g. npm run build && npm run start, then npm run check:rules -- http://localhost:3000
 //
-//  5  Shapes and effects: every computed border-radius (and ::before/::after) is 0 or 4px; no box-shadow,
-//     text-shadow, blur, backdrop-filter or background-clip:text; gradients only in the film bands'
-//     scrims; no effect utilities in class lists (they hide in hover states); `rounded-(?!hard)` finds
-//     nothing in src. Rings are outlines: `ring-` stays banned.
-//  6  Two families: all text is Instrument Serif or Inter; the serif only on h1-h3 (and their em), the
-//     founder letter (.letter), the footer wordmark and the phone menu's links; every heading is in the
-//     serif; the fonts loaded are exactly the three src/fonts files (compared by content).
-//  7  Scale: every font size is a step of the scale at that width (checked against the spec's values);
-//     every h1-h3 is on the H3 step or above; every text inside .letter is on the H3 step; no h4-h6 in
-//     <main>; no `text-[` in src.
-//  8  Case and alignment: uppercase only inside .label; no centred text outside the home hero.
-//  9  Italics: an em never sits in an h3, a summary, a p, a button, .letter or .eyebrow; it is always its
-//     heading's trailing phrase, in the heading's colour; at most one em per [data-band], and only
-//     inside the heading that labels that band (its aria-labelledby target).
-// 10  Eyebrows: every h2 in <main>, and every h1 but the home hero's, comes right after a p.eyebrow; no
-//     h2 in <main> stands outside [data-section-head] (except in [data-prose] or [data-form-success],
-//     which are also exempt from the eyebrow); every .eyebrow in <main> and the footer reads lowercase,
-//     1 to 3 words, and computes to Inter, the small step, weight 500, normal tracking, no transform and
-//     the surface's muted colour; the heading's top sits 16px (within 1) under the eyebrow's bottom, on
-//     its left edge (within 1). No .label sits right before or right above an h1 or h2.
+//  5  Shapes and effects: every computed corner radius (and ::before/::after) is 0, 4, 8, 10, 12, 16 or
+//     20px, a pill (at least half the box's shorter side) or 50%; every primary, secondary and glass
+//     [data-button] is a pill (each corner at least half its height); text fields (input but checkbox,
+//     radio, range and hidden; select; textarea) have 4px corners; body > header and --nav-h are 56px
+//     tall; no text-shadow and no background-clip:text; a blur() filter only on a decorative layer
+//     (aria-hidden, itself or above, with no text in it); backdrop-filter only in body > header and on
+//     [data-button="glass"]; a gradient layer (the background, ::before or ::after) never behind text:
+//     the pseudo's own, the element's own text runs, or any text a text-level element (a button, link,
+//     label, heading, paragraph, list item or inline run) holds; no text-shadow-*, bg-clip-text or
+//     text-transparent beside a gradient utility in a class list (any variant); no hover, focus, active
+//     or checked rule in the stylesheets sets a text-shadow, background-clip:text or a corner off those
+//     radii (a pill there is 999px or more); in src, rounded-* is only none, hard, card, panel, pill,
+//     full or the image radii [0.5rem], [0.625rem] and [0.75rem] (side prefixes and variants allowed).
+//     box-shadow is allowed.
+//  6  Two families: all text is PT Serif or Inter (the faces of --font-ptserif, --font-ptserif-italic,
+//     --font-inter and --font-inter-italic); every h1-h3 is in PT Serif; PT Serif italic only inside an
+//     em or i, and Inter italic only on the footer tagline; [data-button], form fields (input, select,
+//     textarea, option) with their labels and legends, .eyebrow, .label and [data-prose] paragraphs are
+//     never in the serif (display lines, the menus and the footer logo may be); the fonts loaded are
+//     files of src/fonts from the site's own origin (compared by content).
+//  7  Type: the tokens compute to CLAUDE.md's sizes (--text-h1 40/30, --text-h2 48/31, --text-h2s 36/30,
+//     --text-h3 32/26, --text-label 12, --text-body 16 at 1440/390); every h1 in <main> is on the h1
+//     step but the home hero's and a [data-scatter] hero's; every h1-h3 is 16px or more with negative
+//     letter-spacing; no h4-h6 in <main>; no rendered text under 11px.
+//  8  Case and alignment: uppercase only at 12px or under, never in a heading or a [data-button]; no
+//     centred p, li or heading runs over 4 lines from 768 or 6 lines below it (a phone column holds about
+//     60% of a desktop lead's measure; failures at 1440 and 390, warnings at 1024 and 768); nothing
+//     centred in [data-prose] or in a form's labels and fields.
+//  9  Italics: an em or i never sits in an h3, a summary, a p, a button, .letter or .eyebrow, or outside
+//     a heading; it is its heading's trailing phrase, in the heading's colour or the surface's accent
+//     (--s-accent read on the heading's surface: its nearest band, tone, surface class, header or
+//     footer); at most one per [data-band], inside the heading that labels that band (its
+//     aria-labelledby target). The footer tagline is the only italic text outside an em or i.
+// 10  Eyebrows: every .eyebrow in <main> and the footer is Inter capitals in its surface's --s-fg (read
+//     on the surface, as in 9), either the dotted eyebrow (12px, weight 400, 0.04em, an 8x8 round
+//     ::before in the surface's --s-accent at 45%) or
+//     .eyebrow-plain (11px, weight 600, 0.02em, no dot); its source text is 1 to 4 words in sentence
+//     case (an uppercase letter or a digit first, not all capitals); an h1 or h2 right after it starts
+//     8 to 40px under it, on its left edge or its centre (within 1px). No .label sits right before or
+//     right above an h1 or h2.
 // 11  No claims: the banned words appear only inside the allowed sentences ("$" also inside
 //     [data-calculator]); "approval" only inside the approvals phrase and the Honest by default rule;
 //     every .numeral is a cited stat (with its source link and the cited note), a design fact (while
@@ -34,51 +55,72 @@
 //     the caption from every image and film on 26 September 2026.
 // 13  Coded demos: each software window shows "Demo data" and the illustrative-model note beneath it
 //     once, and its panel data keeps its Demo data line; the app panel (role="group") shows "Demo data"
-//     and its note. Windows on /, /commercial and /download, the app panel on /homes-and-rentals.
+//     and its note. Windows on /platform, /commercial and /download, the app panel on
+//     /homes-and-rentals.
 // 14  Media: every /media/ path in the served HTML and JS is a manifest id (variants --name-w and
-//     renditions --r included); all 29 appear on the site; no id shows in two frames on a route in any
-//     state (a [data-hover-clip] frame's still and clip are one figure); public/media holds only
-//     manifest files and nothing is added to public/video or media-src.
+//     renditions --r included); all 29 appear on the site but those SPEC.unplaced lists (each with its
+//     reason, reported as a note, and a failure once it is placed again so the list stays true); no id shows in two frames on a route in any
+//     state (a [data-hover-clip] frame's still and clip are one figure; media inside aria-hidden, the
+//     footer's picture loop and the bubble hero, are not frames); public/media holds only manifest
+//     files and nothing is added to public/video or media-src.
 // 21  Motion: under reduced motion no video plays, nothing reveals, crossfades or snaps smoothly, and
 //     the window shows its recording with native controls; without it never two videos play at once,
 //     the live window stops drawing once off screen (judged no sooner than 2.5s after it leaves, then
-//     1.5s without a draw call within 8s), nothing is sticky but the header, nothing moves with the
-//     scroll and no figure counts up.
+//     1.5s without a draw call within 8s), nothing is fixed but the header and the skip link, nothing
+//     is sticky but a column in <main> that sticks under the header (top at least --nav-h): a nav or a
+//     block holding a heading, a nav or a form, never a band (a [data-band], a section, a block of
+//     <main> or one holding a band) nor over two thirds of its band's width; nothing moves with the
+//     scroll (what an infinite animation moves, by transform, translate, offset, inset or margin, is
+//     not sampled) and no figure counts up. The form clause is wider than the spec's "holds a heading
+//     or is a nav": the home FAQ's sticky block is its enquiry card (FaqForm.tsx), which has no heading.
 // 22  Titles and links: every route's <title> is its own, "What the page is | Lienry Drones", exactly as
 //     pageTitle in src/lib/site.ts builds it. Its one canonical link and its og:url are its own address;
 //     og:title and twitter:title are the title without the brand; og:description and
 //     twitter:description repeat its meta description; the card has an og:image. No two routes share a
 //     title or a description.
-// 23  Placeholders: no "to come", no data-media-placeholder, no empty photo box.
+// 23  Placeholders: no "to come", no data-media-placeholder, no empty photo box (a decorative layer,
+//     aria-hidden itself or above, is never one).
 // 24  Enquiry labels: every link to /register-interest carries the one label of its ?type=.
-// 25  Headline length: every h1 and h2 in <main> is 7 words or fewer (aria-hidden parts removed); an h3
-//     over 7 is a warning.
 // 26  Orphans: no h1-h3 or band-level intro paragraph of two or more lines ends on a line holding one
 //     word (failures at 1440 and 390, warnings at 1024 and 768).
-// 27  Paragraph lines (1440): every p in <main>, answers in closed details included, renders on 2 lines
-//     or fewer; [data-prose], forms, .letter, [data-ui], .sr-only and stat source lines are exempt.
-// 28  Copy budget: the words a visitor sees in <main> at load, counted as main's innerText without the
-//     outermost [data-ui], [data-prose], form, .sr-only, [aria-hidden="true"] and the legacy demo
-//     selectors, split on whitespace, are at most 0.667 x the route's baseline in
-//     scripts/copy-baseline.json at that width. The all-states count is reported only.
-//     --write-baseline <file> records both counts per route at 1440 and 390 and runs nothing else.
 // 29  Labels: a .label is legal only inside [data-ui] or the header (body > header).
-// 31b Spacing lint (src): margin, padding, gap, space, inset, top/right/bottom/left and scroll-margin or
-//     scroll-padding utilities use the 8px scale (multipliers 0, px, 2, 4, 6, 8, 10, 12, 16, 20, 24, 32,
-//     40; 1/2, full and auto on position and inset), scale rems, or the layout variables. Lines marked
-//     frozen-header, the header, the window, its readouts, the app panel and the 3D scenes are skipped.
 // 33  Calculator (any route with [data-calculator], at 390, 768 and 1440): labelled fields, one live
 //     region (the sr-only p), the worked figures computed here with totalOver, no decimals, no overflow,
 //     the status within 1s, no tween, no network request while typing, no saving or comparison words.
 // 41  Hover clips (with the motion passes): nothing requested at load; hovering a card plays its clip
 //     alone within 1.2s and leaving pauses it within 400ms; focusing its link plays it and pauses it by
 //     5.2s; the card keeps its height; at 390 (touch) and under reduced motion there is no clip at all.
+// 44  References never load: no request from any page this script opens goes to refresh.tech,
+//     legora.com or a subdomain of either, and no address in the page (href, src, srcset, poster,
+//     action, data: a preconnect or a link makes no request) is on one; no text in the page (hidden
+//     states, every open menu, ::before and ::after content, a field's value, alt, the aria text,
+//     title, placeholder, an option's label, the tab title and meta tags included) reads
+//     "refresh.tech" or "legora" (any case) or "ReFresh" (that case: "refresh" alone is ordinary
+//     English); no text file in src or public (but the generated public/media) and no served HTML, JS
+//     or CSS names them in either form.
 //
-// Tabs, stage parts and story beats are swept: every state is audited again. Copy the checks compare
-// against (allowed sentences, stats, design facts, the app note, brand and titles) is read from the
-// content modules and src/lib/site.ts through the project's TypeScript, with tolerant getters: a missing
-// path fails only the check that needs it. Exit code: 0 when every check passes, 1 when any fails, 2 when
-// the checks could not run.
+// Retired checks:
+//  25  Headline length: retired 20 Oct 2026: the reference's statements run 8 to 17 words.
+//  27  Paragraph lines: retired 20 Oct 2026: the copy follows the reference's templates.
+//  28  Copy budget: retired 20 Oct 2026: the copy follows the reference's templates, not the pre-pass
+//      word count (scripts/copy-baseline.json and --write-baseline are deleted with it).
+//  31b Spacing lint: retired 20 Oct 2026 with the 8px scale: the reference's spacing is measured.
+//  The 4px-only corners, the box-shadow, blur, backdrop and gradient bans, the type scale, the serif's
+//  short list, "uppercase only in .label", "no centred text", the eyebrow-per-h2 rule and the lowercase
+//  muted eyebrow: retired 20 Oct 2026 for the CLAUDE.md system above.
+//
+// --inject <file.js> adds that file's source as an init script after the page library on every page
+// the script opens (the reduced-motion, calculator and hover-clip passes included), so a self-test can
+// break a rule on purpose and see the check fail.
+//
+// Tabs, stage parts and story beats are swept: every state is audited again. Every panel the header
+// opens (each desktop panel, the phone menu and each of its sections) is opened and audited too: the
+// element rules (5-10, 12, 13, 29), its enquiry links (24) and its words (44). The 404 page
+// (/this-page-does-not-exist, which must answer 404) runs every check but 22. Copy the checks compare
+// against (allowed sentences, stats, design facts, the app note, the footer tagline and titles) is read
+// from the content modules and src/lib/site.ts through the project's TypeScript, with tolerant getters:
+// a missing path fails only the checks that need it. Exit code: 0 when every check passes, 1 when any
+// fails, 2 when the checks could not run.
 
 import { createRequire } from "node:module";
 import { execSync } from "node:child_process";
@@ -88,7 +130,9 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const ROUTES = ["/", "/platform", "/commercial", "/homes-and-rentals", "/solar", "/company", "/download", "/register-interest", "/privacy", "/fit-check", "/calculator"];
+// The site's own 404 page, served with status 404 (as in check:a11y and check:layout).
+const NOT_FOUND = "/this-page-does-not-exist";
+const ROUTES = ["/", "/platform", "/commercial", "/homes-and-rentals", "/solar", "/company", "/download", "/register-interest", "/privacy", "/fit-check", "/calculator", NOT_FOUND];
 const VIEWPORTS = {
   1440: { width: 1440, height: 900, mobile: false },
   1024: { width: 1024, height: 768, mobile: false },
@@ -96,7 +140,7 @@ const VIEWPORTS = {
   390: { width: 390, height: 844, mobile: true },
 };
 
-// Acceptance strings and values that the spec itself defines (E2, B4, B6, B7), not copy from content.
+// Acceptance strings and values that the spec itself defines (E2, B4, B6, B7, CLAUDE.md), not copy from content.
 const SPEC = {
   // E2 check 12: the caption the owner removed, which must not come back.
   retiredCaption: "Concept render",
@@ -108,11 +152,38 @@ const SPEC = {
   approvalsPhrase: "We do not claim any approvals",
   // E2 check 24.
   enquiryLabels: { "": "Register interest", homeowner: "Register interest", commercial: "Book a pilot conversation", investor: "Investor enquiries", landlord: "I own rentals" },
-  // E2 check 7: the steps at each width, in the order display, h1, h2, h3, lead, body, small, caption, label, numeral.
+  // Check 7: CLAUDE.md's sizes, the tokens at each width.
   steps: {
-    1440: { display: 83.2, h1: 69.6, h2: 50.4, h3: 30, lead: 19, body: 16, small: 14, caption: 13, label: 12, numeral: 96 },
-    390: { display: 52, h1: 44, h2: 36, h3: 24, lead: 17, body: 16, small: 14, caption: 13, label: 12, numeral: 56 },
+    1440: { h1: 40, h2: 48, h2s: 36, h3: 32, label: 12, body: 16 },
+    390: { h1: 30, h2: 31, h2s: 30, h3: 26, label: 12, body: 16 },
   },
+  // Check 7: the smallest rendered text and heading.
+  minText: 11,
+  minHeading: 16,
+  // Check 5: the corner radii CLAUDE.md names (px), besides pills and 50%; the header bar's height.
+  radii: [0, 4, 8, 10, 12, 16, 20],
+  navH: 56,
+  // Check 14: manifest assets the site keeps but does not show, each with its reason. The owner keeps
+  // the current films until the Higgsfield swap (20 Oct 2026); placing one again fails until it is
+  // removed from this list.
+  unplaced: {
+    "c2-commercial-clip": "the /commercial hover clip, unplaced since the refresh layout dropped hover clips",
+  },
+  // Check 5 (src): the rounded-* utilities a class may use.
+  rounded: /^rounded-(?:(?:t|r|b|l|s|e|tl|tr|br|bl|ss|se|es|ee)-)?(?:none|hard|card|panel|pill|full|\[0\.5rem\]|\[0\.625rem\]|\[0\.75rem\])$/,
+  // Check 8: uppercase only at this size or under; a centred run of at most this many lines from 768
+  // and below it. The reference's centred hero and tab leads run 4 lines on desktop and 5 to 6 in the
+  // phone column (/homes-and-rentals, /company, the /register-interest tabs).
+  maxUppercase: 12,
+  maxCentredLines: { wide: 4, phone: 6 },
+  // Check 10: the two eyebrows (size px, weight, tracking em), the words, the gap to the heading.
+  eyebrows: { dotted: { size: 12, weight: "400", tracking: 0.04 }, plain: { size: 11, weight: "600", tracking: 0.02 } },
+  eyebrowWords: 4,
+  eyebrowGap: [8, 40],
+  // Check 44: the reference sites, their names in text (any case) and the ReFresh spelling (that case).
+  referenceHost: /(?:^|\.)(?:refresh\.tech|legora\.com)$/i,
+  referenceText: "refresh\\.tech|legora",
+  referenceBrand: "ReFresh",
   // E2 check 11: whole words, case-insensitive.
   banned: [
     ["customer", /\bcustomers?\b/gi],
@@ -132,38 +203,21 @@ const SPEC = {
     ["$", /\$/g],
     ["price", /\bprices?\b/gi],
   ],
-  // Where Part C puts the coded demos (D2 check 13).
+  // Where the coded demos are (check 13): the home page no longer carries the window.
   demos: {
-    "/": { windows: 1 },
+    "/platform": { windows: 1 },
     "/commercial": { windows: 1 },
     "/homes-and-rentals": { apps: 1 },
     "/download": { windows: 1 },
   },
-  // D2 check 10 (and the Eyebrow component): lowercase, one to three words.
-  eyebrow: "^[a-z0-9]+(?:[ '\u2019&-][a-z0-9]+){0,2}$",
-  // D2 check 25.
-  maxHeadlineWords: 7,
-  // D2 check 27.
-  maxParagraphLines: 2,
-  // D2 check 28.
-  copyRatio: 0.667,
   // D2 check 33: words that would turn the visitor's own figures into a Lienry claim.
   calcClaims: /\b(sav(e|es|ing|ings)|ROI|payback|cheaper|less than|compared|with Lienry|Lienry('s)? (cost|price|fee))/i,
-  // D2 check 31b: the spacing utilities, their allowed multipliers and arbitrary values.
-  lint: {
-    skipFiles: ["src/components/site/Nav.tsx", "src/components/software/SoftwareWindow.tsx", "src/components/software/PanelReadouts.tsx", "src/components/app/AppPanel.tsx"],
-    skipDirs: ["src/components/three/"],
-    multipliers: ["0", "px", "2", "4", "6", "8", "10", "12", "16", "20", "24", "32", "40"],
-    positional: ["1/2", "full", "auto"],
-    rems: ["0", "0.5", "1", "1.5", "2", "2.5", "3", "4", "5", "6", "8", "10"],
-    vars: ["--nav-h", "--page-margin", "--section-y", "--head-gap", "--hero-top", "--hero-gap", "--gutter", "--bleed"],
-  },
 };
 
 const CHECKS = {
   5: "shapes and effects",
   6: "two families",
-  7: "type scale",
+  7: "type",
   8: "case and alignment",
   9: "italics",
   10: "eyebrows",
@@ -175,14 +229,11 @@ const CHECKS = {
   22: "titles and links",
   23: "no placeholders",
   24: "one label per enquiry route",
-  25: "headlines of 7 words at most",
   26: "no orphaned last word",
-  27: "paragraphs of 2 lines at most",
-  28: "copy budget",
   29: "labels only in UI and the header",
-  "31b": "spacing lint",
   33: "the calculator",
   41: "hover clips",
+  44: "references never load",
 };
 // Checks that run with the motion passes (--no-motion skips them).
 const MOTION_CHECKS = new Set(["21", "41"]);
@@ -190,18 +241,16 @@ const MOTION_CHECKS = new Set(["21", "41"]);
 function usage() {
   console.log(`Usage: node scripts/check-rules.mjs <baseUrl> [route ...] [options]
 
-Runs the design pass's rule checks (5-14, 21-29, 31b, 33 and 41) against a served build.
+Runs the rule checks (5-14, 21-24, 26, 29, 33, 41 and 44) against a served build.
 
   <baseUrl>          the served build, e.g. http://localhost:3000 (default)
-  route              one or more routes (default: all nine)
+  route              one or more routes (default: all eleven and ${NOT_FOUND}, the 404 page)
   --widths 1440,390  viewport widths (1440x900 and 390x844 by default; 1024 and 768 are known too)
   --json <file>      also write the full report as JSON
   --no-sweep         skip the tab and disclosure state sweeps
   --no-motion        skip the motion passes (checks 21 and 41), which load every route again
-  --baseline <file>  check 28's baseline (default scripts/copy-baseline.json)
-  --write-baseline <file>
-                     record check 28's word counts per route (at load and in all states, at each
-                     width) into <file>, e.g. scripts/copy-baseline.json, and run no other check`);
+  --inject <file.js> add the file's source as an init script, after the page library, on every page
+                     the script opens (all passes): a self-test that breaks a rule on purpose`);
 }
 
 function fail(message, showUsage = false) {
@@ -211,7 +260,7 @@ function fail(message, showUsage = false) {
 }
 
 function parseArgs(argv) {
-  const opts = { base: "http://localhost:3000", routes: [], widths: [1440, 390], json: null, sweep: true, motion: true, writeBaseline: null, baseline: path.join(ROOT, "scripts/copy-baseline.json") };
+  const opts = { base: "http://localhost:3000", routes: [], widths: [1440, 390], json: null, sweep: true, motion: true, inject: null };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     const value = () => {
@@ -225,9 +274,14 @@ function parseArgs(argv) {
       process.exit(0);
     } else if (a.startsWith("--widths")) opts.widths = value().split(",").map((w) => Number(w.trim()));
     else if (a.startsWith("--json")) opts.json = value();
-    else if (a.startsWith("--write-baseline")) opts.writeBaseline = value();
-    else if (a.startsWith("--baseline")) opts.baseline = path.resolve(value());
-    else if (a === "--no-sweep") opts.sweep = false;
+    else if (a.startsWith("--inject")) {
+      const file = path.resolve(value());
+      try {
+        opts.inject = { file, content: readFileSync(file, "utf8") };
+      } catch (err) {
+        fail(`Cannot read --inject ${file} (${String(err.message).split("\n")[0]}).`);
+      }
+    } else if (a === "--no-sweep") opts.sweep = false;
     else if (a === "--no-motion") opts.motion = false;
     else if (a.startsWith("--")) fail(`Unknown option ${a}.`, true);
     else if (/^https?:\/\//.test(a)) opts.base = a.replace(/\/+$/, "");
@@ -345,7 +399,8 @@ function loadContent() {
     designFacts = null;
   }
   return {
-    brand: get(() => site.brand.name, "site.brand.name"),
+    // Checks 6 and 9: the footer tagline, the one run of Inter italic.
+    tagline: get(() => site.footer.tagline, "site.footer.tagline"),
     // Check 22: every route's tab title, as src/lib/site.ts builds it, its share card's title, and the
     // site's address.
     titles: get(() => Object.fromEntries(Object.keys(site.pageTitles).map((route) => [route, site.pageTitle(route)])), "site.pageTitle"),
@@ -366,12 +421,13 @@ function loadContent() {
   };
 }
 
-// Which check needs which content path (a missing path fails only that check).
+// Which checks need which content path (a missing path fails only those checks).
 const NEEDS = [
   [/^faq |^company honest|^stats/, 11],
   [/^homes\.appPanel/, 13],
   [/^site\.(pageTitle|siteUrl)/, 22],
-  [/^site\.brand/, 6],
+  [/^site\.footer\.tagline/, 6],
+  [/^site\.footer\.tagline/, 9],
 ];
 
 // ---------------------------------------------------------------------------------------------------
@@ -424,30 +480,24 @@ function pageLib() {
     }
     return "rgb(255, 255, 255)";
   };
-  // Relative luminance (WCAG), 0 to 1: a surface over 0.4 is light (plaster, raised, sunken).
-  const luminance = (colour) => {
-    const [r, g, b] = rgba(colour).map((v, i) => (i < 3 ? v / 255 : v));
-    const lin = (c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
-    return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
-  };
-  R.luminance = luminance;
-  // The palette, read from the tokens on :root.
-  let tokens = null;
-  R.tokens = () => {
-    if (tokens) return tokens;
-    tokens = {};
-    const probe = document.createElement("div");
-    document.body.appendChild(probe);
-    for (const name of ["plaster", "ink", "muted", "muted-on-dark", "glass", "glass-on-dark"]) {
-      probe.style.color = "";
-      probe.style.color = `var(--color-${name})`;
-      tokens[name] = getComputedStyle(probe).color;
-    }
+  // A value resolved at an element: a hidden probe inside it takes one declaration (a custom property
+  // such as var(--s-accent), or a color-mix of one) and reads it back computed, then leaves.
+  const resolveAt = (el, prop, value) => {
+    const probe = document.createElement("span");
+    probe.style.display = "none";
+    probe.style.setProperty(prop, value);
+    el.appendChild(probe);
+    const out = getComputedStyle(probe).getPropertyValue(prop);
     probe.remove();
-    return tokens;
+    return out;
   };
+  // The surface an element sits on (checks 9 and 10): its nearest ancestor that sets the surface tokens
+  // (a band or tone, a surface class, the header or the footer), else the root. The tokens are read
+  // there, never at the element, so a token the element (or a plain wrapper) sets cannot vouch for it.
+  const SURFACE = "[data-tone], [data-band], .on-light, .on-dark, .on-film, .surface-raised, .surface-sunken, .surface-ink-raised, body > header, body > footer";
+  const surfaceOf = (el) => el.parentElement?.closest(SURFACE) || document.documentElement;
 
-  // The type scale at this width, read from the tokens.
+  // The tokens CLAUDE.md sizes at this width, read from the custom properties.
   let steps = null;
   R.steps = () => {
     if (steps) return steps;
@@ -455,22 +505,34 @@ function pageLib() {
     const probe = document.createElement("span");
     probe.textContent = "x";
     document.body.appendChild(probe);
-    for (const t of ["display", "h1", "h2", "h3", "lead", "body", "small", "caption", "label", "numeral"]) {
+    for (const t of ["h1", "h2", "h2s", "h3", "label", "body"]) {
       probe.style.fontSize = `var(--text-${t})`;
       steps[t] = Math.round(parseFloat(getComputedStyle(probe).fontSize) * 100) / 100;
     }
     probe.remove();
     return steps;
   };
-  // The three faces next/font emits, read from the family variables on <html>.
+  // The header's height token, in px.
+  R.navH = () => {
+    const probe = document.createElement("div");
+    probe.style.cssText = "position:absolute;visibility:hidden;height:var(--nav-h)";
+    document.body.appendChild(probe);
+    const h = probe.getBoundingClientRect().height;
+    probe.remove();
+    return h;
+  };
+  // The four faces next/font emits, read from the family variables on <html>.
   let families = null;
   const firstFamily = (list) => (list || "").split(",")[0].replace(/["']/g, "").trim();
   R.families = () => {
     if (families) return families;
     const cs = getComputedStyle(document.documentElement);
-    const serif = [firstFamily(cs.getPropertyValue("--font-instrument")), firstFamily(cs.getPropertyValue("--font-instrument-italic"))].filter(Boolean);
-    const sans = [firstFamily(cs.getPropertyValue("--font-inter"))].filter(Boolean);
-    families = { serif: new Set(serif), sans: new Set(sans), all: new Set([...serif, ...sans]) };
+    const face = (name) => firstFamily(cs.getPropertyValue(name)) || null;
+    const serif = face("--font-ptserif");
+    const serifItalic = face("--font-ptserif-italic");
+    const inter = face("--font-inter");
+    const interItalic = face("--font-inter-italic");
+    families = { serif, serifItalic, inter, interItalic, serifs: new Set([serif, serifItalic].filter(Boolean)), all: new Set([serif, serifItalic, inter, interItalic].filter(Boolean)) };
     return families;
   };
 
@@ -550,9 +612,7 @@ function pageLib() {
     const footer = document.querySelector("body > footer") || [...document.querySelectorAll("footer")].find((f) => !f.closest("main")) || null;
     const h1 = main?.querySelector("h1");
     const homeHero = location.pathname === "/" && h1 ? items.find((it) => it.el.contains(h1))?.el ?? null : null;
-    const burger = document.querySelector("body > header button[aria-controls][aria-expanded]");
-    const menu = burger ? document.getElementById(burger.getAttribute("aria-controls")) : null;
-    R.state = { main, items, footer, homeHero, burger, menu, controls: items.map((it) => controlsOf(it.el)) };
+    R.state = { main, items, footer, homeHero, controls: items.map((it) => controlsOf(it.el)) };
     return R.state;
   };
   const where = (el) => {
@@ -565,9 +625,11 @@ function pageLib() {
   };
   const inFilm = (el) => R.state.items.some((it) => it.film && it.el.contains(el));
   const filmBlockOf = (el) => R.state.items.find((it) => it.film && it.el.contains(el))?.el ?? null;
-  const inMenuLink = (el) => !!(R.state.menu && R.state.menu.contains(el) && el.closest("a"));
-  const isWordmark = (el) => !!(R.state.footer && R.state.footer.contains(el) && clean(el.textContent) === R.cfg.brand);
   const inHomeHero = (el) => !!(R.state.homeHero && R.state.homeHero.contains(el));
+  // The footer tagline (checks 6 and 9): the one run of Inter italic.
+  const isTagline = (el) => !!(R.cfg.tagline && R.state.footer && R.state.footer.contains(el) && quotes(clean(el.textContent)) === quotes(clean(R.cfg.tagline)));
+  // A decorative layer (checks 5 and 23): aria-hidden, itself or above, with no text in it.
+  const decorative = (el) => !!el.closest("[aria-hidden='true']") && !clean(el.textContent);
 
   const labelOf = (el) => {
     const copy = el.cloneNode(true);
@@ -617,20 +679,33 @@ function pageLib() {
       tick();
     });
 
-  const radiusBad = (s) => {
-    for (const k of ["borderTopLeftRadius", "borderTopRightRadius", "borderBottomRightRadius", "borderBottomLeftRadius"]) {
+  // Check 5: the first corner value that is not one of CLAUDE.md's radii, a pill (at least half the
+  // box's shorter side) or 50%, or null. A box of unknown size is a pill only from 9999px.
+  const CORNERS = ["borderTopLeftRadius", "borderTopRightRadius", "borderBottomRightRadius", "borderBottomLeftRadius"];
+  const radiusBad = (s, w, h) => {
+    const half = Math.min(w, h) / 2;
+    for (const k of CORNERS) {
       const v = s[k];
       if (!v) continue;
       for (const part of v.split(/\s+/)) {
         const n = parseFloat(part);
-        if (part.endsWith("%") ? n !== 0 : !(Math.abs(n) < 0.01 || Math.abs(n - 4) < 0.01)) return v;
+        if (part.endsWith("%")) {
+          if (Math.abs(n) < 0.01 || Math.abs(n - 50) < 0.01) continue;
+          return v;
+        }
+        if (R.cfg.radii.some((r) => Math.abs(n - r) < 0.01)) continue;
+        if (Number.isFinite(half) ? n >= half - 0.5 : n >= 9999) continue;
+        return v;
       }
     }
     return null;
   };
-  // Tailwind utilities that draw shadows, rings, blurs or gradients, with any variant prefix.
-  const EFFECT = /^(?:shadow|inset-shadow|drop-shadow|text-shadow|blur|backdrop-|ring(?:-|$)|inset-ring|bg-clip-text|bg-(?:linear|radial|conic|gradient)-|bg-\[(?:linear|radial|conic|repeating)-gradient)/;
-  const GRADIENT = /^bg-(?:linear|radial|conic|gradient)-|^bg-\[(?:linear|radial|conic|repeating)-gradient/;
+  // A corner that is not a pill on a box this high (each value at least half of it, or 50%).
+  const notPill = (s, h) => CORNERS.map((k) => s[k]).find((v) => !v.split(/\s+/).every((part) => (part.endsWith("%") ? parseFloat(part) >= 50 : parseFloat(part) >= h / 2 - 0.5))) ?? null;
+  const textField = (el) => el.matches("select, textarea") || (el.tagName === "INPUT" && !["checkbox", "radio", "range", "hidden"].includes(el.type));
+  // Tailwind utilities that draw text shadows or gradient text, with any variant prefix; and gradients.
+  const TEXT_EFFECT = /^(?:text-shadow-(?!none$)|bg-clip-text$|\[(?:-webkit-)?background-clip:text\]$|\[text-shadow:)/;
+  const GRADIENT = /^bg-(?:linear|radial|conic)(?:-|$)|^bg-gradient-|^bg-\[(?:linear|radial|conic|repeating)-gradient|^\[background(?:-image)?:[^\]]*gradient\(/;
   const baseUtility = (token) => {
     let depth = 0;
     let cut = -1;
@@ -639,17 +714,33 @@ function pageLib() {
       else if (token[i] === "]") depth--;
       else if (token[i] === ":" && depth === 0) cut = i;
     }
-    return token.slice(cut + 1).replace(/^!/, "");
+    return token.slice(cut + 1).replace(/^!/, "").replace(/!$/, "");
   };
+  // Check 5(h): the text a gradient layer would sit behind. A layer is the element's background or its
+  // ::before or ::after (which paints inside the element's box): the pseudo's own text, the element's
+  // own text runs, and on a text-level element (a button, link, label, heading, paragraph, list item or
+  // inline run, whose label often sits in spans) any text it holds. A band or block holding text in
+  // its children is a surface, not a text run.
+  const TEXT_LEVEL = "[data-button], button, a, label, legend, summary, h1, h2, h3, h4, h5, h6, p, li, dt, dd, figcaption, span, em, strong, small, b, i";
+  const textBehind = (el) => {
+    if (ownText(el)) return true;
+    if (!el.matches(TEXT_LEVEL)) return false;
+    const copy = el.cloneNode(true);
+    copy.querySelectorAll("[aria-hidden='true'], .sr-only, svg").forEach((n) => n.remove());
+    return !!clean(copy.textContent);
+  };
+  // UI text that is never in the serif (check 6): buttons, form fields and their labels, eyebrows,
+  // labels and the policy's paragraphs.
+  const UI_TEXT = "[data-button], input, select, textarea, option, label, legend, .eyebrow, .label, [data-prose] p";
+  const round = (v) => Math.round(v * 10) / 10;
 
-  // Element rules (checks 5, 6, 7, 8, 9's italic style, 10, 12, 13) inside a scope.
+  // Element rules (checks 5, 6, 7, 8, 9's italic style, 10, 12, 13, 29) inside a scope.
   R.elementAudit = (scopeSel) => {
     const scope = scopeSel === "document" ? document.body : typeof scopeSel === "number" ? R.state.items[scopeSel]?.el : document.querySelector(scopeSel);
     const out = [];
     if (!scope) return out;
     const add = (check, el, kind, detail = "") => out.push({ check, where: where(el), kind, sample: `${R.describe(el)}${detail ? ` ${detail}` : ""}` });
     const st = R.steps();
-    const sizes = Object.values(st);
     const fam = R.families();
     const els = [scope, ...scope.querySelectorAll("*")];
     for (const el of els) {
@@ -658,53 +749,88 @@ function pageLib() {
       if (["script", "style", "noscript", "template", "head", "meta", "link"].includes(tag)) continue;
       if (!rendered(el)) continue;
       const cs = getComputedStyle(el);
-      const film = inFilm(el);
       const layers = [["", cs]];
       for (const p of ["::before", "::after"]) {
         const ps = getComputedStyle(el, p);
         if (ps.content && ps.content !== "none" && ps.content !== "normal") layers.push([p, ps]);
       }
+      // The layout box (an svg has no offset box: its rect).
+      const r = el.getBoundingClientRect();
+      const w = el.offsetWidth ?? r.width;
+      const h = el.offsetHeight ?? r.height;
       for (const [p, s] of layers) {
-        const r = radiusBad(s);
-        if (r) add(5, el, "border-radius other than 0 or 4px", `${p} ${r}`.trim());
-        if (s.boxShadow && s.boxShadow !== "none") add(5, el, "box-shadow", `${p} ${s.boxShadow}`.trim().slice(0, 70));
+        const pseudoText = p && /^["']/.test(s.content) && s.content.length > 2;
+        const bad = radiusBad(s, p ? parseFloat(s.width) : w, p ? parseFloat(s.height) : h);
+        if (bad) add(5, el, "corner radius other than 0, 4, 8, 10, 12, 16 or 20px, a pill or 50%", `${p} ${bad}`.trim());
         if (s.textShadow && s.textShadow !== "none") add(5, el, "text-shadow", `${p} ${s.textShadow}`.trim().slice(0, 70));
-        if (/blur\(/.test(s.filter)) add(5, el, "blur filter", `${p} ${s.filter}`.trim());
-        if (s.backdropFilter && s.backdropFilter !== "none") add(5, el, "backdrop-filter", `${p} ${s.backdropFilter}`.trim());
         if (s.backgroundClip === "text" || s.webkitBackgroundClip === "text") add(5, el, "background-clip: text (gradient text)", p);
-        if (/gradient\(/.test(s.backgroundImage) && !film) add(5, el, "gradient outside the film bands' scrims", p);
-        if (p && /^["']/.test(s.content) && s.content.length > 2) {
+        if (/blur\(/.test(s.filter) && !decorative(el)) add(5, el, "blur filter on a layer that is not decorative (aria-hidden, with no text)", `${p} ${s.filter}`.trim());
+        if (s.backdropFilter && s.backdropFilter !== "none" && !el.closest("body > header") && !el.matches("[data-button='glass']")) add(5, el, "backdrop-filter outside the header and the glass button", `${p} ${s.backdropFilter}`.trim());
+        if (/gradient\(/.test(s.backgroundImage) && ((p && pseudoText) || textBehind(el))) add(5, el, "gradient background behind its own text", p);
+        if (pseudoText) {
           const fs = parseFloat(s.fontSize);
-          if (!sizes.some((v) => Math.abs(v - fs) < 0.1)) add(7, el, "font size off the scale", `${p} ${fs}px`);
-          if (!fam.all.has(firstFamily(s.fontFamily))) add(6, el, "font family outside Instrument Serif and Inter", `${p} ${firstFamily(s.fontFamily)}`);
-          if (s.textTransform === "uppercase" && !el.closest(".label")) add(8, el, "uppercase outside .label", p);
+          if (!fam.all.has(firstFamily(s.fontFamily))) add(6, el, "font family outside PT Serif and Inter", `${p} ${firstFamily(s.fontFamily)}`);
+          if (fs < R.cfg.minText - 0.05) add(7, el, `text under ${R.cfg.minText}px`, `${p} ${round(fs)}px`);
+          if (s.textTransform === "uppercase" && fs > R.cfg.maxUppercase + 0.05) add(8, el, `uppercase text over ${R.cfg.maxUppercase}px`, `${p} ${round(fs)}px`);
         }
       }
-      for (const token of el.classList) {
-        const base = baseUtility(token);
-        if (!EFFECT.test(base) || /-(?:none|0)$/.test(base)) continue;
-        if (GRADIENT.test(base) && film) continue;
-        add(5, el, "shadow, ring, blur or gradient utility in the class list", token);
+      // Effect utilities hide in hover and focus states, so the class list is read too.
+      const bases = [...el.classList].map((token) => [token, baseUtility(token)]);
+      for (const [token, base] of bases) if (TEXT_EFFECT.test(base)) add(5, el, "text-shadow or gradient-text utility in the class list", token);
+      const transparent = bases.find(([, base]) => base === "text-transparent");
+      const gradient = bases.find(([, base]) => GRADIENT.test(base));
+      if (transparent && gradient) add(5, el, "text-transparent beside a gradient utility (gradient text)", `${transparent[0]} ${gradient[0]}`);
+      // Pills and fields.
+      const variant = el.getAttribute("data-button");
+      if (["primary", "secondary", "glass"].includes(variant)) {
+        const corner = notPill(cs, h);
+        if (corner) add(5, el, `a ${variant} button that is not a pill (each corner at least half its ${round(h)}px height)`, corner);
       }
+      if (textField(el)) {
+        const corner = CORNERS.map((k) => cs[k]).find((v) => !v.split(/\s+/).every((part) => Math.abs(parseFloat(part) - 4) < 0.01 && part.endsWith("px")));
+        if (corner) add(5, el, "a text field without 4px corners", corner);
+      }
+
       const control = ["INPUT", "SELECT", "TEXTAREA"].includes(el.tagName);
       if (!control && !ownText(el)) continue;
       const first = firstFamily(cs.fontFamily);
-      if (!fam.all.has(first)) add(6, el, "font family outside Instrument Serif and Inter", first);
-      else if (fam.serif.has(first) && !el.closest("h1, h2, h3") && !el.closest(".letter") && !isWordmark(el) && !inMenuLink(el)) add(6, el, "Instrument Serif outside h1-h3, .letter, the footer wordmark and the phone menu");
       const fs = parseFloat(cs.fontSize);
-      if (!sizes.some((v) => Math.abs(v - fs) < 0.1)) add(7, el, "font size off the scale", `${Math.round(fs * 100) / 100}px`);
-      // The founder letter is set at the H3 step, every word of it.
-      if (el.closest(".letter") && Math.abs(fs - st.h3) > 0.1) add(7, el, `text in .letter off the H3 step (${st.h3}px)`, `${Math.round(fs * 100) / 100}px`);
-      if (cs.textTransform === "uppercase" && !el.closest(".label")) add(8, el, "uppercase outside .label");
-      if (/center/.test(cs.textAlign) && !control && el.tagName !== "OPTION" && !inHomeHero(el)) add(8, el, "centred text outside the home hero");
-      if (cs.fontStyle === "italic" && !el.closest("em, i")) add(9, el, "italic outside an em");
+      const italic = /italic|oblique/.test(cs.fontStyle);
+      const tagline = isTagline(el);
+      // Check 6: the two families, the serif kept off UI text, each italic face in its one place.
+      if (!fam.all.has(first)) add(6, el, "font family outside PT Serif and Inter", first);
+      else {
+        if (fam.serifs.has(first) && el.closest(UI_TEXT)) add(6, el, "PT Serif on UI text ([data-button], a form field or its label, .eyebrow, .label or a [data-prose] paragraph)");
+        if (italic || first === fam.serifItalic || first === fam.interItalic) {
+          const placed = (first === fam.serifItalic && italic && el.closest("em, i")) || (first === fam.interItalic && italic && tagline);
+          if (!placed) add(6, el, "italic out of place (PT Serif italic only in an em or i, Inter italic only on the footer tagline)", `(${first}, ${cs.fontStyle})`);
+        }
+      }
+      // Check 7: nothing under the smallest size.
+      if (fs < R.cfg.minText - 0.05) add(7, el, `text under ${R.cfg.minText}px`, `${Math.round(fs * 100) / 100}px`);
+      // Check 8: capitals only at the label sizes, never in a heading or a button.
+      if (cs.textTransform === "uppercase") {
+        if (el.closest("h1, h2, h3, h4, h5, h6")) add(8, el, "uppercase in a heading");
+        else if (el.closest("[data-button]")) add(8, el, "uppercase in a [data-button]");
+        else if (fs > R.cfg.maxUppercase + 0.05) add(8, el, `uppercase text over ${R.cfg.maxUppercase}px`, `${round(fs)}px`);
+      }
+      // Check 8: no centred policy text, and no centred labels or fields in a form.
+      if (/center/.test(cs.textAlign) && el.tagName !== "OPTION") {
+        if (el.closest("[data-prose]")) add(8, el, "centred text in [data-prose]");
+        else if (el.closest("form") && (control || el.closest("label, legend"))) add(8, el, "a centred label or field in a form");
+      }
+      // Check 9: italic only in an em or i, and the footer tagline.
+      if (italic && !el.closest("em, i") && !tagline) add(9, el, "italic outside an em or i (only the footer tagline may be)");
     }
     for (const h of scope.querySelectorAll("h1, h2, h3")) {
       if (!rendered(h)) continue;
       const cs = getComputedStyle(h);
       const fs = parseFloat(cs.fontSize);
-      if (fs < st.h3 - 0.1) add(7, h, `heading below the H3 step (${st.h3}px)`, `${Math.round(fs * 100) / 100}px`);
-      if (!fam.serif.has(firstFamily(cs.fontFamily))) add(6, h, "heading not in Instrument Serif", firstFamily(cs.fontFamily));
+      if (!fam.serifs.has(firstFamily(cs.fontFamily))) add(6, h, "heading not in PT Serif", firstFamily(cs.fontFamily));
+      if (fs < R.cfg.minHeading - 0.05) add(7, h, `heading under ${R.cfg.minHeading}px`, `${round(fs)}px`);
+      if (!(parseFloat(cs.letterSpacing) < 0)) add(7, h, "heading without negative letter-spacing (tight tracking)", `(${cs.letterSpacing})`);
+      // The display heroes (the home film, a [data-scatter] hero) set their own h1.
+      if (h.tagName === "H1" && h.closest("main") && !inHomeHero(h) && !h.closest("[data-scatter]") && Math.abs(fs - st.h1) > 0.1) add(7, h, `an h1 off the h1 step (${st.h1}px)`, `${round(fs)}px`);
     }
     for (const h of scope.querySelectorAll("h4, h5, h6")) if (h.closest("main")) add(7, h, "h4-h6 in <main>");
     // Check 10: a label never sits directly above an h1 or h2.
@@ -723,45 +849,54 @@ function pageLib() {
       });
       if (above) add(10, h, "a .label sits directly above the heading", `(${R.describe(above)})`);
     }
-    // Check 10: eyebrows. Structure (an eyebrow right before each h2 in <main> and each h1 but the
-    // home hero's; every h2 inside [data-section-head]), the eyebrow's words and computed style, and
-    // its geometry against the heading.
-    const eyebrowRe = new RegExp(R.cfg.eyebrow);
-    const tk = R.tokens();
-    const round = (v) => Math.round(v * 10) / 10;
-    for (const h of scope.querySelectorAll("main h1, main h2")) {
-      const exempt = h.closest("[data-prose], [data-form-success]");
-      if (h.tagName === "H2" && !exempt && !h.closest("[data-section-head]")) add(10, h, "an h2 outside [data-section-head]");
-      if (exempt || (h.tagName === "H1" && inHomeHero(h))) continue;
-      const prev = h.previousElementSibling;
-      if (!prev || !prev.matches(".eyebrow")) {
-        add(10, h, `an ${h.tagName.toLowerCase()} without an eyebrow (p.eyebrow) right before it`, prev ? `(it follows ${R.describe(prev)})` : "(it is the first child of its parent)");
-        continue;
-      }
-      if (!rendered(h) || !rendered(prev)) continue;
-      const hr = h.getBoundingClientRect();
-      const er = prev.getBoundingClientRect();
-      const gap = hr.top - er.bottom;
-      if (Math.abs(gap - 16) > 1) add(10, h, "eyebrow to heading is not 16px (within 1)", `(${round(gap)}px under "${clean(prev.textContent)}")`);
-      if (Math.abs(hr.left - er.left) > 1) add(10, h, "eyebrow and heading do not share a left edge (within 1px)", `(eyebrow at x ${round(er.left)}, heading at x ${round(hr.left)})`);
-    }
+    // Check 10: eyebrows. The words (the source text, before the capitals), the computed style against
+    // the surface (its --s-fg and --s-accent, read at the eyebrow) and the h1 or h2 that follows one.
+    const [gapMin, gapMax] = R.cfg.eyebrowGap;
     for (const e of scope.querySelectorAll(".eyebrow")) {
       if (!e.closest("main") && !(R.state.footer && R.state.footer.contains(e))) continue;
       if (!rendered(e)) continue;
       const text = clean(e.textContent);
-      if (!eyebrowRe.test(text)) add(10, e, "eyebrow is not lowercase, 1 to 3 words", `("${text}")`);
+      const words = text.split(" ").filter(Boolean).length;
+      const sentence = /^[\p{Lu}\p{Nd}]/u.test(text) && !(/\p{L}/u.test(text) && text === text.toUpperCase());
+      if (!sentence || words < 1 || words > R.cfg.eyebrowWords) add(10, e, `eyebrow text is not sentence case, 1 to ${R.cfg.eyebrowWords} words`, `("${text}")`);
       const cs = getComputedStyle(e);
+      const plain = e.classList.contains("eyebrow-plain");
+      const want = plain ? R.cfg.eyebrows.plain : R.cfg.eyebrows.dotted;
+      const fs = parseFloat(cs.fontSize);
       const problems = [];
       const family = firstFamily(cs.fontFamily);
-      if (!fam.sans.has(family)) problems.push(`family ${family}, not Inter`);
-      if (Math.abs(parseFloat(cs.fontSize) - st.small) > 0.1) problems.push(`size ${cs.fontSize}, not the small step (${st.small}px)`);
-      if (cs.fontWeight !== "500") problems.push(`weight ${cs.fontWeight}, not 500`);
-      if (!(cs.letterSpacing === "normal" || Math.abs(parseFloat(cs.letterSpacing)) < 0.01)) problems.push(`letter-spacing ${cs.letterSpacing}, not normal`);
-      if (cs.textTransform !== "none") problems.push(`text-transform ${cs.textTransform}`);
-      const dark = luminance(effectiveBackground(e)) <= 0.4;
-      const want = dark ? tk["muted-on-dark"] : tk.muted;
-      if (!same(cs.color, want)) problems.push(`colour ${cs.color}, not ${dark ? "muted-on-dark" : "muted"} (${want}) on this ${dark ? "dark" : "light"} surface`);
+      if (family !== fam.inter) problems.push(`family ${family}, not Inter`);
+      if (cs.textTransform !== "uppercase") problems.push(`text-transform ${cs.textTransform}, not uppercase`);
+      const surface = surfaceOf(e);
+      const fg = resolveAt(surface, "color", "var(--s-fg)");
+      if (!same(cs.color, fg)) problems.push(`colour ${cs.color}, not the surface's --s-fg (${fg})`);
+      if (Math.abs(fs - want.size) > 0.05) problems.push(`size ${cs.fontSize}, not ${want.size}px`);
+      if (cs.fontWeight !== want.weight) problems.push(`weight ${cs.fontWeight}, not ${want.weight}`);
+      const tracking = parseFloat(cs.letterSpacing) || 0;
+      if (Math.abs(tracking - want.tracking * fs) > 0.05) problems.push(`letter-spacing ${cs.letterSpacing}, not ${want.tracking}em (${Math.round(want.tracking * fs * 100) / 100}px)`);
+      const dot = getComputedStyle(e, "::before");
+      const dotted = dot.content !== "none" && dot.content !== "normal" && dot.display !== "none";
+      if (plain) {
+        if (dotted) problems.push("a dot (::before) on .eyebrow-plain");
+      } else if (!dotted) problems.push("no dot (::before)");
+      else {
+        const dw = parseFloat(dot.width);
+        const dh = parseFloat(dot.height);
+        if (!(Math.abs(dw - 8) < 0.05 && Math.abs(dh - 8) < 0.05)) problems.push(`dot ${dot.width} x ${dot.height}, not 8 x 8`);
+        else if (notPill(dot, 8)) problems.push(`dot corners ${notPill(dot, 8)}, not round`);
+        const accent = resolveAt(surface, "background-color", "color-mix(in srgb, var(--s-accent) 45%, transparent)");
+        if (!same(dot.backgroundColor, accent)) problems.push(`dot ${dot.backgroundColor}, not --s-accent at 45% (${accent})`);
+      }
       if (problems.length) add(10, e, "eyebrow style is off the spec", `(${problems.join("; ")})`);
+      const h = e.nextElementSibling;
+      if (!h || !h.matches("h1, h2") || !rendered(h)) continue;
+      const er = e.getBoundingClientRect();
+      const hr = h.getBoundingClientRect();
+      const gap = hr.top - er.bottom;
+      if (gap < gapMin || gap > gapMax) add(10, h, `eyebrow to heading is not ${gapMin} to ${gapMax}px`, `(${round(gap)}px under "${text}")`);
+      const left = Math.abs(hr.left - er.left);
+      const centre = Math.abs((hr.left + hr.right) / 2 - (er.left + er.right) / 2);
+      if (left > 1 && centre > 1) add(10, h, "eyebrow and heading share neither a left edge nor a centre (within 1px)", `(left edges ${round(er.left)} and ${round(hr.left)}, centres ${round(centre)}px apart, under "${text}")`);
     }
     // Check 29: the uppercase .label is for data labels inside UI ([data-ui]) and the header only.
     for (const l of scope.querySelectorAll(".label")) {
@@ -776,11 +911,12 @@ function pageLib() {
   R.captionCounts = () => R.lastCaptions;
 
   // The media inside a scope, grouped by frame: a figure, or a film block. Check 14 reads them too.
+  // Media inside aria-hidden (the footer's picture loop, the bubble hero) is decoration, not a frame.
   function frames(scope) {
     const map = new Map();
     for (const m of scope.querySelectorAll("img, video")) {
       const id = mediaId(m);
-      if (!id || !present(m)) continue;
+      if (!id || !present(m) || m.closest("[aria-hidden='true']")) continue;
       // A hover clip and the still under it are one figure.
       const frame = m.closest("[data-hover-clip]") || m.closest("figure") || filmBlockOf(m);
       const key = frame || m;
@@ -849,10 +985,77 @@ function pageLib() {
     return [...ids];
   };
 
-  // Page rules (checks 9, 11, 21's sticky parts, 22, 23, 24): the whole DOM, hidden states included.
+  // Check 5 in the stylesheets: the states the audit never puts an element in (hover, focus, active,
+  // checked). A rule under one of them, at any depth of nesting, sets no text-shadow, no
+  // background-clip:text and no corner outside CLAUDE.md's radii (the box is unknown here, so a pill is
+  // 999px or more, or 50%). Values are resolved on a probe, so var() and rem read as px.
+  const STATE = /:(?:hover|focus|focus-visible|focus-within|active|checked)\b/;
+  const RADIUS_PROPS = ["border-radius", "border-top-left-radius", "border-top-right-radius", "border-bottom-right-radius", "border-bottom-left-radius", "border-start-start-radius", "border-start-end-radius", "border-end-start-radius", "border-end-end-radius"];
+  function stateRules() {
+    const out = [];
+    const probe = document.createElement("div");
+    document.body.appendChild(probe);
+    const corners = (prop, value) => {
+      probe.style.cssText = "position:absolute;visibility:hidden;width:100px;height:100px";
+      probe.style.setProperty(prop, value);
+      const cs = getComputedStyle(probe);
+      return CORNERS.map((k) => cs[k]);
+    };
+    const offScale = (part) => {
+      const n = parseFloat(part);
+      if (part.endsWith("%")) return !(Math.abs(n) < 0.01 || Math.abs(n - 50) < 0.01);
+      return !(R.cfg.radii.some((r) => Math.abs(n - r) < 0.01) || n >= 999);
+    };
+    const rule = (sel, prop, value) => `${clean(sel, 90)} { ${prop}: ${clean(value, 60)} }`;
+    const visit = (rules, inState, outer) => {
+      for (const r of rules) {
+        const sel = r.selectorText ? (outer ? `${outer} ${r.selectorText}` : r.selectorText) : outer;
+        const state = inState || STATE.test(r.selectorText || "");
+        if (state && r.style) {
+          const st = r.style;
+          const shadow = st.getPropertyValue("text-shadow").trim();
+          if (shadow && !/^(?:none|initial|unset|inherit|revert)/.test(shadow)) out.push({ kind: "text-shadow in a hover, focus, active or checked rule", sample: rule(sel, "text-shadow", shadow) });
+          for (const prop of ["background-clip", "-webkit-background-clip"]) {
+            if (/\btext\b/.test(st.getPropertyValue(prop))) out.push({ kind: "background-clip: text in a hover, focus, active or checked rule", sample: rule(sel, prop, st.getPropertyValue(prop)) });
+          }
+          for (const prop of RADIUS_PROPS) {
+            const value = st.getPropertyValue(prop).trim();
+            if (!value || /^(?:initial|unset|inherit|revert)/.test(value)) continue;
+            const off = corners(prop, value).find((v) => v.split(/\s+/).some(offScale));
+            if (!off) continue;
+            out.push({ kind: "a corner radius other than 0, 4, 8, 10, 12, 16 or 20px, a pill or 50% in a hover, focus, active or checked rule", sample: rule(sel, prop, value === off ? value : `${value} (${off})`) });
+            break;
+          }
+        }
+        if (r.cssRules && !(r instanceof CSSKeyframesRule)) visit(r.cssRules, state, sel);
+      }
+    };
+    for (const sheet of document.styleSheets) {
+      let rules = null;
+      try {
+        rules = sheet.cssRules;
+      } catch {
+        continue;
+      }
+      visit(rules, false, "");
+    }
+    probe.remove();
+    return out;
+  }
+
+  // Page rules (checks 5's header bar and state rules, 9, 11, 21's sticky parts, 22, 23, 24, 44's
+  // text): the whole DOM, hidden states included.
   R.pageAudit = () => {
     const out = [];
     const add = (check, el, kind, detail = "") => out.push({ check, where: el ? where(el) : "page", kind, sample: el ? `${R.describe(el)}${detail ? ` ${detail}` : ""}` : detail });
+
+    // Check 5: the bar in body > header is --nav-h, 56px, tall; the stylesheets' state rules.
+    const navH = R.navH();
+    for (const v of stateRules()) add(5, null, v.kind, v.sample);
+    const bar = document.querySelector("body > header");
+    if (Math.abs(navH - R.cfg.navH) > 0.5) add(5, null, `--nav-h computes to ${round(navH)}px, not ${R.cfg.navH}px`);
+    if (!bar) add(5, null, "no header bar (body > header)");
+    else if (Math.abs(bar.getBoundingClientRect().height - R.cfg.navH) > 0.5) add(5, bar, `the header bar is ${round(bar.getBoundingClientRect().height)}px tall, not ${R.cfg.navH}px`);
 
     // Check 9: gather every em and i.
     const italics = [...document.body.querySelectorAll("em, i")].map((e) => {
@@ -867,7 +1070,7 @@ function pageLib() {
         heading: heading ? heading.tagName.toLowerCase() : null,
         headingText: heading ? clean(heading.textContent) : "",
         trailing: heading ? clean(heading.textContent).endsWith(clean(e.textContent)) : false,
-        colourMatches: heading ? same(getComputedStyle(e).color, hcs.color) : true,
+        colourMatches: heading ? same(getComputedStyle(e).color, hcs.color) || same(getComputedStyle(e).color, resolveAt(surfaceOf(heading), "color", "var(--s-accent)")) : true,
         inSummary: !!e.closest("summary"),
         inP: !!e.closest("p"),
         inButton: !!e.closest("button, [data-button]"),
@@ -911,12 +1114,25 @@ function pageLib() {
       };
     });
 
-    // Check 21: sticky and fixed elements, scroll-driven animations.
+    // Check 21: sticky and fixed elements, scroll-driven animations. A sticky block in <main> is a column
+    // beside the content that sticks under the header (its top at least --nav-h): a nav, or a block
+    // holding a heading, a nav or a form (the home FAQ's enquiry card, which holds no heading), never a
+    // band (a [data-band], a section, a block of <main> or one holding a band) and at most two thirds
+    // of its band's width.
     const header = document.querySelector("body > header, header.nav-bar") || document.querySelector("header");
+    const mainBlocks = new Set(R.state.items.map((it) => it.el));
     for (const el of document.body.querySelectorAll("*")) {
       const cs = getComputedStyle(el);
       if ((cs.position === "sticky" || cs.position === "fixed") && !rendered(el)) continue;
-      if (cs.position === "sticky") add(21, el, "sticky element (only the header may be)");
+      if (cs.position === "sticky" && !(header && header.contains(el))) {
+        const below = parseFloat(cs.top) >= navH - 0.5;
+        const holds = el.matches("nav") || !!el.querySelector("h1, h2, h3, h4, h5, h6, nav, form");
+        const isBand = el.matches("[data-band], section, main") || mainBlocks.has(el) || !!el.querySelector("[data-band], section");
+        const band = el.parentElement?.closest("[data-band], main") || document.body;
+        const share = el.getBoundingClientRect().width / Math.max(1, band.getBoundingClientRect().width);
+        const why = [!el.closest("main") ? "outside <main>" : "", !below ? "above the header's bottom" : "", !holds ? "holds no heading, nav or form" : "", isBand ? "a whole band" : "", share > 2 / 3 ? `${Math.round(share * 100)}% of its band's width` : ""].filter(Boolean);
+        if (why.length) add(21, el, "sticky element other than a nav or a heading, nav or form column in <main> that sticks under the header", `(top ${cs.top}: ${why.join(", ")})`);
+      }
       if (cs.position === "fixed" && !(header && header.contains(el)) && !el.matches('a[href="#main"]')) add(21, el, "fixed element other than the header");
       if ((cs.animationTimeline && !/^(auto|none)$/.test(cs.animationTimeline)) || (cs.viewTimelineName && cs.viewTimelineName !== "none") || (cs.scrollTimelineName && cs.scrollTimelineName !== "none")) add(21, el, "scroll-driven animation");
     }
@@ -929,6 +1145,9 @@ function pageLib() {
       if (/photo|portrait|placeholder/i.test(`${el.getAttribute("aria-label") || ""} ${el.textContent}`)) add(23, el, "photo placeholder box");
     }
     R.emptyBoxes = emptyBoxes();
+
+    // Check 44: the reference sites' names, in the page's text and attributes and in the head.
+    out.push(...R.references("document"));
 
     // Check 22: every copy of the canonical link, the description and the share card's tags.
     const values = (selector, attr) => [...document.querySelectorAll(selector)].map((e) => e.getAttribute(attr));
@@ -956,11 +1175,65 @@ function pageLib() {
     return links;
   };
 
+  // Check 44: text that names a reference site in a scope ("document" for the page and its head): every
+  // text node, hidden states included; the text attributes (alt, aria-label, title, placeholder,
+  // aria-description and the other aria text, a value, an option's label, meta content) and a field's
+  // value; ::before and ::after content (attr() resolved); and every address an attribute holds
+  // (href, src, srcset, poster, action, data), which a request check misses for preconnects and links.
+  const TEXT_ATTRS = ["alt", "aria-label", "title", "placeholder", "aria-description", "aria-roledescription", "aria-valuetext", "aria-placeholder", "value", "label", "content"];
+  const URL_ATTRS = ["href", "src", "srcset", "poster", "action", "formaction", "data", "xlink:href"];
+  const pseudoContent = (el, p) => {
+    const c = getComputedStyle(el, p).content;
+    if (!c || c === "none" || c === "normal") return "";
+    return c.replace(/attr\(\s*([\w-]+)\s*\)/g, (_, name) => el.getAttribute(name) || "").replace(/["']/g, "");
+  };
+  R.references = (scopeSel) => {
+    const root = scopeSel === "document" ? document.documentElement : document.querySelector(scopeSel);
+    const out = [];
+    if (!root) return out;
+    const anyCase = new RegExp(R.cfg.referenceText, "i");
+    const brand = new RegExp(R.cfg.referenceBrand);
+    const hit = (text) => {
+      const m = text.match(anyCase) || text.match(brand);
+      return m ? `"…${clean(text.slice(Math.max(0, m.index - 40), m.index + m[0].length + 40))}…"` : null;
+    };
+    const at = (el) => (el.closest("head") ? "page" : where(el));
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+      const p = n.parentElement;
+      if (!p || p.closest("script, style, noscript, template")) continue;
+      const found = hit(n.textContent);
+      if (found) out.push({ check: 44, where: where(p), kind: "text names a reference site (refresh.tech, Legora or ReFresh)", sample: `${R.describe(p)} ${found}` });
+    }
+    for (const el of [root, ...root.querySelectorAll("*")]) {
+      if (el.closest("script, style, noscript, template")) continue;
+      for (const attr of TEXT_ATTRS) {
+        const found = el.hasAttribute(attr) ? hit(el.getAttribute(attr)) : null;
+        if (found) out.push({ check: 44, where: at(el), kind: `${attr} text names a reference site (refresh.tech, Legora or ReFresh)`, sample: `<${el.tagName.toLowerCase()}> ${found}` });
+      }
+      if ((el.tagName === "INPUT" || el.tagName === "TEXTAREA") && el.value !== el.getAttribute("value")) {
+        const found = hit(el.value || "");
+        if (found) out.push({ check: 44, where: at(el), kind: "a field's value names a reference site (refresh.tech, Legora or ReFresh)", sample: `<${el.tagName.toLowerCase()}> ${found}` });
+      }
+      for (const attr of URL_ATTRS) {
+        const value = el.getAttribute(attr);
+        const m = value && value.match(anyCase);
+        if (m) out.push({ check: 44, where: at(el), kind: `an address (${attr}) on a reference site (refresh.tech or legora.com)`, sample: `<${el.tagName.toLowerCase()}> ${clean(value, 90)}` });
+      }
+      if (el.closest("head")) continue;
+      for (const p of ["::before", "::after"]) {
+        const found = hit(pseudoContent(el, p));
+        if (found) out.push({ check: 44, where: at(el), kind: `${p} content names a reference site (refresh.tech, Legora or ReFresh)`, sample: `${R.describe(el)} ${found}` });
+      }
+    }
+    return out;
+  };
+
   // Empty boxes: a filled or framed rectangle of 96px or more with nothing rendered in it.
   function emptyBoxes() {
     const found = [];
     for (const el of document.querySelectorAll("main *, footer *")) {
-      if (inFilm(el) || el.closest("svg")) continue;
+      if (inFilm(el) || el.closest("svg") || el.closest("[aria-hidden='true']")) continue;
       const r = el.getBoundingClientRect();
       if (r.width < 96 || r.height < 96 || !rendered(el)) continue;
       const cs = getComputedStyle(el);
@@ -987,65 +1260,6 @@ function pageLib() {
         resolve(still ? { where: where(el), sample: `${R.describe(el)} ${Math.round(r.width)}x${Math.round(r.height)}` } : null);
       }, 2500),
     );
-  };
-
-  // Check 28: the copy budget's counter. Words at load are main's innerText with the outermost
-  // excluded subtrees hidden for the one synchronous read (so nothing they hold is counted and no
-  // observer ever sees the change); words in all states walk the text nodes instead, so closed answers
-  // and inactive tabs count too, with a word break at every element that is not phrasing content.
-  const COPY_EXCLUDE = [
-    "[data-ui]",
-    "[data-prose]",
-    "form",
-    ".sr-only",
-    '[aria-hidden="true"]',
-    "[data-software-preview]",
-    "[role='group'][aria-label$='demo window']",
-    "[role='group'][aria-label$='demo data']",
-  ].join(", ");
-  const INLINE = new Set(["A", "ABBR", "B", "BDI", "BDO", "CITE", "CODE", "DATA", "DFN", "EM", "I", "KBD", "MARK", "Q", "S", "SAMP", "SMALL", "SPAN", "STRONG", "SUB", "SUP", "TIME", "U", "VAR", "WBR"]);
-  const wordsIn = (s) => (s || "").split(/\s+/).filter(Boolean).length;
-  const outermostExcluded = (root) => [...root.querySelectorAll(COPY_EXCLUDE)].filter((e) => {
-    const above = e.parentElement?.closest(COPY_EXCLUDE);
-    return !above || !root.contains(above);
-  });
-  const atLoad = (root) => {
-    if (!root || root.closest(COPY_EXCLUDE)) return 0;
-    const hidden = outermostExcluded(root).map((e) => [e, e.style.getPropertyValue("display"), e.style.getPropertyPriority("display")]);
-    for (const [e] of hidden) e.style.setProperty("display", "none", "important");
-    const text = root.innerText;
-    for (const [e, value, priority] of hidden) {
-      if (value) e.style.setProperty("display", value, priority);
-      else e.style.removeProperty("display");
-    }
-    return wordsIn(text);
-  };
-  const allStates = (root) => {
-    if (!root || root.closest(COPY_EXCLUDE)) return 0;
-    let text = "";
-    const visit = (node) => {
-      for (const c of node.childNodes) {
-        if (c.nodeType === 3) text += c.textContent;
-        else if (c.nodeType === 1) {
-          if (c.matches(COPY_EXCLUDE) || c.matches("script, style, template, noscript")) {
-            text += " ";
-            continue;
-          }
-          const block = !INLINE.has(c.tagName);
-          if (block) text += " ";
-          visit(c);
-          if (block) text += " ";
-        }
-      }
-    };
-    visit(root);
-    return wordsIn(text);
-  };
-  // { load, all, bands: [{ i, id, load }] }: the page's counts and each band's share of the words at load.
-  R.copyWords = () => {
-    const main = document.querySelector("main");
-    const bands = (R.state?.items ?? []).map((it, i) => ({ i: i + 1, id: it.el.getAttribute("data-band") || it.el.id || it.el.tagName.toLowerCase(), load: atLoad(it.el) }));
-    return { load: atLoad(main), all: allStates(main), bands };
   };
 
   // Check 13: open each window's "Inspect panel data" and read it.
@@ -1214,13 +1428,29 @@ function pageLib() {
     }
     return false;
   };
+  // What a running infinite animation moves (bubble drift, glow drift, a marquee) drifts on its own: it
+  // is not sampled. Only an animation whose keyframes move its target counts (a transform, translate,
+  // rotate, scale, offset path, inset or margin); a loop of colour or opacity moves nothing.
+  const MOVES = /^(?:transform|translate|rotate|scale|offset[A-Z]|top|left|right|bottom|inset|margin)/;
+  const moves = (a) => {
+    try {
+      return a.effect.getKeyframes().some((k) => Object.keys(k).some((p) => MOVES.test(p)));
+    } catch {
+      return true;
+    }
+  };
   R.positions = () => {
     R.posEls = [];
     const pos = [];
+    const drifting = document
+      .getAnimations()
+      .filter((a) => a.playState === "running" && a.effect?.getTiming?.().iterations === Infinity && moves(a))
+      .map((a) => a.effect.target)
+      .filter(Boolean);
     for (const el of document.querySelectorAll("main *")) {
       const r = el.getBoundingClientRect();
       if (r.width < 40 || r.height < 40) continue;
-      if (awaitingReveal(el)) continue;
+      if (awaitingReveal(el) || drifting.some((t) => t.contains(el))) continue;
       let fixed = false;
       for (let e = el; e && e !== document.body; e = e.parentElement) {
         const p = getComputedStyle(e).position;
@@ -1246,21 +1476,7 @@ function pageLib() {
     return moved.slice(0, 5).map((m) => ({ where: where(m.el), sample: `${R.describe(m.el)} moved ${m.delta}px` }));
   };
 
-  // Checks 25 to 27: words and lines. A heading's words, without its aria-hidden parts.
-  const visibleText = (el) => {
-    const copy = el.cloneNode(true);
-    copy.querySelectorAll("[aria-hidden='true'], .sr-only").forEach((n) => n.remove());
-    return clean(copy.textContent);
-  };
-  R.headlines = () =>
-    [...document.querySelectorAll("main h1, main h2, main h3")]
-      .filter((h) => !h.closest("[data-ui]"))
-      .map((h) => {
-        const text = visibleText(h);
-        return { tag: h.tagName.toLowerCase(), text, words: text.split(/\s+/).filter(Boolean).length, where: where(h), sample: R.describe(h) };
-      });
-
-  // The rendered lines of an element, each with its words. Words are whitespace-separated runs of the
+  // Checks 8 and 26: the rendered lines of an element, each with its words. Words are whitespace-separated runs of the
   // element's text (a run that crosses an inline element, "pre-<em>launch</em>", stays one word while
   // it stays on one line); each word is placed by its Range rect, and rects are grouped into lines by
   // their vertical middle. Text in svg, .sr-only and aria-hidden parts is not counted.
@@ -1324,21 +1540,18 @@ function pageLib() {
     }
     return out;
   };
-  // Check 27: every p in <main> on 2 lines or fewer. Closed details are opened for the measurement
-  // and closed again. Exempt: [data-prose], forms, .letter, [data-ui], .sr-only, stat source lines.
-  R.paragraphLines = (max, scopeIndex = null) => {
-    const scope = scopeIndex === null ? document.querySelector("main") : R.state.items[scopeIndex]?.el;
+  // Check 8: centred p, li and h1-h3 that run over max lines. An li is measured only when it holds no
+  // block of text of its own (its p or heading is measured instead).
+  R.centredRuns = (max, scopeIndex = null) => {
+    const scope = scopeIndex === null ? document.body : R.state.items[scopeIndex]?.el;
     if (!scope) return [];
-    const closed = [...scope.querySelectorAll("details:not([open])")];
-    for (const d of closed) d.open = true;
     const out = [];
-    for (const p of scope.querySelectorAll("p")) {
-      if (!p.closest("main") || p.closest("[data-prose], form, .letter, [data-ui], .sr-only") || p.querySelector("a[target='_blank']")) continue;
-      if (p.getClientRects().length === 0 || !visibleText(p)) continue;
-      const n = lines(p).length;
-      if (n > max) out.push({ where: where(p), lines: n, sample: R.describe(p) });
+    for (const el of scope.querySelectorAll("p, li, h1, h2, h3")) {
+      if (!rendered(el) || el.closest("svg, .sr-only") || !/center/.test(getComputedStyle(el).textAlign)) continue;
+      if (el.tagName === "LI" && [...el.querySelectorAll("*")].some((k) => !/^(inline|contents)/.test(getComputedStyle(k).display) && clean(k.textContent))) continue;
+      const n = lines(el).length;
+      if (n > max) out.push({ where: where(el), tag: el.tagName.toLowerCase(), lines: n, sample: R.describe(el) });
     }
-    for (const d of closed) d.open = false;
     return out;
   };
 
@@ -1437,16 +1650,33 @@ function pageLib() {
     };
   };
 
-  R.menuButton = () => (R.state.burger && rendered(R.state.burger) ? R.state.burger.getAttribute("aria-label") || "menu" : null);
-  R.toggleMenu = () => {
-    if (!R.state.burger) return false;
-    R.state.burger.click();
+  // The header's menus: every rendered button in body > header that opens a panel (the three desktop
+  // panels from 1024, the phone menu's button below it), and inside an open panel each button that
+  // opens a list of its own (the phone menu's sections, which mount only when expanded).
+  R.menuButtons = () => {
+    const header = document.querySelector("body > header");
+    R.menuEls = header ? [...header.querySelectorAll("button[aria-controls][aria-expanded]")].filter(rendered) : [];
+    return R.menuEls.map((b) => labelOf(b) || b.getAttribute("aria-controls"));
+  };
+  const opens = (b) => {
+    if (!b || !b.isConnected) return false;
+    if (b.getAttribute("aria-expanded") !== "true") b.click();
     return true;
   };
-  R.menuState = () => {
-    const burger = R.state.burger;
-    R.state.menu = burger ? document.getElementById(burger.getAttribute("aria-controls")) : null;
-    return !!R.state.menu;
+  R.openMenu = (i) => opens(R.menuEls?.[i]);
+  // The panel button i opened, once it renders: the labels of its own section buttons.
+  R.menuPanel = (i) => {
+    const b = R.menuEls?.[i];
+    const panel = b && b.getAttribute("aria-expanded") === "true" ? document.getElementById(b.getAttribute("aria-controls")) : null;
+    if (!panel || !rendered(panel)) return null;
+    R.subEls = [...panel.querySelectorAll("button[aria-controls][aria-expanded]")].filter(rendered);
+    return R.subEls.map((s) => labelOf(s) || s.getAttribute("aria-controls"));
+  };
+  R.openSub = (j) => opens(R.subEls?.[j]);
+  R.subOpen = (j) => {
+    const b = R.subEls?.[j];
+    const list = b && b.getAttribute("aria-expanded") === "true" ? document.getElementById(b.getAttribute("aria-controls")) : null;
+    return !!list && rendered(list);
   };
 }
 
@@ -1494,14 +1724,23 @@ try {
 }
 
 const cfg = {
-  brand: content.brand ?? "Lienry Drones",
   retiredCaption: SPEC.retiredCaption,
   demoData: SPEC.demoData,
   windowNote: SPEC.windowNote,
   readoutsNote: SPEC.readoutsNote,
   appPanelLabel: SPEC.appPanelLabel,
   appNote: content.appNote ?? null,
-  eyebrow: SPEC.eyebrow,
+  tagline: content.tagline ?? null,
+  radii: SPEC.radii,
+  navH: SPEC.navH,
+  minText: SPEC.minText,
+  minHeading: SPEC.minHeading,
+  maxUppercase: SPEC.maxUppercase,
+  eyebrows: SPEC.eyebrows,
+  eyebrowWords: SPEC.eyebrowWords,
+  eyebrowGap: SPEC.eyebrowGap,
+  referenceText: SPEC.referenceText,
+  referenceBrand: SPEC.referenceBrand,
 };
 
 const call = (page, fn, arg) => page.evaluate(fn, arg);
@@ -1525,19 +1764,38 @@ async function settlePage(page, vh) {
   await R(page, "idle", 3000);
 }
 
+// Every page the checks open: the page library, the draw counter, then the --inject mutation. Its
+// requests to a reference site are kept for check 44 (refs).
 async function newPage(width, extra = {}) {
   const vp = VIEWPORTS[width] ?? { width, height: width < 800 ? 844 : 900, mobile: width < 800 };
   const context = await browser.newContext({ viewport: { width: vp.width, height: vp.height }, deviceScaleFactor: 1, isMobile: vp.mobile, hasTouch: vp.mobile, ...extra });
   await context.addInitScript(pageLib);
   await context.addInitScript(drawCounter);
+  if (opts.inject) await context.addInitScript({ content: opts.inject.content });
+  const refs = [];
+  context.on("request", (req) => {
+    let host = "";
+    try {
+      host = new URL(req.url()).hostname;
+    } catch {
+      return;
+    }
+    if (SPEC.referenceHost.test(host)) refs.push(`${req.resourceType()} ${req.url()}`);
+  });
   const page = await context.newPage();
-  return { context, page, vp };
+  return { context, page, vp, refs };
 }
+// Check 44: a pass's requests to a reference site, as failures.
+const judgeRefs = (refs, add) => {
+  for (const r of new Set(refs)) add(44, "page", "a request to a reference site (refresh.tech or legora.com)", r);
+};
 
+// The not-found route must answer 404 (its page is the site's own); every other route below 400.
 async function load(page, route) {
   try {
     const res = await page.goto(opts.base + route, { waitUntil: "networkidle", timeout: 60000 });
-    if (!res || res.status() >= 400) return `HTTP ${res ? res.status() : "no response"}`;
+    const status = res ? res.status() : null;
+    if (route === NOT_FOUND ? status !== 404 : !status || status >= 400) return `HTTP ${status ?? "no response"}${route === NOT_FOUND ? ", not 404" : ""}`;
   } catch (err) {
     return String(err.message).split("\n")[0];
   }
@@ -1655,74 +1913,16 @@ function judgeHead(route, head, add) {
   }
 }
 
-// Check 28's counter on one loaded route: after the network settles and the fonts are in, before any
-// scroll or interaction, so it counts what a visitor sees at load.
-async function countCopy(page) {
-  await call(page, () => document.fonts.ready.then(() => true));
-  await page.waitForTimeout(500);
-  await R(page, "discover");
-  return R(page, "copyWords");
-}
-
-// --write-baseline: record the counts per route and width, then stop. No other check runs.
-if (opts.writeBaseline) {
-  const routes = {};
-  console.log(`check:rules  ${opts.base}`);
-  console.log(`check 28 baseline: words in <main> at load and in all states, at ${opts.widths.join(" and ")}`);
-  let failed = 0;
-  for (const route of opts.routes) {
-    routes[route] = {};
-    for (const width of opts.widths) {
-      const { context, page } = await newPage(width);
-      const error = await load(page, route);
-      if (error) {
-        console.log(`  ${route} @${width}  FAIL could not load (${error})`);
-        failed++;
-      } else {
-        const c = await countCopy(page);
-        routes[route][width] = { load: c.load, all: c.all };
-        const top = [...c.bands].sort((a, b) => b.load - a.load).slice(0, 3).map((b) => `#${b.id} ${b.load}`).join(", ");
-        console.log(`  ${route.padEnd(20)} @${width}  ${String(c.load).padStart(4)} words at load, ${String(c.all).padStart(4)} in all states  (most: ${top})`);
-      }
-      await context.close();
-    }
-  }
-  await browser.close();
-  if (failed) fail(`${failed} route${failed === 1 ? "" : "s"} could not load; ${opts.writeBaseline} was not written.`);
-  let commit = null;
-  try {
-    commit = execSync("git rev-parse --short HEAD", { cwd: ROOT, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
-  } catch {
-    // Not a git checkout: the baseline is still valid without the commit.
-  }
-  const baseline = {
-    note: "Check 28's copy baseline: the words in <main> per route before the October 2026 design pass. The gate is words at load <= 0.667 x this count. Recorded with node scripts/check-rules.mjs <url> --write-baseline scripts/copy-baseline.json.",
-    counter: "main.innerText without the outermost [data-ui], [data-prose], form, .sr-only, [aria-hidden=true], [data-software-preview], [role=group][aria-label$='demo window'] and [role=group][aria-label$='demo data'], split on whitespace. 'all' walks textContent instead (closed answers and inactive tabs included) and is reported only.",
-    recorded: new Date().toISOString().slice(0, 10),
-    commit,
-    routes,
-  };
-  writeFileSync(path.resolve(opts.writeBaseline), `${JSON.stringify(baseline, null, 2)}\n`);
-  console.log(`Baseline written to ${opts.writeBaseline} (${Object.keys(routes).length} routes).`);
-  process.exit(0);
-}
-
 const report = { base: opts.base, when: new Date().toISOString(), runs: [], site: [] };
 const siteFailures = [];
-// Check 28's baseline: words at load per route and width before the pass.
-let copyBaseline = null;
-try {
-  copyBaseline = JSON.parse(readFileSync(opts.baseline, "utf8")).routes;
-} catch (err) {
-  copyBaseline = null;
-  siteFailures.push({ check: 28, kind: "the copy baseline could not be read", sample: `${path.relative(ROOT, opts.baseline)}: ${String(err.message).split("\n")[0]}` });
-}
 // Routes that hold a calculator or hover clips get their own passes (checks 33 and 41) after the rest.
 const calcRoutes = new Set();
 const clipRoutes = new Set();
 let totalWarnings = 0;
 const idsSeen = new Set();
 const scripts = new Set();
+// Check 44: the stylesheets the pages loaded (scanned for the reference names with the HTML and JS).
+const styles = new Set();
 const fontsLoaded = new Map();
 const stepsByWidth = new Map();
 const pending = [];
@@ -1732,8 +1932,9 @@ let totalFailures = 0;
 const byCheck = {};
 
 console.log(`check:rules  ${opts.base}`);
-console.log(`Checks 5-14, 21-29, 31b, 33 and 41 at ${opts.widths.join(" and ")}${opts.sweep ? ", sweeping tabs, stage parts and story beats" : ""}${opts.motion ? ", with the motion passes" : ""}`);
+console.log(`Checks 5-14, 21-24, 26, 29, 33, 41 and 44 at ${opts.widths.join(" and ")}${opts.sweep ? ", sweeping tabs, stage parts and story beats" : ""}${opts.motion ? ", with the motion passes" : ""}`);
 if (content.error) console.log(`  note: ${content.error}; the checks that compare against content report it.`);
+if (opts.inject) console.log(`  note: injecting ${path.relative(process.cwd(), opts.inject.file) || opts.inject.file} on every page`);
 for (const e of content.loadErrors ?? []) console.log(`  note: could not load ${e}`);
 
 for (const route of opts.routes) {
@@ -1750,11 +1951,12 @@ for (const route of opts.routes) {
       timings.push(`${label} ${((Date.now() - lap) / 1000).toFixed(1)}s`);
       lap = Date.now();
     };
-    const { context, page, vp } = await newPage(width);
+    const { context, page, vp, refs } = await newPage(width);
     page.on("response", (res) => {
       const url = res.url();
       const type = res.request().resourceType();
       if (type === "script" && url.startsWith(opts.base)) scripts.add(url);
+      if (type === "stylesheet" && url.startsWith(opts.base)) styles.add(url);
       if (type === "font" || /\.(woff2?|ttf|otf)(\?|$)/.test(url)) {
         pending.push(
           res
@@ -1772,19 +1974,6 @@ for (const route of opts.routes) {
       await context.close();
       continue;
     }
-
-    // Check 28: the words at load, before any scroll or interaction, against the route's baseline.
-    const copy = await countCopy(page);
-    const base28 = copyBaseline?.[route]?.[width]?.load;
-    if (copyBaseline && typeof base28 === "number") {
-      const budget = Math.floor(base28 * SPEC.copyRatio);
-      const margin = budget - copy.load;
-      if (copy.load > budget) {
-        const top = [...copy.bands].sort((a, b) => b.load - a.load).slice(0, 3).map((b) => `#${b.id} ${b.load}`).join(", ");
-        add(28, "page", `${copy.load} words at load, over the budget of ${budget} (${SPEC.copyRatio} x the baseline ${base28})`, `${-margin} over; most words in ${top}`);
-      }
-      notes.push(`copy: ${copy.load} words at load against a budget of ${budget} (baseline ${base28}), margin ${margin}; ${copy.all} in all states`);
-    } else notes.push(`copy: ${copy.load} words at load, ${copy.all} in all states (no baseline for ${route} at ${width})`);
 
     // Check 21, count-ups: read each figure the moment it first comes into view, then again later.
     if (opts.motion) {
@@ -1822,25 +2011,24 @@ for (const route of opts.routes) {
     judgeItalics(pageRes.italics, add);
     judgeClaims(pageRes.texts, pageRes.numerals, add);
     judgeLinks(pageRes.links, add);
-    if (content.error) add(22, "page", "titles not checked", content.error);
-    else if (!content.titles) add(22, "page", "titles not checked", "content path missing: site.pageTitle");
-    else if (!content.titles[route]) add(22, "page", "no tab title for this route in pageTitles (src/lib/site.ts)", "");
-    else if (pageRes.title !== content.titles[route]) add(22, "page", `<title> is "${pageRes.title}", not "${content.titles[route]}"`, "");
-    judgeHead(route, pageRes.head, add);
-    titlesSeen.set(route, pageRes.title);
-    descriptionsSeen.set(route, pageRes.head.description[0]);
-
-    // Check 25: headline length.
-    for (const h of await R(page, "headlines")) {
-      if (h.words <= SPEC.maxHeadlineWords) continue;
-      if (h.tag === "h3") warn(25, h.where, `an h3 of ${h.words} words (over ${SPEC.maxHeadlineWords})`, `"${h.text}"`);
-      else add(25, h.where, `an ${h.tag} of ${h.words} words, over ${SPEC.maxHeadlineWords}`, `"${h.text}"`);
+    // Check 22 is about the site's own routes: the 404 page has no entry in pageTitles and no address.
+    if (route === NOT_FOUND) notes.push(`HTTP 404: check 22 (titles and links) does not apply to the not-found page`);
+    else {
+      if (content.error) add(22, "page", "titles not checked", content.error);
+      else if (!content.titles) add(22, "page", "titles not checked", "content path missing: site.pageTitle");
+      else if (!content.titles[route]) add(22, "page", "no tab title for this route in pageTitles (src/lib/site.ts)", "");
+      else if (pageRes.title !== content.titles[route]) add(22, "page", `<title> is "${pageRes.title}", not "${content.titles[route]}"`, "");
+      judgeHead(route, pageRes.head, add);
+      titlesSeen.set(route, pageRes.title);
+      descriptionsSeen.set(route, pageRes.head.description[0]);
     }
-    // Check 26: orphans; failures at 1440 and 390, warnings at the widths between.
-    const orphanGate = width === 1440 || width === 390 ? add : warn;
-    for (const o of await R(page, "orphans")) orphanGate(26, o.where, `the last of ${o.lines} lines holds one word ("${o.word}")`, o.sample);
-    // Check 27: paragraph lines, at 1440.
-    if (width === 1440) for (const o of await R(page, "paragraphLines", SPEC.maxParagraphLines)) add(27, o.where, `a paragraph of ${o.lines} lines (at most ${SPEC.maxParagraphLines} at 1440)`, o.sample);
+
+    // Checks 8 (centred runs) and 26 (orphans): failures at 1440 and 390, warnings at the widths between.
+    const lineGate = width === 1440 || width === 390 ? add : warn;
+    const maxCentred = width < 768 ? SPEC.maxCentredLines.phone : SPEC.maxCentredLines.wide;
+    const centredKind = (o) => `a centred ${o.tag} of ${o.lines} lines (at most ${maxCentred})`;
+    for (const o of await R(page, "centredRuns", maxCentred)) lineGate(8, o.where, centredKind(o), o.sample);
+    for (const o of await R(page, "orphans")) lineGate(26, o.where, `the last of ${o.lines} lines holds one word ("${o.word}")`, o.sample);
     // Checks 33 and 41 run in their own passes on the routes that have a calculator or hover clips.
     if (await call(page, () => !!document.querySelector("[data-calculator]"))) calcRoutes.add(route);
     if (await call(page, () => !!document.querySelector("[data-hover-clip]"))) clipRoutes.add(route);
@@ -1882,16 +2070,16 @@ for (const route of opts.routes) {
             baseline.add(key);
             failures.push({ ...v, where: String(v.where), sample: `with ${state}: ${v.sample}` });
           }
-          // Lines in the newly shown panel (checks 26 and 27).
+          // Lines in the newly shown panel (checks 8 and 26).
           const lineViolations = [
-            ...(await R(page, "orphans", g.block)).map((o) => ({ check: 26, where: String(o.where), kind: `the last of ${o.lines} lines holds one word ("${o.word}")`, sample: o.sample, gate: orphanGate })),
-            ...(width === 1440 ? (await R(page, "paragraphLines", SPEC.maxParagraphLines, g.block)).map((o) => ({ check: 27, where: String(o.where), kind: `a paragraph of ${o.lines} lines (at most ${SPEC.maxParagraphLines} at 1440)`, sample: o.sample, gate: add })) : []),
+            ...(await R(page, "centredRuns", maxCentred, g.block)).map((o) => ({ check: 8, where: String(o.where), kind: centredKind(o), sample: o.sample })),
+            ...(await R(page, "orphans", g.block)).map((o) => ({ check: 26, where: String(o.where), kind: `the last of ${o.lines} lines holds one word ("${o.word}")`, sample: o.sample })),
           ];
           for (const v of lineViolations) {
             const key = `${v.check}|${v.where}|${v.kind}|${v.sample}`;
             if (baseline.has(key)) continue;
             baseline.add(key);
-            v.gate(v.check, v.where, v.kind, `with ${state}: ${v.sample}`);
+            lineGate(v.check, v.where, v.kind, `with ${state}: ${v.sample}`);
           }
           dupes(await R(page, "mediaFrames"), state);
           for (const id of await R(page, "mediaInDom")) idsSeen.add(id);
@@ -1902,27 +2090,46 @@ for (const route of opts.routes) {
       }
     }
 
-    // The phone menu: its links may use the serif; everything else holds; its enquiry links too.
-    if (await R(page, "menuButton")) {
-      await R(page, "toggleMenu");
-      await page.waitForTimeout(500);
-      if (await R(page, "menuState")) {
-        for (const v of await R(page, "elementAudit", "body > header")) {
-          const key = `${v.check}|header|${v.kind}|${v.sample}`;
-          if (baseline.has(key)) continue;
-          baseline.add(key);
-          failures.push({ ...v, where: "header", sample: `with the menu open: ${v.sample}` });
-        }
-        judgeLinks(await R(page, "enquiryLinks", "body > header"), (c, w, k, s) => {
-          const key = `${c}|${w}|${k}|${s}`;
-          if (baseline.has(key)) return;
-          baseline.add(key);
-          add(c, w, k, `with the menu open: ${s}`);
-        });
-        await page.keyboard.press("Escape");
-        await page.waitForTimeout(300);
+    // The menus: every panel the header opens (the three desktop panels, the phone menu and each of its
+    // sections in turn) is audited open: every element rule, its enquiry links (check 24) and its words
+    // (check 44). A state only adds what the default state did not already report.
+    const menuAudit = async (state) => {
+      for (const v of [...(await R(page, "elementAudit", "body > header")), ...(await R(page, "references", "body > header"))]) {
+        const key = `${v.check}|header|${v.kind}|${v.sample}`;
+        if (baseline.has(key)) continue;
+        baseline.add(key);
+        failures.push({ ...v, where: "header", sample: `with ${state}: ${v.sample}` });
       }
+      judgeLinks(await R(page, "enquiryLinks", "body > header"), (c, w, k, s) => {
+        const key = `${c}|${w}|${k}|${s}`;
+        if (baseline.has(key)) return;
+        baseline.add(key);
+        add(c, w, k, `with ${state}: ${s}`);
+      });
+    };
+    const menus = await R(page, "menuButtons");
+    const audited = [];
+    for (let i = 0; i < menus.length; i++) {
+      await R(page, "openMenu", i);
+      await page.waitForTimeout(500);
+      const sections = await R(page, "menuPanel", i);
+      if (!sections) {
+        notes.push(`menu "${menus[i]}": its panel did not render when opened, so it was not audited`);
+        continue;
+      }
+      const state = `the "${menus[i]}" panel open`;
+      await menuAudit(state);
+      for (let j = 0; j < sections.length; j++) {
+        await R(page, "openSub", j);
+        await page.waitForTimeout(350);
+        if (await R(page, "subOpen", j)) await menuAudit(`${state} and "${sections[j]}" expanded`);
+        else notes.push(`menu "${menus[i]}": its section "${sections[j]}" did not render when expanded, so it was not audited`);
+      }
+      audited.push(`"${menus[i]}"${sections.length ? ` (${sections.length} sections)` : ""}`);
+      await page.keyboard.press("Escape");
+      await page.waitForTimeout(400);
     }
+    if (audited.length) notes.push(`menus audited open: ${audited.join(", ")}`);
 
     // Check 13: the panel data behind "Inspect panel data" (loaded when the details open).
     mark("sweeps and menu");
@@ -2032,6 +2239,7 @@ for (const route of opts.routes) {
     }
     await Promise.all(pending);
     await context.close();
+    judgeRefs(refs, add);
 
     // Reduced motion: no video plays, nothing reveals, crossfades or snaps smoothly, the window records.
     if (opts.motion) {
@@ -2072,6 +2280,7 @@ for (const route of opts.routes) {
         }
       }
       await reduced.context.close();
+      judgeRefs(reduced.refs, add);
       mark("reduced motion");
     }
 
@@ -2154,7 +2363,7 @@ async function calcPass(route, width) {
   const failures = [];
   const notes = [];
   const add = (kind, sample = "") => failures.push({ check: 33, kind, sample });
-  const { context, page } = await newPage(width);
+  const { context, page, refs } = await newPage(width);
   try {
     const err = await load(page, route);
     if (err) return add("could not load the route for the calculator pass", err);
@@ -2248,6 +2457,7 @@ async function calcPass(route, width) {
     notes.push(`checked the worked figures, the 3% case and the maximum; ${requests.length} request${requests.length === 1 ? "" : "s"} while typing`);
   } finally {
     await context.close();
+    judgeRefs(refs, (check, where, kind, sample) => failures.push({ check, kind, sample }));
     printPass(`${route} calculator @${width}`, failures, notes);
   }
 }
@@ -2259,10 +2469,13 @@ async function clipPass(route) {
   const notes = [];
   const add = (kind, sample = "") => failures.push({ check: 41, kind, sample });
   const films = new Set();
+  // Each page's requests to a reference site (check 44).
+  const refs = [];
   try {
     // Desktop, fine pointer.
     {
-      const { context, page, vp } = await newPage(1440);
+      const { context, page, vp, refs: seen } = await newPage(1440);
+      refs.push(seen);
       const loadFilms = [];
       let phase = "load";
       page.on("request", (req) => {
@@ -2337,7 +2550,8 @@ async function clipPass(route) {
     }
     // Touch at 390, and reduced motion at 1440: no clip video, no clip request, the still shown.
     for (const [label, width, extra] of [["at 390 with touch", 390, {}], ["under reduced motion", 1440, { reducedMotion: "reduce" }]]) {
-      const { context, page } = await newPage(width, extra);
+      const { context, page, refs: seen } = await newPage(width, extra);
+      refs.push(seen);
       const asked = [];
       page.on("request", (req) => {
         const id = filmOf(req.url());
@@ -2365,6 +2579,7 @@ async function clipPass(route) {
       await context.close();
     }
   } finally {
+    judgeRefs(refs.flat(), (check, where, kind, sample) => failures.push({ check, kind, sample }));
     printPass(`${route} hover clips`, failures, notes);
   }
 }
@@ -2416,9 +2631,16 @@ for (const [where, text] of texts) {
     pathsSeen.set(file, where);
   }
 }
-if (opts.routes.length === ROUTES.length) {
+if (ROUTES.every((r) => r === NOT_FOUND || opts.routes.includes(r))) {
   const missing = [...manifestIds].filter((id) => !idsSeen.has(id));
-  for (const id of missing) siteAdd(14, "a manifest id that appears nowhere on the site", id);
+  for (const id of missing) {
+    if (SPEC.unplaced[id]) console.log(`  note  14: ${id} is kept but not shown (${SPEC.unplaced[id]})`);
+    else siteAdd(14, "a manifest id that appears nowhere on the site", id);
+  }
+  for (const id of Object.keys(SPEC.unplaced)) {
+    if (!manifestIds.has(id)) siteAdd(14, "SPEC.unplaced names an id that is not in the manifest", id);
+    else if (idsSeen.has(id)) siteAdd(14, "an id SPEC.unplaced calls unplaced shows on the site: remove it from the list", id);
+  }
 } else console.log("  note  all 29 manifest ids are checked only when every route runs");
 
 // Check 14: public/media holds only what media:fetch writes; nothing added to public/video or media-src.
@@ -2451,7 +2673,7 @@ for (const [seen, what] of [[titlesSeen, "a tab title"], [descriptionsSeen, "a d
   for (const [text, routes] of byText) if (routes.length > 1) siteAdd(22, `two routes share ${what}`, `"${text}" on ${routes.join(", ")}`);
 }
 
-// Check 6: every font file loaded is one of the three in src/fonts, byte for byte.
+// Check 6: every font file loaded is one of src/fonts, byte for byte, from the site's own origin.
 if (!fontsLoaded.size) siteAdd(6, "no font files were loaded", "");
 for (const [url, hash] of fontsLoaded) {
   if (!url.startsWith(opts.base)) siteAdd(6, "a font loaded from another origin", url);
@@ -2459,39 +2681,8 @@ for (const [url, hash] of fontsLoaded) {
 }
 const usedFonts = new Set([...fontsLoaded.values()].map((h) => fontHashes.get(h)).filter(Boolean));
 
-// Check 31b: a spacing utility's value. Multipliers on the 8px scale, 1/2, full and auto for position
-// and inset, auto for margins (centring and pushing, not spacing: check 31a skips them too), scale rems,
-// or the layout variables, alone or inside calc() and max().
-const LINT = SPEC.lint;
-const SPACING_UTILITY = /^(-?)(m[trblxyse]?|p[trblxyse]?|gap(?:-[xy])?|space-[xy]|inset(?:-[xy])?|top|right|bottom|left|scroll-[mp][trblxy]?)-(.+)$/;
-const POSITIONAL = /^(inset(?:-[xy])?|top|right|bottom|left)$/;
-const lintUtility = (token) => {
-  const m = baseUtilityNode(token).match(SPACING_UTILITY);
-  if (!m) return null;
-  const [, , kind, value] = m;
-  if (LINT.multipliers.includes(value)) return null;
-  if (POSITIONAL.test(kind) && LINT.positional.includes(value)) return null;
-  if (/^m[trblxyse]?$/.test(kind) && value === "auto") return null;
-  const shorthand = value.match(/^\((--[a-z-]+)\)$/);
-  if (shorthand) return LINT.vars.includes(shorthand[1]) ? null : `the variable ${shorthand[1]} is not a layout variable`;
-  const arbitrary = value.match(/^\[(.+)\]$/);
-  if (!arbitrary) return `${value} is not a multiplier on the 8px scale`;
-  const css = arbitrary[1].replace(/_/g, " ");
-  const remOk = (v) => LINT.rems.map((r) => `${r}rem`).includes(v) || v === "0";
-  if (remOk(css)) return null;
-  const varOk = (v) => {
-    const vm = v.match(/^var\((--[a-z-]+)\)$/);
-    return !!vm && LINT.vars.includes(vm[1]);
-  };
-  if (varOk(css)) return null;
-  if (/^(calc|max)\(/.test(css)) {
-    const parts = css.replace(/var\((--[a-z-]+)\)/g, (all, v) => (LINT.vars.includes(v) ? " V " : " X ")).split(/[\s()+*\/,-]+|calc|max/).filter(Boolean);
-    const bad = parts.filter((t) => t !== "V" && !remOk(t));
-    return bad.length ? `${css} uses ${bad.map((b) => (b === "X" ? "a variable outside the layout set" : b)).join(", ")}` : null;
-  }
-  return `${css} is not a scale rem or a layout variable`;
-};
-// The utility without its variants (md:, group-hover:, [&>li]:) and its important flag.
+// Check 5 in source: every rounded-* utility in src is one of CLAUDE.md's (its variants and important
+// flag aside). A rounded="..." prop is not a utility.
 const baseUtilityNode = (token) => {
   let depth = 0;
   let cut = -1;
@@ -2502,55 +2693,70 @@ const baseUtilityNode = (token) => {
   }
   return token.slice(cut + 1).replace(/^!/, "").replace(/!$/, "");
 };
-const lintSkipped = (rel) => LINT.skipFiles.includes(rel) || LINT.skipDirs.some((d) => rel.startsWith(d));
-let lintFiles = 0;
-let lintTokens = 0;
-
-// Checks 5 and 7 in source (rounded-(?!hard) and text-[ in src), and check 31b's spacing lint.
-const walk = (dir) => readdirSync(dir).flatMap((f) => (statSync(path.join(dir, f)).isDirectory() ? walk(path.join(dir, f)) : [path.join(dir, f)]));
-for (const file of walk(path.join(ROOT, "src"))) {
+// Check 44 in source: the reference sites' names in any text file, any case, and the ReFresh spelling.
+const referenceName = new RegExp(SPEC.referenceText, "i");
+const referenceBrand = new RegExp(SPEC.referenceBrand);
+const namesReference = (text) => text.match(referenceName) || text.match(referenceBrand);
+// public/media is generated by media:fetch (gitignored): not the repository's own files.
+const generated = path.join(ROOT, "public/media");
+const walk = (dir) => readdirSync(dir).flatMap((f) => {
+  const file = path.join(dir, f);
+  if (file === generated) return [];
+  return statSync(file).isDirectory() ? walk(file) : [file];
+});
+let roundedTokens = 0;
+let scanned = 0;
+const sourceFiles = [...walk(path.join(ROOT, "src")), ...(existsSync(path.join(ROOT, "public")) ? walk(path.join(ROOT, "public")) : [])];
+for (const file of sourceFiles) {
   const buf = readFileSync(file);
   if (buf.includes(0)) continue;
+  scanned++;
   const relFile = path.relative(ROOT, file).split(path.sep).join("/");
-  const lintThis = /\.(tsx?|jsx?|css|mjs)$/.test(file) && !lintSkipped(relFile);
-  if (lintThis) lintFiles++;
+  const inSrc = relFile.startsWith("src/");
   buf
     .toString("utf8")
     .split("\n")
     .forEach((line, i) => {
       const rel = `${relFile}:${i + 1}`;
-      if (/rounded-(?!hard)/.test(line)) siteAdd(5, "rounded-(?!hard) in src", `${rel} ${line.trim().slice(0, 90)}`);
-      if (line.includes("text-[")) siteAdd(7, "text-[ in src", `${rel} ${line.trim().slice(0, 90)}`);
-      // 31b: class tokens on the line, outside comments and the frozen header's lines.
-      const trimmed = line.trim();
-      if (!lintThis || line.includes("frozen-header") || /^(\/\/|\/\*|\*|\{\/\*)/.test(trimmed)) return;
-      for (const token of line.split(/[\s"'`{}]+/)) {
-        if (!token || !/[a-z]-/.test(token)) continue;
-        const why = lintUtility(token);
-        if (why === null) {
-          if (SPACING_UTILITY.test(baseUtilityNode(token))) lintTokens++;
-          continue;
-        }
-        lintTokens++;
-        siteAdd("31b", "a spacing utility off the 8px scale", `${rel} ${token} (${why})`);
+      if (namesReference(line)) siteAdd(44, "a file names a reference site (refresh.tech, Legora or ReFresh)", `${rel} ${line.trim().slice(0, 100)}`);
+      if (!inSrc) return;
+      for (const token of line.split(/[\s"'`{},;]+/)) {
+        const base = baseUtilityNode(token);
+        if (!base.startsWith("rounded-")) continue;
+        roundedTokens++;
+        if (!SPEC.rounded.test(base)) siteAdd(5, "a rounded-* utility outside rounded-(none|hard|card|panel|pill|full) and the image radii", `${rel} ${token}`);
       }
     });
 }
-console.log(`  note  31b: ${lintTokens} spacing utilities in ${lintFiles} files linted (skipped: ${[...LINT.skipFiles, ...LINT.skipDirs.map((d) => `${d}**`)].join(", ")}, and lines marked frozen-header)`);
+console.log(`  note  5: ${roundedTokens} rounded-* utilities in src; 44: ${scanned} text files in src and public (but public/media) scanned`);
 
-// Content paths the checks needed and could not find: each fails only its own check.
-for (const name of content.missing ?? []) {
-  const check = NEEDS.find(([re]) => re.test(name))?.[1];
-  if (check) siteAdd(check, "content path missing", name);
-  else console.log(`  note  content path missing (no check needs it to pass): ${name}`);
+// Check 44: the served HTML, JS and CSS name no reference site.
+const served = new Map(texts);
+for (const url of styles) {
+  try {
+    served.set(url.replace(opts.base, ""), await (await fetch(url)).text());
+  } catch {
+    // A stylesheet that cannot be fetched again has no text to scan.
+  }
+}
+for (const [where, text] of served) {
+  const named = namesReference(text);
+  if (named) siteAdd(44, "served HTML, JS or CSS names a reference site (refresh.tech, Legora or ReFresh)", `${where}: "…${text.slice(Math.max(0, named.index - 40), named.index + 50).replace(/\s+/g, " ")}…"`);
 }
 
-// Check 7: the scale's tokens compute to the spec's steps at 1440 and 390.
+// Content paths the checks needed and could not find: each fails only the checks that need it.
+for (const name of content.missing ?? []) {
+  const checks = NEEDS.filter(([re]) => re.test(name)).map(([, check]) => check);
+  for (const check of checks) siteAdd(check, "content path missing", name);
+  if (!checks.length) console.log(`  note  content path missing (no check needs it to pass): ${name}`);
+}
+
+// Check 7: the size tokens compute to CLAUDE.md's sizes at 1440 and 390.
 for (const [width, steps] of stepsByWidth) {
   const want = SPEC.steps[width];
   if (!want) continue;
   for (const [step, px] of Object.entries(want)) {
-    if (Math.abs((steps[step] ?? 0) - px) > 0.1) siteAdd(7, `the ${step} step computes to ${steps[step]}px at ${width}, not the spec's ${px}px`);
+    if (Math.abs((steps[step] ?? 0) - px) > 0.1) siteAdd(7, `--text-${step} computes to ${steps[step]}px at ${width}, not CLAUDE.md's ${px}px`);
   }
 }
 
@@ -2562,8 +2768,8 @@ for (const f of siteFailures) {
 }
 for (const g of [...siteGroups.values()].sort((a, b) => parseInt(a.check, 10) - parseInt(b.check, 10))) {
   const n = g.samples.filter(Boolean).length;
-  // The source lint lists more of its findings: each one is a line to change.
-  const show = g.check === "31b" ? 12 : 4;
+  // The source scans list more of their findings: each one is a line to change.
+  const show = g.check === 5 || g.check === 44 ? 8 : 4;
   console.log(`       FAIL [${g.check}] ${g.kind}${n > 1 ? ` (${n}x)` : ""}${n ? `: ${g.samples.slice(0, show).join("; ")}` : ""}${n > show ? `; ${n - show} more${opts.json ? " (all in the JSON report)" : " (pass --json for all)"}` : ""}`);
   byCheck[g.check] = (byCheck[g.check] ?? 0) + 1;
   totalFailures++;
@@ -2576,7 +2782,9 @@ console.log("");
 console.log(`Summary: ${totalFailures ? `${totalFailures} failure${totalFailures === 1 ? "" : "s"}` : "every check passes"}${totalWarnings ? `, ${totalWarnings} warning${totalWarnings === 1 ? "" : "s"}` : ""} across ${opts.routes.length} route${opts.routes.length === 1 ? "" : "s"} at ${opts.widths.join(" and ")}.`);
 for (const [check, name] of Object.entries(CHECKS).sort(([a], [b]) => parseInt(a, 10) - parseInt(b, 10))) {
   if (!opts.motion && MOTION_CHECKS.has(check)) {
-    console.log(`  [${check}] ${name}: skipped (--no-motion)`);
+    // Check 21's sticky and fixed rules are part of the page audit, so they run without the passes.
+    const partial = check === "21" ? `${byCheck[check] ? `${byCheck[check]} failing` : "pass"} on sticky and fixed elements; the motion passes ` : "";
+    console.log(`  [${check}] ${name}: ${partial}skipped (--no-motion)`);
     continue;
   }
   const ran = check === "33" ? (calcRoutes.size ? "" : " (no route has a calculator)") : check === "41" ? (clipRoutes.size ? "" : " (no route has hover clips)") : "";
