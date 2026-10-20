@@ -66,44 +66,120 @@ export function pageMetadata(route: Route, description: string): Metadata {
 }
 
 /** One entry in a header menu: a title and a one-line description. */
-export type MenuLink = { href: string; label: string; note: string };
+/** One link in a header panel: its icon (src/components/blocks/Icon.tsx), title and one-line note. */
+export type MenuLink = { href: string; label: string; note: string; icon: string };
+
+/** A column of a header panel: a heading, the tile tone for its icons, and its links (in 1 or 2 columns). */
+export type MenuGroup = { heading: string; tone: "teal" | "sand" | "green"; cols?: 1 | 2; muted?: boolean; links: readonly MenuLink[] };
+
+/** The dark card that opens the Resources panel: an eyebrow, a title, three links with tags, and a pill. */
+export type MenuFeature = { eyebrow: string; title: string; items: readonly { href: string; tag: string; label: string }[]; action: { href: string; label: string } };
 
 /**
- * The header's menus. Platform, Solutions and Resources open panels; About is a plain link. Every
- * enquiry label is the one label that route has everywhere.
+ * The header's menus. Platform, Solutions and Resources open wide panels of grouped links; About is a
+ * plain link. Every enquiry label is the one label that route has everywhere.
  */
-export const menus = [
+export const menus: readonly { id: string; label: string; groups: readonly MenuGroup[]; feature?: MenuFeature }[] = [
   {
     id: "platform",
     label: "Platform",
-    links: [
-      { href: "/platform", label: "Platform overview", note: "One drone platform, six parts." },
-      { href: "/platform#dock", label: "Dock", note: "A roof capsule or a ground pod." },
-      { href: "/platform#tether", label: "Tether", note: "Water and power, always connected." },
-      { href: "/platform#scan", label: "Scan", note: "The building mapped before any clean." },
-      { href: "/platform#software", label: "Software", note: "A 3D model, live progress, debris shading." },
-      { href: "/download", label: "Lienry Desktop", note: "The desktop software for Mac and Windows." },
+    groups: [
+      {
+        heading: "Hardware",
+        tone: "teal",
+        links: [
+          { href: "/platform#dock", label: "Dock", note: "A weatherproof roof capsule or a waterproof ground pod.", icon: "dock" },
+          { href: "/platform#tether", label: "Tether", note: "Water and power through one line, for the whole clean.", icon: "tether" },
+          { href: "/platform#drone", label: "Drone", note: "Short, planned routes across five kinds of surface.", icon: "drone" },
+        ],
+      },
+      {
+        heading: "Intelligence",
+        tone: "sand",
+        links: [
+          { href: "/platform#scan", label: "Scan", note: "The structure and dimensions, mapped before any clean.", icon: "scan" },
+          { href: "/platform#software", label: "Software", note: "A 3D model, live wash progress and debris shading.", icon: "layers" },
+          { href: "/platform#automation", label: "Automation", note: "Start a clean from anywhere, or let the re-scan decide.", icon: "repeat" },
+        ],
+      },
+      {
+        heading: "Get started",
+        tone: "green",
+        links: [
+          { href: "/platform", label: "Platform overview", note: "How the six parts work as one.", icon: "grid" },
+          { href: "/download", label: "Lienry Desktop", note: "The desktop software for Mac and Windows.", icon: "download" },
+          { href: "/fit-check", label: "Fit check", note: "Seven questions on whether your building suits it.", icon: "check" },
+        ],
+      },
     ],
   },
   {
     id: "solutions",
     label: "Solutions",
-    links: [
-      { href: "/commercial", label: "Commercial buildings", note: "A roof capsule for buildings under 70 metres." },
-      { href: "/homes-and-rentals", label: "Homes and rentals", note: "A ground pod, started from your phone." },
-      { href: "/solar", label: "Solar", note: "Panels at the right pressure, on your interval." },
+    groups: [
+      {
+        heading: "By property",
+        tone: "teal",
+        cols: 2,
+        muted: true,
+        links: [
+          { href: "/commercial", label: "Office buildings", note: "Glass and render under 70 metres", icon: "building" },
+          { href: "/commercial", label: "Apartment blocks", note: "Facades and balcony glass", icon: "apartments" },
+          { href: "/homes-and-rentals", label: "Homes", note: "Windows, walls, roofing, driveways", icon: "home" },
+          { href: "/homes-and-rentals", label: "Rental properties", note: "Cleaned between tenants, from anywhere", icon: "key" },
+          { href: "/solar", label: "Solar", note: "Rooftop arrays and solar farm rows", icon: "sun" },
+        ],
+      },
+      {
+        heading: "By role",
+        tone: "green",
+        cols: 2,
+        muted: true,
+        links: [
+          { href: "/commercial", label: "Facility managers", note: "One system for the whole building", icon: "person" },
+          { href: "/commercial", label: "Strata and owners", note: "Nobody at height on your facade", icon: "shield" },
+          { href: "/homes-and-rentals", label: "Homeowners", note: "Started from the app", icon: "phone" },
+          { href: "/company", label: "Investors", note: "We are raising a pre-seed round", icon: "chart" },
+        ],
+      },
     ],
   },
   {
     id: "resources",
     label: "Resources",
-    links: [
-      { href: "/fit-check", label: "Fit check", note: "Seven questions: is your building a fit?" },
-      { href: "/calculator", label: "Cost calculator", note: "What outsourced cleaning adds up to." },
-      { href: "/platform#faq", label: "Questions", note: "Straight answers, including what is undecided." },
+    feature: {
+      eyebrow: "Inside Lienry",
+      title: "Where the platform is up to",
+      items: [
+        { href: "/company", tag: "Company", label: "Concept stage, raising pre-seed, with a pilot next" },
+        { href: "/platform", tag: "Platform", label: "Six parts that work as one, on a roof or beside a house" },
+        { href: "/download", tag: "Software", label: "Lienry Desktop, for Mac and Windows" },
+      ],
+      action: { href: "/company", label: "About Lienry" },
+    },
+    groups: [
+      {
+        heading: "Tools",
+        tone: "teal",
+        muted: true,
+        links: [
+          { href: "/fit-check", label: "Fit check", note: "Seven questions from the design brief, scored as you go.", icon: "check" },
+          { href: "/calculator", label: "Cost calculator", note: "What outsourced cleaning adds up to over 5 and 10 years.", icon: "calculator" },
+        ],
+      },
+      {
+        heading: "Learn",
+        tone: "sand",
+        muted: true,
+        links: [
+          { href: "/platform#faq", label: "Questions", note: "Straight answers, including what is undecided.", icon: "question" },
+          { href: "/#how", label: "How a clean works", note: "Scan, plan, clean, check and report.", icon: "repeat" },
+          { href: "/#safety", label: "Safety by design", note: "The tether, camera, checks and dock.", icon: "shield" },
+        ],
+      },
     ],
   },
-] as const satisfies readonly { id: string; label: string; links: readonly MenuLink[] }[];
+];
 
 /** The header's plain link after the menus. */
 export const navAbout = { href: "/company", label: "About" } as const;

@@ -14,6 +14,18 @@ const paths: Record<string, string> = {
   pin: "M12 21s7-6 7-11a7 7 0 1 0-14 0c0 5 7 11 7 11Zm0-8.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z",
   water: "M12 3s6 6.5 6 11a6 6 0 1 1-12 0c0-4.5 6-11 6-11Z",
   sun: "M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0-13v2m0 14v2M3 12h2m14 0h2M5.6 5.6 7 7m10 10 1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4",
+  drone: "M4 7h4M16 7h4M6 7v2m12-2v2M9 11h6l1 3H8l1-3Zm3 3v3",
+  scan: "M4 8V5a1 1 0 0 1 1-1h3m8 0h3a1 1 0 0 1 1 1v3m0 8v3a1 1 0 0 1-1 1h-3m-8 0H5a1 1 0 0 1-1-1v-3m3-4h10",
+  layers: "m12 4 8 4-8 4-8-4 8-4Zm-8 8 8 4 8-4M4 16l8 4 8-4",
+  grid: "M4 4h7v7H4V4Zm9 0h7v7h-7V4ZM4 13h7v7H4v-7Zm9 0h7v7h-7v-7Z",
+  download: "M12 4v11m0 0-4-4m4 4 4-4M5 20h14",
+  building: "M5 21V4h9v17M14 9h5v12M8 8h3M8 12h3M8 16h3M3 21h18",
+  apartments: "M4 21V6l8-3 8 3v15M4 21h16M8 9h2m4 0h2M8 13h2m4 0h2M8 17h2m4 0h2",
+  home: "M4 11 12 4l8 7M6 9.5V20h12V9.5M10 20v-5h4v5",
+  key: "M14.5 9.5a4 4 0 1 0-1.4 3L20 19.5M17 16.5l2-2m-4.5-5h.01",
+  chart: "M4 20h16M7 16v-4m5 4V8m5 8v-6",
+  calculator: "M7 3h10a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Zm1 4h8M9 12h.01M12 12h.01M15 12h.01M9 16h.01M12 16h.01M15 16h.01",
+  question: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm-2.5-11.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.7m0 3h.01",
 };
 
 export type IconName = keyof typeof paths;

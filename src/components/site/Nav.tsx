@@ -8,8 +8,9 @@ import { menus, navAbout, navUtility } from "@/lib/site";
 import { useScrolledPast } from "@/lib/hooks";
 import { Button } from "@/components/ui/Button";
 import { Mark } from "@/components/ui/Wordmark";
+import { MenuPanel } from "@/components/site/MenuPanel";
 
-type MenuId = (typeof menus)[number]["id"];
+type MenuId = string;
 
 function Chevron({ open }: { open: boolean }) {
   return (
@@ -132,7 +133,9 @@ export function Nav() {
                 aria-expanded={menu === m.id}
                 aria-controls={`menu-${m.id}`}
                 onClick={() => setMenu((v) => (v === m.id ? null : m.id))}
-                className="flex h-9 items-center gap-1.5 rounded-pill px-3 text-small transition-opacity duration-200 hover:opacity-70"
+                className={`flex h-9 items-center gap-1.5 rounded-[0.5rem] px-3 text-small transition-[background-color,opacity] duration-200 ${
+                  menu === m.id ? (overHero ? "bg-white/15" : "bg-ink/[0.06]") : "hover:opacity-70"
+                }`}
               >
                 {m.label}
                 <Chevron open={menu === m.id} />
@@ -176,22 +179,13 @@ export function Nav() {
               key={active.id}
               id={`menu-${active.id}`}
               onMouseEnter={() => hoverOpen(active.id)}
-              className="absolute left-1/2 top-[calc(var(--nav-h)-0.5rem)] hidden w-[40rem] -translate-x-1/2 rounded-card border border-line bg-white p-3 text-ink shadow-[0_24px_48px_-24px_rgb(0_0_0/0.25)] lg:block"
+              className="absolute left-1/2 top-[calc(var(--nav-h)-0.5rem)] hidden w-[min(62.5rem,calc(100vw-3rem))] -translate-x-1/2 rounded-[0.75rem] border border-line bg-white p-5 text-ink shadow-[0_24px_60px_-28px_rgb(0_0_0/0.3)] lg:block"
               initial={reduce ? false : { opacity: 0, y: -6 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.18, ease: [0.4, 0, 0.2, 1] }}
             >
-              <ul className="grid grid-cols-2 gap-1">
-                {active.links.map((l) => (
-                  <li key={l.href}>
-                    <Link href={l.href} onClick={() => setMenu(null)} className="block rounded-[0.625rem] px-4 py-3 transition-[background-color,border-color,color] duration-200 hover:bg-paper">
-                      <span className="block text-small font-medium">{l.label}</span>
-                      <span className="mt-1 block text-caption text-muted">{l.note}</span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+              <MenuPanel groups={active.groups} feature={active.feature} onPick={() => setMenu(null)} />
             </motion.div>
           ) : null}
         </AnimatePresence>
@@ -211,7 +205,7 @@ export function Nav() {
               <div key={m.id} className="border-b border-line py-6">
                 <p className="eyebrow">{m.label}</p>
                 <ul className="mt-3">
-                  {m.links.map((l) => (
+                  {m.groups.flatMap((g) => g.links).filter((l, i, all) => all.findIndex((x) => x.href === l.href) === i).map((l) => (
                     <li key={l.href}>
                       <Link href={l.href} onClick={() => setOpen(false)} className="flex min-h-11 items-center text-body">
                         {l.label}
