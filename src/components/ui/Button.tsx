@@ -105,7 +105,7 @@ export function Button(props: ButtonProps) {
   const cls = `${base} ${variant === "tertiary" ? "" : `${sizes[size]} ${pad[badge ? "badge" : "plain"][size]}`} ${variants[variant]} ${off[variant]} ${className}`;
   // Pills roll their label up on hover: two copies in one clipped grid cell, the second (aria-hidden)
   // waiting a line below. Nothing is positioned, so contrast tools read the label against the pill.
-  const roll = "[grid-area:1/1] transition-transform duration-300 ease-instrument motion-reduce:transition-none";
+  const roll = "[grid-area:1/1] flex items-center justify-center gap-2 transition-transform duration-300 ease-instrument motion-reduce:transition-none";
   const label =
     variant === "tertiary" ? (
       children

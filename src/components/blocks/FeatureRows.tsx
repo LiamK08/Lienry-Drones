@@ -66,8 +66,10 @@ const layouts = {
     rail: "mx-auto w-full max-w-[83rem]",
     rows: "flex flex-col gap-20 lg:gap-[6.25rem]",
     grid: "grid items-center gap-8 lg:grid-cols-2 lg:gap-10",
-    text: (right: boolean) => `order-2 ${right ? "lg:order-1" : "lg:order-2"}`,
-    media: (right: boolean) => `order-1 ${right ? "lg:order-2" : "lg:order-1"}`,
+    // The DOM follows the desktop order (a left picture comes first), so the order classes only move a
+    // right-hand picture above its text on phones.
+    text: (right: boolean) => (right ? "order-2 lg:order-1" : ""),
+    media: (right: boolean) => (right ? "order-1 lg:order-2" : ""),
     paras: "mt-4 space-y-2",
     para: "max-w-none text-small leading-[1.2] text-fg",
     list: "mt-8 space-y-[1.1875rem]",
@@ -108,6 +110,18 @@ export function FeatureRows({
 }) {
   const solutions = variant === "solutions";
   const L = layouts[variant];
+  const mediaOf = (r: FeatureRowItem, right: boolean) => (
+    <div className={L.media(right)}>
+      {r.media ??
+        (r.image ? (
+          solutions ? (
+            <Picture id={r.image.id} alt={r.image.alt} position={r.image.position} aspect="5/4" aspectSm="5/4" rounded="image" sizes="(min-width: 1440px) 644px, (min-width: 1024px) 46vw, 100vw" />
+          ) : (
+            <Picture id={r.image.id} alt={r.image.alt} position={r.image.position} aspect={r.aspect ?? "4/3"} aspectSm="4/3" rounded="card" sizes="(min-width: 1440px) 684px, (min-width: 1024px) 50vw, 100vw" />
+          )
+        ) : null)}
+    </div>
+  );
   const rows = (
     <div className={`${L.rows} ${solutions && eyebrow ? "mt-12 lg:mt-20" : ""}`}>
       {items.map((r, i) => {
@@ -115,6 +129,7 @@ export function FeatureRows({
         return (
           <section key={r.id} id={r.id} aria-labelledby={`${r.id}-heading`} className="scroll-mt-24">
             <div className={L.grid}>
+              {solutions && !right ? mediaOf(r, right) : null}
               <Reveal className={L.text(right)}>
                 {r.eyebrow ? <p className="eyebrow eyebrow-plain">{r.eyebrow}</p> : null}
                 <h2 id={`${r.id}-heading`} className="text-h3">
@@ -160,16 +175,7 @@ export function FeatureRows({
                   )
                 ) : null}
               </Reveal>
-              <div className={L.media(right)}>
-                {r.media ??
-                  (r.image ? (
-                    solutions ? (
-                      <Picture id={r.image.id} alt={r.image.alt} position={r.image.position} aspect="5/4" aspectSm="5/4" rounded="image" sizes="(min-width: 1440px) 644px, (min-width: 1024px) 46vw, 100vw" />
-                    ) : (
-                      <Picture id={r.image.id} alt={r.image.alt} position={r.image.position} aspect={r.aspect ?? "4/3"} aspectSm="4/3" rounded="card" sizes="(min-width: 1440px) 684px, (min-width: 1024px) 50vw, 100vw" />
-                    )
-                  ) : null)}
-              </div>
+              {solutions && !right ? null : mediaOf(r, right)}
             </div>
             {r.facts ? (
               <ul className="mt-12 grid gap-8 pt-2 md:grid-cols-2 lg:grid-cols-4 lg:gap-0">

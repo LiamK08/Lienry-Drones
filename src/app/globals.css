@@ -377,6 +377,9 @@
   .marquee {
     animation: marquee 40s linear infinite;
   }
+  [data-paused] .marquee {
+    animation-play-state: paused;
+  }
 
   /* The about hero's round pictures: each pops in (a small overshoot), then drifts slowly about its
      spot. The pop is on the item and the drift on its frame, so the two never fight over transform. */

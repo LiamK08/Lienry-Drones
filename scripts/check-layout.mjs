@@ -61,7 +61,7 @@ import { writeFileSync } from "node:fs";
 import path from "node:path";
 
 const NOT_FOUND = "/this-page-does-not-exist";
-const ROUTES = ["/", "/platform", "/commercial", "/homes-and-rentals", "/solar", "/company", "/download", "/register-interest", "/privacy", NOT_FOUND];
+const ROUTES = ["/", "/platform", "/commercial", "/homes-and-rentals", "/solar", "/company", "/download", "/register-interest", "/privacy", "/fit-check", "/calculator", NOT_FOUND];
 const VIEWPORTS = {
   1440: { width: 1440, height: 900, mobile: false },
   1024: { width: 1024, height: 768, mobile: false },

@@ -1,3 +1,5 @@
+import { MarqueeToggle } from "@/components/ui/MarqueeToggle";
+
 /**
  * A quiet strip under a hero: a small caption, 36, then words set in the serif, muted, on a slow loop
  * (the `.marquee` keyframes, 40s) inside a 1110px window that fades at both edges. The words say
@@ -21,7 +23,7 @@ export function WordStrip({ label, items }: { label: string; items: readonly str
     </ul>
   );
   return (
-    <section aria-label={label} data-band="for" data-tone="plaster" className="page-x relative bg-plaster pb-20 md:pb-[4.75rem]">
+    <section aria-label={label} data-band="for" data-tone="plaster" data-marquee="" className="page-x relative bg-plaster pb-20 md:pb-[4.75rem]">
       <div className="mx-auto max-w-[69.375rem] text-center">
         <p className="mx-auto max-w-none text-label leading-[1.4] font-normal uppercase tracking-[0.08em] text-muted max-md:text-[0.6875rem]">{label}</p>
         <div className="mt-9 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_30%,black_70%,transparent)] motion-reduce:[mask-image:none]">
@@ -35,6 +37,7 @@ export function WordStrip({ label, items }: { label: string; items: readonly str
           </div>
         </div>
       </div>
+      <MarqueeToggle name="the scrolling words" className="absolute bottom-6 right-(--page-margin) text-muted hover:bg-ink/[0.06] hover:text-ink md:bottom-5" />
       <div aria-hidden="true" className="page-x absolute inset-x-0 bottom-0 max-md:hidden">
         <div className="mx-auto h-px max-w-[72rem] bg-gradient-to-r from-transparent via-line to-transparent" />
       </div>

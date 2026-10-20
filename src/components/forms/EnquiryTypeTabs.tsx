@@ -83,7 +83,7 @@ function TabsView({ type, onSelect }: { type: EnquiryType; onSelect: (t: Enquiry
               {t.items[k].tab}
               <span
                 aria-hidden="true"
-                className={`absolute inset-x-0 bottom-0 h-0.5 origin-center bg-accent transition-transform duration-300 ease-settle motion-reduce:transition-none ${on ? "scale-x-100" : "scale-x-0"}`}
+                className={`absolute inset-x-0 bottom-0 h-0.5 origin-center bg-accent forced-colors:forced-color-adjust-none forced-colors:bg-[Highlight] transition-transform duration-300 ease-settle motion-reduce:transition-none ${on ? "scale-x-100" : "scale-x-0"}`}
               />
             </button>
           );

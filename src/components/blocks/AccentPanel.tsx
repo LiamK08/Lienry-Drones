@@ -47,8 +47,8 @@ export function AccentPanel({
           <div aria-hidden="true" className="glow-drift pointer-events-none absolute left-1/3 top-1/2 -z-10 h-56 w-[28rem] -rotate-[20deg] rounded-pill bg-accent-hover/40 blur-[60px] [animation-delay:-7s]" />
         </>
       )}
-      <div className="mx-auto flex w-full flex-col items-center text-center">
-        <h2 id={`${id}-heading`} className="mx-auto max-w-[35rem] text-h2s">
+      <div className={`mx-auto flex w-full flex-col items-center text-center ${bleed ? "max-w-3xl px-4" : ""}`}>
+        <h2 id={`${id}-heading`} className={`mx-auto text-h2s ${bleed ? "" : "max-w-[35rem]"}`}>
           {headline}
         </h2>
         <Button href={action.href} variant={dark ? "secondary" : "glass"} size={dark ? "sm" : "md"} arrow={!dark} className={dark ? "mt-6" : "mt-8"}>

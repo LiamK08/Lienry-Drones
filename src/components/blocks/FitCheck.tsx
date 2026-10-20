@@ -50,7 +50,7 @@ export function FitCheck({ id = "fit", layout = "card", intro, badge }: FitCheck
           {all.map((q, i) => (
             <span
               key={q.id}
-              className={`h-1 flex-1 rounded-pill transition-[background-color] duration-200 motion-reduce:transition-none ${i < answered ? "bg-accent" : "bg-line"}`}
+              className={`h-1 flex-1 rounded-pill transition-[background-color] duration-200 motion-reduce:transition-none forced-colors:forced-color-adjust-none ${i < answered ? "bg-accent forced-colors:bg-[Highlight]" : "bg-line forced-colors:bg-[GrayText]"}`}
             />
           ))}
         </div>
@@ -81,7 +81,7 @@ export function FitCheck({ id = "fit", layout = "card", intro, badge }: FitCheck
                             <label
                               key={a.id}
                               className={`relative flex h-[38px] cursor-pointer items-center rounded-pill border px-4 text-small shadow-[0_1px_2px_rgb(0_0_0/0.06)] transition-[background-color,border-color,color] duration-200 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus ${
-                                on ? "border-accent bg-accent text-white" : "border-line bg-white text-ink hover:border-ink"
+                                on ? "border-accent bg-accent text-white forced-colors:forced-color-adjust-none forced-colors:border-[Highlight] forced-colors:bg-[Highlight] forced-colors:text-[HighlightText]" : "border-line bg-white text-ink hover:border-ink"
                               }`}
                             >
                               <input type="radio" name={`${id}-${q.id}`} value={a.id} checked={on} onChange={() => setAnswers((s) => ({ ...s, [q.id]: a.id }))} className="sr-only" />

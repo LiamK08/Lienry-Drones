@@ -38,6 +38,8 @@ const chip =
   "flex min-h-[2.125rem] w-full cursor-pointer items-center rounded-hard border border-control bg-white px-4 py-1.5 text-[0.8125rem] leading-[1.2] text-fg-muted " +
   "transition-[background-color,border-color,color] duration-200 ease-instrument motion-reduce:transition-none hover:border-fg " +
   "has-[:checked]:border-accent has-[:checked]:bg-accent has-[:checked]:text-white has-[:checked]:hover:border-accent-hover has-[:checked]:hover:bg-accent-hover " +
+  // Forced colours drop the fill, so the chosen chip takes the system highlight instead.
+  "forced-colors:has-[:checked]:forced-color-adjust-none forced-colors:has-[:checked]:border-[Highlight] forced-colors:has-[:checked]:bg-[Highlight] forced-colors:has-[:checked]:text-[HighlightText] " +
   "has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-solid has-[:focus-visible]:outline-focus";
 
 /** A listing card's 250px white panel; its content sits at the bottom. */
