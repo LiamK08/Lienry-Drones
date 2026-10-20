@@ -34,11 +34,13 @@ fields keep `--radius-hard` (4px). The header bar is 56px (`--nav-h`).
 Soft blurred accent glows are allowed behind heroes and accent panels. No text shadows or
 gradient text.
 
-Checks: `check:a11y` and `perf:vitals` gate every route. `check:layout` and `check:rules` still
-encode the earlier 4px, left-aligned system, so their shape, alignment, eyebrow and headline
-checks fail by design; their honesty checks (11 claims, 12 captions, 22 titles, 24 enquiry
-labels) still apply. Hero headings hold their fallback-font line count on phones (`holdLines`),
-or the web font arriving shifts the page.
+Checks: `check:a11y`, `perf:vitals`, `check:layout` and `check:rules` gate every route. Since
+20 October 2026 the last two encode this system: the radius set and pills, PT Serif over Inter at
+the token sizes, dotted capital eyebrows on their heading, centred heads centred where they sit,
+content inside the rail and the 20px phone margins, the band palette and Band's pads. Their
+honesty checks (11 claims, 12 captions, 22 titles, 24 enquiry labels, 44 no ReFresh or Legora)
+never relax. Change a check only together with the rule here that it encodes. Hero headings hold
+their fallback-font line count on phones (`holdLines`), or the web font arriving shifts the page.
 
 Header contrast: `npm run contrast -- <frame>` proves the bar stays legible over the hero
 film. Run it after touching the header, the hero scrim or the primary button.
