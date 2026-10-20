@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { createContext, Suspense, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, Suspense, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { enquiryTypes, type EnquiryType } from "@/lib/enquiry-schema";
 import { registerPage } from "@/content/register";
 import { TextLink } from "@/components/ui/TextLink";
@@ -12,7 +12,7 @@ import { TextLink } from "@/components/ui/TextLink";
 // link to another ?type= on the same page still wins.
 
 type Picked = { type: EnquiryType; url: EnquiryType | null } | null;
-type Shared = { picked: Picked; setPicked: (p: Picked) => void };
+type Shared = { picked: Picked; setPicked: (p: Picked) => void; url: EnquiryType | null; setUrl: (u: EnquiryType | null) => void };
 
 const PickedContext = createContext<Shared | null>(null);
 
@@ -21,7 +21,8 @@ const isEnquiryType = (v: string | null): v is EnquiryType => (enquiryTypes as r
 /** Wrap the tabs and the form in this to tie them together. Without it, each keeps its own pick. */
 export function EnquiryTypeProvider({ children }: { children: ReactNode }) {
   const [picked, setPicked] = useState<Picked>(null);
-  const value = useMemo(() => ({ picked, setPicked }), [picked]);
+  const [url, setUrl] = useState<EnquiryType | null>(null);
+  const value = useMemo(() => ({ picked, setPicked, url, setUrl }), [picked, url]);
   return <PickedContext.Provider value={value}>{children}</PickedContext.Provider>;
 }
 
@@ -112,18 +113,33 @@ function TabsView({ type, onSelect }: { type: EnquiryType; onSelect: (t: Enquiry
   );
 }
 
-function LiveTabs() {
-  const [type, setType] = useEnquiryType();
-  return <TabsView type={type} onSelect={setType} />;
+/** Reports the URL's ?type= after hydration. It alone sits under Suspense, so the tabs never remount. */
+function UrlType({ onType }: { onType: (t: EnquiryType | null) => void }) {
+  const raw = useSearchParams().get("type");
+  useEffect(() => onType(isEnquiryType(raw) ? raw : null), [raw, onType]);
+  return null;
 }
 
-const noop = () => {};
-
-/** The enquirer tabs: the four types from enquiryTypes, each with Lienry's own line (content/register). */
+/**
+ * The enquirer tabs: the four types from enquiryTypes, each with Lienry's own line (content/register).
+ * The server render (homeowner) stays in place through hydration; ?type= then selects its tab, so the
+ * panel text is painted once, with the page, rather than swapped in when the script arrives.
+ */
 export function EnquiryTypeTabs() {
+  const shared = useContext(PickedContext);
+  const [ownUrl, setOwnUrl] = useState<EnquiryType | null>(null);
+  const [ownPicked, setOwnPicked] = useState<Picked>(null);
+  const url = shared ? shared.url : ownUrl;
+  const setUrl = shared ? shared.setUrl : setOwnUrl;
+  const picked = shared ? shared.picked : ownPicked;
+  const setPicked = shared ? shared.setPicked : setOwnPicked;
+  const type = picked && picked.url === url ? picked.type : (url ?? "homeowner");
   return (
-    <Suspense fallback={<TabsView type="homeowner" onSelect={noop} />}>
-      <LiveTabs />
-    </Suspense>
+    <>
+      <Suspense fallback={null}>
+        <UrlType onType={setUrl} />
+      </Suspense>
+      <TabsView type={type} onSelect={(t) => setPicked({ type: t, url })} />
+    </>
   );
 }
