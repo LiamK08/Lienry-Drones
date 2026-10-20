@@ -13,7 +13,6 @@ export const commercialPage = {
   rows: [
     {
       id: "capsule",
-      eyebrow: "Features",
       title: "A capsule on the roof that keeps the drone ready between cleans",
       paragraphs: [
         "The drone lives in a weatherproof capsule on the roof. Its water tether is fed from above, so the drone never carries water and never runs out mid-clean.",
@@ -48,20 +47,12 @@ export const commercialPage = {
     emphasis: "from the dock up.",
     aside: "Designed in, not supervised in",
     tags: ["Tether", "Obstacle camera", "Surface checks"],
-    images: [
-      { id: "f1-tether", alt: "The tether's metal coupling where it enters the underside of the drone", position: "43% 45%" },
-      { id: "c1-commercial-hero", alt: "The roof capsule on a plant deck at dawn, the drone rising from its cradle", position: "75% 50%" },
-    ],
+    image: { id: "f1-tether", alt: "The tether's metal coupling where it enters the underside of the drone", position: "43% 45%" },
     columns: [
       { icon: "tether", title: "Always tethered", text: "Water and power through one line from the dock, for the whole clean." },
       { icon: "camera", title: "Obstacle avoidance", text: "A camera on the drone watches the surface and what is around it." },
       { icon: "doc", title: "Site permissions", text: "We do not claim any approvals. What each site will need is still being finalised." },
     ],
-  },
-  cost: {
-    eyebrow: "Your numbers",
-    headline: "Add up what you spend now",
-    intro: "Enter your facade area and what you pay each year for 5 and 10 year totals. Not a Lienry quote.",
   },
   close: { headline: "A small number of buildings, first. Is yours one of them?", action: { label: "Book a pilot conversation", href: "/register-interest?type=commercial" } },
 };

@@ -10,11 +10,16 @@ export const solarPage = {
     primary: { label: "Register interest", href: "/register-interest" },
   },
   strip: { label: "Designed for solar", items: ["Rooftop arrays", "Solar farm rows", "Commercial roofs", "Rental rooftops"] },
-  stats: { eyebrow: "Industry figures", headline: "What soiling costs", intro: "Three figures from peer-reviewed and international sources, each cited." },
+  stats: {
+    eyebrow: "Industry figures",
+    headline: "What soiling costs",
+    emphasis: "costs",
+    intro: "Three figures from peer-reviewed and international sources, each cited.",
+    image: { id: "so1-solar-hero", alt: "The drone washing a row of ground-mounted solar panels in the morning mist, its tether running back to a reel on a concrete pad", position: "60% 55%" },
+  },
   rows: [
     {
       id: "panels",
-      eyebrow: "Features",
       title: "It knows a panel is a panel",
       paragraphs: ["During a clean the drone identifies each material it is cleaning and adjusts its pressure to suit. Water comes through the tether, so the drone never carries it."],
       checks: ["Material identified during the clean", "Pressure set for solar glass", "Adjustable in the app"],

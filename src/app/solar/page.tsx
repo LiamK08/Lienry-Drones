@@ -7,25 +7,38 @@ import { AccentPanel } from "@/components/blocks/AccentPanel";
 import { CenterHero } from "@/components/blocks/CenterHero";
 import { FaqCentered } from "@/components/blocks/FaqCentered";
 import { FeatureRows } from "@/components/blocks/FeatureRows";
+import { FiguresBlock } from "@/components/blocks/SafetyBlock";
 import { WordStrip } from "@/components/blocks/WordStrip";
-import { CITED_NOTE, StatBand, pickStats } from "@/components/sections/StatBand";
+import { CITED_NOTE, pickStats } from "@/components/sections/StatBand";
 
 export const metadata: Metadata = pageMetadata(
   "/solar",
   "Dust and grime cost solar owners real energy. Lienry treats a panel as its own material, sets the pressure to match, and cleans on the interval you choose.",
 );
 
-/** /solar: the solutions template, with three cited soiling figures after the hero. */
+/**
+ * /solar: the solutions template. The hero, the strip, one white run of feature rows, the three
+ * cited soiling figures on paper (with the cited note), the questions on white, then the closing panel.
+ */
 export default function SolarPage() {
   const { hero, strip, stats, rows, close } = solarPage;
   return (
     <>
-      <CenterHero mobileLines={3} eyebrow={hero.eyebrow} headline={hero.headline} emphasis={hero.emphasis} lead={hero.lead} primary={hero.primary} />
+      <CenterHero mobileLines={3} leadLines={{ phone: 4, wide: 2 }} eyebrow={hero.eyebrow} headline={hero.headline} emphasis={hero.emphasis} lead={hero.lead} primary={hero.primary} />
       <WordStrip label={strip.label} items={strip.items} />
-      <StatBand id="soiling" tone="ink" eyebrow={stats.eyebrow} headline={stats.headline} notePosition="foot" intro={stats.intro} items={pickStats(solarStats, ["unsw-soiling", "iea-soiling", "joule-soiling"])} note={CITED_NOTE} />
-      <FeatureRows id="features" items={rows} />
-      <FaqCentered tone="paper" items={faqFor("solar")} />
-      <AccentPanel id="closing" headline={close.headline} action={close.action} />
+      <FeatureRows id="features" variant="solutions" eyebrow="Features" items={rows} />
+      <FiguresBlock
+        id="soiling"
+        eyebrow={stats.eyebrow}
+        headline={stats.headline}
+        emphasis={stats.emphasis}
+        aside={stats.intro}
+        image={stats.image}
+        items={pickStats(solarStats, ["unsw-soiling", "iea-soiling", "joule-soiling"])}
+        note={CITED_NOTE}
+      />
+      <FaqCentered items={faqFor("solar")} spacing="page" narrow />
+      <AccentPanel id="closing" headline={close.headline} action={close.action} band="close" />
     </>
   );
 }

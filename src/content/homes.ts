@@ -14,7 +14,6 @@ export const homesPage = {
   rows: [
     {
       id: "pod",
-      eyebrow: "Features",
       title: "A ground pod that powers the drone and feeds it water",
       paragraphs: [
         "The pod sits beside the house, near the garden tap. It shelters the drone between cleans and runs power and water through the same tether.",
@@ -34,7 +33,6 @@ export const homesPage = {
     },
   ],
   stats: {
-    eyebrow: "Why it matters",
     headline: "Why it matters in Australia",
     intro: "Two cited figures about the homes it is designed for.",
     action: { label: "I own rentals", href: "/register-interest?type=landlord" },
@@ -45,10 +43,7 @@ export const homesPage = {
     emphasis: "nobody walking the roof.",
     aside: "No ladders, no lifts, no crews to book",
     tags: ["Tether", "Camera", "Ground pod"],
-    images: [
-      { id: "y3-story-driveway", alt: "The drone washing the concrete driveway of a rental house", position: "50% 50%" },
-      { id: "ho1-homes-hero", alt: "The Lienry ground pod beside a house at first light, the drone washing a window", position: "42% 50%" },
-    ],
+    image: { id: "ho1-homes-hero", alt: "The Lienry ground pod beside a house at first light, the drone washing a window", position: "42% 55%" },
     columns: [
       { icon: "person", title: "Nobody at height", text: "No one climbs a ladder or walks the roof to clean it." },
       { icon: "phone", title: "Started from the app", text: "Pick the areas and start the clean from wherever you are." },
@@ -60,9 +55,7 @@ export const homesPage = {
 
 /** The app, told as five beats of one clean. A beat's `app` is the state the app panel shows with it. */
 export const landlordStory = {
-  eyebrow: "the app",
   headline: "Your property. Wherever you are.",
-  emphasis: "Wherever you are.",
   intro: "You own a rental in Sydney and live overseas. It needs a clean before the next tenant.",
   beats: [
     { title: "Open the app.", body: "The property is already mapped, every surface in reach.", imageId: "y1-story-before", app: "map" },
