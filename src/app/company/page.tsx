@@ -29,7 +29,7 @@ export default function CompanyPage() {
             {rows.map((r, i) => (
               <section key={r.id} aria-labelledby={`${r.id}-heading`} className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
                 <Reveal className={i % 2 ? "lg:order-2" : ""}>
-                  <h2 id={`${r.id}-heading`} className="text-[2rem] leading-[1.15] md:text-[2.5rem]">
+                  <h2 id={`${r.id}-heading`} className="text-h2s">
                     {r.title}
                   </h2>
                   {r.paragraphs.map((p) => (
@@ -48,7 +48,7 @@ export default function CompanyPage() {
       </Band>
       <Band id="rules" tone="paper" labelledBy="rules-heading">
         <Container>
-          <h2 id="rules-heading" className="text-center text-h2">
+          <h2 id="rules-heading" className="text-center text-h2s">
             Three rules we build by
           </h2>
           <ul className="mx-auto mt-12 grid max-w-6xl gap-6 md:grid-cols-3">
@@ -67,7 +67,7 @@ export default function CompanyPage() {
       <Band id="round" tone="plaster" labelledBy="round-heading">
         <Container>
           <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
-            <h2 id="round-heading" className="text-h2">
+            <h2 id="round-heading" className="text-h2s">
               {founders.headline}
             </h2>
             <p className="mt-5 text-body text-fg-muted">{founders.body}</p>

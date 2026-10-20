@@ -15,8 +15,8 @@ type HeadBase = {
   id: string;
   /** Default "h2". */
   as?: "h1" | "h2";
-  /** Type step. Default follows `as`. */
-  size?: "h1" | "h2";
+  /** Type step. Default follows `as`; "h2s" is the inner-page section size. */
+  size?: "h1" | "h2" | "h2s";
   /** The lowercase line above the heading: 1 to 3 words (Eyebrow throws in development otherwise). */
   eyebrow: string;
   /** The whole heading, as stored in content: 7 words at most (throws in development otherwise). */
@@ -71,7 +71,7 @@ export function Headline({ text, emphasis, breakBefore = false }: { text: string
 export function SectionHead(props: SectionHeadProps) {
   const { id, as: H = "h2", size, eyebrow, headline, emphasis, breakBefore, below, reveal = true, className = "" } = props;
   const { intro, link, action } = props as { intro?: string; link?: Action; action?: ReactNode };
-  const step = (size ?? H) === "h1" ? "text-h1" : "text-h2";
+  const step = (size ?? H) === "h1" ? "text-h1" : size === "h2s" ? "text-h2s" : "text-h2";
 
   const heading = (
     <>

@@ -32,7 +32,7 @@ export function PillarTabs({ id, eyebrow, headline, items }: { id: string; eyebr
   return (
     <Band id={id} tone="plaster" labelledBy={`${id}-heading`}>
       <Container>
-        <SectionHead id={`${id}-heading`} layout="center" eyebrow={eyebrow} headline={headline} className="scroll-mt-24" />
+        <SectionHead id={`${id}-heading`} layout="center" size="h2s" eyebrow={eyebrow} headline={headline} className="scroll-mt-24" />
         <div role="tablist" aria-label={headline} className="no-scrollbar mx-auto mt-10 flex max-w-4xl gap-6 overflow-x-auto border-b border-line md:justify-center">
           {items.map((p, i) => (
             <button
@@ -63,7 +63,7 @@ export function PillarTabs({ id, eyebrow, headline, items }: { id: string; eyebr
             <div className="grid items-center gap-10 md:grid-cols-[0.8fr_1fr] md:gap-14">
               <Picture id={p.image.id} alt={p.image.alt} position={p.image.position} aspect="1/1" rounded="card" sizes="(min-width: 1024px) 380px, 100vw" />
               <div>
-                <h3 className="text-[2rem] leading-tight">{p.title}</h3>
+                <h3 className="text-h3">{p.title}</h3>
                 <p className="mt-4 text-small text-fg-muted">{p.body}</p>
                 {p.link ? (
                   <Button href={p.link.href} variant="secondary" size="sm" className="mt-6">

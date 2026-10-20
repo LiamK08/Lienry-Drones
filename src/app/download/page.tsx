@@ -44,7 +44,7 @@ export default function DownloadPage() {
         <Container>
           <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
             <p className="eyebrow">{features.eyebrow}</p>
-            <h2 id="features-heading" className="text-h2">
+            <h2 id="features-heading" className="text-h2s">
               {features.headline}
             </h2>
             <p className="mt-4 text-body text-fg-muted">{features.intro}</p>

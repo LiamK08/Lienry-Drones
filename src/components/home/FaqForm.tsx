@@ -17,7 +17,7 @@ export function FaqForm() {
         <div className="grid gap-12 lg:grid-cols-[1fr_1fr] lg:gap-16">
           <div>
             <p className="eyebrow">{faq.eyebrow}</p>
-            <h2 id="faq-heading" className="em-accent text-h2">
+            <h2 id="faq-heading" className="em-accent text-h2s">
               <Headline text={faq.headline} emphasis={faq.emphasis} />
             </h2>
             <div className="mt-8">

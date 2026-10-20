@@ -16,7 +16,7 @@ export function Footer() {
             {brand.name.split(" ")[0]}
           </p>
         </div>
-        <p className="mt-4 max-w-none font-display text-h3 italic text-white/90">{footer.tagline}</p>
+        <p className="mt-4 max-w-none font-[family-name:var(--font-inter-italic)] text-[1.375rem] italic tracking-[-0.02em] text-white/90">{footer.tagline}</p>
         <nav aria-label="Footer" className="mt-12 grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-4">
           {footer.groups.map((g) => (
             <div key={g.id}>

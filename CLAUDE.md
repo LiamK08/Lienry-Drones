@@ -21,8 +21,11 @@ templates, section order and interaction patterns, in Lienry's own words, fonts,
 media. White ground, a warm paper band and a pale accent tint; Lienry's glass teal is the one
 accent; near-black for the dark band and the footer. Section heads may be centred.
 
-Type: two families only, Instrument Serif for headings, display lines and the footer logo, and
-Inter for everything else. Eyebrows are an accent dot and 12px capitals (`.eyebrow`).
+Type: two families only, both open-licensed and self-hosted: PT Serif (regular and italic) for
+headings, display lines and the footer logo, and Inter for everything else (its italic only in the
+footer tagline, loaded on demand). Sizes follow the reference: page titles 40px (30 on phones), home
+section titles 48px (31), inner section titles 36px (30), card titles 32px (26), with tight negative
+tracking. Eyebrows are an accent dot and 12px capitals (`.eyebrow`).
 
 Shape: buttons are pills (`rounded-pill`, optional round arrow badge); cards are `rounded-card`
 (16px), panels `rounded-panel` (20px); small tags and form fields keep `--radius-hard` (4px).

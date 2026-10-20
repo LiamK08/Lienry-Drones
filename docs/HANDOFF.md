@@ -7,7 +7,7 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
 - On 20 October the owner asked for the site to follow refresh.tech's layout as closely as possible,
   in Lienry's own words, fonts, colours and media. That is built and live on `main` (`b929b3d` and
   after): the shell (pill buttons, dotted eyebrows, centred heads, the menus header and the near-black
-  footer), home, /platform, /commercial, /homes-and-rentals, /solar, /company, /register-interest,
+  footer, PT Serif headings over Inter at the reference's sizes), home, /platform, /commercial, /homes-and-rentals, /solar, /company, /register-interest,
   /download, /privacy (centred legal header, sticky contents beside the policy) and the 404, plus two
   new pages, /fit-check and /calculator.
 - Where a ReFresh section rests on things Lienry does not have (customer logos, testimonials, case
@@ -61,8 +61,11 @@ NODE_USE_ENV_PROXY=1 node scripts/perf-vitals.mjs http://localhost:3000 [routes]
   intent (say so) or cited from `src/content/stats.ts` with their source links.
 - **Original words:** take layout and interaction patterns from refresh.tech, never its text,
   headings, code, imagery, icons or logo. Write every line fresh for Lienry.
-- **Font swap:** at Lighthouse's 412px width many headings wrap one line differently in the fallback
-  font. Give each hero its `mobileLines` (the fallback line count) or the page shifts.
+- **Fonts:** PT Serif and Inter (OFL), self-hosted in `src/fonts`. Only the upright Inter and the two
+  PT Serif files are preloaded; preloading anything else (the Inter italic is 80 KB) pushes /download
+  over the 2.5 s LCP budget.
+- **Font swap:** a heading can wrap one line differently in the fallback font at phone widths. Give
+  each hero its `mobileLines` (the larger of the two wraps from 360 to 412) or the page shifts.
 - **Transitions:** use `transition-[background-color,border-color,color]`, not `transition-colors`,
   on anything focusable: the latter animates the outline colour and the focus ring fails contrast.
 - **Media:** no new or replacement imagery without the owner's say. Never pair a closed ground pod

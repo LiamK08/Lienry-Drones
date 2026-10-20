@@ -24,7 +24,7 @@ export function SystemCards() {
               <li key={c.id} className="flex flex-col rounded-card border border-line bg-white p-6 md:p-8">
                 <p className="text-small font-medium text-ink">{c.name}</p>
                 <p className="mt-1 text-caption text-muted">{c.sub}</p>
-                <p className="mt-6 font-display text-[1.5rem] leading-snug text-ink">{c.statement}</p>
+                <p className="mt-6 font-display text-[1.375rem] leading-snug text-ink">{c.statement}</p>
                 <dl className="mt-auto grid grid-cols-3 gap-4 border-t border-line pt-6">
                   {figures.map((f) => (
                     <div key={f.label}>

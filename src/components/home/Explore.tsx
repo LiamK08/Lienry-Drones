@@ -51,7 +51,7 @@ export function Explore() {
                 <Picture id={lead.image.id} alt="" position={lead.image.position} fit="fill" rounded="none" zoom sizes="(min-width: 1024px) 50vw, 100vw" className="absolute inset-0" />
                 <span aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(to_top,rgba(18,17,16,0.9)_0%,rgba(18,17,16,0.1)_60%)]" />
                 <Tags kind={lead.kind} tag={lead.tag} className="absolute left-4 top-4" />
-                <span className="relative p-6 font-display text-[2rem] leading-tight text-white">{lead.title}</span>
+                <span className="relative p-6 font-display text-[1.75rem] leading-tight text-white">{lead.title}</span>
               </Link>
             </li>
           ) : null}

@@ -30,7 +30,7 @@ export default function CommercialPage() {
       <SafetyBlock {...safety} />
       <Band id="cost" tone="plaster" labelledBy="cost-heading">
         <Container>
-          <SectionHead id="cost-heading" layout="center" eyebrow={cost.eyebrow} headline={cost.headline} intro={cost.intro} />
+          <SectionHead id="cost-heading" layout="center" size="h2s" eyebrow={cost.eyebrow} headline={cost.headline} intro={cost.intro} />
           <div className="mx-auto mt-(--head-gap) max-w-6xl rounded-panel border border-line bg-white p-6 md:p-10">
             <CostCalculator headingId="cost-heading" noteId="cost-note" defaultType="Commercial building" />
           </div>

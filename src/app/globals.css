@@ -51,21 +51,27 @@
   --text-display: clamp(3.25rem, 2.5rem + 3vw, 5.75rem);
   --text-display--line-height: 1.05;
   --text-display--letter-spacing: -0.02em;
-  --text-h1: clamp(2.75rem, 2.1rem + 2.5vw, 4.5rem);
-  --text-h1--line-height: 1.08;
-  --text-h1--letter-spacing: -0.02em;
-  --text-h2: clamp(2.25rem, 1.8rem + 1.5vw, 3.25rem);
-  --text-h2--line-height: 1.12;
-  --text-h2--letter-spacing: -0.02em;
-  --text-h3: clamp(1.5rem, 1.3rem + 0.7vw, 1.875rem);
-  --text-h3--line-height: 1.15;
-  --text-h3--letter-spacing: -0.02em;
+  /* Heading sizes measured on the reference at 390 and 1440. */
+  --text-h1: clamp(1.875rem, 1.6rem + 1.1vw, 2.5rem);
+  --text-h1--line-height: 1.1;
+  --text-h1--letter-spacing: -0.03em;
+  --text-h2: clamp(1.9375rem, 1.45rem + 2vw, 3rem);
+  --text-h2--line-height: 1.1;
+  --text-h2--letter-spacing: -0.05em;
+  --text-h2s: clamp(1.875rem, 1.75rem + 0.5vw, 2.25rem);
+  --text-h2s--line-height: 1.1;
+  --text-h2s--letter-spacing: -0.02em;
+  --text-h3: clamp(1.625rem, 1.5rem + 0.5vw, 2rem);
+  --text-h3--line-height: 1.1;
+  --text-h3--letter-spacing: -0.01em;
   --text-lead: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
   --text-lead--line-height: 1.45;
   --text-body: 1rem;
   --text-body--line-height: 1.55;
+  --text-body--letter-spacing: -0.01em;
   --text-small: 0.875rem;
-  --text-small--line-height: 1.5;
+  --text-small--line-height: 1.45;
+  --text-small--letter-spacing: -0.02em;
   --text-caption: 0.8125rem;
   --text-caption--line-height: 1.5;
   --text-label: 0.75rem;
@@ -92,8 +98,8 @@
 
 /* next/font sets the font variables on <html>; inline so the utilities resolve them there. */
 @theme inline {
-  --font-display: var(--font-instrument), "Iowan Old Style", "Palatino Linotype", Georgia, serif;
-  --font-display-italic: var(--font-instrument-italic), "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --font-display: var(--font-ptserif), Georgia, "Times New Roman", serif;
+  --font-display-italic: var(--font-ptserif-italic), Georgia, "Times New Roman", serif;
   --font-sans: var(--font-inter), "Helvetica Neue", Arial, sans-serif;
   /* Role colours: each resolves at the element to the nearest surface's --s-* value. `inline` is
      required: the utility must emit var(--s-*) itself, or :root would freeze the value. */
@@ -228,6 +234,7 @@
     font-optical-sizing: auto;
     font-size: var(--text-body);
     line-height: var(--text-body--line-height);
+    letter-spacing: -0.01em;
     font-feature-settings: "kern", "liga", "calt", "cv11";
     -webkit-font-smoothing: antialiased;
     overflow-x: clip;
@@ -243,6 +250,7 @@
     font-family: var(--font-display);
     font-weight: 400;
     letter-spacing: -0.02em;
+    line-height: 1.1;
     text-wrap: balance;
   }
 
@@ -327,7 +335,7 @@
     font-size: var(--text-label);
     line-height: 1.2;
     font-weight: 500;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
     color: var(--s-fg);
     max-width: none;
@@ -359,6 +367,25 @@
   }
   .marquee {
     animation: marquee 40s linear infinite;
+  }
+
+  /* The about hero's round pictures: each pops in (a small overshoot), then drifts slowly about its
+     spot. The pop is on the item and the drift on its frame, so the two never fight over transform. */
+  @keyframes bubble-pop {
+    from { opacity: 0; transform: scale(0.3); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  @keyframes bubble-drift {
+    0%, 100% { translate: 0 0; }
+    25% { translate: 7px -10px; }
+    50% { translate: -6px -4px; }
+    75% { translate: -9px 7px; }
+  }
+  .bubble-pop {
+    animation: bubble-pop 750ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+  .bubble-drift {
+    animation: bubble-drift 10s ease-in-out infinite;
   }
 
   /* The step timer's rule: fills left to right over one step. */

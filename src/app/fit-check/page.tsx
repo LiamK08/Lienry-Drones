@@ -13,10 +13,10 @@ export default function FitCheckPage() {
   const { hero, head } = fitCheckPage;
   return (
     <>
-      <SplitHero mobileLines={3} eyebrow={hero.eyebrow} headline={hero.headline} emphasis={hero.emphasis} lead={hero.lead} image={hero.image} />
+      <SplitHero mobileLines={2} eyebrow={hero.eyebrow} headline={hero.headline} emphasis={hero.emphasis} lead={hero.lead} image={hero.image} />
       <Band id="check" tone="plaster" labelledBy="check-heading">
         <Container>
-          <SectionHead id="check-heading" layout="center" eyebrow={head.eyebrow} headline={head.headline} intro={head.intro} />
+          <SectionHead id="check-heading" layout="center" size="h2s" eyebrow={head.eyebrow} headline={head.headline} intro={head.intro} />
           <div className="mx-auto mt-(--head-gap) max-w-6xl">
             <FitCheck id="page-fit" />
           </div>

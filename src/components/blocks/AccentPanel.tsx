@@ -12,7 +12,7 @@ export function AccentPanel({ id, headline, action, bleed = false, note }: { id:
       <div aria-hidden="true" className="pointer-events-none absolute -left-20 -top-20 -z-10 size-96 rounded-pill bg-white/15 blur-3xl" />
       <div aria-hidden="true" className="pointer-events-none absolute -bottom-32 right-0 -z-10 size-[28rem] rounded-pill bg-[#8ed4e0]/25 blur-3xl" />
       <div className="mx-auto flex max-w-3xl flex-col items-center px-4 text-center">
-        <h2 id={`${id}-heading`} className="text-[2rem] leading-[1.15] md:text-[2.75rem]">
+        <h2 id={`${id}-heading`} className="text-h2s">
           {headline}
         </h2>
         <Button href={action.href} variant="secondary" arrow className="mt-8">

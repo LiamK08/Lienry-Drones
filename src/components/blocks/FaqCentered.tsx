@@ -11,7 +11,7 @@ export function FaqCentered({ id = "faq", items, tone = "plaster" }: { id?: stri
         <div className="mx-auto max-w-2xl">
           <div className="flex flex-col items-center text-center">
             <p className="eyebrow">Got questions?</p>
-            <h2 id={`${id}-heading`} className="em-accent text-h2">
+            <h2 id={`${id}-heading`} className="em-accent text-h1">
               <Headline text="Frequently asked questions" emphasis="questions" />
             </h2>
           </div>

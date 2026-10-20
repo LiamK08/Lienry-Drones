@@ -48,7 +48,7 @@ export function FeatureRows({ id, tone = "plaster", items, startSide = "right" }
                 <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
                   <Reveal className={right ? "" : "lg:order-2"}>
                     {r.eyebrow ? <p className="eyebrow">{r.eyebrow}</p> : null}
-                    <h2 id={`${r.id}-heading`} className="text-[2rem] leading-[1.15] md:text-[2.5rem]">
+                    <h2 id={`${r.id}-heading`} className="text-h2s">
                       {r.title}
                     </h2>
                     <div className="mt-5 space-y-4">

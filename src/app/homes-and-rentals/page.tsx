@@ -22,7 +22,7 @@ export default function HomesPage() {
   const { hero, strip, rows, stats, safety, close } = homesPage;
   return (
     <>
-      <CenterHero mobileLines={4} eyebrow={hero.eyebrow} headline={hero.headline} emphasis={hero.emphasis} lead={hero.lead} primary={hero.primary} />
+      <CenterHero mobileLines={3} eyebrow={hero.eyebrow} headline={hero.headline} emphasis={hero.emphasis} lead={hero.lead} primary={hero.primary} />
       <WordStrip label={strip.label} items={strip.items} />
       <FeatureRows id="features" items={rows} />
       <LandlordStory />

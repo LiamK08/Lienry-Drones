@@ -22,7 +22,7 @@ export default function PlatformPage() {
   const { hero, parts, rows, statement, close } = platformPage;
   return (
     <>
-      <SplitHero mobileLines={3} eyebrow={hero.eyebrow} headline={hero.headline} emphasis={hero.emphasis} lead={hero.lead} primary={hero.primary} secondary={hero.secondary} image={hero.image} />
+      <SplitHero mobileLines={2} eyebrow={hero.eyebrow} headline={hero.headline} emphasis={hero.emphasis} lead={hero.lead} primary={hero.primary} secondary={hero.secondary} image={hero.image} />
       <PillarTabs id="parts" eyebrow={parts.eyebrow} headline={parts.headline} items={parts.items} />
       <FeatureRows id="features" tone="paper" items={rows} />
       <AccentPanel id="statement" bleed headline={statement.headline} action={statement.action} />
