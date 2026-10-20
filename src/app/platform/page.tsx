@@ -16,7 +16,8 @@ export const metadata: Metadata = pageMetadata(
 
 /**
  * /platform: the split hero, the six parts as tabs (each panel is the anchor the footer links to),
- * three feature rows, the accent statement, the questions, and the working software window.
+ * three feature rows each on its own ground (paper, white, mist), the dark statement band, the
+ * questions, and the working software window.
  */
 export default function PlatformPage() {
   const { hero, parts, rows, statement, close } = platformPage;
@@ -24,9 +25,11 @@ export default function PlatformPage() {
     <>
       <SplitHero mobileLines={2} eyebrow={hero.eyebrow} headline={hero.headline} emphasis={hero.emphasis} lead={hero.lead} primary={hero.primary} secondary={hero.secondary} image={hero.image} />
       <PillarTabs id="parts" eyebrow={parts.eyebrow} headline={parts.headline} items={parts.items} />
-      <FeatureRows id="features" tone="paper" items={rows} />
-      <AccentPanel id="statement" bleed headline={statement.headline} action={statement.action} />
-      <FaqCentered items={faqFor("platform")} />
+      <FeatureRows id="features" tone="paper" pad="feature" items={[rows[0]]} startSide="right" />
+      <FeatureRows id="systems-row" tone="plaster" pad="feature" items={[rows[1]]} startSide="left" />
+      <FeatureRows id="planned-row" tone="mist" pad="feature" items={[rows[2]]} startSide="right" />
+      <AccentPanel id="statement" bleed dark headline={statement.headline} action={statement.action} />
+      <FaqCentered tight items={faqFor("platform")} />
       <ProductClose id="close" headline={close.headline} body={close.body} action={close.action} />
     </>
   );

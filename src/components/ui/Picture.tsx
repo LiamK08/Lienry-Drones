@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { coverSizes, focusOf, getImage, largest, ratio, srcSet, variantSrcSet } from "@/lib/media";
 
-export type PictureAspect = "21/9" | "16/9" | "2/1" | "3/2" | "4/3" | "5/4" | "1/1" | "4/5" | "3/4" | "2/3";
+export type PictureAspect = "21/9" | "16/9" | "2/1" | "3/2" | "4/3" | "5/4" | "7/6" | "1/1" | "4/5" | "3/4" | "2/3";
 
 export type PictureProps = {
   /** A manifest still id (public/media). */

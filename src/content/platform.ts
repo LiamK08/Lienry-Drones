@@ -45,6 +45,7 @@ export const platformPage = {
       title: "On the roof, or beside the house",
       paragraphs: ["The commercial system docks in a roof capsule and is fed from above, for buildings under 70 metres. The home system docks in a ground pod that powers the drone and feeds it water."],
       callout: { title: "What both systems share", items: ["The same drone, scan and software", "A tether, so nothing is carried", "A clean with nobody on site"] },
+      aspect: "16/9" as const,
       image: { id: "m2-capsule-master", alt: "The Lienry roof capsule open on a flat roof, the drone on its cradle beside the tether reel", position: "50% 50%" },
     },
     {
@@ -54,6 +55,8 @@ export const platformPage = {
       paragraphs: ["Booked cleans happen on a crew's calendar. A resident drone works from the scan instead: it checks the building, finds where debris has built up, and cleans there."],
       checks: ["A re-scan that shades built-up debris", "A clean you can start from anywhere", "A record of what was cleaned and when"],
       link: { label: "Register interest", href: "/register-interest" },
+      linkStyle: "primary" as const,
+      aspect: "16/9" as const,
       image: { id: "m3-pod-master", alt: "The Lienry ground pod open beside a garden tap, the home drone inside", position: "35% 50%" },
     },
   ],

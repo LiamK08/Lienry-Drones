@@ -28,7 +28,7 @@ export type SplitHeroProps = {
 export function SplitHero({ eyebrow, headline, emphasis, lead, primary, secondary, image, tone = "paper", mobileLines }: SplitHeroProps) {
   const hold = holdLines(mobileLines);
   return (
-    <Band id="hero" as="header" tone={tone} pad="hero" labelledBy="hero-heading">
+    <Band id="hero" as="header" tone={tone} pad="split" labelledBy="hero-heading">
       <Container>
         <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
           <div>
@@ -36,9 +36,9 @@ export function SplitHero({ eyebrow, headline, emphasis, lead, primary, secondar
             <h1 id="hero-heading" className={`em-accent text-h1 ${hold.className}`} style={hold.style}>
               <Headline text={headline} emphasis={emphasis} />
             </h1>
-            {lead ? <p className="mt-5 max-w-xl text-body text-fg-muted md:text-lead">{lead}</p> : null}
+            {lead ? <p className="mt-4 max-w-xl text-small text-fg-muted">{lead}</p> : null}
             {primary || secondary ? (
-              <div className="mt-8 flex flex-col items-start gap-3 sm:flex-row">
+              <div className="mt-6 flex flex-col items-start gap-3 sm:flex-row">
                 {primary ? (
                   <Button href={primary.href} arrow>
                     {primary.label}
@@ -52,7 +52,7 @@ export function SplitHero({ eyebrow, headline, emphasis, lead, primary, secondar
               </div>
             ) : null}
           </div>
-          <Picture id={image.id} alt={image.alt} position={image.position} aspect="5/4" aspectSm="4/3" rounded="card" priority className="-order-1 lg:order-none" sizes="(min-width: 1440px) 684px, (min-width: 1024px) 50vw, 100vw" />
+          <Picture id={image.id} alt={image.alt} position={image.position} aspect="7/6" aspectMd="16/9" aspectSm="4/3" rounded="card" priority className="-order-1 lg:order-none" sizes="(min-width: 1440px) 684px, (min-width: 1024px) 50vw, 100vw" />
         </div>
       </Container>
     </Band>

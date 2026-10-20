@@ -5,9 +5,9 @@ import { Headline } from "@/components/ui/SectionHead";
 import { Reveal } from "@/components/ui/Reveal";
 
 /** The questions, centred: the eyebrow, "Frequently asked questions" with its accent italic, then the rows. */
-export function FaqCentered({ id = "faq", items, tone = "plaster" }: { id?: string; items: readonly FaqItem[]; tone?: "plaster" | "paper" }) {
+export function FaqCentered({ id = "faq", items, tone = "plaster", tight = false }: { id?: string; items: readonly FaqItem[]; tone?: "plaster" | "paper"; tight?: boolean }) {
   return (
-    <Band id={id} tone={tone} labelledBy={`${id}-heading`}>
+    <Band id={id} tone={tone} pad={tight ? "none" : "section"} labelledBy={`${id}-heading`} className={tight ? "pb-6 pt-20 lg:pt-[7.5rem]" : ""}>
       <Container>
         <div className="mx-auto max-w-2xl">
           <Reveal animate y={10} className="flex flex-col items-center text-center">

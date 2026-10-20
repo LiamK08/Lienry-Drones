@@ -30,7 +30,7 @@ export function PillarTabs({ id, eyebrow, headline, items }: { id: string; eyebr
   }, [id, items]);
 
   return (
-    <Band id={id} tone="plaster" labelledBy={`${id}-heading`}>
+    <Band id={id} tone="plaster" pad="tabs" labelledBy={`${id}-heading`}>
       <Container>
         <SectionHead id={`${id}-heading`} layout="center" size="h2s" eyebrow={eyebrow} headline={headline} className="scroll-mt-24" />
         <div role="tablist" aria-label={headline} className="no-scrollbar mx-auto mt-10 flex max-w-4xl gap-6 overflow-x-auto border-b border-line md:justify-center">

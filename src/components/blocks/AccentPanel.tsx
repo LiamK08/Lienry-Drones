@@ -3,19 +3,29 @@ import { Band, Container } from "@/components/ui/Band";
 import { Button } from "@/components/ui/Button";
 
 /**
- * The closing ask: a rounded accent panel (inset), or a full-bleed accent band (`bleed`), with a soft
- * light wash, a centred serif line and one white pill.
+ * The closing ask: a rounded accent panel (inset), or a full-bleed band (`bleed`), with a soft light
+ * wash, a centred serif line and one white pill. `dark` is the platform's statement band: near-black
+ * with teal glows and a small white pill.
  */
-export function AccentPanel({ id, headline, action, bleed = false, note }: { id: string; headline: string; action: Action; bleed?: boolean; note?: string }) {
+export function AccentPanel({ id, headline, action, bleed = false, dark = false, note }: { id: string; headline: string; action: Action; bleed?: boolean; dark?: boolean; note?: string }) {
   const inner = (
-    <div className={`on-dark relative isolate overflow-hidden bg-accent text-white ${bleed ? "py-24" : "rounded-panel px-6 py-20 md:py-28"}`}>
-      <div aria-hidden="true" className="pointer-events-none absolute -left-20 -top-20 -z-10 size-96 rounded-pill bg-white/15 blur-3xl" />
-      <div aria-hidden="true" className="pointer-events-none absolute -bottom-32 right-0 -z-10 size-[28rem] rounded-pill bg-[#8ed4e0]/25 blur-3xl" />
+    <div className={`on-dark relative isolate overflow-hidden text-white ${dark ? "bg-[#0a0a0a]" : "bg-accent"} ${bleed ? "py-24" : "rounded-panel px-6 py-20 md:py-28"}`}>
+      {dark ? (
+        <>
+          <div aria-hidden="true" className="pointer-events-none absolute -left-10 top-1/2 -z-10 h-[30rem] w-[48rem] -translate-y-1/2 rounded-pill bg-accent/70 blur-[100px]" />
+          <div aria-hidden="true" className="pointer-events-none absolute -right-20 top-0 -z-10 h-80 w-[40rem] rounded-pill bg-[#1c4f5a]/80 blur-[90px]" />
+        </>
+      ) : (
+        <>
+          <div aria-hidden="true" className="pointer-events-none absolute -left-20 -top-20 -z-10 size-96 rounded-pill bg-white/15 blur-3xl" />
+          <div aria-hidden="true" className="pointer-events-none absolute -bottom-32 right-0 -z-10 size-[28rem] rounded-pill bg-[#8ed4e0]/25 blur-3xl" />
+        </>
+      )}
       <div className="mx-auto flex max-w-3xl flex-col items-center px-4 text-center">
         <h2 id={`${id}-heading`} className="text-h2s">
           {headline}
         </h2>
-        <Button href={action.href} variant="secondary" arrow className="mt-8">
+        <Button href={action.href} variant="secondary" size={dark ? "sm" : "md"} arrow={!dark} className={dark ? "mt-6" : "mt-8"}>
           {action.label}
         </Button>
         {note ? <p className="mt-6 text-caption text-white">{note}</p> : null}

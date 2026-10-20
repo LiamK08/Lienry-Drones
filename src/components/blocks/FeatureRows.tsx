@@ -20,6 +20,10 @@ export type FeatureRowItem = {
   media?: ReactNode;
   /** A strip of four short facts under the row. */
   facts?: readonly { title: string; text: string }[];
+  /** The picture's frame from 1024. Default "4/3"; "16/9" is the wide, shorter frame. */
+  aspect?: "4/3" | "16/9";
+  /** The row's pill: a small white one (default) or the accent one with its arrow badge. */
+  linkStyle?: "secondary" | "primary";
 };
 
 function Check() {
@@ -36,9 +40,22 @@ function Check() {
  * picture on the right). Text: an optional eyebrow, the h2, paragraphs, a check list, a tinted callout
  * and a pill. Below 1024 the picture follows the text. A row may close with four short facts.
  */
-export function FeatureRows({ id, tone = "plaster", items, startSide = "right" }: { id: string; tone?: "plaster" | "paper"; items: readonly FeatureRowItem[]; startSide?: "left" | "right" }) {
+export function FeatureRows({
+  id,
+  tone = "plaster",
+  items,
+  startSide = "right",
+  pad = "section",
+}: {
+  id: string;
+  tone?: "plaster" | "paper" | "mist";
+  items: readonly FeatureRowItem[];
+  startSide?: "left" | "right";
+  /** "feature" is the platform's 88px row band. */
+  pad?: "section" | "feature";
+}) {
   return (
-    <Band id={id} tone={tone} ariaLabel="Features">
+    <Band id={id} tone={tone} pad={pad} ariaLabel="Features">
       <Container>
         <div className="flex flex-col gap-24 lg:gap-32">
           {items.map((r, i) => {
@@ -47,13 +64,13 @@ export function FeatureRows({ id, tone = "plaster", items, startSide = "right" }
               <section key={r.id} id={r.id} aria-labelledby={`${r.id}-heading`} className="scroll-mt-24">
                 <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
                   <Reveal className={right ? "" : "lg:order-2"}>
-                    {r.eyebrow ? <p className="eyebrow">{r.eyebrow}</p> : null}
-                    <h2 id={`${r.id}-heading`} className="text-h2s">
+                    {r.eyebrow ? <p className="eyebrow eyebrow-plain">{r.eyebrow}</p> : null}
+                    <h2 id={`${r.id}-heading`} className="text-h3">
                       {r.title}
                     </h2>
-                    <div className="mt-5 space-y-4">
+                    <div className="mt-4 space-y-3">
                       {r.paragraphs.map((p) => (
-                        <p key={p} className="max-w-xl text-body text-fg-muted">
+                        <p key={p} className="max-w-xl text-small text-fg-muted">
                           {p}
                         </p>
                       ))}
@@ -79,17 +96,23 @@ export function FeatureRows({ id, tone = "plaster", items, startSide = "right" }
                       </div>
                     ) : null}
                     {r.link ? (
-                      <Button href={r.link.href} variant="secondary" size="sm" className="mt-8">
-                        {r.link.label}
-                      </Button>
+                      r.linkStyle === "primary" ? (
+                        <Button href={r.link.href} arrow className="mt-6">
+                          {r.link.label}
+                        </Button>
+                      ) : (
+                        <Button href={r.link.href} variant="secondary" size="sm" className="mt-6">
+                          {r.link.label}
+                        </Button>
+                      )
                     ) : null}
                   </Reveal>
                   <div className={right ? "" : "lg:order-1"}>
-                    {r.media ?? (r.image ? <Picture id={r.image.id} alt={r.image.alt} position={r.image.position} aspect="4/3" rounded="card" sizes="(min-width: 1440px) 684px, (min-width: 1024px) 50vw, 100vw" /> : null)}
+                    {r.media ?? (r.image ? <Picture id={r.image.id} alt={r.image.alt} position={r.image.position} aspect={r.aspect ?? "4/3"} aspectSm="4/3" rounded="card" sizes="(min-width: 1440px) 684px, (min-width: 1024px) 50vw, 100vw" /> : null)}
                   </div>
                 </div>
                 {r.facts ? (
-                  <ul className="mt-16 grid gap-8 border-t border-line pt-8 md:grid-cols-2 lg:grid-cols-4 lg:gap-0">
+                  <ul className="mt-12 grid gap-8 pt-2 md:grid-cols-2 lg:grid-cols-4 lg:gap-0">
                     {r.facts.map((f, k) => (
                       <li key={f.title} className={k ? "lg:border-l lg:border-line lg:pl-6" : "lg:pr-6"}>
                         <p className="text-small font-medium text-fg">{f.title}</p>
