@@ -3,9 +3,28 @@
 // `headline`, images are ImageRef-compatible `{ id, alt, position }` with manifest still ids, and links
 // are Action-compatible `{ label, href }`.
 
-export const privacyPage = {
+export type PrivacySection = {
+  title: string;
+  /** The opening paragraph; the lead-in line when a list follows. */
+  body: string;
+  /** Optional items under the lead-in, rendered as lettered lines: (a), (b), (c). */
+  list?: readonly string[];
+  /** Optional paragraph after the list. */
+  close?: string;
+  /** Optional link: where `label` appears in the section's text (its first place in that line), it links to `href`. */
+  link?: { label: string; href: string };
+};
+
+export const privacyPage: {
+  headline: string;
+  updated: string;
+  /** The legal tab strip under the hero. Lienry has one legal page; later ones slot in here. */
+  legalPages: readonly { label: string; href: string }[];
+  sections: readonly PrivacySection[];
+} = {
   headline: "Privacy policy.",
   updated: "September 2026",
+  legalPages: [{ label: "Privacy policy", href: "/privacy" }],
   sections: [
     {
       title: "Who we are",
@@ -13,7 +32,16 @@ export const privacyPage = {
     },
     {
       title: "What we collect",
-      body: "When you register interest we collect the details you give us: your name, email address, phone number if you provide it, the type of property you are asking about, its location, your message, and which kind of enquiry you selected.",
+      body: "When you register interest we collect the details you give us:",
+      list: [
+        "your name;",
+        "your email address;",
+        "your phone number, if you provide it;",
+        "the type of property you are asking about;",
+        "its location;",
+        "your message; and",
+        "which kind of enquiry you selected.",
+      ],
     },
     {
       title: "How we use it",
@@ -29,7 +57,11 @@ export const privacyPage = {
     },
     {
       title: "Your rights",
-      body: "You can ask us what we hold about you, ask us to correct it, or ask us to delete it, in line with the Australian Privacy Principles. Contact us through the enquiry form on the Register interest page.",
+      body: "In line with the Australian Privacy Principles, you can ask us:",
+      list: ["what we hold about you;", "to correct it; or", "to delete it."],
+      close: "Contact us through the enquiry form on the Register interest page.",
+      // Check 24: a link to /register-interest reads exactly "Register interest".
+      link: { label: "Register interest", href: "/register-interest" },
     },
   ],
 };
