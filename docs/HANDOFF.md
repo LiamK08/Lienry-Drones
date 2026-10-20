@@ -37,8 +37,9 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
   768; `check:rules` (with motion) passes on all 12 routes at 1440 and 390; `check:a11y` passes on all
   12 routes; `perf:vitals` (three runs each) passes on all 11 pages.
 - 21 October: at the owner's request the home hero shows only the headline and the support line,
-  64px above the strip from 768 (80 on phones): its two pills are gone, and the film's pause control
-  is hidden until a keyboard reaches it (it then shows bottom right, so WCAG 2.2.2 still holds).
+  64px above the strip from 768 (80 on phones): its two pills and the film's pause control are gone.
+  The owner chose to drop the pause control entirely, knowing WCAG 2.2.2 asks for one on a looping
+  film; reduced motion and Save-Data still get the still poster instead of the film.
 - The owner said the imagery is not good enough yet and will be redone in Higgsfield later. Until
   they say so, keep the current stills and film in the new layouts.
 

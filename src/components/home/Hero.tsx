@@ -1,7 +1,7 @@
 "use client";
 
 import { hero } from "@/content/home";
-import { FilmLayer, FilmPause, useFilm } from "@/components/ui/FilmMedia";
+import { FilmLayer, useFilm } from "@/components/ui/FilmMedia";
 import { Headline } from "@/components/ui/SectionHead";
 
 // A veil over the whole film, the header scrim, and a deeper scrim behind the centred head.
@@ -15,9 +15,8 @@ const scrims = (
 
 /**
  * The home hero: the film full screen, the centred headline low in the frame with its italic turn,
- * then the support line. Nothing else sits on the film: its pause control stays out of sight until a
- * keyboard reaches it (WCAG 2.2.2), then shows bottom right. Under reduced motion or Save-Data the
- * poster stands alone.
+ * then the support line. Nothing else sits on the film, which has no pause control (the owner's call,
+ * 21 October). Under reduced motion or Save-Data the poster stands alone.
  */
 export function Hero() {
   const film = useFilm({ videoId: hero.videoId, threshold: 0.1 });
@@ -29,9 +28,6 @@ export function Hero() {
           <Headline text={hero.headline} emphasis={hero.emphasis} />
         </h1>
         <p className="mt-5 max-w-[34rem] text-balance text-body text-white/90 md:max-w-[46rem] md:text-lead">{hero.support}</p>
-      </div>
-      <div className="page-x pointer-events-none absolute inset-x-0 bottom-6 flex justify-end opacity-0 focus-within:pointer-events-auto focus-within:opacity-100">
-        <FilmPause film={film} name="hero film" />
       </div>
     </section>
   );
