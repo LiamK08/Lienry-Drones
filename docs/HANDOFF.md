@@ -1,23 +1,26 @@
 # Handoff, 20 October 2026
 
-Read this first in a new session, then `CLAUDE.md` and the Status section of `docs/DESIGN-PASS.md`.
-Update this file at the end of each session.
+Read this first in a new session, then `CLAUDE.md`. Update this file at the end of each session.
 
 ## Where things stand
 
-- The October design pass is finished on every page. Home and the eight inner pages (/platform,
-  /commercial, /homes-and-rentals, /solar, /company, /download, /register-interest, /privacy) and
-  the 404 page are built on the new system.
-- `main` is at `7e53da9` and deploys to www.lienrydrones.com. The work branch was
-  `claude/nifty-wozniak-ini85h`; it matches `main`.
-- At `7e53da9`, all four gates passed on every route:
-  - `check:layout`
-  - `check:rules`
-  - `check:a11y`
-  - `perf:vitals` (mobile, applied throttling, three runs). Median LCP ran from 1.6 s to 2.42 s
-    (/commercial is the closest to the 2.5 s limit). CLS was at most 0.08 (/solar).
-- PR #13 (the design pass) was closed rather than merged, because the owner asked for each step to
-  be pushed straight to `main`. There is no open PR.
+- On 20 October the owner asked for the site to follow refresh.tech's layout as closely as possible,
+  in Lienry's own words, fonts, colours and media. That is built and live on `main` (`b929b3d` and
+  after): the shell (pill buttons, dotted eyebrows, centred heads, the menus header and the near-black
+  footer), home, /platform, /commercial, /homes-and-rentals, /solar, /company, /register-interest,
+  /download, and two new pages, /fit-check and /calculator. /privacy and the 404 keep their October
+  layouts on the new tokens.
+- Where a ReFresh section rests on things Lienry does not have (customer logos, testimonials, case
+  studies, security certifications, articles), the page shows an honest stand-in: a strip of what it
+  is designed for, three settings with design-intent and cited figures, link cards into Lienry's own
+  pages, and safety-by-design tiles. Keep it that way.
+- Gates at `b929b3d`: typecheck, lint and build pass; `check:a11y` passes on all 11 routes;
+  `perf:vitals` (mobile, applied throttling, one run each) passes on all 11, LCP 1.7 to 2.3 s, CLS
+  under 0.1. `check:layout` and `check:rules` encode the October 4px, left-aligned system and fail by
+  design on shape, alignment, eyebrow and headline length; read only their honesty checks (11, 12,
+  22, 24), which pass apart from check 13's old demand for a software window on the home page.
+- The owner said the imagery is not good enough yet and will be redone in Higgsfield later. Until
+  they say so, keep the current stills and film in the new layouts.
 
 ## How the owner works
 
@@ -50,56 +53,39 @@ NODE_USE_ENV_PROXY=1 node scripts/perf-vitals.mjs http://localhost:3000 [routes]
 - **Proxy:** Chromium does not trust the proxy CA. The scripts route requests through Playwright
   (`scripts/media/lib.mjs` `routed()`), and Node needs `NODE_USE_ENV_PROXY=1`.
 
-## Rules that are easy to break (the checks enforce them)
+## Rules that are easy to break
 
-- **Bands:** every page alternates plaster and ink bands and ends on plaster, because the footer is
-  ink. The one exception is a band with `pad="attached"` straight after the hero, in its tone
-  (/commercial's steps). No raised or sunken bands.
-- **Headings:**
-  - Every h1 and h2 has a lowercase eyebrow of 1 to 3 words and runs to 7 words at most.
-  - A section has at most one italic, and it is the trailing phrase (`emphasis`) of the band's own
-    heading.
-  - No heading or band intro may end on a one-word line, at 1440 or at 390.
-- **Copy:**
-  - Every `p` in `<main>` runs 2 lines at most at 1440. The exceptions are `[data-prose]`, forms,
-    `.letter` and `[data-ui]`.
-  - The words seen at load stay within 0.667 × the route's figure in `scripts/copy-baseline.json`.
-    /solar has about 3 words to spare.
-- **Claims:**
-  - No customers, results, prices, savings, approvals or certifications.
-  - "approval" may appear only in the FAQ's "We do not claim any approvals" and the Honest by default
-    rule (`companyPage.values.items`; keep that path).
-  - "$" may appear only inside the calculator.
-- **Media:**
-  - All 29 manifest ids must appear somewhere on the site.
-  - An id may show only once per route.
-  - Never show a closed ground pod (ho1, y1, p5, so1) beside an open one (m3, p3, p4, y3, y5).
-  - No new or replacement imagery without the owner's say. The phone poster of the software
-    recording was recompressed in place (same frame) to fit the /download load budget.
-- **Spacing:** utilities use the 8px scale only (multipliers 0, px, 2, 4, 6, 8, 10, 12, 16, 20, 24,
-  32, 40) or the layout variables, such as `py-(--section-y)` and `mt-(--head-gap)`.
-- **Font swap shifts layout:** on a phone, Lighthouse loads pages at 412px. If an h1 wraps
-  differently in the fallback font, the hero image moves. /solar's headline was chosen so it wraps
-  the same in both fonts, with `breakBefore` from 768.
+- **Honesty:** no customers, logos, testimonials, results, prices, savings, certifications or
+  approvals. "approval" appears only in the FAQ's "We do not claim any approvals" (and the Honest by
+  default rule in `companyPage.values.items`; keep that path, check 11 reads it). Figures are design
+  intent (say so) or cited from `src/content/stats.ts` with their source links.
+- **Original words:** take layout and interaction patterns from refresh.tech, never its text,
+  headings, code, imagery, icons or logo. Write every line fresh for Lienry.
+- **Font swap:** at Lighthouse's 412px width many headings wrap one line differently in the fallback
+  font. Give each hero its `mobileLines` (the fallback line count) or the page shifts.
+- **Transitions:** use `transition-[background-color,border-color,color]`, not `transition-colors`,
+  on anything focusable: the latter animates the outline colour and the focus ring fails contrast.
+- **Media:** no new or replacement imagery without the owner's say. Never pair a closed ground pod
+  (ho1, y1, p5, so1) beside an open one (m3, p3, p4, y3, y5) in one view.
 - **Next.js 16:** read `node_modules/next/dist/docs` before touching framework APIs.
 
 ## Building blocks
 
-- **Sections** (`src/components/sections`):
-  - `PageHero` (image, film or `after`)
-  - `ClosingSection` (collage or image)
-  - `CardGrid` (2 or 3 columns, optional anchors)
-  - `StepCards` (`pad="attached"` allowed)
-  - `FeatureRow`
-  - `StatBand` (cited stats from `src/content/stats.ts`)
-  - `Faq` (ids from `faqFor(set)` in `src/content/faq.ts`)
-  - `CostCalculator`
-  - `HeroFilmFrame`
-- **Home only** (`src/components/home`): `Hero`, `Benefits`, `Flow`, `PlacesRow`, `VisionLetter`.
-  `LandlordStory` (the app story, on ink) also lives there and is used on /homes-and-rentals.
-- **Copy:** one module per route in `src/content`.
-- **UI** (`src/components/ui`): `Band` / `Container`, `SectionHead`, `MediaCard`, `Picture`,
-  `Reveal`, `SnapTrack`, `StepTabs`, `Field`, `Button`.
+- **Pattern blocks** (`src/components/blocks`): `SplitHero` (platform, fit check, calculator),
+  `CenterHero` (solution pages), `BubbleHero` (company), `WordStrip`, `FeatureRows` (alternating rows
+  with checks, callout, fact strip, or a node such as the software window), `PillarTabs` (the six
+  parts; each panel id is the footer anchor), `SafetyBlock`, `AccentPanel` (inset or full bleed),
+  `FaqCentered` and `FaqRows`, `ProductClose` (the framed software window), `FitCheck`, `Icon`,
+  `holdLines`.
+- **Home** (`src/components/home`): `Hero`, `Strip` (marquee), `WhyFit`, `ExpandCards`, `StepTimer`,
+  `SystemCards`, `Explore`, `SafetyPanel`, `FaqForm`; `LandlordStory` is used on /homes-and-rentals.
+- **Earlier sections still in use**: `StatBand` (cited figures), `CostCalculator`, `PageHero` (404),
+  `Faq` types.
+- **Copy:** one module per route in `src/content` (`tools.ts` for /fit-check and /calculator). Menus
+  and footer links in `src/lib/site.ts`.
+- **Tokens** (`src/app/globals.css`): `bg-paper`, `bg-tint`, `bg-night`, `border-line`, `text-accent`,
+  `rounded-card`, `rounded-panel`, `rounded-pill`; Band tones `plaster` (white), `paper`, `tint`,
+  `ink`, `night`.
 
 ## Waiting on the owner
 
@@ -112,8 +98,10 @@ NODE_USE_ENV_PROXY=1 node scripts/perf-vitals.mjs http://localhost:3000 [routes]
 
 ## Possible next steps
 
+- Swap in the owner's Higgsfield imagery and films when they have the account (the layouts take
+  them as they are: tall 2:3 or 1:1.83 portraits for the expanding cards, 1200x483 for the step panel,
+  4:3 for feature rows).
+- Update `check:layout` and `check:rules` to the new system (pills, card radius, centred heads,
+  dotted capitals eyebrows) so they gate again instead of failing by design.
+- /privacy and the 404 could move to the new templates.
 - Answer any of the five questions above as the owner replies.
-- Take side-by-side screenshots at 1440 and 390 for every page, and look over each page by eye.
-- Run `npm run contrast` and `perf:motion`; neither has run since the inner pages were rebuilt.
-- Add hover clips to the other benefit cards and the closing collages once films exist (owner
-  approval needed).

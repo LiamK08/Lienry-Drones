@@ -16,19 +16,32 @@ primary source. The imagery is AI-generated. The owner removed the Concept rende
 The coded software preview carries Demo data and an illustrative-model note.
 No new or replacement media without the user's instructions.
 
-Type: two families only, Instrument Serif for headings and Inter for everything else.
-Every size comes from a step of the scale in `src/app/globals.css`; there is no step
-between H3 and body, so every heading element sits on H3 or above. Labels are the only
-uppercase. Everything is left aligned except the home hero.
+Layout (since 20 October 2026, the owner's brief): the site follows refresh.tech's page
+templates, section order and interaction patterns, in Lienry's own words, fonts, colours and
+media. White ground, a warm paper band and a pale accent tint; Lienry's glass teal is the one
+accent; near-black for the dark band and the footer. Section heads may be centred.
 
-Shape: one radius token, `--radius-hard` at 4px. No pills, chips, badges, pastel tints,
-glows, blurs, text shadows or gradient text.
+Type: two families only, Instrument Serif for headings, display lines and the footer logo, and
+Inter for everything else. Eyebrows are an accent dot and 12px capitals (`.eyebrow`).
+
+Shape: buttons are pills (`rounded-pill`, optional round arrow badge); cards are `rounded-card`
+(16px), panels `rounded-panel` (20px); small tags and form fields keep `--radius-hard` (4px).
+Soft blurred accent glows are allowed behind heroes and accent panels. No text shadows or
+gradient text.
+
+Checks: `check:a11y` and `perf:vitals` gate every route. `check:layout` and `check:rules` still
+encode the earlier 4px, left-aligned system, so their shape, alignment, eyebrow and headline
+checks fail by design; their honesty checks (11 claims, 12 captions, 22 titles, 24 enquiry
+labels) still apply. Hero headings hold their fallback-font line count on phones (`holdLines`),
+or the web font arriving shifts the page.
 
 Header contrast: `npm run contrast -- <frame>` proves the bar stays legible over the hero
 film. Run it after touching the header, the hero scrim or the primary button.
 
-Legora is a reference for quality and structure only. No Legora code, text, imagery,
-icons, logos or assets enter this repository, and the site never loads one.
+Legora and refresh.tech are references for quality and structure only. No Legora or ReFresh
+code, text, imagery, icons, logos or assets enter this repository, and the site never loads
+one. Where a ReFresh section rests on customers, logos, testimonials or certifications, Lienry
+shows an honest stand-in (design facts, cited figures, links into its own pages).
 
 <!-- BEGIN:nextjs-agent-rules -->
 
