@@ -60,8 +60,9 @@ function TabsView({ type, onSelect }: { type: EnquiryType; onSelect: (t: Enquiry
     document.getElementById(tabId(enquiryTypes[to]))?.focus();
   }
 
+  // data-sweep="form": the tabs choose the form's fields, so the band's height follows them (check 3).
   return (
-    <div>
+    <div data-sweep="form">
       <div role="tablist" aria-label={t.label} className="grid grid-cols-2 justify-items-center gap-y-[11px] md:grid-cols-4">
         {enquiryTypes.map((k, i) => {
           const on = k === type;

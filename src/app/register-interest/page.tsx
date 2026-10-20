@@ -36,9 +36,9 @@ export default function RegisterInterestPage() {
     <Band
       id="register"
       tone="plaster"
-      pad="hero"
+      pad="none"
       labelledBy="register-heading"
-      className="z-10 overflow-x-clip lg:pt-[calc(var(--nav-h)+3.5rem)] lg:pb-[5.625rem]"
+      className="z-10 overflow-x-clip pt-(--hero-top) pb-(--section-y) lg:pt-[calc(var(--nav-h)+3.5rem)] lg:pb-[5.625rem]"
     >
       <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-[18rem] size-[28rem] -translate-x-1/2 rounded-pill bg-[#d9c7a8]/20 blur-3xl" />
       <div aria-hidden="true" className="pointer-events-none absolute -bottom-48 left-1/2 size-[24rem] -translate-x-1/2 rounded-pill bg-accent/10 blur-3xl" />

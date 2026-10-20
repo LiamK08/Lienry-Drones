@@ -44,7 +44,7 @@ const column = (i: number) => (i ? "md:border-l md:border-line/50 md:pl-6 md:pb-
  */
 function PaperBand({ id, eyebrow, headline, emphasis, breakBefore, aside, image, children }: { id: string; eyebrow: string; headline: string; emphasis?: string; breakBefore?: boolean; aside: ReactNode; image: ImageRef; children: ReactNode }) {
   return (
-    <Band id={id} tone="paper" pad="feature" labelledBy={`${id}-heading`} className="max-md:py-14">
+    <Band id={id} tone="paper" pad="none" labelledBy={`${id}-heading`} className="py-14 md:py-16 lg:py-[5.5rem]">
       <div className="mx-auto w-full max-w-[83rem]">
         <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between md:gap-10">
           <div className="min-w-0">

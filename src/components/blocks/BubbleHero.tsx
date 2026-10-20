@@ -31,6 +31,7 @@ export function BubbleHero({ headline, emphasis, lead, images, mobileLines }: { 
       id="hero"
       data-band="hero"
       data-tone="ink"
+      data-scatter=""
       aria-labelledby="hero-heading"
       className="on-dark relative isolate min-h-[848px] overflow-hidden bg-[linear-gradient(to_bottom,var(--color-accent)_0%,var(--color-accent)_47%,color-mix(in_srgb,var(--color-accent)_88%,#ffffff)_72%,#ffffff_100%)] pb-20 pt-[300px] text-white lg:flex lg:min-h-[900px] lg:flex-col lg:justify-center lg:pb-0 lg:pt-0"
     >

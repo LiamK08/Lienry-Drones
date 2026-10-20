@@ -16,7 +16,7 @@ export const downloadPage = {
     },
   },
   hero: {
-    eyebrow: "lienry desktop",
+    eyebrow: "Lienry Desktop",
     headline: "Your building, on your desk.",
     emphasis: "on your desk.",
     lead: "See the 3D scan of your building, set zones and pressure, and watch every wash live.",
@@ -29,7 +29,7 @@ export const downloadPage = {
     register: { label: "Register interest", href: "/register-interest" },
   },
   features: {
-    eyebrow: "what it does",
+    eyebrow: "What it does",
     headline: "What the software does.",
     intro: "Every clean is planned on a model of your own building.",
     items: [

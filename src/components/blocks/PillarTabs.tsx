@@ -58,22 +58,27 @@ export function PillarTabs({ id, eyebrow, headline, items }: { id: string; eyebr
             </button>
           ))}
         </div>
-        {items.map((p, i) => (
-          <div key={p.id} id={p.id} role="tabpanel" aria-labelledby={`${id}-tab-${p.id}`} hidden={i !== active} className="mx-auto mt-12 max-w-4xl">
-            <div className="grid items-center gap-10 md:grid-cols-[0.8fr_1fr] md:gap-14">
-              <Picture id={p.image.id} alt={p.image.alt} position={p.image.position} aspect="1/1" rounded="card" sizes="(min-width: 1024px) 380px, 100vw" />
-              <div>
-                <h3 className="text-h3">{p.title}</h3>
-                <p className="mt-4 text-small text-fg-muted">{p.body}</p>
-                {p.link ? (
-                  <Button href={p.link.href} variant="secondary" size="sm" className="mt-6">
-                    {p.link.label}
-                  </Button>
-                ) : null}
+        {/* Every panel shares one grid cell, so the band keeps the tallest panel's height and switching
+            a tab never moves the page (check 3). Inactive panels are invisible, out of the tab order and
+            the accessibility tree (visibility: hidden). */}
+        <div className="mx-auto mt-12 grid max-w-4xl">
+          {items.map((p, i) => (
+            <div key={p.id} id={p.id} role="tabpanel" aria-labelledby={`${id}-tab-${p.id}`} className={`[grid-area:1/1] ${i === active ? "visible" : "invisible"}`}>
+              <div className="grid items-center gap-10 md:grid-cols-[0.8fr_1fr] md:gap-14">
+                <Picture id={p.image.id} alt={p.image.alt} position={p.image.position} aspect="1/1" rounded="card" sizes="(min-width: 1024px) 380px, 100vw" />
+                <div>
+                  <h3 className="text-h3">{p.title}</h3>
+                  <p className="mt-4 text-small text-fg-muted">{p.body}</p>
+                  {p.link ? (
+                    <Button href={p.link.href} variant="secondary" size="sm" className="mt-6">
+                      {p.link.label}
+                    </Button>
+                  ) : null}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </Container>
     </Band>
   );
