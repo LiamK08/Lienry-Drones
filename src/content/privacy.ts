@@ -29,7 +29,7 @@ export const privacyPage = {
     },
     {
       title: "Your rights",
-      body: "You can ask us what we hold about you, ask us to correct it, or ask us to delete it, in line with the Australian Privacy Principles. Contact us using the details on the Company page.",
+      body: "You can ask us what we hold about you, ask us to correct it, or ask us to delete it, in line with the Australian Privacy Principles. Contact us through the enquiry form on the Register interest page.",
     },
   ],
 };

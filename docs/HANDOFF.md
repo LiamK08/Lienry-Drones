@@ -8,8 +8,8 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
   in Lienry's own words, fonts, colours and media. That is built and live on `main` (`b929b3d` and
   after): the shell (pill buttons, dotted eyebrows, centred heads, the menus header and the near-black
   footer), home, /platform, /commercial, /homes-and-rentals, /solar, /company, /register-interest,
-  /download, and two new pages, /fit-check and /calculator. /privacy and the 404 keep their October
-  layouts on the new tokens.
+  /download, /privacy (centred legal header, sticky contents beside the policy) and the 404, plus two
+  new pages, /fit-check and /calculator.
 - Where a ReFresh section rests on things Lienry does not have (customer logos, testimonials, case
   studies, security certifications, articles), the page shows an honest stand-in: a strip of what it
   is designed for, three settings with design-intent and cited figures, link cards into Lienry's own
@@ -103,5 +103,4 @@ NODE_USE_ENV_PROXY=1 node scripts/perf-vitals.mjs http://localhost:3000 [routes]
   4:3 for feature rows).
 - Update `check:layout` and `check:rules` to the new system (pills, card radius, centred heads,
   dotted capitals eyebrows) so they gate again instead of failing by design.
-- /privacy and the 404 could move to the new templates.
 - Answer any of the five questions above as the owner replies.

@@ -1,7 +1,7 @@
-// The 404 page's copy (src/app/not-found.tsx, package P7): a PageHero with no media.
+// The 404 page's copy (src/app/not-found.tsx): a centred message with the way home.
 
 export const notFoundPage = {
-  eyebrow: "not found",
+  eyebrow: "Not found",
   headline: "Nothing lives at this address.",
   emphasis: "at this address.",
   lead: "The page may have moved, or the link may be mistyped.",
