@@ -10,8 +10,6 @@ export const hero = {
   headline: "Clean exteriors. Nobody on site.",
   emphasis: "Nobody on site.",
   support: "A cleaning drone that lives on your property, maps it, and washes glass, panels, walls, roofing and driveways.",
-  primary: { label: "See how it works", href: "#how" },
-  secondary: { label: "Check your building", href: "#fit-check" },
   videoId: "h1-hero-film" as const,
   posterId: "h0-hero-still" as const,
 };
