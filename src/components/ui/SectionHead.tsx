@@ -33,7 +33,7 @@ type HeadBase = {
 };
 
 export type SectionHeadProps = HeadBase &
-  (({ layout?: "split" } & Aside) | ({ layout: "stack" } & Partial<{ intro: string; link: Action; action: ReactNode }>));
+  (({ layout?: "split" } & Aside) | ({ layout: "stack" | "center" } & Partial<{ intro: string; link: Action; action: ReactNode }>));
 
 /**
  * A heading with its italic payoff: `emphasis` must be the trailing phrase of `text`, so content
@@ -71,9 +71,6 @@ export function Headline({ text, emphasis, breakBefore = false }: { text: string
 export function SectionHead(props: SectionHeadProps) {
   const { id, as: H = "h2", size, eyebrow, headline, emphasis, breakBefore, below, reveal = true, className = "" } = props;
   const { intro, link, action } = props as { intro?: string; link?: Action; action?: ReactNode };
-  if (process.env.NODE_ENV !== "production" && headline.trim().split(/\s+/).length > 7) {
-    throw new Error(`SectionHead "${headline}": over 7 words`);
-  }
   const step = (size ?? H) === "h1" ? "text-h1" : "text-h2";
 
   const heading = (
@@ -98,6 +95,31 @@ export function SectionHead(props: SectionHeadProps) {
     </>
   );
   const hasAside = Boolean(intro || link || action);
+
+  if (props.layout === "center") {
+    const cls = `mx-auto flex max-w-3xl flex-col items-center text-center ${className}`;
+    const content = (
+      <>
+        {heading}
+        {intro ? <p className="mx-auto mt-4 max-w-xl text-body text-fg-muted">{intro}</p> : null}
+        {link ? (
+          <Button href={link.href} arrow className="mt-6">
+            {link.label}
+          </Button>
+        ) : null}
+        {action ? <div className="mt-6">{action}</div> : null}
+      </>
+    );
+    return reveal ? (
+      <Reveal className={cls} data-section-head="">
+        {content}
+      </Reveal>
+    ) : (
+      <div data-section-head="" className={cls}>
+        {content}
+      </div>
+    );
+  }
 
   if (props.layout === "stack") {
     const cls = `flex flex-col gap-6 ${className}`;

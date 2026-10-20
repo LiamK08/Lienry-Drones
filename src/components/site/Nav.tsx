@@ -4,73 +4,95 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useId, useRef, useState } from "react";
-import { nav, navUtility } from "@/lib/site";
+import { menus, navAbout, navUtility } from "@/lib/site";
 import { useScrolledPast } from "@/lib/hooks";
 import { Button } from "@/components/ui/Button";
 import { Mark } from "@/components/ui/Wordmark";
 
-// A 13px link in a 30px box, with a hairline underline under the current page (60% on hover). The
-// box's padding sets the gap between links: 20px, and 30px from 1100.
-const linkCls = (active: boolean) =>
-  `relative flex h-[30px] items-center px-[10px] text-caption leading-none transition-opacity duration-200 after:absolute after:inset-x-[10px] after:bottom-[4px] after:h-px after:bg-current after:transition-opacity after:duration-200 hover:after:opacity-60 min-[1100px]:px-[15px] min-[1100px]:after:inset-x-[15px] ${
-    active ? "after:opacity-100" : "after:opacity-0"
-  }`;
+type MenuId = (typeof menus)[number]["id"];
+
+function Chevron({ open }: { open: boolean }) {
+  return (
+    <svg viewBox="0 0 12 12" aria-hidden="true" className={`size-3 transition-transform duration-200 ease-instrument motion-reduce:transition-none ${open ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 4.5 6 7.5l3-3" />
+    </svg>
+  );
+}
+
+/** The logo: the mark and the name, as the link home. */
+function Logo({ className = "" }: { className?: string }) {
+  return (
+    <Link href="/" aria-label="Lienry Drones home" className={`flex items-center gap-2 rounded-hard ${className}`}>
+      <Mark className="h-6 w-auto" />
+      <span aria-hidden="true" className="font-display text-[1.375rem] leading-none tracking-[-0.01em]">
+        Lienry
+      </span>
+    </Link>
+  );
+}
 
 /**
- * The header: nav links pinned hard left, the mark centred as the link home, and hard right the
- * Download link beside the one action. A 72px bar, 13px links in 30px boxes, a 30px button. The
- * full bar needs 1024px: below that the absolutely centred mark would run into the left links, so
- * phones and tablets get the burger. Over the home hero it is transparent
- * and reads white on the hero's own scrim; past 80px it becomes a solid plaster bar with a
- * hairline and ink text. Phones get the mark centred, a hamburger on the right and a full screen
- * menu, which lists Download after the five nav links.
+ * The header: the logo left, the menus centred (Platform, Solutions and Resources open a panel of
+ * links on hover or click; About is a plain link), and on the right a white Download pill beside the
+ * Register interest pill. Over the home film it is transparent with white text; anywhere else, or
+ * once scrolled, it is a white bar with a hairline. Below 1024 a burger opens a full-screen menu.
  */
 export function Nav() {
   const pathname = usePathname();
-  const scrolled = useScrolledPast(80);
+  const scrolled = useScrolledPast(40);
   const [open, setOpen] = useState(false);
+  const [menu, setMenu] = useState<MenuId | null>(null);
   const reduce = useReducedMotion();
   const panelId = useId();
   const headerRef = useRef<HTMLElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const closeTimer = useRef<number | undefined>(undefined);
 
+  // Close a desktop panel on Escape or a click outside the header.
+  useEffect(() => {
+    if (!menu) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMenu(null);
+    const onDown = (e: PointerEvent) => !headerRef.current?.contains(e.target as Node) && setMenu(null);
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("pointerdown", onDown);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("pointerdown", onDown);
+    };
+  }, [menu]);
+
+  // The phone menu: Escape closes it, Tab stays inside, and the page behind is inert and still.
   useEffect(() => {
     if (!open) return;
-    const focusables = () => Array.from(headerRef.current?.querySelectorAll<HTMLElement>('a[href],button:not([disabled])') ?? []).filter(el => el.getClientRects().length > 0);
+    const focusables = () => Array.from(headerRef.current?.querySelectorAll<HTMLElement>("a[href],button:not([disabled])") ?? []).filter((el) => el.getClientRects().length > 0);
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") { setOpen(false); menuButtonRef.current?.focus(); }
+      if (e.key === "Escape") {
+        setOpen(false);
+        menuButtonRef.current?.focus();
+      }
       if (e.key === "Tab") {
-        const items = focusables(); const first = items[0]; const last = items[items.length - 1];
-        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
-        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
+        const items = focusables();
+        const first = items[0];
+        const last = items[items.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last?.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first?.focus();
+        }
       }
     };
     document.addEventListener("keydown", onKey);
-
-    // Lock the element that actually scrolls. globals.css sets overflow-x on <html>, which stops
-    // the viewport taking its scroll behaviour from <body>, so hiding body's overflow alone does
-    // nothing and the page slides around behind the open menu.
     const root = document.documentElement;
     const prevOverflow = root.style.overflow;
     root.style.overflow = "hidden";
-
-    // Put the page behind the panel out of reach so Tab cannot land on a link the panel is
-    // covering. The skip link goes with it: its target is inert too, so following it does nothing.
-    // The header stays live because it carries the close button.
-    const behind = [
-      document.getElementById("main"),
-      document.querySelector("footer"),
-      document.querySelector('a[href="#main"]'),
-    ].filter(Boolean) as HTMLElement[];
+    const behind = [document.getElementById("main"), document.querySelector("footer"), document.querySelector('a[href="#main"]')].filter(Boolean) as HTMLElement[];
     behind.forEach((el) => el.setAttribute("inert", ""));
-
-    // Past lg the burger and the panel are both display:none. Without this a rotation or a resize
-    // would strand the menu open, holding the bar in its solid state with nothing left to close it.
     const wide = window.matchMedia("(min-width: 64rem)");
     const onWide = () => wide.matches && setOpen(false);
     onWide();
     wide.addEventListener("change", onWide);
-
     return () => {
       document.removeEventListener("keydown", onKey);
       wide.removeEventListener("change", onWide);
@@ -79,9 +101,16 @@ export function Nav() {
     };
   }, [open]);
 
-  const overHero = pathname === "/" && !scrolled;
-  const dark = overHero && !open;
-  const solid = (scrolled || pathname !== "/") && !open;
+  const overHero = pathname === "/" && !scrolled && !open && !menu;
+  const hoverOpen = (id: MenuId) => {
+    window.clearTimeout(closeTimer.current);
+    setMenu(id);
+  };
+  const hoverClose = () => {
+    window.clearTimeout(closeTimer.current);
+    closeTimer.current = window.setTimeout(() => setMenu(null), 160);
+  };
+  const active = menus.find((m) => m.id === menu);
 
   return (
     <header
@@ -89,87 +118,119 @@ export function Nav() {
       role={open ? "dialog" : undefined}
       aria-modal={open ? true : undefined}
       aria-label={open ? "Menu" : undefined}
-      className={`nav-bar fixed inset-x-0 top-0 z-50 h-[var(--nav-h)] border-b ${
-        solid ? "border-hairline bg-plaster" : open ? "border-transparent bg-plaster" : "border-transparent bg-transparent"
-      } ${dark ? "on-dark text-white" : "text-ink"}`}
+      className={`fixed inset-x-0 top-0 z-50 h-[var(--nav-h)] border-b transition-[background-color,border-color,color] duration-200 ease-instrument motion-reduce:transition-none ${
+        overHero ? "on-dark border-transparent bg-transparent text-white" : "border-line bg-white text-ink"
+      }`}
     >
-      <nav aria-label="Primary" className="relative flex h-full items-center px-[15px] md:px-6">
-        <ul className="-ml-[10px] hidden items-center lg:flex min-[1100px]:-ml-[15px]">
-          {nav.map((item) => {
-            const active = pathname === item.href;
-            return (
-              <li key={item.href}>
-                <Link href={item.href} aria-current={active ? "page" : undefined} className={linkCls(active)}>
-                  {item.label}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-        <Link href="/" aria-label="Lienry Drones home" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-hard">
-          <Mark className="h-7 w-auto" />
-        </Link>
-        <div className="ml-auto flex items-center">
-          <div className="hidden items-center lg:flex">
-            <Link href={navUtility.href} aria-current={pathname === navUtility.href ? "page" : undefined} className={linkCls(pathname === navUtility.href)}>
-              {navUtility.label}
+      <nav aria-label="Primary" className="relative mx-auto flex h-full max-w-grid items-center px-4 md:px-6" onMouseLeave={hoverClose}>
+        <Logo />
+        <ul className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 lg:flex">
+          {menus.map((m) => (
+            <li key={m.id} onMouseEnter={() => hoverOpen(m.id)}>
+              <button
+                type="button"
+                aria-expanded={menu === m.id}
+                aria-controls={`menu-${m.id}`}
+                onClick={() => setMenu((v) => (v === m.id ? null : m.id))}
+                className="flex h-9 items-center gap-1.5 rounded-pill px-3 text-small transition-opacity duration-200 hover:opacity-70"
+              >
+                {m.label}
+                <Chevron open={menu === m.id} />
+              </button>
+            </li>
+          ))}
+          <li onMouseEnter={hoverClose}>
+            <Link href={navAbout.href} aria-current={pathname === navAbout.href ? "page" : undefined} className="flex h-9 items-center rounded-pill px-3 text-small transition-opacity duration-200 hover:opacity-70">
+              {navAbout.label}
             </Link>
-            <Button href="/register-interest" size="sm" frozen onDark={dark} arrow>
+          </li>
+        </ul>
+        <div className="ml-auto flex items-center gap-2">
+          <div className="hidden items-center gap-2 lg:flex">
+            <Button href={navUtility.href} variant="secondary" size="sm">
+              {navUtility.label}
+            </Button>
+            <Button href="/register-interest" size="sm">
               Register interest
             </Button>
           </div>
           <button
             ref={menuButtonRef}
             type="button"
-            className="-mr-2 inline-flex h-11 w-11 items-center justify-center rounded-hard lg:hidden"
+            className="-mr-2 inline-flex h-11 w-11 items-center justify-center rounded-pill lg:hidden"
             aria-expanded={open}
             aria-controls={panelId}
             aria-label={open ? "Close menu" : "Open menu"}
             onClick={() => setOpen((v) => !v)}
           >
             <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" aria-hidden="true">
-              {open ? (
-                <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-              ) : (
-                <path d="M3 8h18M3 16h18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-              )}
+              {open ? <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /> : <path d="M3 8h18M3 16h18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />}
             </svg>
           </button>
         </div>
+
+        {/* The desktop panel under the bar, one menu at a time. */}
+        <AnimatePresence>
+          {active ? (
+            <motion.div
+              key={active.id}
+              id={`menu-${active.id}`}
+              onMouseEnter={() => hoverOpen(active.id)}
+              className="absolute left-1/2 top-[calc(var(--nav-h)-0.5rem)] hidden w-[40rem] -translate-x-1/2 rounded-card border border-line bg-white p-3 text-ink shadow-[0_24px_48px_-24px_rgb(0_0_0/0.25)] lg:block"
+              initial={reduce ? false : { opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.18, ease: [0.4, 0, 0.2, 1] }}
+            >
+              <ul className="grid grid-cols-2 gap-1">
+                {active.links.map((l) => (
+                  <li key={l.href}>
+                    <Link href={l.href} onClick={() => setMenu(null)} className="block rounded-[0.625rem] px-4 py-3 transition-colors duration-200 hover:bg-paper">
+                      <span className="block text-small font-medium">{l.label}</span>
+                      <span className="mt-1 block text-caption text-muted">{l.note}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
       </nav>
+
       <AnimatePresence>
         {open ? (
           <motion.div
             id={panelId}
-            className="fixed inset-x-0 top-[var(--nav-h)] bottom-0 z-40 flex flex-col overflow-y-auto bg-plaster px-[15px] text-ink md:px-6 lg:hidden"
+            className="fixed inset-x-0 bottom-0 top-[var(--nav-h)] z-40 flex flex-col overflow-y-auto bg-white px-4 pb-8 text-ink md:px-6 lg:hidden"
             initial={reduce ? false : { opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
+            transition={{ duration: 0.24, ease: [0.4, 0, 0.2, 1] }}
           >
-            <ul className="border-t border-hairline">
-              {[...nav, navUtility].map((item) => {
-                const active = pathname === item.href;
-                return (
-                  <li key={item.href} className="border-b border-hairline">
-                    <Link href={item.href} onClick={() => setOpen(false)} className="flex items-center justify-between py-4 font-display text-h3" aria-current={active ? "page" : undefined}>
-                      <span className={active ? "underline decoration-1 underline-offset-[6px]" : undefined}>{item.label}</span>
-                      <svg viewBox="0 0 16 16" className="h-4 w-4 text-muted" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                        <path d="M3 8h10M8.5 3.5 13 8l-4.5 4.5" />
-                      </svg>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-            <div className="mt-auto flex flex-col gap-4 pb-8 pt-10">
-              <Button href="/register-interest" size="lg" frozen arrow onClick={() => setOpen(false)}>
+            {menus.map((m) => (
+              <div key={m.id} className="border-b border-line py-6">
+                <p className="eyebrow">{m.label}</p>
+                <ul className="mt-3">
+                  {m.links.map((l) => (
+                    <li key={l.href}>
+                      <Link href={l.href} onClick={() => setOpen(false)} className="flex min-h-11 items-center text-body">
+                        {l.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+            <Link href={navAbout.href} onClick={() => setOpen(false)} className="flex min-h-14 items-center border-b border-line text-body">
+              {navAbout.label}
+            </Link>
+            <div className="mt-8 flex flex-col gap-3">
+              <Button href="/register-interest" size="lg" arrow onClick={() => setOpen(false)}>
                 Register interest
               </Button>
-              <Button href="/register-interest?type=investor" variant="secondary" size="lg" frozen onClick={() => setOpen(false)}>
-                Investor enquiries
+              <Button href={navUtility.href} variant="secondary" size="lg" onClick={() => setOpen(false)}>
+                {navUtility.label}
               </Button>
-              <p className="label mt-2 text-muted">Concept stage. Sydney, Australia.</p>
             </div>
           </motion.div>
         ) : null}

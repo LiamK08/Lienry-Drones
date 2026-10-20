@@ -1,146 +1,213 @@
-// Home page copy, and only the home page's objects (the inner pages' copy is one module per route,
-// re-exported by pages.ts). Conventions shared with every content module:
+// Home page copy, and only the home page's objects (the inner pages' copy is one module per route).
+// Conventions shared with every content module:
 // - `emphasis` is always the trailing phrase of its `headline`; `Headline` sets it in the italic.
-// - Images are ImageRef-compatible `{ id, alt, position }`, where `id` is a still in scripts/media/manifest.json.
-// - Links are Action-compatible `{ label, href }`.
-// - Facts come from docs/SITE-PLAN.md only. Nothing here claims a customer, result, price, saving or approval.
-
-import type { FlowStep } from "@/components/ui/StepTabs";
-import type { StepId } from "@/content/software";
+// - Images are `{ id, alt, position }`, where `id` is a still in scripts/media/manifest.json.
+// - Links are `{ label, href }`.
+// - Facts come from docs/SITE-PLAN.md only. Nothing here claims a customer, result, price, saving or
+//   approval. Figures are design intent (marked as such) or cited in src/content/stats.ts.
 
 export const hero = {
   headline: "Clean exteriors. Nobody on site.",
   emphasis: "Nobody on site.",
-  support: "A resident cleaning drone for the property you own.",
-  primary: { label: "Register interest", href: "/register-interest" },
+  support: "A cleaning drone that lives on your property, maps it, and washes glass, panels, walls, roofing and driveways.",
+  primary: { label: "See how it works", href: "#how" },
+  secondary: { label: "Check your building", href: "#fit-check" },
   videoId: "h1-hero-film" as const,
   posterId: "h0-hero-still" as const,
 };
 
-/**
- * Four reasons, each a whole-card link with a 4:5 still. Card 1 plays the commercial clip on hover or
- * focus (its first and last frame is the still, so the handover is seamless); the others are stills
- * until a clip exists for them.
- */
+/** The slow strip of words under the hero: what the system is designed for. */
+export const strip = {
+  label: "Designed for",
+  items: ["Glass facades", "Solar panels", "Rendered walls", "Metal roofing", "Driveways", "Office buildings", "Apartment blocks", "Rental homes", "Solar farms"],
+};
+
+export const why = {
+  eyebrow: "Why it matters",
+  headline: "Clean glass shouldn't need someone on a rope.",
+  intro: "Lienry is a drone that lives on the property and cleans its exterior on a schedule, with nobody working at height.",
+};
+
+/** The fit check: seven yes, partly or no questions drawn from the design brief, scored live. */
+export const fitCheck = {
+  eyebrow: "Fit check · 1 minute",
+  title: "Is your building a fit?",
+  intro: "Seven questions from the design brief. Mark where you stand.",
+  groups: [
+    {
+      label: "The building",
+      questions: [
+        { id: "height", text: "It is under 70 metres tall" },
+        { id: "dock", text: "There is room on the roof or the ground for a dock" },
+        { id: "supply", text: "Water and power are close to that spot" },
+      ],
+    },
+    {
+      label: "The clean",
+      questions: [
+        { id: "surfaces", text: "Most of the exterior is glass, panels, render, roofing or paving" },
+        { id: "regular", text: "You pay for exterior cleaning at least once a year" },
+        { id: "height-work", text: "You would rather nobody worked at height" },
+        { id: "remote", text: "You want to start a clean without booking anyone" },
+      ],
+    },
+  ],
+  answers: [
+    { id: "yes", label: "Yes", score: 1 },
+    { id: "partly", label: "Partly", score: 0.5 },
+    { id: "no", label: "No", score: 0 },
+  ],
+  panel: {
+    label: "Your fit",
+    answered: "{n} of 7 answered",
+    empty: "Answer the seven questions to see how well your building matches the design.",
+    verdicts: [
+      { min: 6, title: "A strong fit", body: "Your building matches the design closely. Register interest and we will be in touch about the pilot." },
+      { min: 4, title: "A likely fit", body: "Most of it matches. The points below are worth a conversation before a pilot." },
+      { min: 0, title: "Worth a conversation", body: "Some of it may not match the design yet. Tell us about the building and we will say what we can." },
+    ],
+    gaps: "Worth discussing",
+    primary: { label: "Register interest", href: "/register-interest" },
+    secondary: { label: "Book a pilot conversation", href: "/register-interest?type=commercial" },
+    note: "Indicative only, from the design brief. Site requirements are still being finalised.",
+  },
+};
+
+/** Five tall cards that widen on hover. Icons are drawn in ExpandCards. */
 export const benefits = {
-  eyebrow: "by design",
-  headline: "Designed to stay. Built to clean.",
-  emphasis: "Built to clean.",
-  intro: "A resident drone for glass, solar panels, walls, roofing and driveways on buildings under 70 metres.",
+  eyebrow: "Why Lienry",
+  headline: "What changes when the drone lives on site.",
+  intro: "Five things a resident system does that a booked crew cannot.",
   cards: [
     {
-      id: "c1-commercial-hero",
-      title: "Lives on the roof",
-      body: "A weatherproof capsule keeps the drone on the building between cleans.",
-      href: "/commercial",
-      position: "73% 50%",
-      alt: "The roof capsule open on an office roof at first light, the drone rising above its cradle",
-      clip: { videoId: "c2-commercial-clip" as const },
-    },
-    {
-      id: "f1-tether",
+      icon: "shield",
       title: "Nobody at height",
-      body: "A tether, an obstacle-avoidance camera and onboard surface checks are built in.",
-      href: "/platform#tether",
-      position: "43% 45%",
-      alt: "The tether's metal coupling where it enters the underside of the drone",
-      clip: null,
+      body: "The drone works on a tether from its dock, so nobody goes up on a rope or a lift.",
+      image: { id: "p1-tower", alt: "The commercial drone mid-clean on a glass office building, its tether rising to the roof", position: "50% 40%" },
     },
     {
-      id: "y2-story-panels",
-      title: "Each surface, its own pressure",
-      body: "It identifies each material and adjusts its pressure to suit.",
-      href: "/platform#drone",
-      position: "50% 45%",
-      alt: "The drone washing rooftop solar panels, half the array clean and wet",
-      clip: null,
+      icon: "repeat",
+      title: "Cleaner, more often",
+      body: "On commercial buildings it re-scans every two days and cleans when the scan says so.",
+      image: { id: "p2-apartments", alt: "The drone washing the balcony glass of an apartment building", position: "50% 40%" },
     },
     {
-      id: "ho1-homes-hero",
-      title: "Start it from anywhere",
+      icon: "sliders",
+      title: "The right pressure",
+      body: "Glass, panels, render, roofing and paving each get the pressure they need.",
+      image: { id: "p3-house", alt: "The home drone washing the front windows of a suburban house", position: "50% 40%" },
+    },
+    {
+      icon: "phone",
+      title: "Started from anywhere",
       body: "On the home system, start a clean from the app wherever you are.",
-      href: "/homes-and-rentals",
-      position: "48% 50%",
-      alt: "The drone washing a window at the side of a house, its tether running down to the ground pod",
-      clip: null,
+      image: { id: "p4-rental", alt: "The home drone over rooftop solar panels on a rental townhouse", position: "50% 40%" },
+    },
+    {
+      icon: "record",
+      title: "Every clean on record",
+      body: "The desktop software shows what was cleaned, when, and what is due next.",
+      image: { id: "y2-story-panels", alt: "The drone washing rooftop solar panels, half the array clean and wet", position: "50% 45%" },
     },
   ],
 };
 
-/** The five steps of a clean, each driving a preset of the coded software window on a demo building. */
-export type FlowStepId = "scan" | "plan" | "clean" | "check" | "report";
-
-export const flow = {
-  eyebrow: "how it works",
-  headline: "Every clean starts from the scan.",
-  intro: "Select a step to see it in the desktop software, on a demo building.",
+/** How a clean runs: five timed steps over one large picture. */
+export const how = {
+  eyebrow: "How it works",
+  headline: "From scan to report, on its own.",
+  emphasis: "on its own.",
+  intro: "Every clean follows the same five steps, planned on a model of your building.",
   label: "Steps of a clean",
   steps: [
-    { id: "scan", number: "01", tab: "Scan", line: "The drone maps the building's structure and dimensions." },
-    { id: "plan", number: "02", tab: "Plan", line: "Each zone gets its own surface, preset and pressure." },
-    { id: "clean", number: "03", tab: "Clean", line: "The clean moves down the facade, two passes per floor." },
-    { id: "check", number: "04", tab: "Check", line: "A re-scan shades the areas where debris has built up." },
-    { id: "report", number: "05", tab: "Report", line: "The software shows what was cleaned and when the next clean is due." },
-  ] satisfies readonly FlowStep<FlowStepId>[],
-  /** The window preset each step applies. */
-  presets: { scan: "map", plan: "plan", clean: "clean", check: "rescan", report: "report" } satisfies Record<FlowStepId, StepId>,
+    { id: "scan", n: "01", who: "The drone", tab: "Scans it", title: "Maps the building first.", body: "Structure and dimensions, before the first clean.", image: { id: "s4-scan", alt: "The drone holding off the corner of a glass building to scan it", position: "50% 40%" } },
+    { id: "plan", n: "02", who: "The software", tab: "Plans it", title: "Every zone gets a plan.", body: "Surface, pressure and route for each part of the building.", image: { id: "s5-software", alt: "A laptop showing the desktop software's shaded 3D building", position: "50% 50%" } },
+    { id: "clean", n: "03", who: "The drone", tab: "Cleans it", title: "Washes with nobody on site.", body: "Water through the tether, two passes per floor.", image: { id: "m1-drone-master", alt: "The Lienry drone washing a glass wall, its spray bar on the pane", position: "50% 50%" } },
+    { id: "check", n: "04", who: "The scan", tab: "Checks it", title: "Looks again.", body: "A re-scan shades where debris has built up.", image: { id: "f2-camera", alt: "The drone's sensor strip and scanning sensor, close up", position: "50% 45%" } },
+    { id: "report", n: "05", who: "The software", tab: "Reports it", title: "Back to the dock, on record.", body: "What was cleaned, and when the next clean is due.", image: { id: "s6-automation", alt: "The roof capsule open at dawn, the drone above its cradle", position: "50% 40%" } },
+  ],
 };
 
-export const cost = {
-  eyebrow: "your numbers",
-  headline: "Your cleaning spend, added up.",
-  intro: "See what outsourced exterior cleaning costs you over 5 and 10 years.",
-};
-
-export const places = {
-  eyebrow: "where it works",
-  headline: "Built around your property.",
-  emphasis: "your property.",
-  intro: "Five kinds of property, one platform.",
-  track: { label: "Property types. Use left and right arrow keys to browse.", prevLabel: "Previous property", nextLabel: "Next property" },
-  // Full 2:3 portraits. The order keeps the ground-pod stills with the open lid (p3, p4) out of view
-  // of the one with the closed lid (p5) at three across.
+/** Three settings, each a card with design figures (or cited figures, for solar). */
+export const systems = {
+  eyebrow: "Three settings",
+  headline: "Built for the buildings you own.",
+  intro: "One platform on a roof, beside a house or along a solar row. Figures are design intent at concept stage, not results.",
+  link: { label: "See the platform", href: "/platform" },
   cards: [
-    { id: "p3-house", title: "Homes", body: "Windows, walls, roofing and the driveway, started from the app.", href: "/homes-and-rentals" },
-    { id: "p4-rental", title: "Rental properties", body: "A clean before the next tenant, started from anywhere.", href: "/homes-and-rentals" },
-    { id: "p1-tower", title: "Commercial towers", body: "Glass, walls and roofing under 70 metres, from a roof capsule.", href: "/commercial" },
-    { id: "p2-apartments", title: "Apartment buildings", body: "Facades and balcony glass with nobody working at height.", href: "/commercial" },
-    { id: "p5-solar-farm", title: "Solar farms", body: "Panels cleaned on the interval you set.", href: "/solar" },
+    {
+      id: "commercial",
+      name: "Commercial",
+      sub: "Office and apartment buildings",
+      statement: "A capsule on the roof feeds the drone from above, and the desktop software runs the whole building.",
+      figures: [
+        { value: "<70 m", label: "Building height" },
+        { value: "2 days", label: "Re-scan interval" },
+        { value: "0", label: "People at height" },
+      ],
+      link: { label: "The commercial system", href: "/commercial" },
+    },
+    {
+      id: "homes",
+      name: "Homes and rentals",
+      sub: "Houses, townhouses and rentals",
+      statement: "A ground pod powers the drone and feeds it water. You start the clean from your phone.",
+      figures: [
+        { value: "5", label: "Surface types" },
+        { value: "1", label: "Ground pod" },
+        { value: "0", label: "Crews to book" },
+      ],
+      link: { label: "The home system", href: "/homes-and-rentals" },
+    },
+    {
+      id: "solar",
+      name: "Solar",
+      sub: "Rooftop arrays and solar farm rows",
+      statement: "Panels are cleaned at the pressure set for solar glass, on the interval you choose.",
+      // Cited figures from src/content/stats.ts, by id.
+      cited: ["unsw-soiling", "iea-soiling", "cer-rooftop"],
+      link: { label: "Solar", href: "/solar" },
+    },
   ],
 };
 
-/** The founder's letter, set in the serif at the H3 step (`.letter`). */
-export const visionLetter = {
-  eyebrow: "from the founder",
-  headline: "Why we are building Lienry.",
-  paragraphs: [
-    "Buildings get dirty on their own schedule, not when someone is free to clean them.",
-    "So we are building a drone that lives on the property and keeps its exterior clean.",
-    "It maps the building, treats each surface as its own material, and nobody has to be there.",
-    "We are at concept stage in Sydney and raising our pre-seed round. We would like to hear from you.",
+/** The dark band of link cards into the rest of the site. Filters by kind. */
+export const explore = {
+  eyebrow: "Explore",
+  headline: "Inside the platform",
+  link: { label: "See the platform", href: "/platform" },
+  filters: ["All", "Systems", "Platform", "Tools", "Company"],
+  cards: [
+    { kind: "Systems", tag: "Commercial", title: "A capsule on the roof, and nobody on a rope", href: "/commercial", image: { id: "c1-commercial-hero", alt: "The roof capsule on a plant deck at dawn", position: "75% 50%" } },
+    { kind: "Systems", tag: "Homes", title: "Homes and rentals, cleaned from your phone", href: "/homes-and-rentals", image: { id: "ho1-homes-hero", alt: "The ground pod beside a house, the drone washing a window", position: "45% 50%" } },
+    { kind: "Systems", tag: "Solar", title: "Solar panels at the right pressure", href: "/solar", image: { id: "so2-solar-closeup", alt: "Water beading on a clean solar panel", position: "50% 50%" } },
+    { kind: "Platform", tag: "Platform", title: "Six parts of one platform", href: "/platform", image: { id: "m2-capsule-master", alt: "The roof capsule open, the drone on its cradle", position: "50% 50%" } },
+    { kind: "Tools", tag: "Fit check", title: "Seven questions: is your building a fit?", href: "/fit-check", image: { id: "p5-solar-farm", alt: "The drone low over a solar farm row", position: "50% 60%" } },
+    { kind: "Tools", tag: "Calculator", title: "What outsourced cleaning adds up to", href: "/calculator", image: { id: "f4-dock", alt: "Rain beading on the closed lid of the roof capsule", position: "50% 50%" } },
+    { kind: "Company", tag: "Company", title: "Why we are building Lienry", href: "/company", image: { id: "co1-company", alt: "A harbour-side street of mid-rise buildings at dawn", position: "50% 50%" } },
   ],
-  signature: { name: "Liam Kennedy", title: "Founder and CEO" },
-  link: { label: "About Lienry", href: "/company" },
 };
 
-export const faqHead = {
-  eyebrow: "questions",
-  headline: "What people ask first.",
+/** The black panel: what a safety or facilities team asks first. */
+export const safety = {
+  eyebrow: "Safety by design",
+  headline: "Built so nobody works at height.",
+  body: "What a safety or facilities team will ask first, in one place.",
+  link: { label: "Read about the tether", href: "/platform#tether" },
+  tiles: [
+    { icon: "tether", title: "Tether", note: "Water and power, always connected" },
+    { icon: "camera", title: "Obstacle camera", note: "Avoidance built into the drone" },
+    { icon: "check", title: "Surface checks", note: "Onboard, on every pass" },
+    { icon: "dock", title: "Weatherproof dock", note: "Shelter between cleans" },
+    { icon: "person", title: "Nobody at height", note: "No rope access, no lift" },
+    { icon: "doc", title: "Approvals", note: "Still being finalised" },
+  ],
 };
 
-export const closing = {
-  eyebrow: "get involved",
-  headline: "Help shape what comes next.",
-  emphasis: "what comes next.",
-  body: "Lienry is pre-launch. Tell us about your property.",
-  primary: { label: "Register interest", href: "/register-interest" },
-  links: [
-    { label: "Book a pilot conversation", href: "/register-interest?type=commercial" },
-    { label: "Investor enquiries", href: "/register-interest?type=investor" },
-  ],
-  collage: [
-    { id: "y5-story-done", alt: "A rental house after its clean, the ground pod open by the garden tap", position: "50% 55%" },
-    { id: "f4-dock", alt: "Rain beading on the closed lid of the roof capsule", position: "50% 50%" },
-    { id: "f2-camera", alt: "The drone's sensor strip and scanning sensor, close up", position: "50% 45%" },
-  ],
-} as const;
+export const faq = {
+  eyebrow: "Got questions?",
+  headline: "Frequently asked questions",
+  emphasis: "questions",
+  formTitle: "Register interest",
+  formNote: "Lienry is pre-launch. We reply personally.",
+};

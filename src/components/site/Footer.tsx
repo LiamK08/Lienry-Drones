@@ -1,55 +1,53 @@
-import { Container } from "@/components/ui/Band";
-import { TextLink } from "@/components/ui/TextLink";
+import Link from "next/link";
 import { brand, footer } from "@/lib/site";
+import { Mark } from "@/components/ui/Wordmark";
 
 /**
- * The site footer: an ink band, so every page (which ends on plaster) closes on a change of tone.
- *
- * From 1024 on the 12-column rail: the statement (an h2 at the H2 step) and the status line in
- * columns 1-4, and the four link groups in 5-12, each 212px wide at 1440, under lowercase eyebrows.
- * Below 768 the groups form an open two-by-two grid (no disclosures), four across from 768. Every
- * link is a 44px row. Then the wordmark at the display step, 32, a rule, 24 and the legal line.
- * The top padding is the section padding (`--section-y`).
+ * The footer: a near-black plate. A tall quiet top, then the logo set large with the tagline in the
+ * serif italic under it, four link columns, a hairline and the legal line with the privacy link.
  */
 export function Footer() {
   return (
-    <footer data-tone="ink" className="on-dark page-x bg-ink pb-6 pt-(--section-y) text-plaster md:pb-8">
-      <Container>
-        <div className="lg:grid-12">
-          <div className="lg:col-span-4">
-            <h2 className="text-h2">
-              {footer.statement[0]}
-              <br />
-              {footer.statement[1]}
-            </h2>
-            <p className="mt-6 text-small text-fg-muted">{brand.status}</p>
-          </div>
-          <nav aria-label="Footer" className="mt-10 grid grid-cols-2 gap-x-(--gutter) gap-y-10 md:grid-cols-4 lg:col-span-8 lg:col-start-5 lg:mt-0">
-            {footer.groups.map((g) => (
-              <div key={g.id}>
-                <p id={`footer-${g.id}`} className="eyebrow">
-                  {g.heading}
-                </p>
-                <ul aria-labelledby={`footer-${g.id}`} className="mt-4">
-                  {g.links.map((l) => (
-                    <li key={l.href}>
-                      <TextLink href={l.href} list className="inline-flex min-h-11 items-center text-body">
-                        {l.label}
-                      </TextLink>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+    <footer data-tone="ink" className="on-dark page-x bg-night pb-8 pt-32 text-white md:pt-48">
+      <div className="mx-auto max-w-6xl">
+        <div className="flex items-center gap-4 md:gap-6">
+          <Mark className="h-14 w-auto md:h-20" />
+          <p aria-hidden="true" className="max-w-none font-display text-[3.5rem] leading-none tracking-[-0.02em] md:text-[6rem]">
+            {brand.name.split(" ")[0]}
+          </p>
+        </div>
+        <p className="mt-4 max-w-none font-display text-h3 italic text-white/90">{footer.tagline}</p>
+        <nav aria-label="Footer" className="mt-12 grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-4">
+          {footer.groups.map((g) => (
+            <div key={g.id}>
+              <p id={`footer-${g.id}`} className="text-caption text-white/55">
+                {g.heading}
+              </p>
+              <ul aria-labelledby={`footer-${g.id}`} className="mt-3">
+                {g.links.map((l) => (
+                  <li key={l.href}>
+                    <Link href={l.href} className="inline-flex min-h-8 items-center text-small text-white/90 transition-colors duration-200 hover:text-white hover:underline hover:underline-offset-4">
+                      {l.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </nav>
+        <div className="mt-16 flex flex-col gap-4 border-t border-white/10 pt-6 md:flex-row md:items-center md:justify-between">
+          <p className="text-caption text-white/55">{footer.legal}</p>
+          <ul className="flex gap-6">
+            {footer.legalLinks.map((l) => (
+              <li key={l.href}>
+                <Link href={l.href} className="text-caption text-white/55 transition-colors duration-200 hover:text-white">
+                  {l.label}
+                </Link>
+              </li>
             ))}
-          </nav>
+          </ul>
         </div>
-        <p aria-hidden="true" className="mt-20 max-w-none font-display text-display leading-none lg:mt-32">
-          {brand.name}
-        </p>
-        <div className="mt-8 border-t border-rule pt-6">
-          <p className="text-caption text-fg-muted">{footer.legal}</p>
-        </div>
-      </Container>
+      </div>
     </footer>
   );
 }

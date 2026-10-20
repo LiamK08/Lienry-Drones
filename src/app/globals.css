@@ -2,8 +2,15 @@
 
 @theme {
   --color-*: initial;
-  --color-plaster: #f3efe7;
-  --color-raised: #fbf9f4;
+  --color-plaster: #ffffff;
+  --color-raised: #f8f7f4;
+  --color-paper: #f8f7f4;
+  --color-tint: #eaf2f3;
+  --color-night: #121110;
+  --color-line: #e8e4dc;
+  --color-accent: #0f6a7c;
+  --color-accent-hover: #0a5260;
+  --color-accent-on-dark: #8ed4e0;
   --color-sunken: #e9e3d8;
   --color-ink: #1c1a17;
   --color-ink-raised: #26221d;
@@ -32,6 +39,9 @@
 
   --radius-*: initial;
   --radius-hard: 4px;
+  --radius-card: 1rem;
+  --radius-panel: 1.25rem;
+  --radius-pill: 9999px;
 
   /* Clear Tailwind's default families (sans, serif, mono) so the only font utilities that
      exist are the two the site actually ships. Redefined in the @theme inline block below. */
@@ -89,6 +99,9 @@
      required: the utility must emit var(--s-*) itself, or :root would freeze the value. */
   --color-fg: var(--s-fg);
   --color-fg-muted: var(--s-muted);
+  --color-dot: var(--s-accent);
+  --color-card: var(--s-card);
+  --color-edge: var(--s-line);
   --color-surface: var(--s-bg);
   --color-rule: var(--s-rule);
   --color-control: var(--s-control);
@@ -120,17 +133,17 @@
     --nav-h: 4.5rem;          /* 72, the frozen header */
     --page-margin: 1rem;      /* 16 below 768 */
     --gutter: 1rem;           /* 16 below 768 */
-    --section-y: 5rem;        /* 80 below 768 */
+    --section-y: 4rem;        /* 64 below 768 */
     --head-gap: 2.5rem;       /* 40 below 1024 */
     --hero-gap: 2.5rem;       /* 40 below 768 */
     --hero-top: calc(var(--nav-h) + var(--hero-gap));
     --bleed: max(var(--page-margin), calc((100vw - 87rem) / 2));
   }
   @media (min-width: 48rem) {
-    :root { --page-margin: 1.5rem; --gutter: 1.5rem; --section-y: 6rem; --hero-gap: 3rem; }
+    :root { --page-margin: 1.5rem; --gutter: 1.5rem; --section-y: 5rem; --hero-gap: 3rem; }
   }
   @media (min-width: 64rem) {
-    :root { --section-y: 8rem; --head-gap: 4rem; --hero-gap: 4rem; }
+    :root { --section-y: 6rem; --head-gap: 3rem; --hero-gap: 4rem; }
   }
 
   /* Light surfaces. .on-light, .surface-raised and .surface-sunken restore light inside an ink band. */
@@ -144,10 +157,13 @@
     --s-link: var(--color-glass);            /* 5.43 plaster, 5.92 raised, 4.88 sunken */
     --s-link-hover: var(--color-glass-deep);
     --s-focus: var(--color-glass);
-    --s-action: var(--color-ink);
-    --s-action-fg: var(--color-white);       /* 17.36 */
-    --s-action-hover: var(--color-ink-hover);/* white on it 11.60 */
+    --s-action: var(--color-accent);
+    --s-action-fg: var(--color-white);       /* 6.41 */
+    --s-action-hover: var(--color-accent-hover);
     --s-action-edge: transparent;
+    --s-accent: var(--color-accent);
+    --s-card: var(--color-white);
+    --s-line: var(--color-line);
     --s-error: var(--color-debris-text);     /* 5.56 plaster, 6.06 raised */
     --s-media: var(--color-sunken);
   }
@@ -164,10 +180,13 @@
     --s-link: var(--color-glass-on-dark);    /* 10.45 / 9.51 */
     --s-link-hover: var(--color-plaster);
     --s-focus: var(--color-glass-on-dark);
-    --s-action: var(--color-plaster);
-    --s-action-fg: var(--color-ink);         /* 15.14 */
-    --s-action-hover: var(--color-plaster-hover); /* ink on it 10.35 */
+    --s-action: var(--color-accent);
+    --s-action-fg: var(--color-white);
+    --s-action-hover: var(--color-accent-hover);
     --s-action-edge: transparent;
+    --s-accent: var(--color-accent-on-dark);
+    --s-card: var(--color-ink-raised);
+    --s-line: rgb(255 255 255 / 0.12);
     --s-error: var(--color-debris-on-dark);  /* 6.10 / 5.55 */
     --s-media: var(--color-ink-raised);
   }
@@ -180,10 +199,10 @@
     --s-link: var(--color-white);
     --s-link-hover: var(--color-white);
     --s-control: rgb(255 255 255 / 0.75);
-    --s-action: var(--color-ink);
+    --s-action: var(--color-accent);
     --s-action-fg: var(--color-white);
-    --s-action-hover: var(--color-ink-hover);
-    --s-action-edge: rgb(255 255 255 / 0.75); /* composites to rgb(198,198,197): 3.51:1 on the brightest frame, 10.16:1 on ink */
+    --s-action-hover: var(--color-accent-hover);
+    --s-action-edge: transparent; /* composites to rgb(198,198,197): 3.51:1 on the brightest frame, 10.16:1 on ink */
   }
 
   /* The UA centres button text. Button labels centre by flex instead, so no text is centred
@@ -299,21 +318,56 @@
     padding-right: var(--page-margin);
   }
 
-  /* The lowercase line above every section heading: Inter 14px, weight 500, the surface's muted colour. */
+  /* The line above every section heading: a small accent dot, then 12px Inter capitals. */
   .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
     font-family: var(--font-sans);
-    font-size: var(--text-small);
-    line-height: var(--text-small--line-height);
+    font-size: var(--text-label);
+    line-height: 1.2;
     font-weight: 500;
-    letter-spacing: normal;
-    text-transform: none;
-    color: var(--s-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--s-fg);
     max-width: none;
+  }
+
+  .eyebrow::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    flex: none;
+    border-radius: 9999px;
+    background: var(--s-accent);
   }
 
   /* The one eyebrow-to-heading gap: 16. */
   .eyebrow + :is(h1, h2) {
     margin-top: 1rem;
+  }
+
+  /* A heading whose italic phrase takes the surface's accent (the FAQ, inner heroes). */
+  .em-accent em {
+    color: var(--s-accent);
+  }
+
+  /* A slow loop of words: the strip under the home hero. Paused under reduced motion. */
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  .marquee {
+    animation: marquee 40s linear infinite;
+  }
+
+  /* The step timer's rule: fills left to right over one step. */
+  @keyframes fill {
+    from { width: 0%; }
+    to { width: 100%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee { animation: none; }
   }
 
   /* The founder letter: the serif at the H3 step, the one run of serif text. */

@@ -1,52 +1,34 @@
 import type { Metadata } from "next";
 import { Hero } from "@/components/home/Hero";
-import { Benefits } from "@/components/home/Benefits";
-import { Flow } from "@/components/home/Flow";
-import { PlacesRow } from "@/components/home/PlacesRow";
-import { VisionLetter } from "@/components/home/VisionLetter";
-import { ClosingSection } from "@/components/sections/ClosingSection";
-import { CostCalculator } from "@/components/sections/CostCalculator";
-import { Faq } from "@/components/sections/Faq";
-import { Band, Container } from "@/components/ui/Band";
-import { SectionHead } from "@/components/ui/SectionHead";
-import { closing, cost, faqHead } from "@/content/home";
-import { faqFor, faqIntro, homeFaqLink } from "@/content/faq";
+import { Strip } from "@/components/home/Strip";
+import { WhyFit } from "@/components/home/WhyFit";
+import { ExpandCards } from "@/components/home/ExpandCards";
+import { StepTimer } from "@/components/home/StepTimer";
+import { SystemCards } from "@/components/home/SystemCards";
+import { Explore } from "@/components/home/Explore";
+import { SafetyPanel } from "@/components/home/SafetyPanel";
+import { FaqForm } from "@/components/home/FaqForm";
 import { brand, pageMetadata } from "@/lib/site";
 
 export const metadata: Metadata = pageMetadata("/", brand.description);
 
 /**
- * Home in eight sections, alternating dark and light: the film, why it is built the way it is, the
- * five steps of a clean in the desktop software, what outsourced cleaning adds up to, where it works,
- * the founder's letter, the first questions and the ask. Then the ink footer.
+ * Home: the film, the strip of what it is designed for, why it matters with the fit check, five
+ * expanding reasons, the five timed steps, three settings, the explore band, the safety panel, and the
+ * questions beside the enquiry form. Then the footer.
  */
 export default function HomePage() {
   return (
     <>
       <Hero />
-      <Benefits />
-      <Flow />
-      <Band id="cost" tone="plaster" labelledBy="cost-heading">
-        <Container>
-          <SectionHead id="cost-heading" eyebrow={cost.eyebrow} headline={cost.headline} intro={cost.intro} />
-          <div className="mt-(--head-gap)">
-            <CostCalculator headingId="cost-heading" noteId="cost-note" />
-          </div>
-        </Container>
-      </Band>
-      <PlacesRow />
-      <VisionLetter />
-      <Faq id="faq" tone="ink" eyebrow={faqHead.eyebrow} headline={faqHead.headline} intro={faqIntro} link={homeFaqLink} items={faqFor("home")} />
-      <ClosingSection
-        id="closing"
-        eyebrow={closing.eyebrow}
-        headline={closing.headline}
-        emphasis={closing.emphasis}
-        body={closing.body}
-        primary={closing.primary}
-        links={closing.links}
-        media={{ kind: "collage", items: closing.collage }}
-      />
+      <Strip />
+      <WhyFit />
+      <ExpandCards />
+      <StepTimer />
+      <SystemCards />
+      <Explore />
+      <SafetyPanel />
+      <FaqForm />
     </>
   );
 }

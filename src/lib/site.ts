@@ -27,6 +27,8 @@ export const pageTitles = {
   "/download": "Download Lienry Desktop",
   "/register-interest": "Register interest",
   "/privacy": "Privacy policy",
+  "/fit-check": "Is your building a fit?",
+  "/calculator": "What outsourced cleaning costs",
 } as const;
 
 export type Route = keyof typeof pageTitles;
@@ -63,6 +65,50 @@ export function pageMetadata(route: Route, description: string): Metadata {
   };
 }
 
+/** One entry in a header menu: a title and a one-line description. */
+export type MenuLink = { href: string; label: string; note: string };
+
+/**
+ * The header's menus. Platform, Solutions and Resources open panels; About is a plain link. Every
+ * enquiry label is the one label that route has everywhere.
+ */
+export const menus = [
+  {
+    id: "platform",
+    label: "Platform",
+    links: [
+      { href: "/platform", label: "Platform overview", note: "One drone platform, six parts." },
+      { href: "/platform#dock", label: "Dock", note: "A roof capsule or a ground pod." },
+      { href: "/platform#tether", label: "Tether", note: "Water and power, always connected." },
+      { href: "/platform#scan", label: "Scan", note: "The building mapped before any clean." },
+      { href: "/platform#software", label: "Software", note: "A 3D model, live progress, debris shading." },
+      { href: "/download", label: "Lienry Desktop", note: "The desktop software for Mac and Windows." },
+    ],
+  },
+  {
+    id: "solutions",
+    label: "Solutions",
+    links: [
+      { href: "/commercial", label: "Commercial buildings", note: "A roof capsule for buildings under 70 metres." },
+      { href: "/homes-and-rentals", label: "Homes and rentals", note: "A ground pod, started from your phone." },
+      { href: "/solar", label: "Solar", note: "Panels at the right pressure, on your interval." },
+    ],
+  },
+  {
+    id: "resources",
+    label: "Resources",
+    links: [
+      { href: "/fit-check", label: "Fit check", note: "Seven questions: is your building a fit?" },
+      { href: "/calculator", label: "Cost calculator", note: "What outsourced cleaning adds up to." },
+      { href: "/platform#faq", label: "Questions", note: "Straight answers, including what is undecided." },
+    ],
+  },
+] as const satisfies readonly { id: string; label: string; links: readonly MenuLink[] }[];
+
+/** The header's plain link after the menus. */
+export const navAbout = { href: "/company", label: "About" } as const;
+
+/** @deprecated The old flat list, kept for the phone menu's order and the sitemap. */
 export const nav = [
   { href: "/platform", label: "Platform" },
   { href: "/commercial", label: "Commercial" },
@@ -71,7 +117,7 @@ export const nav = [
   { href: "/company", label: "Company" },
 ] as const;
 
-/** The header's utility link, beside the Register interest button, and the last item in the phone menu. */
+/** The header's white pill, beside Register interest. */
 export const navUtility = { href: "/download", label: "Download" } as const;
 
 /**
@@ -79,48 +125,51 @@ export const navUtility = { href: "/download", label: "Download" } as const;
  * eyebrows, and the legal line. Every enquiry label is the one label that route has everywhere.
  */
 export const footer = {
-  statement: ["Resident cleaning.", "Designed in Sydney."],
+  tagline: "Resident exterior cleaning",
   groups: [
     {
       id: "platform",
-      heading: "platform",
+      heading: "Platform",
       links: [
+        { href: "/platform", label: "Overview" },
         { href: "/platform#dock", label: "Dock" },
         { href: "/platform#tether", label: "Tether" },
         { href: "/platform#drone", label: "Drone" },
         { href: "/platform#scan", label: "Scan" },
         { href: "/platform#software", label: "Software" },
         { href: "/platform#automation", label: "Automation" },
-        { href: "/download", label: "Download" },
       ],
     },
     {
-      id: "systems",
-      heading: "systems",
+      id: "solutions",
+      heading: "Solutions",
       links: [
-        { href: "/commercial", label: "Commercial system" },
-        { href: "/homes-and-rentals", label: "Home system" },
+        { href: "/commercial", label: "Commercial buildings" },
+        { href: "/homes-and-rentals", label: "Homes and rentals" },
         { href: "/solar", label: "Solar" },
+        { href: "/download", label: "Lienry Desktop" },
+      ],
+    },
+    {
+      id: "resources",
+      heading: "Resources",
+      links: [
+        { href: "/fit-check", label: "Fit check" },
+        { href: "/calculator", label: "Cost calculator" },
+        { href: "/register-interest?type=commercial", label: "Book a pilot conversation" },
+        { href: "/register-interest?type=landlord", label: "I own rentals" },
       ],
     },
     {
       id: "company",
-      heading: "company",
+      heading: "Company",
       links: [
-        { href: "/company", label: "About Lienry" },
-        { href: "/privacy", label: "Privacy" },
-      ],
-    },
-    {
-      id: "contact",
-      heading: "get in touch",
-      links: [
+        { href: "/company", label: "About" },
         { href: "/register-interest", label: "Register interest" },
-        { href: "/register-interest?type=commercial", label: "Book a pilot conversation" },
         { href: "/register-interest?type=investor", label: "Investor enquiries" },
-        { href: "/register-interest?type=landlord", label: "I own rentals" },
       ],
     },
   ],
   legal: "© 2026 Lienry Drones. Sydney, Australia.",
+  legalLinks: [{ href: "/privacy", label: "Privacy policy" }],
 } as const;

@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { coverSizes, focusOf, getImage, largest, ratio, srcSet, variantSrcSet } from "@/lib/media";
 
-export type PictureAspect = "21/9" | "16/9" | "2/1" | "3/2" | "4/3" | "1/1" | "4/5" | "3/4" | "2/3";
+export type PictureAspect = "21/9" | "16/9" | "2/1" | "3/2" | "4/3" | "5/4" | "1/1" | "4/5" | "3/4" | "2/3";
 
 export type PictureProps = {
   /** A manifest still id (public/media). */
@@ -38,6 +38,8 @@ export type PictureProps = {
   overlay?: ReactNode;
   /** The page's LCP image: eager, sync decode, fetchpriority high. */
   priority?: boolean;
+  /** The frame's corners: "hard" (4px, default), "card" (16px) or "none". */
+  rounded?: "hard" | "card" | "none";
   className?: string;
   imgClassName?: string;
 };
@@ -120,6 +122,7 @@ export function Picture({
   zoom = false,
   overlay,
   priority = false,
+  rounded = "hard",
   className = "",
   imgClassName = "",
 }: PictureProps) {
@@ -143,7 +146,7 @@ export function Picture({
     ...(maxHeight ? { "--pic-max": maxHeight } : null),
     ...positionVars(id, position, positionMd, positionSm),
   } as CSSProperties;
-  const frame = `relative w-full overflow-hidden rounded-hard bg-media ${frameCls}`;
+  const frame = `relative w-full overflow-hidden ${rounded === "card" ? "rounded-card" : rounded === "none" ? "" : "rounded-hard"} bg-media ${frameCls}`;
 
   if (!asset) {
     // The build fetches every asset first (prebuild), so this only shows in a local tree without

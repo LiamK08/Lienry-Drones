@@ -2,7 +2,7 @@
 // files never import from here: they stay plain literals whose shapes match these types structurally.
 
 /** A page section's tone. Raised and sunken are surfaces inside a section (.surface-raised, .surface-sunken). */
-export type BandTone = "plaster" | "ink";
+export type BandTone = "plaster" | "ink" | "paper" | "tint" | "night";
 
 /** @deprecated Accepted by Band until integration; check 4 fails it. */
 export type LegacyTone = "raised" | "sunken";
