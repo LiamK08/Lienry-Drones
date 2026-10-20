@@ -200,7 +200,7 @@ export const safety = {
     { icon: "check", title: "Surface checks", note: "Onboard, on every pass" },
     { icon: "dock", title: "Weatherproof dock", note: "Shelter between cleans" },
     { icon: "person", title: "Nobody at height", note: "No rope access, no lift" },
-    { icon: "doc", title: "Approvals", note: "Still being finalised" },
+    { icon: "doc", title: "Site permissions", note: "Still being finalised" },
   ],
 };
 

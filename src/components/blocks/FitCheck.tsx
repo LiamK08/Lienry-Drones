@@ -48,7 +48,7 @@ export function FitCheck({ id = "fit" }: { id?: string }) {
                         return (
                           <label
                             key={a.id}
-                            className={`relative flex h-8 cursor-pointer items-center rounded-pill border px-3.5 text-caption transition-colors duration-200 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus ${
+                            className={`relative flex h-8 cursor-pointer items-center rounded-pill border px-3.5 text-caption transition-[background-color,border-color,color] duration-200 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus ${
                               on ? "border-accent bg-accent text-white" : "border-line bg-white text-ink hover:border-ink"
                             }`}
                           >

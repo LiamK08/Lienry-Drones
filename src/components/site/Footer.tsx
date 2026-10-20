@@ -26,7 +26,7 @@ export function Footer() {
               <ul aria-labelledby={`footer-${g.id}`} className="mt-3">
                 {g.links.map((l) => (
                   <li key={l.href}>
-                    <Link href={l.href} className="inline-flex min-h-8 items-center text-small text-white/90 transition-colors duration-200 hover:text-white hover:underline hover:underline-offset-4">
+                    <Link href={l.href} className="inline-flex min-h-8 items-center text-small text-white/90 transition-[background-color,border-color,color] duration-200 hover:text-white hover:underline hover:underline-offset-4">
                       {l.label}
                     </Link>
                   </li>
@@ -40,7 +40,7 @@ export function Footer() {
           <ul className="flex gap-6">
             {footer.legalLinks.map((l) => (
               <li key={l.href}>
-                <Link href={l.href} className="text-caption text-white/55 transition-colors duration-200 hover:text-white">
+                <Link href={l.href} className="text-caption text-white/55 transition-[background-color,border-color,color] duration-200 hover:text-white">
                   {l.label}
                 </Link>
               </li>

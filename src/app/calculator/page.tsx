@@ -13,7 +13,7 @@ export default function CalculatorPage() {
   const { hero, head } = calculatorPage;
   return (
     <>
-      <SplitHero eyebrow={hero.eyebrow} headline={hero.headline} emphasis={hero.emphasis} lead={hero.lead} image={hero.image} />
+      <SplitHero mobileLines={3} eyebrow={hero.eyebrow} headline={hero.headline} emphasis={hero.emphasis} lead={hero.lead} image={hero.image} />
       <Band id="cost" tone="plaster" labelledBy="cost-heading">
         <Container>
           <SectionHead id="cost-heading" layout="center" eyebrow={head.eyebrow} headline={head.headline} intro={head.intro} />

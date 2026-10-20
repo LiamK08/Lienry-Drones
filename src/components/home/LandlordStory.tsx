@@ -55,7 +55,7 @@ export function LandlordStory() {
                         aria-controls={`story-panel-${b.app}`}
                         aria-disabled={open}
                         onClick={() => setActive(i)}
-                        className={`flex min-h-11 w-full items-baseline gap-4 py-4 text-left transition-colors duration-200 ease-instrument motion-reduce:transition-none ${
+                        className={`flex min-h-11 w-full items-baseline gap-4 py-4 text-left transition-[background-color,border-color,color] duration-200 ease-instrument motion-reduce:transition-none ${
                           open ? "cursor-default text-fg" : "text-fg-muted hover:text-fg"
                         }`}
                       >

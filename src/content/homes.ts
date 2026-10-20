@@ -52,7 +52,7 @@ export const homesPage = {
     columns: [
       { icon: "person", title: "Nobody at height", text: "No one climbs a ladder or walks the roof to clean it." },
       { icon: "phone", title: "Started from the app", text: "Pick the areas and start the clean from wherever you are." },
-      { icon: "doc", title: "Approvals", text: "We do not claim any approvals. What each site will need is still being finalised." },
+      { icon: "doc", title: "Site permissions", text: "We do not claim any approvals. What each site will need is still being finalised." },
     ],
   },
   close: { headline: "Tell us about your property. We reply personally.", action: { label: "Register interest", href: "/register-interest?type=homeowner" } },

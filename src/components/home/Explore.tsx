@@ -38,7 +38,7 @@ export function Explore() {
               type="button"
               aria-pressed={filter === f}
               onClick={() => setFilter(f)}
-              className={`h-8 rounded-hard border px-3 text-label uppercase tracking-[0.06em] transition-colors duration-200 ${filter === f ? "border-white bg-white text-ink" : "border-white/20 text-white/80 hover:border-white/60"}`}
+              className={`h-8 rounded-hard border px-3 focus-visible:outline-accent-on-dark text-label uppercase tracking-[0.06em] transition-[background-color,border-color,color] duration-200 ${filter === f ? "border-white bg-white text-ink" : "border-white/20 text-white/80 hover:border-white/60"}`}
             >
               {f}
             </button>

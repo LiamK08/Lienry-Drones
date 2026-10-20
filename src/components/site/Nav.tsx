@@ -185,7 +185,7 @@ export function Nav() {
               <ul className="grid grid-cols-2 gap-1">
                 {active.links.map((l) => (
                   <li key={l.href}>
-                    <Link href={l.href} onClick={() => setMenu(null)} className="block rounded-[0.625rem] px-4 py-3 transition-colors duration-200 hover:bg-paper">
+                    <Link href={l.href} onClick={() => setMenu(null)} className="block rounded-[0.625rem] px-4 py-3 transition-[background-color,border-color,color] duration-200 hover:bg-paper">
                       <span className="block text-small font-medium">{l.label}</span>
                       <span className="mt-1 block text-caption text-muted">{l.note}</span>
                     </Link>

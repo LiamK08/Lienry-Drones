@@ -13,7 +13,7 @@ export default function FitCheckPage() {
   const { hero, head } = fitCheckPage;
   return (
     <>
-      <SplitHero eyebrow={hero.eyebrow} headline={hero.headline} emphasis={hero.emphasis} lead={hero.lead} image={hero.image} />
+      <SplitHero mobileLines={3} eyebrow={hero.eyebrow} headline={hero.headline} emphasis={hero.emphasis} lead={hero.lead} image={hero.image} />
       <Band id="check" tone="plaster" labelledBy="check-heading">
         <Container>
           <SectionHead id="check-heading" layout="center" eyebrow={head.eyebrow} headline={head.headline} intro={head.intro} />

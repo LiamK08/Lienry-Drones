@@ -22,7 +22,7 @@ const scrims = (
 export function Hero() {
   const film = useFilm({ videoId: hero.videoId, threshold: 0.1 });
   return (
-    <section aria-labelledby="hero-heading" data-band="hero" data-tone="film" className="on-dark on-film relative isolate flex min-h-[88svh] flex-col justify-end text-white md:min-h-[100svh]">
+    <section aria-labelledby="hero-heading" data-band="hero" data-tone="film" className="on-dark on-film relative isolate flex min-h-[100svh] flex-col justify-end text-white">
       <FilmLayer film={film} videoId={hero.videoId} posterId={hero.posterId} priority fadeIn overlays={scrims} />
       <div className="page-x mx-auto flex w-full max-w-grid flex-col items-center pb-20 pt-[calc(var(--nav-h)+8rem)] text-center md:pb-24">
         <h1 id="hero-heading" className="max-w-none text-balance text-[2.75rem] leading-[1.05] md:text-[3.5rem] lg:text-[4rem]">

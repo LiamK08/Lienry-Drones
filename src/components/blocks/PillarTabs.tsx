@@ -45,13 +45,14 @@ export function PillarTabs({ id, eyebrow, headline, items }: { id: string; eyebr
               tabIndex={i === active ? 0 : -1}
               onClick={() => setActive(i)}
               onKeyDown={(e) => {
-                if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+                const last = items.length - 1;
+                const next = e.key === "ArrowRight" ? (i + 1) % items.length : e.key === "ArrowLeft" ? (i + last) % items.length : e.key === "Home" ? 0 : e.key === "End" ? last : -1;
+                if (next < 0) return;
                 e.preventDefault();
-                const next = (i + (e.key === "ArrowRight" ? 1 : items.length - 1)) % items.length;
                 setActive(next);
                 document.getElementById(`${id}-tab-${items[next].id}`)?.focus();
               }}
-              className={`-mb-px shrink-0 border-b-2 pb-3 text-small transition-colors duration-200 ${i === active ? "border-ink text-ink" : "border-transparent text-muted hover:text-ink"}`}
+              className={`-mb-px shrink-0 border-b-2 pb-3 text-small transition-[background-color,border-color,color] duration-200 ${i === active ? "border-ink text-ink" : "border-transparent text-muted hover:text-ink"}`}
             >
               {p.tab}
             </button>

@@ -1,3 +1,5 @@
+"use client";
+
 import { benefits } from "@/content/home";
 import { Icon } from "@/components/blocks/Icon";
 import { Band, Container } from "@/components/ui/Band";
@@ -15,7 +17,16 @@ export function ExpandCards() {
       <Container>
         <SectionHead id="benefits-heading" layout="center" eyebrow={benefits.eyebrow} headline={benefits.headline} intro={benefits.intro} />
       </Container>
-      <ul className="no-scrollbar -mx-(--page-margin) mt-(--head-gap) flex snap-x snap-mandatory gap-2 overflow-x-auto px-(--page-margin) lg:mx-auto lg:max-w-grid lg:gap-1 lg:overflow-visible lg:px-0">
+      <ul
+        tabIndex={0}
+        aria-label={benefits.headline}
+        // Home and End move the phone track to its ends (a focused scroller only scrolls vertically on them).
+        onKeyDown={(e) => {
+          if (e.key !== "Home" && e.key !== "End") return;
+          e.preventDefault();
+          e.currentTarget.scrollTo({ left: e.key === "End" ? e.currentTarget.scrollWidth : 0 });
+        }}
+        className="no-scrollbar -mx-(--page-margin) mt-(--head-gap) flex snap-x snap-mandatory gap-2 overflow-x-auto px-(--page-margin) lg:mx-auto lg:max-w-grid lg:gap-1 lg:overflow-visible lg:px-0">
         {benefits.cards.map((c) => (
           <li
             key={c.title}

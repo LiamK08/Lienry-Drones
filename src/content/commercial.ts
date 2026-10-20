@@ -55,7 +55,7 @@ export const commercialPage = {
     columns: [
       { icon: "tether", title: "Always tethered", text: "Water and power through one line from the dock, for the whole clean." },
       { icon: "camera", title: "Obstacle avoidance", text: "A camera on the drone watches the surface and what is around it." },
-      { icon: "doc", title: "Approvals", text: "We do not claim any approvals. What each site will need is still being finalised." },
+      { icon: "doc", title: "Site permissions", text: "We do not claim any approvals. What each site will need is still being finalised." },
     ],
   },
   cost: {

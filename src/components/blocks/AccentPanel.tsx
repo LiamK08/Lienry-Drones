@@ -18,7 +18,7 @@ export function AccentPanel({ id, headline, action, bleed = false, note }: { id:
         <Button href={action.href} variant="secondary" arrow className="mt-8">
           {action.label}
         </Button>
-        {note ? <p className="mt-6 text-caption text-white/75">{note}</p> : null}
+        {note ? <p className="mt-6 text-caption text-white">{note}</p> : null}
       </div>
     </div>
   );

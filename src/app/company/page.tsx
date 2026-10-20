@@ -22,7 +22,7 @@ export default function CompanyPage() {
   const { hero, rows, values, founders, close, media } = companyPage;
   return (
     <>
-      <BubbleHero headline={hero.headline} emphasis={hero.emphasis} lead={hero.lead} images={hero.images} />
+      <BubbleHero mobileLines={3} headline={hero.headline} emphasis={hero.emphasis} lead={hero.lead} images={hero.images} />
       <Band id="story" tone="plaster" ariaLabel="Our story">
         <Container>
           <div className="mx-auto flex max-w-6xl flex-col gap-20 lg:gap-28">

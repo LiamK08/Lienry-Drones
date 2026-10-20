@@ -39,7 +39,7 @@ export function SystemCards() {
                     Sources:{" "}
                     {cited.map((s, i) => (
                       <span key={s.id}>
-                        <a href={s.sourceUrl} target="_blank" rel="noopener noreferrer" className="link">
+                        <a href={s.sourceUrl} target="_blank" rel="noopener noreferrer" className="link inline-block py-1">
                           {s.source.split(",")[0]}
                         </a>
                         {i < cited.length - 1 ? "; " : "."}

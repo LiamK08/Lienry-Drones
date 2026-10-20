@@ -6,7 +6,7 @@ export function WordStrip({ label, items }: { label: string; items: readonly str
         <p className="mx-auto max-w-none text-label uppercase tracking-[0.08em] text-muted">{label}</p>
         <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-10 gap-y-3">
           {items.map((w) => (
-            <li key={w} className="font-display text-[1.5rem] text-ink/45">
+            <li key={w} className="font-display text-[1.5rem] text-ink/65">
               {w}
             </li>
           ))}

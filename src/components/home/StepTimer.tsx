@@ -53,13 +53,14 @@ export function StepTimer() {
                   tabIndex={on ? 0 : -1}
                   onClick={() => pick(i)}
                   onKeyDown={(e) => {
-                    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+                    const last = how.steps.length - 1;
+                    const next = e.key === "ArrowRight" ? (i + 1) % how.steps.length : e.key === "ArrowLeft" ? (i + last) % how.steps.length : e.key === "Home" ? 0 : e.key === "End" ? last : -1;
+                    if (next < 0) return;
                     e.preventDefault();
-                    const next = (i + (e.key === "ArrowRight" ? 1 : how.steps.length - 1)) % how.steps.length;
                     pick(next);
                     document.getElementById(`how-tab-${how.steps[next].id}`)?.focus();
                   }}
-                  className="min-w-40 shrink-0 text-left"
+                  className="group/tab min-w-40 shrink-0 text-left"
                 >
                   <span aria-hidden="true" className="relative block h-[3px] overflow-hidden rounded-pill bg-line">
                     <span
@@ -70,7 +71,7 @@ export function StepTimer() {
                   <span className="mt-3 block text-label uppercase tracking-[0.08em] text-muted">
                     {s.n} · {s.who}
                   </span>
-                  <span className={`mt-1 block text-small ${on ? "text-ink" : "text-muted"}`}>{s.tab}</span>
+                  <span className={`mt-1 block text-small transition-[background-color,border-color,color] duration-200 ${on ? "text-ink" : "text-muted group-hover/tab:text-ink"}`}>{s.tab}</span>
                 </button>
               );
             })}
