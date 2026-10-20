@@ -108,6 +108,8 @@ export function Nav() {
   }, [open]);
 
   const overHero = pathname === "/" && !scrolled && !open && !menu;
+  // Elsewhere, at the top of the page the bar is a soft white veil with no rule; once scrolled, solid.
+  const atTop = !scrolled && !open && !menu;
   const hoverOpen = (id: MenuId) => {
     window.clearTimeout(closeTimer.current);
     setMenu(id);
@@ -125,7 +127,7 @@ export function Nav() {
       aria-modal={open ? true : undefined}
       aria-label={open ? "Menu" : undefined}
       className={`fixed inset-x-0 top-0 z-50 h-[var(--nav-h)] border-b transition-[background-color,border-color,color] duration-200 ease-instrument motion-reduce:transition-none ${
-        overHero ? "on-dark border-transparent bg-transparent text-white" : "border-line bg-white text-ink"
+        overHero ? "on-dark border-transparent bg-transparent text-white" : atTop ? "border-transparent bg-white/70 text-ink backdrop-blur-md" : "border-line bg-white text-ink"
       }`}
     >
       <nav aria-label="Primary" className="relative mx-auto flex h-full max-w-grid items-center px-4 md:px-6" onMouseLeave={hoverClose}>
@@ -138,7 +140,7 @@ export function Nav() {
                 aria-expanded={menu === m.id}
                 aria-controls={`menu-${m.id}`}
                 onClick={() => setMenu((v) => (v === m.id ? null : m.id))}
-                className={`flex h-9 items-center gap-1.5 rounded-[0.5rem] px-3 text-small transition-[background-color,opacity] duration-200 ${
+                className={`flex h-8 items-center gap-1.5 rounded-[0.5rem] px-3 text-small transition-[background-color,opacity] duration-200 ${
                   menu === m.id ? (overHero ? "bg-white/15" : "bg-ink/[0.06]") : "hover:opacity-70"
                 }`}
               >
@@ -148,7 +150,7 @@ export function Nav() {
             </li>
           ))}
           <li onMouseEnter={hoverClose}>
-            <Link href={navAbout.href} aria-current={pathname === navAbout.href ? "page" : undefined} className="flex h-9 items-center rounded-pill px-3 text-small transition-opacity duration-200 hover:opacity-70">
+            <Link href={navAbout.href} aria-current={pathname === navAbout.href ? "page" : undefined} className="flex h-8 items-center rounded-pill px-3 text-small transition-opacity duration-200 hover:opacity-70">
               {navAbout.label}
             </Link>
           </li>

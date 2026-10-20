@@ -25,7 +25,12 @@ export const faqItems: readonly FaqEntry[] = [
     a: "We are preparing a pilot program for commercial buildings under 70 metres. Dates and terms are still being finalised.",
     link: { label: "Book a pilot conversation", href: "/register-interest?type=commercial" },
   },
-  { id: "cost", q: "What will it cost?", a: "Pricing is still being finalised. We are not publishing prices before the pilot program." },
+  {
+    id: "cost",
+    q: "What will it cost?",
+    a: "Pricing is still being finalised. We are not publishing prices before the pilot program.",
+    link: { label: "Add up what outsourced cleaning costs you now", href: "/calculator" },
+  },
 ];
 
 /** The questions each page shows, in display order. */
@@ -35,7 +40,8 @@ export const faqSets = {
   commercial: ["roof", "safety", "weather", "water", "approvals", "pilot", "cost"],
   homes: ["app", "safety", "weather", "water", "approvals", "cost"],
   solar: ["surfaces", "weather", "water", "approvals"],
-} as const satisfies Record<"home" | "platform" | "commercial" | "homes" | "solar", readonly FaqId[]>;
+  fitCheck: ["height", "roof", "surfaces", "pilot"],
+} as const satisfies Record<"home" | "platform" | "commercial" | "homes" | "solar" | "fitCheck", readonly FaqId[]>;
 
 /** A page's questions from the bank, in its set's order. */
 export const faqFor = (set: keyof typeof faqSets): FaqEntry[] => faqSets[set].map((id) => faqItems.find((i) => i.id === id)!);

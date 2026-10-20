@@ -57,7 +57,7 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const NOT_FOUND = "/this-page-does-not-exist";
-const ROUTES = ["/", "/platform", "/commercial", "/homes-and-rentals", "/solar", "/company", "/download", "/register-interest", "/privacy", NOT_FOUND];
+const ROUTES = ["/", "/platform", "/commercial", "/homes-and-rentals", "/solar", "/company", "/download", "/register-interest", "/privacy", "/fit-check", "/calculator", NOT_FOUND];
 const VIEWPORTS = {
   1440: { width: 1440, height: 900 },
   1024: { width: 1024, height: 768 },

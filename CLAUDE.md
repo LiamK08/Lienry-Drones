@@ -28,7 +28,9 @@ section titles 48px (31), inner section titles 36px (30), card titles 32px (26),
 tracking. Eyebrows are an accent dot and 12px capitals (`.eyebrow`).
 
 Shape: buttons are pills (`rounded-pill`, optional round arrow badge); cards are `rounded-card`
-(16px), panels `rounded-panel` (20px); small tags and form fields keep `--radius-hard` (4px).
+(16px), panels `rounded-panel` (20px); feature and story images follow the reference's softer
+corners (`Picture rounded="image"`, 12px, 8px from 1024; `rounded="media"`, 10px); small tags and form
+fields keep `--radius-hard` (4px). The header bar is 56px (`--nav-h`).
 Soft blurred accent glows are allowed behind heroes and accent panels. No text shadows or
 gradient text.
 

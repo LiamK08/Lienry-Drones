@@ -14,11 +14,21 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
   studies, security certifications, articles), the page shows an honest stand-in: a strip of what it
   is designed for, three settings with design-intent and cited figures, link cards into Lienry's own
   pages, and safety-by-design tiles. Keep it that way.
-- Gates at `b929b3d`: typecheck, lint and build pass; `check:a11y` passes on all 11 routes;
-  `perf:vitals` (mobile, applied throttling, one run each) passes on all 11, LCP 1.7 to 2.3 s, CLS
-  under 0.1. `check:layout` and `check:rules` encode the October 4px, left-aligned system and fail by
-  design on shape, alignment, eyebrow and headline length; read only their honesty checks (11, 12,
-  22, 24), which pass apart from check 13's old demand for a software window on the home page.
+- Second pass (20 October, PR #14): every inner page was measured against its reference page and
+  rebuilt to it: the solutions template (/commercial, /homes-and-rentals, /solar: hero, word strip,
+  one white features run, one paper band, the FAQ on white, the 1328x400 closing panel), /company
+  (900px bubble hero, asymmetric story rows, funding inside the story band), /register-interest
+  (enquirer tabs tied to the form's "I am a" radios), /fit-check (compact hero, one 684px column with
+  a seven-segment bar, explainer and FAQ cards), /calculator (title hero, featured row, sidebar and
+  card listing) and /privacy (legal tab strip, contents beside the policy). Shared: a 56px header
+  that is a soft white veil at the top of inner pages, 20px phone margins, 42px pills whose label
+  rolls up on hover, softer image corners, restyled FAQ rows, pause controls on both word strips.
+- Gates at `a847829`: typecheck, lint and build pass; `check:a11y` passes on all 12 routes;
+  `perf:vitals` (three runs each) passes on all 11 pages, LCP 1.8 to 2.4 s. `check:layout` and
+  `check:rules` encode the October 4px, left-aligned system and fail by design on shape, alignment,
+  eyebrow and headline length; read only their honesty checks (11, 12, 22, 24) and the calculator
+  check (33), which pass. Check 14 flags the footer's looping pictures as duplicates and check 23 the
+  blurred glows; both are by design now.
 - The owner said the imagery is not good enough yet and will be redone in Higgsfield later. Until
   they say so, keep the current stills and film in the new layouts.
 
@@ -73,6 +83,11 @@ NODE_USE_ENV_PROXY=1 node scripts/perf-vitals.mjs http://localhost:3000 [routes]
   companies' logos there or anywhere as customers, partners or backers.
 - **Transitions:** use `transition-[background-color,border-color,color]`, not `transition-colors`,
   on anything focusable: the latter animates the outline colour and the focus ring fails contrast.
+- **Tailwind token collisions:** the theme defines `--container-grid`, so `inline-grid` compiles to
+  `inline-size: 1392px`, not a display. Write `[display:inline-grid]`.
+- **Hydration and LCP:** never put visible text under a Suspense fallback that is swapped after
+  hydration (useSearchParams): the swap repaints it late and LCP jumps (/register-interest hit 4.8 s).
+  Read the URL in a small child under Suspense and keep the visible tree outside it.
 - **Media:** no new or replacement imagery without the owner's say. Never pair a closed ground pod
   (ho1, y1, p5, so1) beside an open one (m3, p3, p4, y3, y5) in one view.
 - **Next.js 16:** read `node_modules/next/dist/docs` before touching framework APIs.
@@ -84,7 +99,10 @@ NODE_USE_ENV_PROXY=1 node scripts/perf-vitals.mjs http://localhost:3000 [routes]
   with checks, callout, fact strip, or a node such as the software window), `PillarTabs` (the six
   parts; each panel id is the footer anchor), `SafetyBlock`, `AccentPanel` (inset or full bleed),
   `FaqCentered` and `FaqRows`, `ProductClose` (the framed software window), `FitCheck`, `Icon`,
-  `holdLines`.
+  `holdLines`; from the second pass `TitleHero` (/calculator), `FaqCards` (/fit-check),
+  `FiguresPanel` (cited figures in the solutions paper band), `SplitHero variant="compact"`,
+  `FeatureRows variant="solutions"`, `FitCheck layout="column"`, `CostCalculator layout="listing"`,
+  `EnquiryTypeTabs` (with `EnquiryTypeProvider`) and `MarqueeToggle`.
 - **Home** (`src/components/home`): `Hero`, `Strip` (marquee), `WhyFit`, `ExpandCards`, `StepTimer`,
   `SystemCards`, `Explore`, `SafetyPanel`, `FaqForm`; `LandlordStory` is used on /homes-and-rentals.
 - **Earlier sections still in use**: `StatBand` (cited figures), `CostCalculator`, `PageHero` (404),
@@ -103,6 +121,12 @@ NODE_USE_ENV_PROXY=1 node scripts/perf-vitals.mjs http://localhost:3000 [routes]
 4. What contact email should /privacy give?
 5. Lienry Desktop: the installer URLs and version for `src/lib/download.ts`, and whether signing in
    needs a software plan.
+
+## Owner's calls left open by the second pass
+
+- The reference sets some headings at 36px on phones; CLAUDE.md says 30, so they stay 30.
+- /company's hero fades to white later than the reference (an extra stop at 72%) so the lead keeps
+  4.5:1; delete that stop to match the reference exactly.
 
 ## Possible next steps
 

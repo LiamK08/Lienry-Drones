@@ -2,6 +2,13 @@
 // its `headline`; images are ImageRef-compatible `{ id, alt, position }` with manifest still ids; links
 // are Action-compatible `{ label, href }`. Facts come from docs/SITE-PLAN.md only.
 
+/**
+ * How a story row sits from 1024: "wide" (text then picture across 1328, the first row), "imageLeft"
+ * (picture then text, two equal columns across 1200) or "textLeft" (a narrower text column, then a
+ * wider picture, across 1200). Below 1024 every row is text, then picture.
+ */
+export type StoryRowLayout = "wide" | "imageLeft" | "textLeft";
+
 /** A founder on /company. Only `published` entries render, and `photo` renders only when the owner supplies a real photograph. */
 export type FounderEntry = { name: string; title: string; bio: string; photo: null | { src: string; alt: string; width: number; height: number }; published: boolean };
 
@@ -22,30 +29,36 @@ export const companyPage = {
   rows: [
     {
       id: "why",
+      layout: "wide" as StoryRowLayout,
       title: "We think cleaning a building\u2019s exterior shouldn\u2019t need anyone at height.",
       paragraphs: ["Lienry Drones is a Sydney company at concept stage. We are building a resident cleaning drone that lives on a property and keeps its exterior clean with nobody on site. We start with the buildings people own: offices, apartments, homes and rentals."],
       image: { id: "co1-company", alt: "A harbour-side street of mid-rise buildings at dawn", position: "50% 50%" },
     },
     {
       id: "where",
+      layout: "imageLeft" as StoryRowLayout,
       title: "Where we are",
       paragraphs: ["Everything on this site describes the design, and none of it is in service yet. The platform, both systems and the software are designed. We are raising a pre-seed round to build the system and run a pilot with a small number of commercial buildings under 70 metres in Sydney."],
       image: { id: "s6-automation", alt: "The roof capsule open at dawn, the drone above its cradle", position: "50% 40%" },
     },
     {
       id: "values",
+      layout: "textLeft" as StoryRowLayout,
       title: "How we work",
       paragraphs: ["We say only what we can stand behind, and we design safety in rather than leaving it to supervision. Every decision is measured against one question: does this make a property easier to own?"],
       image: { id: "f3-surface", alt: "The drone's spray bar, pad and roller on a pane of glass", position: "50% 50%" },
     },
     {
       id: "next",
+      layout: "imageLeft" as StoryRowLayout,
       title: "What we are exploring",
       paragraphs: ["For some sites we are exploring a hose-free model. It is an idea in development, not a product, and it is not part of the pilot program."],
       image: { id: "m1-drone-master", alt: "The Lienry drone washing a glass wall", position: "50% 50%" },
     },
   ],
-  // The three rules, read by scripts/check-rules.mjs (check 11 allows "approvals" inside Honest by default).
+  // The three rules. The page no longer shows them as a band (the "How we work" row says the same in
+  // one paragraph), but scripts/check-rules.mjs still reads them: check 11 allows "approvals" inside
+  // Honest by default.
   values: {
     items: [
       { title: "Honest by default", body: "No invented customers, results or approvals, and every statistic is cited." },

@@ -31,7 +31,7 @@ import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "no
 import os from "node:os";
 import path from "node:path";
 
-const ROUTES = ["/", "/platform", "/commercial", "/homes-and-rentals", "/solar", "/company", "/download", "/register-interest", "/privacy"];
+const ROUTES = ["/", "/platform", "/commercial", "/homes-and-rentals", "/solar", "/company", "/download", "/register-interest", "/privacy", "/fit-check", "/calculator"];
 const LIGHTHOUSE = "lighthouse@13.5.0";
 const LCP_BUDGET_MS = 2500;
 const CLS_BUDGET = 0.1;
