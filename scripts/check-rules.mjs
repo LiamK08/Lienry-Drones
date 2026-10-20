@@ -2173,7 +2173,10 @@ async function calcPass(route, width) {
     await page.locator("[data-calculator]").scrollIntoViewIfNeeded();
     await page.waitForTimeout(1200);
     try {
-      await page.selectOption(`#${CALC_IDS.type}`, { label: "Commercial building" });
+      // The default layout is a select; the /calculator listing sets the types as a fieldset of radio chips.
+      const isSelect = await page.$eval(`#${CALC_IDS.type}`, (el) => el.tagName === "SELECT");
+      if (isSelect) await page.selectOption(`#${CALC_IDS.type}`, { label: "Commercial building" });
+      else await page.locator(`#${CALC_IDS.type}`).getByLabel("Commercial building", { exact: true }).check({ force: true });
     } catch {
       add('the building type has no "Commercial building" option');
     }
