@@ -66,10 +66,11 @@ const layouts = {
     rail: "mx-auto w-full max-w-[83rem]",
     rows: "flex flex-col gap-20 lg:gap-[6.25rem]",
     grid: "grid items-center gap-8 lg:grid-cols-2 lg:gap-10",
-    // The DOM follows the desktop order (a left picture comes first), so the order classes only move a
-    // right-hand picture above its text on phones.
-    text: (right: boolean) => (right ? "order-2 lg:order-1" : ""),
-    media: (right: boolean) => (right ? "order-1 lg:order-2" : ""),
+    // Text, then picture, in the DOM and below 1024 (as on /platform), so on phones the first picture
+    // stays under the fold and the hero text remains the LCP element; from 1024 a left-hand picture
+    // moves before its text.
+    text: (right: boolean) => (right ? "" : "lg:order-2"),
+    media: (right: boolean) => (right ? "" : "lg:order-1"),
     paras: "mt-4 space-y-2",
     para: "max-w-none text-small leading-[1.2] text-fg",
     list: "mt-8 space-y-[1.1875rem]",
@@ -86,7 +87,7 @@ const layouts = {
  * variant "default" (/platform): the band's own padding, the 1392px grid, 4:3 or 16:9 pictures, and
  * below 1024 the picture follows the text.
  * variant "solutions" (/commercial, /homes-and-rentals, /solar): 80 above the first row (0 on
- * phones, where the strip's own 80 does it), 120 under the last row (56 on phones), and below 1024 the picture comes first.
+ * phones, where the strip's own 80 does it), 120 under the last row (56 on phones), and below 1024 the text comes first, then its picture.
  */
 export function FeatureRows({
   id,
@@ -108,12 +109,13 @@ export function FeatureRows({
 }) {
   const solutions = variant === "solutions";
   const L = layouts[variant];
+  // Phones ask for the picture's real width, inside the page margins.
   const mediaOf = (r: FeatureRowItem, right: boolean) => (
     <div className={L.media(right)}>
       {r.media ??
         (r.image ? (
           solutions ? (
-            <Picture id={r.image.id} alt={r.image.alt} position={r.image.position} aspect="5/4" aspectSm="5/4" rounded="image" sizes="(min-width: 1440px) 644px, (min-width: 1024px) 46vw, 100vw" />
+            <Picture id={r.image.id} alt={r.image.alt} position={r.image.position} aspect="5/4" aspectSm="5/4" rounded="image" sizes="(min-width: 1440px) 644px, (min-width: 1024px) 46vw, (min-width: 768px) calc(100vw - 3rem), calc(100vw - 2.5rem)" />
           ) : (
             <Picture id={r.image.id} alt={r.image.alt} position={r.image.position} aspect={r.aspect ?? "4/3"} aspectSm="4/3" rounded="card" sizes="(min-width: 1440px) 684px, (min-width: 1024px) 50vw, 100vw" />
           )
@@ -127,7 +129,6 @@ export function FeatureRows({
         return (
           <section key={r.id} id={r.id} aria-labelledby={`${r.id}-heading`} className="scroll-mt-24">
             <div className={L.grid}>
-              {solutions && !right ? mediaOf(r, right) : null}
               <Reveal className={L.text(right)}>
                 <h2 id={`${r.id}-heading`} className="text-h3">
                   {r.title}
@@ -172,7 +173,7 @@ export function FeatureRows({
                   )
                 ) : null}
               </Reveal>
-              {solutions && !right ? null : mediaOf(r, right)}
+              {mediaOf(r, right)}
             </div>
             {r.facts ? (
               <ul className="mt-12 grid gap-8 pt-2 md:grid-cols-2 lg:grid-cols-4 lg:gap-0">
