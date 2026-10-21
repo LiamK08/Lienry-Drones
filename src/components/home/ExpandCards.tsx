@@ -9,7 +9,11 @@ import { SectionHead } from "@/components/ui/SectionHead";
 /**
  * Why Lienry: five tall cards in a row, 4px apart. From 1024 the card under the pointer (or holding
  * focus) widens to about four times the others over 700ms and its two-line description fades in just
- * after; the row keeps its height. Titles wrap at a fixed width, so a narrow card never clips them. Below 1024 the row is a swipe track of single cards with every description shown.
+ * after; the row keeps its height. Each picture is drawn once at the open card's width, centred, and
+ * the card is a window onto it, so widening pans the picture out to its sides instead of scaling it
+ * up. While one card is open the others' titles fade, so a narrow card never shows a clipped one.
+ * Below 1024 the row is a swipe
+ * track of single cards with every description shown.
  */
 export function ExpandCards() {
   return (
@@ -26,7 +30,7 @@ export function ExpandCards() {
           e.preventDefault();
           e.currentTarget.scrollTo({ left: e.key === "End" ? e.currentTarget.scrollWidth : 0 });
         }}
-        className="no-scrollbar -mx-(--page-margin) mt-(--head-gap) flex snap-x snap-mandatory gap-2 overflow-x-auto px-(--page-margin) lg:mx-4 lg:gap-1 lg:overflow-visible lg:px-0">
+        className="why-row no-scrollbar @container -mx-(--page-margin) mt-(--head-gap) flex snap-x snap-mandatory gap-2 overflow-x-auto px-(--page-margin) lg:mx-4 lg:gap-1 lg:overflow-visible lg:px-0">
         {benefits.cards.map((c) => (
           <li
             key={c.title}
@@ -35,12 +39,21 @@ export function ExpandCards() {
             aria-describedby={`why-${c.icon}-body`}
             className="group relative h-[28rem] w-[80%] shrink-0 snap-start overflow-hidden rounded-card outline-offset-2 sm:w-[46%] lg:h-[31.25rem] lg:w-auto lg:min-w-0 lg:flex-1 lg:transition-[flex-grow] lg:duration-[700ms] lg:ease-[cubic-bezier(0.4,0,0.2,1)] lg:hover:grow-[4] lg:focus-visible:grow-[4] motion-reduce:transition-none"
           >
-            <Picture id={c.image.id} alt={c.image.alt} position={c.image.position} fit="fill" rounded="none" sizes="(min-width: 1024px) 60vw, 80vw" className="absolute inset-0" />
+            {/* From 1024: the open card's width (half the row less its four 4px gaps), centred on the card. */}
+            <Picture
+              id={c.image.id}
+              alt={c.image.alt}
+              position={c.image.position}
+              fit="fill"
+              rounded="none"
+              sizes="(min-width: 1024px) 50vw, 80vw"
+              className="absolute inset-0 lg:left-1/2 lg:right-auto lg:w-[calc((100cqw-1rem)/2)] lg:-translate-x-1/2"
+            />
             <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(to_top,rgba(18,17,16,0.8)_0%,rgba(18,17,16,0.15)_45%,rgba(18,17,16,0.25)_100%)]" />
             <span className="absolute left-5 top-5 text-white">
               <Icon name={c.icon} />
             </span>
-            <div className="absolute inset-x-5 bottom-5 text-white">
+            <div className="why-text absolute inset-x-5 bottom-5 text-white">
               <h3 id={`why-${c.icon}`} className="max-w-[14rem] text-[1.75rem] leading-[1.1]">
                 {c.title}
               </h3>
