@@ -689,30 +689,39 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare" }: Sof
 
           {tall ? null : (
             <div className="flex flex-col border-t border-hairline @min-[26rem]:@max-[38rem]:grid @min-[26rem]:@max-[38rem]:grid-cols-2 @min-[38rem]:col-start-2 @min-[38rem]:row-span-2 @min-[38rem]:row-start-1 @min-[38rem]:border-l @min-[38rem]:border-t-0 @min-[56rem]:col-start-3 @min-[56rem]:row-span-1">
-              <div className="px-4 pb-4 pt-4 @min-[26rem]:@max-[38rem]:col-start-1 @min-[26rem]:@max-[38rem]:row-start-1">
-                <div className="flex h-5 items-center justify-between gap-3">
-                  <p className="label text-muted">This clean</p>
-                  {status ? (
-                    <span className="flex items-center gap-1.5 text-caption text-muted">
-                      <span aria-hidden="true" className={`size-1.5 rounded-full ${status === "In progress" ? "bg-water" : status === "Complete" ? "bg-glass" : "bg-border-strong"}`} />
-                      {status}
-                    </span>
-                  ) : null}
+              {/* Progress and figures: one column beside the map from 26rem to 38rem, else (contents) items of the inspector's own column. */}
+              <div className="contents @min-[26rem]:@max-[38rem]:col-start-1 @min-[26rem]:@max-[38rem]:row-start-1 @min-[26rem]:@max-[38rem]:flex @min-[26rem]:@max-[38rem]:flex-col">
+                <div className="order-1 px-4 pb-4 pt-4">
+                  <div className="flex h-5 items-center justify-between gap-3">
+                    <p className="label text-muted">This clean</p>
+                    {status ? (
+                      <span className="flex items-center gap-1.5 text-caption text-muted">
+                        <span aria-hidden="true" className={`size-1.5 rounded-full ${status === "In progress" ? "bg-water" : status === "Complete" ? "bg-glass" : "bg-border-strong"}`} />
+                        {status}
+                      </span>
+                    ) : null}
+                  </div>
+                  <p className="readout mt-3 flex items-baseline gap-0.5 text-ink">
+                    <span className="text-[2.5rem] font-light leading-none tracking-[-0.04em]">{shownPct}</span>
+                    <span className="text-small text-muted">%</span>
+                    <span className="sr-only"> of the route</span>
+                  </p>
+                  <span aria-hidden="true" className="mt-3 block h-1 overflow-hidden rounded-full bg-sunken">
+                    <span className="block h-full bg-glass" style={{ width: `${pct}%` }} />
+                  </span>
+                  <p className="mt-2 text-caption text-muted">
+                    <span className="readout text-ink">{done}</span> of {PANELS_IN_PLAN} panels washed
+                  </p>
                 </div>
-                <p className="readout mt-3 flex items-baseline gap-0.5 text-ink">
-                  <span className="text-[2.5rem] font-light leading-none tracking-[-0.04em]">{shownPct}</span>
-                  <span className="text-small text-muted">%</span>
-                  <span className="sr-only"> of the route</span>
-                </p>
-                <span aria-hidden="true" className="mt-3 block h-1 overflow-hidden rounded-full bg-sunken">
-                  <span className="block h-full bg-glass" style={{ width: `${pct}%` }} />
-                </span>
-                <p className="mt-2 text-caption text-muted">
-                  <span className="readout text-ink">{done}</span> of {PANELS_IN_PLAN} panels washed
-                </p>
+
+                <dl className="order-3 mt-auto border-t border-hairline px-4 py-1.5">
+                  <Fact label="Scan age" value={project.scanAge} />
+                  <Fact label="Debris zones found" value={String(project.debrisZones)} />
+                  <Fact label="Next scheduled clean" value={project.nextClean} />
+                </dl>
               </div>
 
-              <div className="border-t border-hairline px-4 py-4 @min-[26rem]:@max-[38rem]:col-start-2 @min-[26rem]:@max-[38rem]:row-span-2 @min-[26rem]:@max-[38rem]:row-start-1 @min-[26rem]:@max-[38rem]:border-l @min-[26rem]:@max-[38rem]:border-t-0">
+              <div className="order-2 border-t border-hairline px-4 py-4 @min-[26rem]:@max-[38rem]:col-start-2 @min-[26rem]:@max-[38rem]:row-start-1 @min-[26rem]:@max-[38rem]:border-l @min-[26rem]:@max-[38rem]:border-t-0">
                 <p className="label text-muted">Facade map</p>
                 <div className="mt-3">
                   <FacadeMap cells={cells} version={live ? mapVersion : -1} wash={live ? layers.wash : true} debris={live ? layers.debris : true} selected={live ? selected : null} />
@@ -731,12 +740,6 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare" }: Sof
                   <Swatch colour="#e0a13a">Debris</Swatch>
                 </ul>
               </div>
-
-              <dl className="mt-auto border-t border-hairline px-4 py-1.5 @min-[26rem]:@max-[38rem]:col-start-1 @min-[26rem]:@max-[38rem]:row-start-2">
-                <Fact label="Scan age" value={project.scanAge} />
-                <Fact label="Debris zones found" value={String(project.debrisZones)} />
-                <Fact label="Next scheduled clean" value={project.nextClean} />
-              </dl>
             </div>
           )}
         </div>
