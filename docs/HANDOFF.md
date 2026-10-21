@@ -46,6 +46,14 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
   owner's call: Lienry Desktop stays in Resources, and every page still closes on its own call to act.
   The same day the owner retired every eyebrow (the dotted capitals label above a heading) across
   the site, header menu card included; check 10 now fails if one renders, and CLAUDE.md says so.
+- Later on 21 October: the solution pages' feature rows run text, then picture, below 1024 (as on
+  /platform): with the eyebrows gone the first picture had risen into the phone's first screen and
+  become a slow lazy LCP image. The home "Built for the buildings you own." band is now short: a
+  centred head and three compact link cards (icon, name, one line, round arrow) straight to
+  /commercial, /homes-and-rentals and /solar, on the compact band padding; its figures are gone. The
+  "What changes when the drone lives on site." cards draw each picture once at the open card's width
+  (centred, `100cqw` of the row), so hover pans the picture out instead of zooming in; while one card
+  is open the others' titles fade (`.why-row` / `.why-text` in globals.css).
 - The owner said the imagery is not good enough yet and will be redone in Higgsfield later. Until
   they say so, keep the current stills and film in the new layouts.
 
