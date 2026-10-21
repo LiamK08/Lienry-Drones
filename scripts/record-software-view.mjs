@@ -1,6 +1,6 @@
 // Record the software view for phones and reduced motion: 12 s of the model, stepped one frame at a
 // time so the recording is deterministic however slowly the headless renderer draws.
-// Usage: node scripts/record-software-view.mjs [baseUrl] [wide|tall]
+// Usage: node scripts/record-software-view.mjs [baseUrl] [wide|tall] [--encode-only]
 // Output: public/video/software-view-<variant>.{mp4,webm} and -poster.jpg
 import { execFileSync } from "node:child_process";
 import { mkdirSync, readdirSync, rmSync, statSync } from "node:fs";
@@ -11,9 +11,10 @@ const require = createRequire(import.meta.url);
 let chromium;
 try { ({ chromium } = require("playwright")); } catch { ({ chromium } = require("/opt/node22/lib/node_modules/playwright")); }
 const ffmpeg = require("ffmpeg-static");
+const sharp = require("sharp");
 
 const base = process.argv[2] ?? "http://localhost:3011";
-const only = process.argv[3];
+const only = process.argv[3] && !process.argv[3].startsWith("--") ? process.argv[3] : undefined;
 const FPS = 24;
 const SECONDS = 12;
 const POSTER_AT = 6.5;
@@ -24,8 +25,8 @@ mkdirSync(out, { recursive: true });
 // at 1.5x (1020x756), tall 576x720 at 1.25x (720x900). The window's own overlays (status card,
 // compass, poster) are hidden, so only the canvas is recorded.
 const variants = {
-  wide: { width: 1440, height: 900, dpr: 1.5, scale: 1020, view: [680, 504] },
-  tall: { width: 800, height: 1100, dpr: 1.25, scale: 720, view: [576, 720] },
+  wide: { width: 1440, height: 900, dpr: 1.5, scale: 1020, out: 756, view: [680, 504] },
+  tall: { width: 800, height: 1100, dpr: 1.25, scale: 720, out: 900, view: [576, 720] },
 };
 
 async function record(name, v) {
@@ -67,14 +68,16 @@ async function record(name, v) {
   return frames;
 }
 
-function encode(name, frames, v) {
-  const vf = `scale=${v.scale}:-2`;
+async function encode(name, frames, v) {
+  // A canvas a row or two taller than its box is cropped to the exact frame the window is built around.
+  const vf = `scale=${v.scale}:-2,crop=${v.scale}:${v.out}`;
   const mp4 = path.join(out, `software-view-${name}.mp4`);
   const webm = path.join(out, `software-view-${name}.webm`);
   const poster = path.join(out, `software-view-${name}-poster.jpg`);
   execFileSync(ffmpeg, ["-y", "-loglevel", "error", "-framerate", String(FPS), "-i", path.join(frames, "%04d.jpg"), "-vf", vf, "-c:v", "libx264", "-crf", "27", "-preset", "slow", "-profile:v", "high", "-pix_fmt", "yuv420p", "-movflags", "+faststart", "-an", mp4]);
   execFileSync(ffmpeg, ["-y", "-loglevel", "error", "-framerate", String(FPS), "-i", path.join(frames, "%04d.jpg"), "-vf", vf, "-c:v", "libvpx-vp9", "-crf", "38", "-b:v", "0", "-deadline", "good", "-cpu-used", "2", "-row-mt", "1", "-pix_fmt", "yuv420p", "-an", webm]);
-  execFileSync(ffmpeg, ["-y", "-loglevel", "error", "-i", path.join(frames, "poster.jpg"), "-vf", vf, "-q:v", "4", poster]);
+  // The poster is the phone LCP image on /download: mozjpeg at 76 keeps it near 55 KB.
+  await sharp(path.join(frames, "poster.jpg")).resize(v.scale).extract({ left: 0, top: 0, width: v.scale, height: v.out }).jpeg({ quality: 76, mozjpeg: true }).toFile(poster);
   for (const f of [mp4, webm, poster]) console.log(`${path.basename(f)}: ${(statSync(f).size / 1024).toFixed(0)} kB`);
 }
 
@@ -83,8 +86,9 @@ await Promise.all(
   Object.entries(variants)
     .filter(([name]) => !only || only === name)
     .map(async ([name, v]) => {
-      const frames = await record(name, v);
+      const cached = path.resolve(".next/cache/software-view-frames", name);
+      const frames = process.argv.includes("--encode-only") ? cached : await record(name, v);
       console.log(`${name}: ${readdirSync(frames).length - 1} frames captured, encoding`);
-      encode(name, frames, v);
+      await encode(name, frames, v);
     }),
 );
