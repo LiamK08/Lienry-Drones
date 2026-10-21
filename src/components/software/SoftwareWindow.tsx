@@ -46,7 +46,11 @@ function sharesOf(cells: ArrayLike<number>): number[] {
   return ZONE_CELLS.map((ids) => Math.floor((100 * ids.filter((i) => cells[i] >= 0.999).length) / ids.length));
 }
 
-/** The recording's figures as a plan: the north face washed top down, then the east face's top floors, to DEMO.completed panels. */
+/**
+ * The recording's figures as a plan: the north face washed top down, then the east face's top floors,
+ * to DEMO.completed panels. A floor is done when its second pass has crossed it: west to east on the
+ * north face, south to north (right to left, seen from outside) on the east face.
+ */
 function demoCells(): Float32Array {
   const out = new Float32Array(CELL_COUNT);
   let left = DEMO.completed;
@@ -54,7 +58,7 @@ function demoCells(): Float32Array {
     const floors = block === MAP.north ? FLOORS - 1 : FLOORS;
     for (let k = 0; k < floors; k++) {
       const floor = FLOORS - 1 - k;
-      for (let bay = 0; bay < block.cols && left > 0; bay++, left--) out[block.offset + floor * block.cols + bay] = 1;
+      for (let k2 = 0; k2 < block.cols && left > 0; k2++, left--) out[block.offset + floor * block.cols + (block === MAP.east ? block.cols - 1 - k2 : k2)] = 1;
     }
   }
   return out;
@@ -138,7 +142,7 @@ function Fact({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-baseline justify-between gap-3 border-t border-hairline py-2 first:border-t-0">
       <dt className="text-caption text-muted">{label}</dt>
-      <dd className="readout text-caption text-ink">{value}</dd>
+      <dd className="readout whitespace-nowrap text-caption text-ink">{value}</dd>
     </div>
   );
 }
@@ -168,7 +172,9 @@ function legLines(a: Activity, complete: boolean): [string, string] {
  *
  * The layout follows the window's own width (a container), not the page's: from 56rem the zones |
  * the model | the inspector, 34rem tall; from 38rem the model (28rem) over the zones as a row, the
- * inspector beside both; below that the model at 4:5, the zones two by two, then the inspector. Both
+ * inspector beside both; from 26rem (a half-width column on a desktop) the model square, the zones as
+ * a row, the inspector in two columns (progress and figures | the map); below that (phones) the model
+ * at 4:5, the zones two by two, then the inspector. Both
  * modes render the same rows at the same heights, so the switch to live mode after hydration moves
  * nothing.
  *
@@ -280,7 +286,9 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare" }: Sof
       if (!info) return setHover(null);
       const r = viewRef.current?.getBoundingClientRect();
       const width = r?.width ?? 400;
-      setHover({ info, x: Math.max(8, Math.min(x - (r?.left ?? 0) + 14, width - 232)), y: y - (r?.top ?? 0) + 14 });
+      const height = r?.height ?? 400;
+      // The card is 224px wide and at most about 124px tall: keep it inside the model's view.
+      setHover({ info, x: Math.max(8, Math.min(x - (r?.left ?? 0) + 14, width - 232)), y: Math.max(8, Math.min(y - (r?.top ?? 0) + 14, height - 132)) });
     };
   }, [viewRef]);
 
@@ -345,7 +353,7 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare" }: Sof
       }
       // The compass turns with the camera: north is +z, which the camera faces at azimuth π. The
       // needle turns; the N stays upright and rides round the dial at the needle's tip.
-      if (needleRef.current && northRef.current && control.azimuth !== shownHeading) {
+      if (needleRef.current && northRef.current && Number.isFinite(control.azimuth) && control.azimuth !== shownHeading) {
         shownHeading = control.azimuth;
         const a = control.azimuth + Math.PI;
         needleRef.current.style.transform = `rotate(${a}rad)`;
@@ -407,7 +415,9 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare" }: Sof
   const tall = capture === "tall";
   const showsPlaying = playing && !reduce;
   const complete = pct >= 100;
-  const status = !live ? null : complete ? "Complete" : showsPlaying ? "In progress" : "Paused";
+  // Whole percent, rounded down, so 100% shows only once the clean is complete.
+  const shownPct = Math.floor(pct);
+  const status = !live ? null : complete ? "Complete" : !layers.wash ? "Wash hidden" : showsPlaying ? "In progress" : "Paused";
   const lines = live && layers.wash && activity ? legLines(activity, complete) : null;
   const segments = spans ? zones.map((z) => ({ id: z.id, from: spans[z.id][0], to: spans[z.id][1] })) : [{ id: "all", from: 0, to: 1 }];
   const activeZone = live && layers.wash && !complete && activity && !activity.moving ? activity.zone : null;
@@ -471,7 +481,7 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare" }: Sof
                     aria-pressed={on}
                     onClick={() => toggle(l.id)}
                     className={`flex h-8 items-center gap-1.5 rounded-hard px-2.5 text-small transition-[background-color,color,box-shadow] duration-200 ease-instrument ${
-                      on ? "bg-white text-ink shadow-[0_0_0_1px_var(--color-hairline),0_1px_2px_rgb(28_26_23/0.1)]" : "text-muted hover:text-ink"
+                      on ? "bg-white text-ink shadow-[0_0_0_1px_var(--color-border-strong),0_1px_2px_rgb(28_26_23/0.1)]" : "text-muted hover:text-ink"
                     }`}
                   >
                     <span className={`transition-opacity duration-200 ${on ? "opacity-100" : "opacity-40"}`}>
@@ -506,7 +516,7 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare" }: Sof
         <div className={tall ? "grid" : "grid @min-[38rem]:grid-cols-[minmax(0,1fr)_15rem] @min-[56rem]:grid-cols-[14rem_minmax(0,1fr)_16rem]"}>
           <div
             ref={viewRef}
-            className={`relative bg-raised ${tall ? "aspect-[4/5]" : "aspect-[4/5] @min-[38rem]:col-start-1 @min-[38rem]:row-start-1 @min-[38rem]:aspect-auto @min-[38rem]:h-[28rem] @min-[56rem]:col-start-2 @min-[56rem]:h-[34rem]"}`}
+            className={`relative bg-raised ${tall ? "aspect-[4/5]" : "aspect-[4/5] @min-[26rem]:@max-[38rem]:aspect-square @min-[38rem]:col-start-1 @min-[38rem]:row-start-1 @min-[38rem]:aspect-auto @min-[38rem]:h-[28rem] @min-[56rem]:col-start-2 @min-[56rem]:h-[34rem]"}`}
             onPointerLeave={() => setHover(null)}
           >
             {live ? (
@@ -607,7 +617,7 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare" }: Sof
                 <p className="label text-muted">Wash route</p>
                 <span className="text-caption text-muted">{zones.length} zones</span>
               </div>
-              <ol className="grid grid-cols-2 gap-px bg-hairline @min-[38rem]:grid-cols-4 @min-[56rem]:grid-cols-1 @min-[56rem]:border-y @min-[56rem]:border-hairline">
+              <ol className="grid grid-cols-2 gap-px bg-hairline @min-[26rem]:@max-[38rem]:grid-cols-4 @min-[38rem]:grid-cols-4 @min-[56rem]:grid-cols-1 @min-[56rem]:border-y @min-[56rem]:border-hairline">
                 {zones.map((z, i) => {
                   const share = zoneShares[i];
                   const isDone = share >= 100;
@@ -678,9 +688,9 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare" }: Sof
           )}
 
           {tall ? null : (
-            <div className="flex flex-col border-t border-hairline @min-[38rem]:col-start-2 @min-[38rem]:row-span-2 @min-[38rem]:row-start-1 @min-[38rem]:border-l @min-[38rem]:border-t-0 @min-[56rem]:col-start-3 @min-[56rem]:row-span-1">
-              <div className="px-4 pb-4 pt-4">
-                <div className="flex items-baseline justify-between gap-3">
+            <div className="flex flex-col border-t border-hairline @min-[26rem]:@max-[38rem]:grid @min-[26rem]:@max-[38rem]:grid-cols-2 @min-[38rem]:col-start-2 @min-[38rem]:row-span-2 @min-[38rem]:row-start-1 @min-[38rem]:border-l @min-[38rem]:border-t-0 @min-[56rem]:col-start-3 @min-[56rem]:row-span-1">
+              <div className="px-4 pb-4 pt-4 @min-[26rem]:@max-[38rem]:col-start-1 @min-[26rem]:@max-[38rem]:row-start-1">
+                <div className="flex h-5 items-center justify-between gap-3">
                   <p className="label text-muted">This clean</p>
                   {status ? (
                     <span className="flex items-center gap-1.5 text-caption text-muted">
@@ -690,9 +700,9 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare" }: Sof
                   ) : null}
                 </div>
                 <p className="readout mt-3 flex items-baseline gap-0.5 text-ink">
-                  <span className="text-[2.5rem] font-light leading-none tracking-[-0.04em]">{Math.round(pct)}</span>
+                  <span className="text-[2.5rem] font-light leading-none tracking-[-0.04em]">{shownPct}</span>
                   <span className="text-small text-muted">%</span>
-                  <span className="sr-only"> washed</span>
+                  <span className="sr-only"> of the route</span>
                 </p>
                 <span aria-hidden="true" className="mt-3 block h-1 overflow-hidden rounded-full bg-sunken">
                   <span className="block h-full bg-glass" style={{ width: `${pct}%` }} />
@@ -702,7 +712,7 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare" }: Sof
                 </p>
               </div>
 
-              <div className="border-t border-hairline px-4 py-4">
+              <div className="border-t border-hairline px-4 py-4 @min-[26rem]:@max-[38rem]:col-start-2 @min-[26rem]:@max-[38rem]:row-span-2 @min-[26rem]:@max-[38rem]:row-start-1 @min-[26rem]:@max-[38rem]:border-l @min-[26rem]:@max-[38rem]:border-t-0">
                 <p className="label text-muted">Facade map</p>
                 <div className="mt-3">
                   <FacadeMap cells={cells} version={live ? mapVersion : -1} wash={live ? layers.wash : true} debris={live ? layers.debris : true} selected={live ? selected : null} />
@@ -714,7 +724,7 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare" }: Sof
                   <span />
                   <span className="whitespace-nowrap">Roof</span>
                 </div>
-                <ul className="mt-3 grid grid-cols-2 gap-x-3 gap-y-1 text-[0.6875rem] text-muted @max-[38rem]:grid-cols-4">
+                <ul className="mt-3 grid grid-cols-2 gap-x-3 gap-y-1 text-[0.6875rem] text-muted @max-[26rem]:grid-cols-4">
                   <Swatch colour="var(--color-glass)">Washed</Swatch>
                   <Swatch colour="#7fb0b9">One pass</Swatch>
                   <Swatch colour="#e4ded3">Pending</Swatch>
@@ -722,7 +732,7 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare" }: Sof
                 </ul>
               </div>
 
-              <dl className="mt-auto border-t border-hairline px-4 py-1.5">
+              <dl className="mt-auto border-t border-hairline px-4 py-1.5 @min-[26rem]:@max-[38rem]:col-start-1 @min-[26rem]:@max-[38rem]:row-start-2">
                 <Fact label="Scan age" value={project.scanAge} />
                 <Fact label="Debris zones found" value={String(project.debrisZones)} />
                 <Fact label="Next scheduled clean" value={project.nextClean} />
@@ -768,12 +778,12 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare" }: Sof
                   dragging.current = false;
                 }}
                 aria-label="Wash progress"
-                aria-valuetext={lines ? `${Math.round(pct)}%, ${lines[0]}, ${lines[1]}` : `${Math.round(pct)}%`}
+                aria-valuetext={lines ? `${shownPct}%, ${lines[0]}, ${lines[1]}` : `${shownPct}%`}
                 className="timeline timeline-bare absolute inset-0 h-full w-full"
                 style={{ "--fill": `${pct}%` } as CSSProperties}
               />
             </div>
-            <span className="readout w-11 shrink-0 text-right text-small text-ink">{Math.round(pct)}%</span>
+            <span className="readout w-11 shrink-0 text-right text-small text-ink">{shownPct}%</span>
           </div>
         ) : (
           // The live timeline's row, held empty from 768 in recording mode (and the server render), so

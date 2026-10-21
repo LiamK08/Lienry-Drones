@@ -150,11 +150,15 @@ export function Building({ controlRef, clockRef, fadeRef }: { controlRef: RefObj
     let total = 0;
     for (let i = 0; i < PANELS.length; i++) {
       const panel = PANELS[i];
+      // `washed` is what the glass shows (it fades with the Wash layer); `planned` is the plan's own
+      // state at the route's progress, which the window's counts, zones and map read whatever is shown.
       let washed = 0;
+      let planned = 0;
       let sweep = 0;
       if (panel.washAt.length) {
         total++;
         for (const w of panel.washAt) {
+          if (control.wash >= w) planned += 1 / panel.washAt.length;
           if (p >= w) {
             washed += 1 / panel.washAt.length;
             const s = (p - w) / SWEEP;
@@ -162,8 +166,8 @@ export function Building({ controlRef, clockRef, fadeRef }: { controlRef: RefObj
           }
         }
       }
-      if (washed >= 0.999) completed++;
-      if (CELL_OF[i] >= 0) control.cells[CELL_OF[i]] = washed;
+      if (planned >= 0.999) completed++;
+      if (CELL_OF[i] >= 0) control.cells[CELL_OF[i]] = planned;
       const scanned = f.scan * (scanU >= 1 ? 1 : panel.centre.y < scanY ? 1 : 0);
       const j = i * 4;
       arr[j] = washed;

@@ -38,7 +38,7 @@ export type SceneControl = {
   activity: { zone: ZoneId; floor: number; pass: number; moving: boolean } | null;
   /** Where each zone's washing starts and ends along the route (0 to 1), written once by the scene. */
   spans: Record<ZoneId, [number, number]> | null;
-  /** The camera's azimuth about the building in radians (0 looks at the north face), written by the scene each frame. */
+  /** The camera's azimuth about the building in radians (0 looks at the north face), written by the scene each frame; NaN until it has drawn. */
   azimuth: number;
   /** Set by the scene: request one frame when nothing else is animating. */
   requestFrame: () => void;
@@ -61,7 +61,7 @@ export function createControl(): SceneControl {
     cells: new Float32Array(CELL_COUNT),
     activity: null,
     spans: null,
-    azimuth: 0,
+    azimuth: NaN,
     requestFrame: () => {},
     onHover: () => {},
   };

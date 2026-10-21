@@ -35,7 +35,7 @@ export default function DownloadPage() {
             <DownloadActions className="mt-8 flex flex-col items-center [&_div]:items-center [&_div]:justify-center" />
           </div>
           <div className="mx-auto mt-14 max-w-5xl overflow-hidden rounded-card border border-line bg-white p-2 shadow-[0_40px_80px_-40px_rgb(0_0_0/0.3)]">
-            <SoftwareWindow priority />
+            <SoftwareWindow priority frame="inset" />
           </div>
         </Container>
       </Band>
