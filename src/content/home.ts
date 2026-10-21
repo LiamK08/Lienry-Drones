@@ -143,12 +143,13 @@ export const systems = {
   headline: "Built for the buildings you own.",
   intro: "One platform on a roof, beside a house or along a solar row. Figures are design intent at concept stage, not results.",
   link: { label: "See the platform", href: "/platform" },
-  // Each card's statement is Lienry's own design intent, attributed to the design brief: these are not
-  // testimonials, and the figures are design intent (commercial, homes) or cited (solar).
-  source: { name: "Lienry design brief", role: "Concept stage, not a result" },
+  // Each card's statement is Lienry's own design intent (from the design brief): these are not
+  // testimonials. Commercial and home figures are design intent; solar's are cited in
+  // src/content/stats.ts, shown with a short label and their sources.
   cards: [
     {
       id: "commercial",
+      icon: "building",
       name: "Commercial",
       sub: "Office and apartment buildings · Roof capsule",
       statement: "A capsule on the roof feeds the drone from above, and the desktop software runs the whole building.",
@@ -157,10 +158,12 @@ export const systems = {
         { value: "2 days", label: "Re-scan interval" },
         { value: "0", label: "People at height" },
       ],
+      note: "Design intent from the Lienry design brief. Concept stage, not results.",
       link: { label: "The commercial system", href: "/commercial" },
     },
     {
       id: "homes",
+      icon: "home",
       name: "Homes and rentals",
       sub: "Houses, townhouses and rentals · Ground pod",
       statement: "A ground pod powers the drone and feeds it water. You start the clean from your phone.",
@@ -169,15 +172,22 @@ export const systems = {
         { value: "1", label: "Ground pod" },
         { value: "0", label: "Crews to book" },
       ],
+      note: "Design intent from the Lienry design brief. Concept stage, not results.",
       link: { label: "The home system", href: "/homes-and-rentals" },
     },
     {
       id: "solar",
+      icon: "sun",
       name: "Solar",
-      sub: "Rooftop arrays and solar farm rows · Cited figures",
+      sub: "Rooftop arrays and solar farm rows",
       statement: "Panels are cleaned at the pressure set for solar glass, on the interval you choose.",
-      // Cited figures from src/content/stats.ts, by id.
-      cited: ["unsw-soiling", "iea-soiling", "cer-rooftop"],
+      // Cited figures from src/content/stats.ts, by id, each with a short label and source name for the card.
+      cited: [
+        { id: "unsw-soiling", label: "Lost to dust, AU farms studied", source: "Prasad et al." },
+        { id: "iea-soiling", label: "Global output lost to soiling", source: "IEA PVPS" },
+        { id: "cer-rooftop", label: "Suitable homes with solar", source: "CER" },
+      ],
+      note: "Industry figures, not Lienry results.",
       link: { label: "Solar", href: "/solar" },
     },
   ],
