@@ -148,6 +148,7 @@ function Rig({ controlRef, clockRef, flyingRef }: { controlRef: RefObject<SceneC
     flyingRef.current = flight.current !== null;
     c.autoRotate = control.active && !fl && t > pauseUntil.current;
     c.update(dt);
+    control.azimuth = c.getAzimuthalAngle();
   });
   return null;
 }

@@ -1,20 +1,9 @@
 import * as THREE from "three";
 import type { ZoneId } from "@/content/software";
+import { BAYS_E, BAYS_N, D, FLOORS, FLOOR_H, GLASS_H, H, LANTERN, ROOF_Y, SLAB_H, W, debrisAt, zoneFor, type Face } from "./dims";
 
-// The building in metres. The north face looks along +z (towards the default camera), the east face along +x.
-export const FLOORS = 12;
-export const FLOOR_H = 3.2;
-export const H = FLOORS * FLOOR_H;
-export const ROOF_SLAB = 0.3;
-export const ROOF_Y = H + ROOF_SLAB;
-export const W = 24;
-export const D = 16;
-export const SLAB_H = 0.55;
-export const GLASS_H = FLOOR_H - SLAB_H;
-export const BAYS_N = 16;
-export const BAYS_E = 10;
-export const BAY_N = W / BAYS_N;
-export const BAY_E = D / BAYS_E;
+export * from "./dims";
+
 export const MULLION_W = 0.1;
 export const RECESS = 0.18;
 export const PARAPET_H = 1.1;
@@ -23,10 +12,7 @@ export const STANDOFF = 0.2;
 export const DRONE_HALF = 0.55;
 export const PAD_H = 1.4;
 
-export const LANTERN = { w: 9, d: 5, h: 1.25, x: -4.5, z: -1.5, cols: 4, rows: 2 };
 export const REEL = new THREE.Vector3(W / 2 - 2.6, ROOF_Y + 0.62, D / 2 - 2.2);
-
-export type Face = "N" | "E" | "S" | "W" | "R";
 
 export type Panel = {
   face: Face;
@@ -43,27 +29,6 @@ export type Panel = {
   debris: number;
   lastWashed: string;
 };
-
-export type Blob = { face: Face; u: number; v: number; ru: number; rv: number; strength: number };
-
-/** Debris build-up as soft blobs in face coordinates (u along the face from its left edge, v height from the ground). */
-export const BLOBS: Blob[] = [
-  { face: "N", u: 6.2, v: 29.5, ru: 3.6, rv: 3.4, strength: 1 },
-  { face: "N", u: 19.5, v: 8.2, ru: 3.2, rv: 2.6, strength: 0.85 },
-  { face: "E", u: 6.8, v: 20.4, ru: 3.0, rv: 3.6, strength: 0.9 },
-];
-
-export function debrisAt(face: Face, u: number, v: number): number {
-  let a = 0;
-  for (const b of BLOBS) {
-    if (b.face !== face) continue;
-    const du = (u - b.u) / b.ru;
-    const dv = (v - b.v) / b.rv;
-    const d2 = du * du + dv * dv;
-    a += b.strength * Math.exp(-d2 * 1.6);
-  }
-  return Math.min(1, a);
-}
 
 /** Left edge origin and outward normal for each facade so face coordinates map to world space. */
 export function faceFrame(face: Face): { origin: THREE.Vector3; along: THREE.Vector3; normal: THREE.Vector3; length: number; rotationY: number } {
@@ -83,14 +48,23 @@ export function faceFrame(face: Face): { origin: THREE.Vector3; along: THREE.Vec
 
 const LAST_WASHED: Record<string, string> = { north: "14 days ago", east: "14 days ago", roof: "28 days ago", shopfront: "7 days ago" };
 
-function zoneFor(face: Face, floor: number): ZoneId | null {
-  if (face === "N") return floor === 0 ? "shopfront" : "north";
-  if (face === "E") return "east";
-  if (face === "R") return "roof";
-  return null;
-}
+/**
+ * One segment of the route: the pass it washes, or the pass it is moving to. `moving` marks a move
+ * between zones (round the corner, over the parapet, down to the shopfront), not the short step
+ * between two passes of one zone.
+ */
+export type Leg = { zone: ZoneId; floor: number; pass: number; moving: boolean };
 
-export type Route = { points: THREE.Vector3[]; cumulative: number[]; length: number; passStarts: Set<number> };
+export type Route = {
+  points: THREE.Vector3[];
+  cumulative: number[];
+  length: number;
+  passStarts: Set<number>;
+  /** One per segment (points[i] to points[i + 1]): a pass, or the move to the pass after it. */
+  legs: Leg[];
+  /** Where each zone's washing starts and ends along the route (progress, 0 to 1). */
+  spans: Record<ZoneId, [number, number]>;
+};
 
 function buildPanels(): Panel[] {
   const out: Panel[] = [];
@@ -139,7 +113,7 @@ function buildPanels(): Panel[] {
  */
 function buildRoute(panels: Panel[]): Route {
   const pts: THREE.Vector3[] = [];
-  const passes: { face: Face; floor: number; y: number; from: THREE.Vector3; to: THREE.Vector3; startIndex: number }[] = [];
+  const passes: { face: Face; floor: number; pass: number; y: number; from: THREE.Vector3; to: THREE.Vector3; startIndex: number }[] = [];
   const passY = (floor: number) => [floor * FLOOR_H + SLAB_H + GLASS_H - PAD_H / 2 + 0.05, floor * FLOOR_H + SLAB_H + PAD_H / 2 - 0.05];
   const offsetOut = RECESS + STANDOFF + DRONE_HALF;
 
@@ -147,12 +121,12 @@ function buildRoute(panels: Panel[]): Route {
     const f = faceFrame(face);
     let atEnd = startAtEnd;
     for (const floor of floors) {
-      for (const y of passY(floor)) {
+      for (const [pass, y] of passY(floor).entries()) {
         const a = f.origin.clone().addScaledVector(f.along, atEnd ? f.length + 0.5 : -0.5).addScaledVector(f.normal, offsetOut - RECESS);
         const b = f.origin.clone().addScaledVector(f.along, atEnd ? -0.5 : f.length + 0.5).addScaledVector(f.normal, offsetOut - RECESS);
         a.y = y;
         b.y = y;
-        passes.push({ face, floor, y, from: a, to: b, startIndex: pts.length });
+        passes.push({ face, floor, pass, y, from: a, to: b, startIndex: pts.length });
         pts.push(a, b);
         atEnd = !atEnd;
       }
@@ -175,7 +149,7 @@ function buildRoute(panels: Panel[]): Route {
   rowZ.forEach((z, i) => {
     const a = new THREE.Vector3(fromRight ? rf.origin.x + LANTERN.w + 0.5 : rf.origin.x - 0.5, ROOF_Y + LANTERN.h + 1.0, z);
     const b = new THREE.Vector3(fromRight ? rf.origin.x - 0.5 : rf.origin.x + LANTERN.w + 0.5, ROOF_Y + LANTERN.h + 1.0, z);
-    passes.push({ face: "R", floor: FLOORS, y: i, from: a, to: b, startIndex: pts.length });
+    passes.push({ face: "R", floor: FLOORS, pass: i, y: i, from: a, to: b, startIndex: pts.length });
     pts.push(a, b);
     fromRight = !fromRight;
   });
@@ -212,7 +186,25 @@ function buildRoute(panels: Panel[]): Route {
     }
   }
   for (const p of panels) p.washAt.sort((a, b) => a - b);
-  return { points: pts, cumulative, length, passStarts: new Set(passes.map((pass) => pass.startIndex)) };
+
+  // Each segment is a pass, or the move to the next pass (the last one's move ends the route).
+  const legs: Leg[] = [];
+  let washed: (typeof passes)[number] | null = null;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const own = passes.find((pass) => pass.startIndex === i);
+    const next = own ?? passes.find((pass) => pass.startIndex > i) ?? passes[passes.length - 1];
+    const zone = zoneFor(next.face, next.floor)!;
+    legs.push({ zone, floor: next.floor, pass: next.pass, moving: !own && !!washed && zoneFor(washed.face, washed.floor) !== zone });
+    if (own) washed = own;
+  }
+  const spans = {} as Record<ZoneId, [number, number]>;
+  for (const p of panels) {
+    if (!p.zone || !p.washAt.length) continue;
+    const span = (spans[p.zone] ??= [1, 0]);
+    span[0] = Math.min(span[0], p.washAt[0]);
+    span[1] = Math.max(span[1], p.washAt[p.washAt.length - 1]);
+  }
+  return { points: pts, cumulative, length, passStarts: new Set(passes.map((pass) => pass.startIndex)), legs, spans };
 }
 
 /** Position along the route at progress p (0 to 1) and the direction of travel. Returns the segment index. */

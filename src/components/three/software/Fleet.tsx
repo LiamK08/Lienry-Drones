@@ -63,6 +63,7 @@ export function Fleet({ controlRef, clockRef, fadeRef }: { controlRef: RefObject
     const { pos, dir, q, e, port, out, lift, pts } = scratch;
     const seg = routeAt(ROUTE, control.wash, pos, dir);
     spraying.current = ROUTE.passStarts.has(seg);
+    control.activity = ROUTE.legs[seg] ?? null;
 
     // Which way does the drone face? Down over the roof, otherwise square to the glass.
     const overRoof = pos.y > ROOF_Y + 0.5 && pos.x < W / 2 - 0.5 && pos.z < D / 2 - 0.5;

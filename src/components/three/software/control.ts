@@ -1,4 +1,5 @@
 import type { ZoneId } from "@/content/software";
+import { CELL_COUNT } from "./dims";
 
 export type Layers = { scan: boolean; wash: boolean; debris: boolean; zones: boolean };
 
@@ -31,6 +32,14 @@ export type SceneControl = {
   stats: { completed: number; total: number };
   /** Where the drone is, written by the scene each frame (used by the recorder's close-up check). */
   drone: { x: number; y: number; z: number };
+  /** Each facade-map cell's washed share (0, 0.5 after one pass, 1), by dims.ts cellIndex. Written by the scene each frame. */
+  cells: Float32Array;
+  /** The leg of the route the drone is on, written by the scene each frame; null until it has drawn. */
+  activity: { zone: ZoneId; floor: number; pass: number; moving: boolean } | null;
+  /** Where each zone's washing starts and ends along the route (0 to 1), written once by the scene. */
+  spans: Record<ZoneId, [number, number]> | null;
+  /** The camera's azimuth about the building in radians (0 looks at the north face), written by the scene each frame. */
+  azimuth: number;
   /** Set by the scene: request one frame when nothing else is animating. */
   requestFrame: () => void;
   onHover: (info: HoverInfo, x: number, y: number) => void;
@@ -49,6 +58,10 @@ export function createControl(): SceneControl {
     visible: false,
     stats: { completed: 0, total: 0 },
     drone: { x: 0, y: 0, z: 0 },
+    cells: new Float32Array(CELL_COUNT),
+    activity: null,
+    spans: null,
+    azimuth: 0,
     requestFrame: () => {},
     onHover: () => {},
   };

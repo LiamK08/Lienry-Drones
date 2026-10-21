@@ -545,4 +545,40 @@
     border: 0;
     border-radius: var(--radius-hard);
   }
+
+  /* The segmented timeline: the window draws the zones' segments under the input, so the input shows
+     only its thumb, a white disc ringed in glass. */
+  .timeline-bare::-webkit-slider-runnable-track {
+    height: 100%;
+    background: transparent;
+  }
+
+  .timeline-bare::-webkit-slider-thumb {
+    width: 16px;
+    height: 16px;
+    margin-top: calc((2rem - 16px) / 2);
+    background: var(--color-white);
+    border: 2px solid var(--color-glass);
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgb(28 26 23 / 0.25);
+  }
+
+  .timeline-bare::-moz-range-track {
+    height: 100%;
+    background: transparent;
+  }
+
+  .timeline-bare::-moz-range-progress {
+    background: transparent;
+  }
+
+  .timeline-bare::-moz-range-thumb {
+    box-sizing: border-box;
+    width: 16px;
+    height: 16px;
+    background: var(--color-white);
+    border: 2px solid var(--color-glass);
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgb(28 26 23 / 0.25);
+  }
 }

@@ -70,6 +70,7 @@ export const zones: Zone[] = [
 export const project = {
   name: "Demo building, 12 storeys",
   app: "Lienry Desktop",
+  view: "Wash plan",
   scanAge: "2 days",
   nextClean: "Thu 07:00",
   debrisZones: 3,

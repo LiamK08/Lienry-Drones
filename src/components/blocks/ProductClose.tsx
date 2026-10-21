@@ -20,7 +20,7 @@ export function ProductClose({ id, headline, body, action }: { id: string; headl
         <div className="relative mx-auto mt-12 max-w-[54rem]">
           <div aria-hidden="true" className="pointer-events-none absolute inset-x-10 -top-10 bottom-0 -z-10 rounded-pill bg-accent/10 blur-3xl" />
           <div className="overflow-hidden rounded-card border border-line bg-white p-2 shadow-[0_40px_80px_-40px_rgb(0_0_0/0.3)]">
-            <SoftwareWindow />
+            <SoftwareWindow frame="inset" />
           </div>
         </div>
       </Container>

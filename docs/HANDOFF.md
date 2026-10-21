@@ -1,4 +1,4 @@
-# Handoff, 20 October 2026
+# Handoff, 21 October 2026
 
 Read this first in a new session, then `CLAUDE.md`. Update this file at the end of each session.
 
@@ -54,6 +54,19 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
   "What changes when the drone lives on site." cards draw each picture once at the open card's width
   (centred, `100cqw` of the row), so hover pans the picture out instead of zooming in; while one card
   is open the others' titles fade (`.why-row` / `.why-text` in globals.css).
+- Also 21 October: the software window (`SoftwareWindow`, on /platform, /commercial and /download)
+  was redesigned to read as real desktop software. A paper title bar with a breadcrumb, "Preview" and
+  a "Demo data" tag; the layers as a segmented control with each layer's key; an Overview button; a
+  status chip ("Washing North facade, Level 9, pass 2 of 2") and a compass over the model; the wash
+  route's four zones with their own progress; an inspector with the clean's percentage, a canvas
+  facade map (the north and east elevations and the roof glazing, one cell per planned panel:
+  pending, one pass, washed, debris still on it) and the figures as rows; a timeline cut into the
+  zones' spans. The scene reports what it draws (`control.cells`, `activity`, `spans`, `azimuth`), so
+  every readout follows the model. The pure dimensions and debris moved to
+  `src/components/three/software/dims.ts` (no three.js) so the window can draw the map without the
+  WebGL chunk; `layout.ts` re-exports them. The layout follows the window's own width (container
+  queries at 38rem and 56rem), and the recording mode renders the same rows at the same heights. The
+  phone recordings in `public/video` were not re-recorded: the 3D model itself did not change.
 - The owner said the imagery is not good enough yet and will be redone in Higgsfield later. Until
   they say so, keep the current stills and film in the new layouts.
 
@@ -129,7 +142,7 @@ NODE_USE_ENV_PROXY=1 node scripts/perf-vitals.mjs http://localhost:3000 [routes]
   `CenterHero` (solution pages), `BubbleHero` (company), `WordStrip`, `FeatureRows` (alternating rows
   with checks, callout, fact strip, or a node such as the software window), `PillarTabs` (the six
   parts; each panel id is the footer anchor), `SafetyBlock`, `AccentPanel` (inset or full bleed),
-  `FaqCentered` and `FaqRows`, `ProductClose` (the framed software window), `FitCheck`, `Icon`,
+  `FaqCentered` and `FaqRows`, `ProductClose` (the framed software window, `frame="inset"`), `FitCheck`, `Icon`,
   `holdLines`; from the second pass `TitleHero` (/calculator), `FaqCards` (/fit-check),
   `FiguresPanel` (cited figures in the solutions paper band), `SplitHero variant="compact"`,
   `FeatureRows variant="solutions"`, `FitCheck layout="column"`, `CostCalculator layout="listing"`,

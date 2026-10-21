@@ -6,7 +6,7 @@ import { useLayoutEffect, useMemo, useRef, type RefObject } from "react";
 import * as THREE from "three";
 import type { Line2, LineSegments2 } from "three-stdlib";
 import { zones, type ZoneId } from "@/content/software";
-import { BAYS_E, BAYS_N, D, FLOORS, H, PANELS, PARAPET_H, RECESS, ROOF_Y, W, debrisAt, faceFrame, zoneOutline, type Face } from "./layout";
+import { BAYS_E, BAYS_N, D, FLOORS, H, PANELS, PARAPET_H, RECESS, ROOF_Y, ROUTE, W, cellIndex, debrisAt, faceFrame, zoneOutline, type Face } from "./layout";
 import { PALETTE, heatTexture, makeDebrisMaterial, makeGlassMaterial, makePointsMaterial, washTexture } from "./materials";
 import type { SceneControl } from "./control";
 
@@ -17,6 +17,8 @@ export type Clock = { t: number; dt: number };
 const SCAN_MS = 4200;
 const SCAN_TOP = ROOF_Y + PARAPET_H + 2.4;
 const SWEEP = 0.018;
+/** Each panel's facade-map cell (dims.ts), or -1 when it is not in the plan. */
+const CELL_OF = PANELS.map((p) => (p.zone ? cellIndex(p.face, p.floor, p.bay) : -1));
 
 function seeded(seed: number) {
   let s = seed >>> 0;
@@ -104,6 +106,10 @@ export function Building({ controlRef, clockRef, fadeRef }: { controlRef: RefObj
   const outlines = useMemo(() => zones.map((z) => ({ id: z.id, points: zoneOutline(z.id) })), []);
 
   useLayoutEffect(() => {
+    controlRef.current.spans = ROUTE.spans;
+  }, [controlRef]);
+
+  useLayoutEffect(() => {
     const m = glass.current;
     if (!m) return;
     const o = new THREE.Object3D();
@@ -157,6 +163,7 @@ export function Building({ controlRef, clockRef, fadeRef }: { controlRef: RefObj
         }
       }
       if (washed >= 0.999) completed++;
+      if (CELL_OF[i] >= 0) control.cells[CELL_OF[i]] = washed;
       const scanned = f.scan * (scanU >= 1 ? 1 : panel.centre.y < scanY ? 1 : 0);
       const j = i * 4;
       arr[j] = washed;
