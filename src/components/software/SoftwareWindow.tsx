@@ -208,6 +208,10 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare" }: Sof
   const [paint, setPaint] = useState<Paint>("off");
   const dragging = useRef(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const posterRef = useRef<HTMLImageElement>(null);
+  // The recording loads and plays only once its first-frame image has painted, so that image, not the
+  // video's own first frame, is the largest paint when the window is in the first screen (/download).
+  const [posterShown, setPosterShown] = useState(false);
   const live = can3d && !reduce;
   const capture = useSyncExternalStore(noop, captureVariant, () => null);
 
@@ -366,14 +370,22 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare" }: Sof
     return () => cancelAnimationFrame(raf);
   }, [live, onScreen, playing, liveCells]);
 
+  // The image may have loaded before hydration, when its onLoad had no listener yet.
+  useEffect(() => {
+    const img = posterRef.current;
+    if (live || !img?.complete || !img.naturalWidth) return;
+    const id = requestAnimationFrame(() => setPosterShown(true));
+    return () => cancelAnimationFrame(id);
+  }, [live, wide]);
+
   useEffect(() => {
     const el = videoRef.current;
-    if (!el || live || reduce || !playing) {
+    if (!el || live || reduce || !playing || !posterShown) {
       el?.pause();
       return;
     }
     return bindPlayback(el, 0.2);
-  }, [live, reduce, wide, playing]);
+  }, [live, reduce, wide, playing, posterShown]);
 
   const toggle = useCallback((id: LayerId) => {
     const control = controlRef.current;
@@ -562,6 +574,8 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare" }: Sof
                     poster attribute, so it never competes with the page's first screen. */}
                 <img
                   key={`${variant}-poster`}
+                  ref={posterRef}
+                  onLoad={() => setPosterShown(true)}
                   src={`/video/software-view-${variant}-poster.jpg`}
                   alt=""
                   aria-hidden="true"
@@ -570,14 +584,17 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare" }: Sof
                   decoding="async"
                   className="pointer-events-none absolute inset-0 h-full w-full object-cover md:object-contain"
                 />
+                {/* One pixel short at the top: Chrome rounds the image's painted rect but floors the video's,
+                    so a full-size video can be one row larger than the image and take over as the page's
+                    largest paint. The strip shows the image's own background beneath. */}
                 <video
                   key={variant}
                   ref={videoRef}
-                  className="absolute inset-0 h-full w-full object-cover md:object-contain"
+                  className="absolute inset-x-0 bottom-0 top-px h-[calc(100%-1px)] w-full object-cover md:object-contain"
                   muted
                   loop
                   playsInline
-                  preload="metadata"
+                  preload={posterShown ? "metadata" : "none"}
                   controls={reduce}
                   aria-label="Recording of the software view: the model of a 12-storey building being scanned and washed"
                 >

@@ -67,6 +67,14 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
   WebGL chunk; `layout.ts` re-exports them. The layout follows the window's own width (container
   queries at 38rem and 56rem), and the recording mode renders the same rows at the same heights. The
   phone recordings in `public/video` were not re-recorded: the 3D model itself did not change.
+  An independent review then fixed: the facade map is SVG (a canvas there read as the live model to
+  check 21), counts follow the plan's progress even with the Wash layer hidden, the compass holds
+  its overview heading until the scene draws, and a window 26 to 38rem wide (/commercial's half
+  column from 1024 to 1309) gets a compact layout instead of the 1.5k px phone stack.
+- /download on phones had a latent LCP race (it failed on `main` too, median 4.8 s): Chrome floors
+  the video's painted rect but rounds the image's, so the recording's first frame could be one row
+  larger than its poster image and take over as LCP. The recording now loads only after its poster
+  has loaded, and sits 1px short at the top (`SoftwareWindow`, commented). Keep both.
 - The owner said the imagery is not good enough yet and will be redone in Higgsfield later. Until
   they say so, keep the current stills and film in the new layouts.
 
