@@ -137,58 +137,32 @@ export const how = {
   ],
 };
 
-/** Three settings, each a card with design figures (or cited figures, for solar). */
+/** Three settings, each a compact card that links to its solution page. */
 export const systems = {
   eyebrow: "Three settings",
   headline: "Built for the buildings you own.",
-  intro: "One platform on a roof, beside a house or along a solar row. Figures are design intent at concept stage, not results.",
-  link: { label: "See the platform", href: "/platform" },
-  // Each card's statement is Lienry's own design intent (from the design brief): these are not
-  // testimonials. Commercial and home figures are design intent; solar's are cited in
-  // src/content/stats.ts, shown with a short label and their sources.
+  intro: "One platform on a roof, beside a house or along a solar row. Pick yours.",
   cards: [
     {
       id: "commercial",
       icon: "building",
       name: "Commercial",
-      sub: "Office and apartment buildings · Roof capsule",
-      statement: "A capsule on the roof feeds the drone from above, and the desktop software runs the whole building.",
-      figures: [
-        { value: "<70 m", label: "Building height" },
-        { value: "2 days", label: "Re-scan interval" },
-        { value: "0", label: "People at height" },
-      ],
-      note: "Design intent from the Lienry design brief. Concept stage, not results.",
-      link: { label: "The commercial system", href: "/commercial" },
+      line: "Office and apartment buildings under 70 metres, cleaned from a capsule on the roof.",
+      href: "/commercial",
     },
     {
       id: "homes",
       icon: "home",
       name: "Homes and rentals",
-      sub: "Houses, townhouses and rentals · Ground pod",
-      statement: "A ground pod powers the drone and feeds it water. You start the clean from your phone.",
-      figures: [
-        { value: "5", label: "Surface types" },
-        { value: "1", label: "Ground pod" },
-        { value: "0", label: "Crews to book" },
-      ],
-      note: "Design intent from the Lienry design brief. Concept stage, not results.",
-      link: { label: "The home system", href: "/homes-and-rentals" },
+      line: "Houses, townhouses and rentals, with a ground pod and a clean started from your phone.",
+      href: "/homes-and-rentals",
     },
     {
       id: "solar",
       icon: "sun",
       name: "Solar",
-      sub: "Rooftop arrays and solar farm rows",
-      statement: "Panels are cleaned at the pressure set for solar glass, on the interval you choose.",
-      // Cited figures from src/content/stats.ts, by id, each with a short label and source name for the card.
-      cited: [
-        { id: "unsw-soiling", label: "Lost to dust, AU farms studied", source: "Prasad et al." },
-        { id: "iea-soiling", label: "Global output lost to soiling", source: "IEA PVPS" },
-        { id: "cer-rooftop", label: "Suitable homes with solar", source: "CER" },
-      ],
-      note: "Industry figures, not Lienry results.",
-      link: { label: "Solar", href: "/solar" },
+      line: "Rooftop arrays and solar farm rows, washed at the pressure set for solar glass.",
+      href: "/solar",
     },
   ],
 };
