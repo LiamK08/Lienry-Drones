@@ -7,6 +7,8 @@ import { makeGroundMaterial, surfaces } from "./materials";
 
 const interior = new THREE.MeshStandardMaterial({ color: "#2b2925", roughness: 1, metalness: 0 });
 const box = new THREE.BoxGeometry(1, 1, 1);
+// BoxGeometry's faces in order: +x, -x, +y (the top), -y, +z, -z.
+const roofSlab = [surfaces.slab, surfaces.slab, surfaces.roof, surfaces.slab, surfaces.slab, surfaces.slab];
 const drum = new THREE.CylinderGeometry(0.3, 0.3, 0.56, 24);
 const flange = new THREE.CylinderGeometry(0.34, 0.34, 0.025, 24);
 
@@ -72,7 +74,8 @@ export function Structure() {
       <mesh geometry={box} material={interior} position={[0, H / 2, 0]} scale={[W - 2 * RECESS - 0.1, H, D - 2 * RECESS - 0.1]} />
       <Slabs />
       <Mullions />
-      <mesh geometry={box} material={surfaces.slab} position={[0, H + ROOF_SLAB / 2, 0]} scale={[W + 0.02, ROOF_SLAB, D + 0.02]} />
+      {/* The roof slab: its edge is a spandrel band like the floors below, its top the roof membrane. */}
+      <mesh geometry={box} material={roofSlab} position={[0, H + ROOF_SLAB / 2, 0]} scale={[W + 0.02, ROOF_SLAB, D + 0.02]} />
       {/* Parapet: four walls and a slightly proud cap. */}
       {[1, -1].map((s) => (
         <group key={`ns${s}`}>

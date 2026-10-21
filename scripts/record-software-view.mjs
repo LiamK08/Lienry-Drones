@@ -20,9 +20,12 @@ const POSTER_AT = 6.5;
 const out = path.resolve("public/video");
 mkdirSync(out, { recursive: true });
 
+// The model view is held at a fixed size so every recording keeps its frame: wide is 680x504 CSS px
+// at 1.5x (1020x756), tall 576x720 at 1.25x (720x900). The window's own overlays (status card,
+// compass, poster) are hidden, so only the canvas is recorded.
 const variants = {
-  wide: { width: 1440, height: 900, dpr: 1.5, scale: 1020 },
-  tall: { width: 800, height: 1100, dpr: 1.25, scale: 720 },
+  wide: { width: 1440, height: 900, dpr: 1.5, scale: 1020, view: [680, 504] },
+  tall: { width: 800, height: 1100, dpr: 1.25, scale: 720, view: [576, 720] },
 };
 
 async function record(name, v) {
@@ -32,8 +35,12 @@ async function record(name, v) {
   const browser = await chromium.launch({ args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"] });
   const page = await browser.newPage({ viewport: { width: v.width, height: v.height }, deviceScaleFactor: v.dpr });
   page.on("pageerror", (e) => console.log("pageerror:", e.message));
-  await page.goto(`${base}/?capture=${name}`, { waitUntil: "networkidle" });
-  await page.evaluate(() => document.querySelector("#software").scrollIntoView({ block: "center" }));
+  await page.goto(`${base}/download?capture=${name}`, { waitUntil: "networkidle" });
+  await page.addStyleTag({
+    content: `[data-model-view] { width: ${v.view[0]}px !important; height: ${v.view[1]}px !important; aspect-ratio: auto !important; max-width: none !important; justify-self: start; }
+      [data-model-view] > :not(:first-child) { display: none !important; }`,
+  });
+  await page.evaluate(() => document.querySelector("[data-model-view]").scrollIntoView({ block: "center" }));
   await page.waitForFunction(() => !!window.__lienryCapture, null, { timeout: 30000 });
   const raf = () => page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
   const step = async (ms) => {
@@ -45,7 +52,7 @@ async function record(name, v) {
   await page.waitForTimeout(800);
   await step(0);
   await page.getByRole("group", { name: "Layers" }).getByRole("button", { name: "Scan", exact: true }).click();
-  const canvas = await page.$("#software canvas");
+  const canvas = await page.$("[data-model-view] canvas");
   const total = FPS * SECONDS;
   const started = Date.now();
   for (let i = 0; i < total; i++) {

@@ -19,36 +19,52 @@ export const PALETTE = {
 
 /**
  * Curtain-wall glass: a physical material with one extra per-instance attribute.
- *   aState.x  washed (0 to 1)      brighter, cleaner, lower roughness
+ *   aState.x  washed (0 to 1)      dusty and hazy at 0; deep, dark and mirror-crisp at 1
  *   aState.y  sweep (0 to 1)       the specular highlight that passes once after a wash
  *   aState.z  scanned (0 to 1)     a faint cool lift while the scan layer is on
  *   aState.w  hovered (0 or 1)     the panel under the pointer
+ * Each pane also varies a little by its instance (tint, and a lit ceiling seen through the glass at
+ * the top of the pane, with some blinds part-drawn), so the facade reads as glass, not a flat grid.
  */
 export function makeGlassMaterial(): THREE.MeshPhysicalMaterial {
   const m = new THREE.MeshPhysicalMaterial({
-    color: new THREE.Color("#9fb3bd"),
-    metalness: 0.05,
-    roughness: 0.28,
-    envMapIntensity: 1.2,
-    clearcoat: 0.6,
-    clearcoatRoughness: 0.25,
-    reflectivity: 0.8,
+    color: new THREE.Color("#22323a"),
+    metalness: 0.3,
+    roughness: 0.06,
+    ior: 1.52,
+    envMapIntensity: 2.2,
+    clearcoat: 1,
+    clearcoatRoughness: 0.06,
+    specularIntensity: 1,
   });
   m.onBeforeCompile = (shader) => {
     shader.vertexShader = shader.vertexShader
-      .replace("#include <common>", "#include <common>\nattribute vec4 aState;\nvarying vec4 vState;\nvarying vec2 vPanelUv;")
-      .replace("#include <uv_vertex>", "#include <uv_vertex>\nvState = aState;\nvPanelUv = uv;");
+      .replace("#include <common>", "#include <common>\nattribute vec4 aState;\nvarying vec4 vState;\nvarying vec2 vPanelUv;\nvarying float vVar;")
+      .replace("#include <uv_vertex>", "#include <uv_vertex>\nvState = aState;\nvPanelUv = uv;\nvVar = fract(sin(float(gl_InstanceID) * 12.9898) * 43758.5453);");
     shader.fragmentShader = shader.fragmentShader
-      .replace("#include <common>", "#include <common>\nvarying vec4 vState;\nvarying vec2 vPanelUv;")
+      .replace("#include <common>", "#include <common>\nvarying vec4 vState;\nvarying vec2 vPanelUv;\nvarying float vVar;")
       .replace(
         "#include <color_fragment>",
         `#include <color_fragment>
-        vec3 washedTint = vec3(0.80, 0.90, 0.93);
-        diffuseColor.rgb = mix(diffuseColor.rgb, washedTint, vState.x * 0.75);
-        diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.70, 0.86, 0.90), vState.z * 0.35);
-        diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.56, 0.83, 0.88), vState.w * 0.5);`,
+        // A pane's own shade, then the room behind it: a warm lit ceiling strip under the head of the
+        // pane, and on some panes a pale blind drawn part way down.
+        diffuseColor.rgb *= 0.88 + 0.24 * vVar;
+        float ceilingLit = smoothstep(0.80, 0.86, vPanelUv.y) * (1.0 - smoothstep(0.92, 0.97, vPanelUv.y));
+        diffuseColor.rgb += vec3(0.16, 0.15, 0.12) * ceilingLit * (0.5 + 0.5 * vVar);
+        float drop = 0.12 + 0.3 * fract(vVar * 7.31);
+        float blind = step(0.68, vVar) * smoothstep(1.0 - drop - 0.01, 1.0 - drop, vPanelUv.y);
+        diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.46, 0.46, 0.43), blind * 0.32);
+        // Dust: unwashed glass is lighter, greyer and hazy; the wash takes it back to clear.
+        vec3 dusty = mix(diffuseColor.rgb, vec3(0.47, 0.48, 0.45), 0.5);
+        diffuseColor.rgb = mix(dusty, diffuseColor.rgb, vState.x);
+        diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.42, 0.66, 0.72), vState.z * 0.3);
+        diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.30, 0.62, 0.70), vState.w * 0.55);`,
       )
-      .replace("#include <roughnessmap_fragment>", "#include <roughnessmap_fragment>\nroughnessFactor = mix(roughnessFactor, 0.06, vState.x);")
+      .replace("#include <roughnessmap_fragment>", "#include <roughnessmap_fragment>\nroughnessFactor = mix(0.42, roughnessFactor, vState.x);")
+      .replace(
+        "#include <lights_physical_fragment>",
+        "#include <lights_physical_fragment>\nmaterial.clearcoat *= mix(0.25, 1.0, vState.x);\nmaterial.clearcoatRoughness = mix(0.38, material.clearcoatRoughness, vState.x);",
+      )
       .replace(
         "#include <emissivemap_fragment>",
         `#include <emissivemap_fragment>
@@ -56,17 +72,21 @@ export function makeGlassMaterial(): THREE.MeshPhysicalMaterial {
         totalEmissiveRadiance += vec3(0.62, 0.78, 0.82) * band * vState.y * (1.0 - vState.y) * 2.4;`,
       );
   };
-  m.customProgramCacheKey = () => "lienry-glass";
+  m.customProgramCacheKey = () => "lienry-glass-3";
   return m;
 }
 
-/** Concrete, slab and mullion finishes. Matte, in the site's warm neutrals. */
+/**
+ * The frame: dark back-painted spandrels at each floor, anodised aluminium mullions and copings,
+ * metal parapet cladding, a grey roof membrane and galvanised plant. The dock keeps its own finishes.
+ */
 export const surfaces = {
-  slab: new THREE.MeshStandardMaterial({ color: "#dcd5c8", roughness: 0.92, metalness: 0 }),
-  mullion: new THREE.MeshStandardMaterial({ color: "#4f4b45", roughness: 0.5, metalness: 0.3 }),
+  slab: new THREE.MeshStandardMaterial({ color: "#323b41", roughness: 0.34, metalness: 0.55, envMapIntensity: 1.2 }),
+  mullion: new THREE.MeshStandardMaterial({ color: "#9aa0a4", roughness: 0.3, metalness: 0.85, envMapIntensity: 1.1 }),
   reveal: new THREE.MeshStandardMaterial({ color: "#d7d0c3", roughness: 0.9, metalness: 0 }),
-  parapet: new THREE.MeshStandardMaterial({ color: "#ebe5d9", roughness: 0.9, metalness: 0 }),
-  plant: new THREE.MeshStandardMaterial({ color: "#c9c2b5", roughness: 0.7, metalness: 0.15 }),
+  parapet: new THREE.MeshStandardMaterial({ color: "#4a5257", roughness: 0.42, metalness: 0.6, envMapIntensity: 1.1 }),
+  roof: new THREE.MeshStandardMaterial({ color: "#a29f98", roughness: 0.95, metalness: 0 }),
+  plant: new THREE.MeshStandardMaterial({ color: "#bdbcb6", roughness: 0.5, metalness: 0.45 }),
   charcoal: new THREE.MeshStandardMaterial({ color: "#2a2723", roughness: 0.55, metalness: 0.2 }),
   shell: new THREE.MeshStandardMaterial({ color: "#f1ece2", roughness: 0.42, metalness: 0.05 }),
   lip: new THREE.MeshStandardMaterial({ color: PALETTE.glass, roughness: 0.4, metalness: 0.2 }),

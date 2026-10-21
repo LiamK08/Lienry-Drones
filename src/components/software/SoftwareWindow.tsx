@@ -528,6 +528,7 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare" }: Sof
         <div className={tall ? "grid" : "grid @min-[38rem]:grid-cols-[minmax(0,1fr)_15rem] @min-[56rem]:grid-cols-[14rem_minmax(0,1fr)_16rem]"}>
           <div
             ref={viewRef}
+            data-model-view=""
             className={`relative bg-raised ${tall ? "aspect-[4/5]" : "aspect-[4/5] @min-[26rem]:@max-[38rem]:aspect-square @min-[38rem]:col-start-1 @min-[38rem]:row-start-1 @min-[38rem]:aspect-auto @min-[38rem]:h-[28rem] @min-[56rem]:col-start-2 @min-[56rem]:h-[34rem]"}`}
             onPointerLeave={() => setHover(null)}
           >
