@@ -22,7 +22,7 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
   a seven-segment bar, explainer and FAQ cards), /calculator (title hero, featured row, sidebar and
   card listing) and /privacy (legal tab strip, contents beside the policy). Shared: a 56px header
   that is a soft white veil at the top of inner pages, 20px phone margins, 42px pills whose label
-  rolls up on hover, softer image corners, restyled FAQ rows, pause controls on both word strips.
+  rolls up on hover, softer image corners, restyled FAQ rows.
 - Third pass (20 October, PR #15): `check:layout` and `check:rules` were rewritten to this system and
   gate again (spec and probe data were in the session scratchpad; the scripts' header comments are now
   the spec). Retired: tone alternation, the 8px spacing scale (31a, 31b), headline length (25),
@@ -39,7 +39,9 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
 - 21 October: at the owner's request the home hero shows only the headline and the support line,
   64px above the strip from 768 (80 on phones): its two pills and the film's pause control are gone.
   The owner chose to drop the pause control entirely, knowing WCAG 2.2.2 asks for one on a looping
-  film; reduced motion and Save-Data still get the still poster instead of the film.
+  film; reduced motion and Save-Data still get the still poster instead of the film. The two word
+  strips lost their pause buttons the same day, on the same call. Headings on phones now follow the
+  reference: section titles 36px (h2, h2s, and an h2 set at the h1 step), card and row titles 30px.
 - The owner said the imagery is not good enough yet and will be redone in Higgsfield later. Until
   they say so, keep the current stills and film in the new layouts.
 
@@ -119,7 +121,7 @@ NODE_USE_ENV_PROXY=1 node scripts/perf-vitals.mjs http://localhost:3000 [routes]
   `holdLines`; from the second pass `TitleHero` (/calculator), `FaqCards` (/fit-check),
   `FiguresPanel` (cited figures in the solutions paper band), `SplitHero variant="compact"`,
   `FeatureRows variant="solutions"`, `FitCheck layout="column"`, `CostCalculator layout="listing"`,
-  `EnquiryTypeTabs` (with `EnquiryTypeProvider`) and `MarqueeToggle`.
+  `EnquiryTypeTabs` (with `EnquiryTypeProvider`).
 - **Home** (`src/components/home`): `Hero`, `Strip` (marquee), `WhyFit`, `ExpandCards`, `StepTimer`,
   `SystemCards`, `Explore`, `SafetyPanel`, `FaqForm`; `LandlordStory` is used on /homes-and-rentals.
 - **Earlier sections still in use**: `StatBand` (cited figures), `CostCalculator`, `PageHero` (404),
@@ -142,7 +144,6 @@ NODE_USE_ENV_PROXY=1 node scripts/perf-vitals.mjs http://localhost:3000 [routes]
 
 ## Owner's calls left open by the second pass
 
-- The reference sets some headings at 36px on phones; CLAUDE.md says 30, so they stay 30.
 - /company's hero fades to white later than the reference (an extra stop at 72%) so the lead keeps
   4.5:1; delete that stop to match the reference exactly.
 - Check 8 lets a centred run be 6 lines below 768 (4 from 768): the reference's centred hero and tab

@@ -155,7 +155,7 @@ const SPEC = {
   // Check 7: CLAUDE.md's sizes, the tokens at each width.
   steps: {
     1440: { h1: 40, h2: 48, h2s: 36, h3: 32, label: 12, body: 16 },
-    390: { h1: 30, h2: 31, h2s: 30, h3: 26, label: 12, body: 16 },
+    390: { h1: 30, h2: 36, h2s: 36, h3: 30, label: 12, body: 16 },
   },
   // Check 7: the smallest rendered text and heading.
   minText: 11,

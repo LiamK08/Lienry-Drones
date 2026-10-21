@@ -49,7 +49,7 @@ function PaperBand({ id, eyebrow, headline, emphasis, breakBefore, aside, image,
         <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between md:gap-10">
           <div className="min-w-0">
             <p className="eyebrow">{eyebrow}</p>
-            <h2 id={`${id}-heading`} className="em-accent max-w-[61rem] text-h1">
+            <h2 id={`${id}-heading`} className="em-accent max-w-[61rem] text-h1 max-md:text-h2s">
               <Headline text={headline} emphasis={emphasis} breakBefore={breakBefore} />
             </h2>
           </div>

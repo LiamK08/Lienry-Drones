@@ -24,8 +24,8 @@ accent; near-black for the dark band and the footer. Section heads may be centre
 Type: two families only, both open-licensed and self-hosted: PT Serif (regular and italic) for
 headings, display lines and the footer logo, and Inter for everything else (its italic only in the
 footer tagline, loaded on demand). Sizes follow the reference: page titles 40px (30 on phones), home
-section titles 48px (31), inner section titles 36px (30), card titles 32px (26), with tight negative
-tracking. Eyebrows are an accent dot and 12px capitals (`.eyebrow`).
+section titles 48px (36), inner section titles 36px (36), card and row titles 32px (30), with tight
+negative tracking. A section's h2 set at the page-title step drops to 36px on phones. Eyebrows are an accent dot and 12px capitals (`.eyebrow`).
 
 Shape: buttons are pills (`rounded-pill`, optional round arrow badge); cards are `rounded-card`
 (16px), panels `rounded-panel` (20px); feature and story images follow the reference's softer

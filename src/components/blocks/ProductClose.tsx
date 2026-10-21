@@ -9,7 +9,7 @@ export function ProductClose({ id, headline, body, action }: { id: string; headl
     <Band id={id} tone="plaster" pad="none" labelledBy={`${id}-heading`} className="pb-12 pt-16 lg:pt-20">
       <Container>
         <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
-          <h2 id={`${id}-heading`} className="text-h1">
+          <h2 id={`${id}-heading`} className="text-h1 max-md:text-h2s">
             {headline}
           </h2>
           <p className="mt-4 text-small text-fg-muted">{body}</p>

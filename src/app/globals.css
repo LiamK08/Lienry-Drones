@@ -55,13 +55,13 @@
   --text-h1: clamp(1.875rem, 1.6rem + 1.1vw, 2.5rem);
   --text-h1--line-height: 1.1;
   --text-h1--letter-spacing: -0.03em;
-  --text-h2: clamp(1.9375rem, 1.45rem + 2vw, 3rem);
+  --text-h2: clamp(2.25rem, 1.971rem + 1.143vw, 3rem);
   --text-h2--line-height: 1.1;
   --text-h2--letter-spacing: -0.05em;
-  --text-h2s: clamp(1.875rem, 1.5rem + 0.9vw, 2.25rem);
+  --text-h2s: 2.25rem;
   --text-h2s--line-height: 1.1;
   --text-h2s--letter-spacing: -0.02em;
-  --text-h3: clamp(1.625rem, 1.25rem + 0.85vw, 2rem);
+  --text-h3: clamp(1.875rem, 1.8286rem + 0.19vw, 2rem);
   --text-h3--line-height: 1.1;
   --text-h3--letter-spacing: -0.01em;
   --text-lead: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
@@ -376,9 +376,6 @@
   }
   .marquee {
     animation: marquee 40s linear infinite;
-  }
-  [data-paused] .marquee {
-    animation-play-state: paused;
   }
 
   /* The about hero's round pictures: each pops in (a small overshoot), then drifts slowly about its

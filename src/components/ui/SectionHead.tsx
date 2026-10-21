@@ -71,7 +71,8 @@ export function Headline({ text, emphasis, breakBefore = false }: { text: string
 export function SectionHead(props: SectionHeadProps) {
   const { id, as: H = "h2", size, eyebrow, headline, emphasis, breakBefore, below, reveal = true, className = "" } = props;
   const { intro, link, action } = props as { intro?: string; link?: Action; action?: ReactNode };
-  const step = (size ?? H) === "h1" ? "text-h1" : size === "h2s" ? "text-h2s" : "text-h2";
+  // A section's h2 at the page-title step keeps the 36px section size on phones, as the reference does.
+  const step = (size ?? H) === "h1" ? (H === "h1" ? "text-h1" : "text-h1 max-md:text-h2s") : size === "h2s" ? "text-h2s" : "text-h2";
 
   const heading = (
     <>

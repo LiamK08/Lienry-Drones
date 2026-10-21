@@ -84,8 +84,9 @@ export default function CompanyPage() {
             })}
           </div>
           <section id="round" aria-labelledby="round-heading" className="mx-auto mt-12 flex max-w-[600px] flex-col items-center text-center lg:mt-11">
-            <h2 id="round-heading" className="text-h2s">
-              {founders.headline}
+            {/* A word joiner after each hyphen keeps "pre-seed" whole, so the 36px phone head breaks between words. */}
+            <h2 id="round-heading" className="text-balance text-h2s">
+              {founders.headline.replaceAll("-", "-\u2060")}
             </h2>
             <p className="mt-5 max-w-[600px] text-[0.875rem] leading-[1.2] text-ink">{founders.body}</p>
             <Button href={founders.action.href} arrow className="mt-7">
