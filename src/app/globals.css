@@ -326,43 +326,7 @@
     padding-right: var(--page-margin);
   }
 
-  /* The line above every section heading: a small accent dot, then 12px Inter capitals. */
-  .eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-    font-family: var(--font-sans);
-    font-size: var(--text-label);
-    line-height: 1.4;
-    font-weight: 400;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--s-fg);
-    max-width: none;
-  }
-
-  .eyebrow-plain {
-    font-size: 0.6875rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-  }
-  .eyebrow-plain::before {
-    display: none;
-  }
-
-  .eyebrow::before {
-    content: "";
-    width: 8px;
-    height: 8px;
-    flex: none;
-    border-radius: 9999px;
-    background: color-mix(in srgb, var(--s-accent) 45%, transparent);
-  }
-
-  /* The one eyebrow-to-heading gap: 16. */
-  .eyebrow + :is(h1, h2) {
-    margin-top: 1rem;
-  }
+  /* No eyebrows: headings stand alone, with no label above them (the owner's call, 21 October 2026). */
 
   /* A heading whose italic phrase takes the surface's accent (the FAQ, inner heroes). */
   .em-accent em {

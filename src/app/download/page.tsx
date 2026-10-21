@@ -28,7 +28,6 @@ export default function DownloadPage() {
         <div aria-hidden="true" className="pointer-events-none absolute -left-24 top-10 size-[26rem] rounded-pill bg-accent/10 blur-3xl" />
         <Container className="relative">
           <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
-            <p className="eyebrow">{hero.eyebrow}</p>
             <h1 id="download-heading" className="em-accent text-h1">
               <Headline text={hero.headline} emphasis={hero.emphasis} />
             </h1>
@@ -43,7 +42,6 @@ export default function DownloadPage() {
       <Band id="features" tone="paper" labelledBy="features-heading">
         <Container>
           <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
-            <p className="eyebrow">{features.eyebrow}</p>
             <h2 id="features-heading" className="text-h2s">
               {features.headline}
             </h2>

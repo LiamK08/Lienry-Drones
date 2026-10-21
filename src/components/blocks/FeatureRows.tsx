@@ -80,14 +80,13 @@ const layouts = {
 
 /**
  * Feature rows: text beside a rounded picture, the side alternating row by row (the first row's
- * picture on the right). Text: an optional eyebrow, the h2, paragraphs, a check list, a tinted callout,
+ * picture on the right). Text: the h2, paragraphs, a check list, a tinted callout,
  * a small note and a pill. A row may close with four short facts.
  *
  * variant "default" (/platform): the band's own padding, the 1392px grid, 4:3 or 16:9 pictures, and
  * below 1024 the picture follows the text.
- * variant "solutions" (/commercial, /homes-and-rentals, /solar): an optional centred `eyebrow` over
- * the whole run, 80 above it (0 on phones, where the strip's own 80 does it) and 80 under it (48 on
- * phones), 120 under the last row (56 on phones), and below 1024 the picture comes first.
+ * variant "solutions" (/commercial, /homes-and-rentals, /solar): 80 above the first row (0 on
+ * phones, where the strip's own 80 does it), 120 under the last row (56 on phones), and below 1024 the picture comes first.
  */
 export function FeatureRows({
   id,
@@ -96,7 +95,6 @@ export function FeatureRows({
   startSide = "right",
   pad = "section",
   variant = "default",
-  eyebrow,
 }: {
   id: string;
   tone?: "plaster" | "paper" | "mist";
@@ -105,7 +103,7 @@ export function FeatureRows({
   /** "feature" is the platform's 88px row band. Ignored by the solutions variant. */
   pad?: "section" | "feature";
   variant?: keyof typeof layouts;
-  /** The solutions variant only: one centred eyebrow above the rows. */
+  /** @deprecated Ignored: the site has no eyebrows (owner, 21 October 2026). */
   eyebrow?: string;
 }) {
   const solutions = variant === "solutions";
@@ -123,7 +121,7 @@ export function FeatureRows({
     </div>
   );
   const rows = (
-    <div className={`${L.rows} ${solutions && eyebrow ? "mt-12 lg:mt-20" : ""}`}>
+    <div className={L.rows}>
       {items.map((r, i) => {
         const right = (i % 2 === 0) === (startSide === "right");
         return (
@@ -131,7 +129,6 @@ export function FeatureRows({
             <div className={L.grid}>
               {solutions && !right ? mediaOf(r, right) : null}
               <Reveal className={L.text(right)}>
-                {r.eyebrow ? <p className="eyebrow eyebrow-plain">{r.eyebrow}</p> : null}
                 <h2 id={`${r.id}-heading`} className="text-h3">
                   {r.title}
                 </h2>
@@ -197,11 +194,6 @@ export function FeatureRows({
     return (
       <Band id={id} tone={tone} pad="none" ariaLabel="Features" className="pt-0 pb-14 md:pt-20 lg:pb-[7.5rem]">
         <div className={L.rail}>
-          {eyebrow ? (
-            <div className="flex justify-center">
-              <p className="eyebrow">{eyebrow}</p>
-            </div>
-          ) : null}
           {rows}
         </div>
       </Band>

@@ -7,7 +7,7 @@ import { holdLines } from "@/components/blocks/holdLines";
 
 /**
  * A solution page's first screen: two soft glows (warm left, teal right) that fade out before the
- * band ends, then a centred eyebrow, the h1 (700px at most), a paragraph (950px) and one pill. No
+ * band ends, then the centred h1 (700px at most), a paragraph (950px) and one pill. No
  * picture, so the h1 is the LCP element. 64 under the bar and 96 above the strip at every width.
  *
  * Inter and its fallback wrap the paragraph differently, so it holds lines too: `leadLines` is the
@@ -15,7 +15,6 @@ import { holdLines } from "@/components/blocks/holdLines";
  * fonts arriving never move the pill or the strip.
  */
 export function CenterHero({
-  eyebrow,
   headline,
   emphasis,
   lead,
@@ -23,7 +22,8 @@ export function CenterHero({
   mobileLines,
   leadLines,
 }: {
-  eyebrow: string;
+  /** @deprecated Ignored: the site has no eyebrows (owner, 21 October 2026). */
+  eyebrow?: string;
   headline: string;
   emphasis?: string;
   lead: string;
@@ -43,7 +43,6 @@ export function CenterHero({
       </div>
       <Container className="max-md:px-2">
         <div className="mx-auto flex max-w-[59.375rem] flex-col items-center text-center">
-          <p className="eyebrow">{eyebrow}</p>
           <h1 id="hero-heading" className={`em-accent mx-auto max-w-[43.75rem] text-h1 ${hold.className}`} style={hold.style}>
             <Headline text={headline} emphasis={emphasis} />
           </h1>

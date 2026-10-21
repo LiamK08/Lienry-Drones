@@ -80,7 +80,6 @@ export default function PrivacyPage() {
       <Band id="hero" as="header" tone="paper" pad="none" labelledBy="privacy-heading" className="pt-[8.625rem] pb-[5.5rem]">
         <Container>
           <div className="flex flex-col items-center text-center">
-            <p className="eyebrow">Legal</p>
             <h1 id="privacy-heading" className={`text-h1 ${hold.className}`} style={hold.style}>
               {p.headline.replace(/\.$/, "")}
             </h1>

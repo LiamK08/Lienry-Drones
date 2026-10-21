@@ -38,7 +38,6 @@ export function FaqCentered({
       <Container>
         <div className="mx-auto max-w-2xl">
           <Reveal animate y={10} className="flex flex-col items-center text-center">
-            <p className="eyebrow">Got questions?</p>
             <h2 id={`${id}-heading`} className="em-accent text-h1 max-md:text-h2s">
               <Headline text="Frequently asked questions" emphasis="questions" />
             </h2>

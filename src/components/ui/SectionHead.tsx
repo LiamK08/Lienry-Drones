@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import type { Action } from "@/lib/types";
 import { Button } from "@/components/ui/Button";
-import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Reveal } from "@/components/ui/Reveal";
 
 /** The aside beside (split) or under (stack) the heading. A split head needs at least one of the three. */
@@ -17,8 +16,8 @@ type HeadBase = {
   as?: "h1" | "h2";
   /** Type step. Default follows `as`; "h2s" is the inner-page section size. */
   size?: "h1" | "h2" | "h2s";
-  /** The lowercase line above the heading: 1 to 3 words (Eyebrow throws in development otherwise). */
-  eyebrow: string;
+  /** @deprecated Ignored: the site has no eyebrows (owner, 21 October 2026). */
+  eyebrow?: string;
   /** The whole heading, as stored in content: 7 words at most (throws in development otherwise). */
   headline: string;
   /** The trailing phrase of `headline`, set in the italic: the section's one italic. */
@@ -58,25 +57,24 @@ export function Headline({ text, emphasis, breakBefore = false }: { text: string
 }
 
 /**
- * A section's head: the eyebrow, 16, the heading (h2, or the page's h1), then its aside: the intro
+ * A section's head: the heading (h2, or the page's h1), then its aside: the intro
  * (text-lead under an h1, text-body otherwise, muted), a tertiary link and an action, in that order.
  *
  * - split (default): from 1024 the heading takes columns 1-7 and the aside 8-12, bottom-aligned on
  *   the 12-column grid; below 1024 the aside follows the heading 24 below.
  * - stack: heading, 24, aside, filling its parent (no inner grid), for a head in a narrow column.
  *
- * Colours come from the surface (role tokens), so the same head reads on plaster and on ink. Spacing
- * between the eyebrow and the heading is `.eyebrow + :is(h1, h2)` (16); the heading has no margin.
+ * Colours come from the surface (role tokens), so the same head reads on plaster and on ink. The heading
+ * has no margin.
  */
 export function SectionHead(props: SectionHeadProps) {
-  const { id, as: H = "h2", size, eyebrow, headline, emphasis, breakBefore, below, reveal = true, className = "" } = props;
+  const { id, as: H = "h2", size, headline, emphasis, breakBefore, below, reveal = true, className = "" } = props;
   const { intro, link, action } = props as { intro?: string; link?: Action; action?: ReactNode };
   // A section's h2 at the page-title step keeps the 36px section size on phones, as the reference does.
   const step = (size ?? H) === "h1" ? (H === "h1" ? "text-h1" : "text-h1 max-md:text-h2s") : size === "h2s" ? "text-h2s" : "text-h2";
 
   const heading = (
     <>
-      <Eyebrow>{eyebrow}</Eyebrow>
       <H id={id} className={step}>
         <Headline text={headline} emphasis={emphasis} breakBefore={breakBefore} />
       </H>

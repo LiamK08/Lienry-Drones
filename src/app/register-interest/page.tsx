@@ -46,8 +46,7 @@ export default function RegisterInterestPage() {
         <EnquiryTypeProvider>
           <div className="grid gap-9 lg:grid-cols-[minmax(0,1fr)_30rem]">
             <div className="lg:flex lg:flex-col">
-              <p className="eyebrow flex w-fit">{r.eyebrow}</p>
-              <h1 id="register-heading" className={`em-accent mt-9 text-h1 ${hold.className}`} style={hold.style}>
+              <h1 id="register-heading" className={`em-accent text-h1 ${hold.className}`} style={hold.style}>
                 <Headline text={r.headline} emphasis={r.emphasis} />
               </h1>
               <p className="mt-3 max-w-none text-body leading-[1.2] text-fg">{r.lead}</p>

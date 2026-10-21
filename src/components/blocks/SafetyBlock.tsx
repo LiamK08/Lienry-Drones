@@ -8,7 +8,8 @@ import { Picture } from "@/components/ui/Picture";
 import { TextLink } from "@/components/ui/TextLink";
 
 export type SafetyBlockProps = {
-  eyebrow: string;
+  /** @deprecated Ignored: the site has no eyebrows (owner, 21 October 2026). */
+  eyebrow?: string;
   /** Two lines: the second is the italic. */
   headline: string;
   emphasis: string;
@@ -21,7 +22,8 @@ export type SafetyBlockProps = {
 
 export type FiguresBlockProps = {
   id: string;
-  eyebrow: string;
+  /** @deprecated Ignored: the site has no eyebrows (owner, 21 October 2026). */
+  eyebrow?: string;
   headline: string;
   emphasis?: string;
   /** The head's right-hand line. */
@@ -38,17 +40,16 @@ const column = (i: number) => (i ? "md:border-l md:border-line/50 md:pl-6 md:pb-
 
 /**
  * The paper band of the solution pages (the reference's security slot): 88 above and below from 1024
- * (64 from 768, 56 on phones) on a 1328px rail. The head: the eyebrow and a 40px h2 (976px at most)
+ * (64 from 768, 56 on phones) on a 1328px rail. The head: a 40px h2 (976px at most)
  * on the left, the aside bottom-aligned beside it from 768, its text left-aligned. Then one picture,
  * full width and 321px tall from 1024, with the image corners, then three divided columns.
  */
-function PaperBand({ id, eyebrow, headline, emphasis, breakBefore, aside, image, children }: { id: string; eyebrow: string; headline: string; emphasis?: string; breakBefore?: boolean; aside: ReactNode; image: ImageRef; children: ReactNode }) {
+function PaperBand({ id, headline, emphasis, breakBefore, aside, image, children }: { id: string; headline: string; emphasis?: string; breakBefore?: boolean; aside: ReactNode; image: ImageRef; children: ReactNode }) {
   return (
     <Band id={id} tone="paper" pad="none" labelledBy={`${id}-heading`} className="py-14 md:py-16 lg:py-[5.5rem]">
       <div className="mx-auto w-full max-w-[83rem]">
         <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between md:gap-10">
           <div className="min-w-0">
-            <p className="eyebrow">{eyebrow}</p>
             <h2 id={`${id}-heading`} className="em-accent max-w-[61rem] text-h1 max-md:text-h2s">
               <Headline text={headline} emphasis={emphasis} breakBefore={breakBefore} />
             </h2>
@@ -81,11 +82,10 @@ function PaperBand({ id, eyebrow, headline, emphasis, breakBefore, aside, image,
  * Safety on paper: the head with its accent italic, a short line and three outlined tags (the honest
  * stand-in for badges: Lienry claims no certifications), one wide picture, then three icon columns.
  */
-export function SafetyBlock({ eyebrow, headline, emphasis, aside, tags, image, columns }: SafetyBlockProps) {
+export function SafetyBlock({ headline, emphasis, aside, tags, image, columns }: SafetyBlockProps) {
   return (
     <PaperBand
       id="safety"
-      eyebrow={eyebrow}
       headline={headline}
       emphasis={emphasis}
       breakBefore
@@ -123,9 +123,9 @@ export function SafetyBlock({ eyebrow, headline, emphasis, aside, tags, image, c
  * column per figure: the numeral (Inter light at the h1 step), its label, and the source line with its
  * index and a link to the primary source (new tab). The cited note follows the columns.
  */
-export function FiguresBlock({ id, eyebrow, headline, emphasis, aside, image, items, note }: FiguresBlockProps) {
+export function FiguresBlock({ id, headline, emphasis, aside, image, items, note }: FiguresBlockProps) {
   return (
-    <PaperBand id={id} eyebrow={eyebrow} headline={headline} emphasis={emphasis} image={image} aside={<p className="max-w-none text-small leading-[1.2] text-fg">{aside}</p>}>
+    <PaperBand id={id} headline={headline} emphasis={emphasis} image={image} aside={<p className="max-w-none text-small leading-[1.2] text-fg">{aside}</p>}>
       <ul className="mt-14 grid gap-10 md:grid-cols-3 md:gap-0">
         {items.map((stat, i) => (
           <li key={stat.id} className={column(i)}>

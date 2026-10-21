@@ -10,7 +10,6 @@ export function SafetyPanel() {
       <Container>
         <div className="on-dark grid gap-10 rounded-panel bg-night p-8 text-white md:p-12 lg:grid-cols-[1fr_1.4fr] lg:items-center">
           <div>
-            <p className="eyebrow">{safety.eyebrow}</p>
             <h2 id="safety-heading" className="text-h2">
               {safety.headline}
             </h2>

@@ -24,7 +24,6 @@ export function Explore() {
       <Container>
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="eyebrow">{explore.eyebrow}</p>
             <h2 id="explore-heading" className="text-h2">
               {explore.headline}
             </h2>

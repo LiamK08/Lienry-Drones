@@ -25,7 +25,8 @@ Type: two families only, both open-licensed and self-hosted: PT Serif (regular a
 headings, display lines and the footer logo, and Inter for everything else (its italic only in the
 footer tagline, loaded on demand). Sizes follow the reference: page titles 40px (30 on phones), home
 section titles 48px (36), inner section titles 36px (36), card and row titles 32px (30), with tight
-negative tracking. A section's h2 set at the page-title step drops to 36px on phones. Eyebrows are an accent dot and 12px capitals (`.eyebrow`).
+negative tracking. A section's h2 set at the page-title step drops to 36px on phones. No eyebrows: headings stand alone,
+with no label above them (the owner's call, 21 October 2026). The header carries no pills.
 
 Shape: buttons are pills (`rounded-pill`, optional round arrow badge); cards are `rounded-card`
 (16px), panels `rounded-panel` (20px); feature and story images follow the reference's softer
@@ -36,7 +37,7 @@ gradient text.
 
 Checks: `check:a11y`, `perf:vitals`, `check:layout` and `check:rules` gate every route. Since
 20 October 2026 the last two encode this system: the radius set and pills, PT Serif over Inter at
-the token sizes, dotted capital eyebrows on their heading, centred heads centred where they sit,
+the token sizes, no eyebrows, centred heads centred where they sit,
 content inside the rail and the 20px phone margins, the band palette and Band's pads. Their
 honesty checks (11 claims, 12 captions, 22 titles, 24 enquiry labels, 44 no ReFresh or Legora)
 never relax. Change a check only together with the rule here that it encodes. Hero headings hold

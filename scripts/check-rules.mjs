@@ -40,13 +40,9 @@
 //     (--s-accent read on the heading's surface: its nearest band, tone, surface class, header or
 //     footer); at most one per [data-band], inside the heading that labels that band (its
 //     aria-labelledby target). The footer tagline is the only italic text outside an em or i.
-// 10  Eyebrows: every .eyebrow in <main> and the footer is Inter capitals in its surface's --s-fg (read
-//     on the surface, as in 9), either the dotted eyebrow (12px, weight 400, 0.04em, an 8x8 round
-//     ::before in the surface's --s-accent at 45%) or
-//     .eyebrow-plain (11px, weight 600, 0.02em, no dot); its source text is 1 to 4 words in sentence
-//     case (an uppercase letter or a digit first, not all capitals); an h1 or h2 right after it starts
-//     8 to 40px under it, on its left edge or its centre (within 1px). No .label sits right before or
-//     right above an h1 or h2.
+// 10  No eyebrows: no .eyebrow or .eyebrow-plain renders anywhere on a page (the header, <main> or the
+//     footer); headings stand alone (the owner retired the labels above them on 21 Oct 2026). No
+//     .label sits right before or right above an h1 or h2.
 // 11  No claims: the banned words appear only inside the allowed sentences ("$" also inside
 //     [data-calculator]); "approval" only inside the approvals phrase and the Honest by default rule;
 //     every .numeral is a cited stat (with its source link and the cited note), a design fact (while
@@ -176,10 +172,6 @@ const SPEC = {
   // phone column (/homes-and-rentals, /company, the /register-interest tabs).
   maxUppercase: 12,
   maxCentredLines: { wide: 4, phone: 6 },
-  // Check 10: the two eyebrows (size px, weight, tracking em), the words, the gap to the heading.
-  eyebrows: { dotted: { size: 12, weight: "400", tracking: 0.04 }, plain: { size: 11, weight: "600", tracking: 0.02 } },
-  eyebrowWords: 4,
-  eyebrowGap: [8, 40],
   // Check 44: the reference sites, their names in text (any case) and the ReFresh spelling (that case).
   referenceHost: /(?:^|\.)(?:refresh\.tech|legora\.com)$/i,
   referenceText: "refresh\\.tech|legora",
@@ -220,7 +212,7 @@ const CHECKS = {
   7: "type",
   8: "case and alignment",
   9: "italics",
-  10: "eyebrows",
+  10: "no eyebrows",
   11: "no claims, figures",
   12: "no Concept render captions",
   13: "coded demos labelled",
@@ -849,54 +841,10 @@ function pageLib() {
       });
       if (above) add(10, h, "a .label sits directly above the heading", `(${R.describe(above)})`);
     }
-    // Check 10: eyebrows. The words (the source text, before the capitals), the computed style against
-    // the surface (its --s-fg and --s-accent, read at the eyebrow) and the h1 or h2 that follows one.
-    const [gapMin, gapMax] = R.cfg.eyebrowGap;
-    for (const e of scope.querySelectorAll(".eyebrow")) {
-      if (!e.closest("main") && !(R.state.footer && R.state.footer.contains(e))) continue;
+    // Check 10: no eyebrows, anywhere on the page.
+    for (const e of document.querySelectorAll(".eyebrow, .eyebrow-plain")) {
       if (!rendered(e)) continue;
-      const text = clean(e.textContent);
-      const words = text.split(" ").filter(Boolean).length;
-      const sentence = /^[\p{Lu}\p{Nd}]/u.test(text) && !(/\p{L}/u.test(text) && text === text.toUpperCase());
-      if (!sentence || words < 1 || words > R.cfg.eyebrowWords) add(10, e, `eyebrow text is not sentence case, 1 to ${R.cfg.eyebrowWords} words`, `("${text}")`);
-      const cs = getComputedStyle(e);
-      const plain = e.classList.contains("eyebrow-plain");
-      const want = plain ? R.cfg.eyebrows.plain : R.cfg.eyebrows.dotted;
-      const fs = parseFloat(cs.fontSize);
-      const problems = [];
-      const family = firstFamily(cs.fontFamily);
-      if (family !== fam.inter) problems.push(`family ${family}, not Inter`);
-      if (cs.textTransform !== "uppercase") problems.push(`text-transform ${cs.textTransform}, not uppercase`);
-      const surface = surfaceOf(e);
-      const fg = resolveAt(surface, "color", "var(--s-fg)");
-      if (!same(cs.color, fg)) problems.push(`colour ${cs.color}, not the surface's --s-fg (${fg})`);
-      if (Math.abs(fs - want.size) > 0.05) problems.push(`size ${cs.fontSize}, not ${want.size}px`);
-      if (cs.fontWeight !== want.weight) problems.push(`weight ${cs.fontWeight}, not ${want.weight}`);
-      const tracking = parseFloat(cs.letterSpacing) || 0;
-      if (Math.abs(tracking - want.tracking * fs) > 0.05) problems.push(`letter-spacing ${cs.letterSpacing}, not ${want.tracking}em (${Math.round(want.tracking * fs * 100) / 100}px)`);
-      const dot = getComputedStyle(e, "::before");
-      const dotted = dot.content !== "none" && dot.content !== "normal" && dot.display !== "none";
-      if (plain) {
-        if (dotted) problems.push("a dot (::before) on .eyebrow-plain");
-      } else if (!dotted) problems.push("no dot (::before)");
-      else {
-        const dw = parseFloat(dot.width);
-        const dh = parseFloat(dot.height);
-        if (!(Math.abs(dw - 8) < 0.05 && Math.abs(dh - 8) < 0.05)) problems.push(`dot ${dot.width} x ${dot.height}, not 8 x 8`);
-        else if (notPill(dot, 8)) problems.push(`dot corners ${notPill(dot, 8)}, not round`);
-        const accent = resolveAt(surface, "background-color", "color-mix(in srgb, var(--s-accent) 45%, transparent)");
-        if (!same(dot.backgroundColor, accent)) problems.push(`dot ${dot.backgroundColor}, not --s-accent at 45% (${accent})`);
-      }
-      if (problems.length) add(10, e, "eyebrow style is off the spec", `(${problems.join("; ")})`);
-      const h = e.nextElementSibling;
-      if (!h || !h.matches("h1, h2") || !rendered(h)) continue;
-      const er = e.getBoundingClientRect();
-      const hr = h.getBoundingClientRect();
-      const gap = hr.top - er.bottom;
-      if (gap < gapMin || gap > gapMax) add(10, h, `eyebrow to heading is not ${gapMin} to ${gapMax}px`, `(${round(gap)}px under "${text}")`);
-      const left = Math.abs(hr.left - er.left);
-      const centre = Math.abs((hr.left + hr.right) / 2 - (er.left + er.right) / 2);
-      if (left > 1 && centre > 1) add(10, h, "eyebrow and heading share neither a left edge nor a centre (within 1px)", `(left edges ${round(er.left)} and ${round(hr.left)}, centres ${round(centre)}px apart, under "${text}")`);
+      add(10, e, "an eyebrow renders (the site has none since 21 Oct 2026)", `("${clean(e.textContent)}")`);
     }
     // Check 29: the uppercase .label is for data labels inside UI ([data-ui]) and the header only.
     for (const l of scope.querySelectorAll(".label")) {
@@ -1736,9 +1684,6 @@ const cfg = {
   minText: SPEC.minText,
   minHeading: SPEC.minHeading,
   maxUppercase: SPEC.maxUppercase,
-  eyebrows: SPEC.eyebrows,
-  eyebrowWords: SPEC.eyebrowWords,
-  eyebrowGap: SPEC.eyebrowGap,
   referenceText: SPEC.referenceText,
   referenceBrand: SPEC.referenceBrand,
 };

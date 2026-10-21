@@ -17,7 +17,6 @@ export default function NotFound() {
     <Band id="hero" as="header" tone="paper" pad="hero" labelledBy="hero-heading" className="flex min-h-[70svh] items-center md:max-lg:min-h-0">
       <Container>
         <div className="flex flex-col items-center text-center">
-          <p className="eyebrow">{p.eyebrow}</p>
           <h1 id="hero-heading" className="em-accent text-h1">
             <Headline text={p.headline} emphasis={p.emphasis} />
           </h1>

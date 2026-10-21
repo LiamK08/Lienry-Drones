@@ -36,8 +36,7 @@ export function MenuPanel({ groups, feature, onPick }: { groups: readonly MenuGr
     <div className={`grid gap-6 ${feature ? "grid-cols-[22rem_1fr]" : ""}`}>
       {feature ? (
         <div className="on-dark flex flex-col rounded-card bg-night p-5 text-white">
-          <p className="eyebrow">{feature.eyebrow}</p>
-          <p className="mt-2 font-display text-[1.375rem] leading-tight">{feature.title}</p>
+          <p className="font-display text-[1.375rem] leading-tight">{feature.title}</p>
           <ul className="mt-4 flex-1">
             {feature.items.map((i) => (
               <li key={i.href} className="border-t border-white/10 py-3">

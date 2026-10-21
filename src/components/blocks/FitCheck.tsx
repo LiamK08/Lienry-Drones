@@ -150,8 +150,7 @@ export function FitCheck({ id = "fit", layout = "card", intro, badge }: FitCheck
   return (
     <div className="grid overflow-hidden rounded-panel border border-line bg-white shadow-[0_32px_64px_-48px_rgb(0_0_0/0.35)] lg:grid-cols-[1.25fr_1fr]">
       <div className="p-6 md:p-10">
-        <p className="text-label font-medium uppercase tracking-[0.08em] text-accent">{fitCheck.eyebrow}</p>
-        <h3 className="mt-4 text-h3">{fitCheck.title}</h3>
+        <h3 className="text-h3">{fitCheck.title}</h3>
         <p className="mt-2 text-small text-muted">{fitCheck.intro}</p>
         {fitCheck.groups.map((g) => (
           <fieldset key={g.label} className="mt-8">
