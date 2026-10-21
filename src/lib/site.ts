@@ -193,9 +193,6 @@ export const nav = [
   { href: "/company", label: "Company" },
 ] as const;
 
-/** The header's white pill, beside Register interest. */
-export const navUtility = { href: "/download", label: "Download" } as const;
-
 /**
  * The footer (src/components/site/Footer.tsx): the statement, four groups of links under lowercase
  * eyebrows, and the legal line. Every enquiry label is the one label that route has everywhere.

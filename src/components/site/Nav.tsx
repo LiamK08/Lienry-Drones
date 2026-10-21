@@ -4,9 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useId, useRef, useState } from "react";
-import { menus, navAbout, navUtility } from "@/lib/site";
+import { menus, navAbout } from "@/lib/site";
 import { useScrolledPast } from "@/lib/hooks";
-import { Button } from "@/components/ui/Button";
 import { Mark } from "@/components/ui/Wordmark";
 import { MenuPanel } from "@/components/site/MenuPanel";
 import { Icon } from "@/components/blocks/Icon";
@@ -34,12 +33,12 @@ function Logo({ className = "" }: { className?: string }) {
 }
 
 /**
- * The header: the logo left, the menus centred (Platform, Solutions and Resources open a panel of
- * links on hover or click; About is a plain link), and on the right a white Download pill beside the
- * Register interest pill. Over the home film it is transparent with white text; anywhere else, or
- * once scrolled, it is a white bar with a hairline. Below 1024 the bar holds the logo, a Register
- * interest pill and the burger, which drops a short white sheet under the bar: the four sections (each
- * opens its links in place), then Download and Register interest side by side. The page stays in view
+ * The header: the logo left and the menus centred (Platform, Solutions and Resources open a panel of
+ * links on hover or click; About is a plain link). It carries no action pills (the owner's call, 21
+ * October): Lienry Desktop sits in Resources, and every page closes on its own Register interest.
+ * Over the home film it is transparent with white text; anywhere else, or once scrolled, it is a white
+ * bar with a hairline. Below 1024 the bar holds the logo and the burger, which drops a short white
+ * sheet under the bar with the four sections (each opens its links in place). The page stays in view
  * below; a tap outside or Escape closes it.
  */
 export function Nav() {
@@ -155,18 +154,7 @@ export function Nav() {
             </Link>
           </li>
         </ul>
-        <div className="ml-auto flex items-center gap-2">
-          <div className="hidden items-center gap-2 lg:flex">
-            <Button href={navUtility.href} variant="secondary" size="sm">
-              {navUtility.label}
-            </Button>
-            <Button href="/register-interest" size="sm">
-              Register interest
-            </Button>
-          </div>
-          <Button href="/register-interest" size="sm" className="lg:hidden" onClick={() => setOpen(false)}>
-            Register interest
-          </Button>
+        <div className="ml-auto flex items-center lg:hidden">
           <button
             ref={menuButtonRef}
             type="button"
@@ -253,14 +241,6 @@ export function Nav() {
                   </Link>
                 </li>
               </ul>
-              <div className="mt-4 grid grid-cols-2 gap-2">
-                <Button href={navUtility.href} variant="secondary" size="lg" className="w-full" onClick={() => setOpen(false)}>
-                  {navUtility.label}
-                </Button>
-                <Button href="/register-interest" size="lg" className="w-full" onClick={() => setOpen(false)}>
-                  Register interest
-                </Button>
-              </div>
             </motion.div>
           </>
         ) : null}

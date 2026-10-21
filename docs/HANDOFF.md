@@ -42,6 +42,8 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
   film; reduced motion and Save-Data still get the still poster instead of the film. The two word
   strips lost their pause buttons the same day, on the same call. Headings on phones now follow the
   reference: section titles 36px (h2, h2s, and an h2 set at the h1 step), card and row titles 30px.
+  The header lost its Download and Register interest pills, in the bar and the phone menu, on the
+  owner's call: Lienry Desktop stays in Resources, and every page still closes on its own call to act.
 - The owner said the imagery is not good enough yet and will be redone in Higgsfield later. Until
   they say so, keep the current stills and film in the new layouts.
 
