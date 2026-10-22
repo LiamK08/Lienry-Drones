@@ -171,7 +171,11 @@ export function SolarFleet({ controlRef, clockRef, fadeRef }: { controlRef: RefO
     pts[4].set(nearX, GROUND + 0.02, z - 0.1);
     pts[5].set(port.x + 0.25, THREE.MathUtils.lerp(GROUND, port.y, 0.55), THREE.MathUtils.lerp(z, port.z, 0.55));
     pts[6].copy(port);
-    const curve = new THREE.CatmullRomCurve3(pts, false, "centripetal");
+    // The spline would dip under the ground where the cable lifts off it towards the drone: sample it
+    // and keep every point on or above the ground.
+    const along = new THREE.CatmullRomCurve3(pts, false, "centripetal").getPoints(TUBE_SEGMENTS);
+    for (const p of along) p.y = Math.max(p.y, GROUND);
+    const curve = new THREE.CatmullRomCurve3(along, false, "centripetal");
     const old = cable.geometry;
     cable.geometry = new THREE.TubeGeometry(curve, TUBE_SEGMENTS, TUBE_R, 6, false);
     old.dispose();

@@ -142,14 +142,15 @@ export function zoneOutline(zone: string): THREE.Vector3[] {
 }
 
 /**
- * What each preset keeps in frame: for the overview, the glass of all four rows and the reel on its pad
+ * What each preset keeps in frame: for the overview, the glass of all four rows and the reel's pad
  * (the ground and the steel's feet may run off the edges, so the array fills the view); for a row, its
  * glass with a margin.
  */
 export function presetBounds(id: string): THREE.Vector3[] {
   if (id === "overview") {
     const last = ROWS - 1;
-    return [onTable(0, 0, 0), onTable(0, ROW_LEN, 0), onTable(0, 0, SLOPE), onTable(last, 0, SLOPE), onTable(last, ROW_LEN, SLOPE), onTable(last, ROW_LEN, 0), REEL];
+    const front = PAD.z + PAD.d / 2;
+    return [onTable(0, 0, 0), onTable(0, ROW_LEN, 0), onTable(0, 0, SLOPE), onTable(last, 0, SLOPE), onTable(last, ROW_LEN, SLOPE), onTable(last, ROW_LEN, 0), REEL, new THREE.Vector3(PAD.x - PAD.w / 2, 0, front), new THREE.Vector3(PAD.x + PAD.w / 2, 0, front)];
   }
   return zoneOutline(id).map((p) => p.clone().add(new THREE.Vector3(0, 0.6, 0)));
 }

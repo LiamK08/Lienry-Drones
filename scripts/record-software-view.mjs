@@ -42,8 +42,11 @@ async function record(name, v) {
   const page = await browser.newPage({ viewport: { width: v.width, height: v.height }, deviceScaleFactor: v.dpr });
   page.on("pageerror", (e) => console.log("pageerror:", e.message));
   await page.goto(`${base}${model.page}?capture=${name}`, { waitUntil: "networkidle" });
+  // The window is held at /download's width (1006px at 1440), so a window in a half column (/solar)
+  // does not clip the view it is recording.
   await page.addStyleTag({
-    content: `[data-model-view] { width: ${v.view[0]}px !important; height: ${v.view[1]}px !important; aspect-ratio: auto !important; max-width: none !important; justify-self: start; }
+    content: `[data-software-preview] { width: 1006px !important; max-width: none !important; }
+      [data-model-view] { width: ${v.view[0]}px !important; height: ${v.view[1]}px !important; aspect-ratio: auto !important; max-width: none !important; justify-self: start; }
       [data-model-view] > :not(:first-child) { display: none !important; }`,
   });
   await page.evaluate(() => document.querySelector("[data-model-view]").scrollIntoView({ block: "center" }));
