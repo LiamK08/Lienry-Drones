@@ -99,8 +99,10 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
   overview sways between two azimuths instead of circling (the backs of the panels say nothing), and
   its framing is fitted across the whole sway. The map is an SVG array map (rows A to D). Recordings:
   `node scripts/record-software-view.mjs http://localhost:3000 --model=solar` writes
-  `public/video/solar-view-{wide,tall}` and posters (about 17 minutes). Check 13 now expects the
-  window on /solar too.
+  `public/video/solar-view-{wide,tall}` and posters (about 17 minutes; the recorder holds every window
+  at /download's 1006px so a half-column window is not clipped). Check 13 expects the window on
+  /solar too; checks 14 and 21 know each window's recordings (`SPEC.windowRecordings`), and CLAUDE.md
+  says a model's window may bring its own (they are recordings of the coded model, not imagery).
 - Also 22 October (owner's request): the /homes-and-rentals app demo is interactive. Nothing is
   ticked at first; the visitor chooses Driveway, Solar panels and/or Windows, starts the clean, and
   each chosen area washes in turn (about 2.5 s each, instant under reduced motion) while the picture
@@ -109,6 +111,9 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
   (`FeatureRows` `wideMedia`: 7 of 12 columns from 1280, 8 of 12 from 1024) and the picture shows on
   phones too, under the app. The windows picture is `p3-house`, so the materials row above it now
   shows `p4-rental` (check 14: no picture in two frames on a route in any state).
+- Gates on 22 October: typecheck, lint and build pass; `check:layout` (1440, 390, 1024 and 768),
+  `check:rules` (with motion on /solar and /homes-and-rentals, without on the rest), `check:a11y` and
+  `perf:vitals` pass on /solar, /homes-and-rentals, /commercial, /download and /platform.
 - The owner said the imagery is not good enough yet and will be redone in Higgsfield later. Until
   they say so, keep the current stills and film in the new layouts.
 
@@ -139,7 +144,8 @@ NODE_USE_ENV_PROXY=1 node scripts/perf-vitals.mjs http://localhost:3000 [routes]
   own shell. Find the `next-server` pid with `ps -eo pid,args | grep next-server` and kill that.
 - **Run order:** run `perf-vitals` alone. Run `check-a11y` alone, or with at most one other check:
   under heavy load it times out mid-transition on the home carousel and step tabs.
-- **Rules check [14]:** it fails while anything in `public/video` is uncommitted. `c2-commercial-clip`
+- **Rules check [14]:** it fails while anything in `public/video` is uncommitted, and on any file
+  added there on the branch except a software window's own recordings (`SPEC.windowRecordings`). `c2-commercial-clip`
   is in the manifest but on no page since the refresh layout dropped hover clips; `SPEC.unplaced` in
   `scripts/check-rules.mjs` lists it with that reason, and check 14 fails if it is placed again while
   still listed.
