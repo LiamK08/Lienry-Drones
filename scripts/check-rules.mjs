@@ -58,7 +58,9 @@
 //     reason, reported as a note, and a failure once it is placed again so the list stays true); no id shows in two frames on a route in any
 //     state (a [data-hover-clip] frame's still and clip are one figure; media inside aria-hidden, the
 //     footer's picture loop and the bubble hero, are not frames); public/media holds only manifest
-//     files and nothing is added to public/video or media-src.
+//     files and nothing is added to public/video or media-src, but for a software window's own
+//     recordings (SPEC.windowRecordings: <stem>-wide and -tall, .mp4, .webm and -poster.jpg, recorded
+//     from the coded model by scripts/record-software-view.mjs; CLAUDE.md says so).
 // 21  Motion: under reduced motion no video plays, nothing reveals, crossfades or snaps smoothly, and
 //     the window shows its recording with native controls; without it never two videos play at once,
 //     the live window stops drawing once off screen (judged no sooner than 2.5s after it leaves, then
@@ -195,6 +197,10 @@ const SPEC = {
     ["$", /\$/g],
     ["price", /\bprices?\b/gi],
   ],
+  // Checks 14 and 21: the software window's recordings, one file stem per model (the building on
+  // /platform, /commercial and /download, the solar array on /solar). They are recordings of the coded
+  // model, not imagery, so a model's window may bring its own; nothing else may be added to public/video.
+  windowRecordings: ["software-view", "solar-view"],
   // Where the coded demos are (check 13): the home page no longer carries the window.
   demos: {
     "/platform": { windows: 1 },
@@ -1271,7 +1277,7 @@ function pageLib() {
   R.windows = () =>
     [...document.querySelectorAll("[role='group'][aria-label$='demo window']")].filter(present).map((w, i) => {
       const wrap = w.closest("[data-software-preview]") || w.parentElement;
-      const rec = [...wrap.querySelectorAll("video")].find((v) => /software-view/.test(v.currentSrc || v.querySelector("source")?.getAttribute("src") || v.getAttribute("poster") || ""));
+      const rec = [...wrap.querySelectorAll("video")].find((v) => R.cfg.windowRecordings.some((stem) => (v.currentSrc || v.querySelector("source")?.getAttribute("src") || v.getAttribute("poster") || "").includes(`/${stem}-`)));
       const r = w.getBoundingClientRect();
       return { i, where: where(w), canvas: !!wrap.querySelector("canvas"), recording: !!rec && present(rec), controls: !!rec?.controls, top: r.top + scrollY, bottom: r.bottom + scrollY };
     });
@@ -1676,6 +1682,7 @@ const cfg = {
   retiredCaption: SPEC.retiredCaption,
   demoData: SPEC.demoData,
   windowNote: SPEC.windowNote,
+  windowRecordings: SPEC.windowRecordings,
   readoutsNote: SPEC.readoutsNote,
   appPanelLabel: SPEC.appPanelLabel,
   appNote: content.appNote ?? null,
@@ -2607,7 +2614,10 @@ try {
   } catch {
     base = git("merge-base HEAD main");
   }
-  for (const f of git(`diff --name-only --diff-filter=A ${base} HEAD -- public/media public/video media-src`).split("\n").filter(Boolean)) siteAdd(14, "a media file added on this branch", f);
+  const recording = new RegExp(`^public/video/(?:${SPEC.windowRecordings.join("|")})-(?:wide|tall)(?:\\.mp4|\\.webm|-poster\\.jpg)$`);
+  for (const f of git(`diff --name-only --diff-filter=A ${base} HEAD -- public/media public/video media-src`).split("\n").filter(Boolean)) {
+    if (!recording.test(f)) siteAdd(14, "a media file added on this branch", f);
+  }
 } catch {
   console.log("  note  git is unavailable: the public/video and media-src history was not checked");
 }

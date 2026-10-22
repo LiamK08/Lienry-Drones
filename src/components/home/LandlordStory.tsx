@@ -49,8 +49,8 @@ function Chip({ shot, text, live }: { shot: Shot; text: string; live: boolean })
 export function LandlordAppFrame() {
   const demo = useCleanDemo();
   const shot = shotOf(demo);
-  // The picture under the incoming one stays opaque until the next change, so the fade never shows
-  // the empty cell through two half-faded pictures.
+  // The picture under the incoming one stays opaque until the next change, and above any picture still
+  // fading out, so the fade never shows the empty cell, or an older picture, through the new one.
   const [shown, setShown] = useState(shot);
   const [under, setUnder] = useState<Shot | null>(null);
   if (shot !== shown) {
@@ -73,7 +73,7 @@ export function LandlordAppFrame() {
             <div
               key={key}
               aria-hidden={!on || undefined}
-              className={`absolute inset-0 transition-opacity duration-500 ease-settle motion-reduce:transition-none ${on ? "z-10 opacity-100" : below ? "opacity-100" : "opacity-0"}`}
+              className={`absolute inset-0 transition-opacity duration-500 ease-settle motion-reduce:transition-none ${on ? "z-10 opacity-100" : below ? "z-[5] opacity-100" : "opacity-0"}`}
             >
               <Picture
                 id={pic.id}

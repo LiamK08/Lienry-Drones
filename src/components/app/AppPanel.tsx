@@ -54,6 +54,15 @@ export function useCleanDemo(): CleanDemo {
   const [phase, setPhase] = useState<CleanPhase>("choose");
   const [run, setRun] = useState({ active: 0, progress: 0 });
   const [message, setMessage] = useState("");
+  // What the visitor's own presses say: cleared, then set on the next frame, so the live region speaks
+  // even when the words repeat (Clean again under reduced motion ends exactly where it started).
+  const sayFrame = useRef(0);
+  useEffect(() => () => cancelAnimationFrame(sayFrame.current), []);
+  const say = (text: string) => {
+    cancelAnimationFrame(sayFrame.current);
+    setMessage("");
+    sayFrame.current = requestAnimationFrame(() => setMessage(text));
+  };
 
   useEffect(() => {
     if (phase !== "running") return;
@@ -92,7 +101,7 @@ export function useCleanDemo(): CleanDemo {
     setChosen(next);
     setPhase("choose");
     setRun({ active: 0, progress: 0 });
-    setMessage(chosenLine(next));
+    say(chosenLine(next));
   };
 
   const start = () => {
@@ -101,18 +110,18 @@ export function useCleanDemo(): CleanDemo {
     if (reducedMotion()) {
       setRun({ active: chosen.length, progress: 100 });
       setPhase("done");
-      setMessage(`${started} ${doneLine(chosen)}`);
+      say(`${started} ${doneLine(chosen)}`);
       return;
     }
     setRun({ active: 0, progress: 0 });
     setPhase("running");
-    setMessage(started);
+    say(started);
   };
 
   const chooseAgain = () => {
     setPhase("choose");
     setRun({ active: 0, progress: 0 });
-    setMessage(chosenLine(chosen));
+    say(chosenLine(chosen));
   };
 
   return { chosen, phase, active: run.active, progress: run.progress, message, toggle, start, chooseAgain };

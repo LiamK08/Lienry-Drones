@@ -21,15 +21,19 @@ const COLOURS = {
 
 const mix = (a: readonly number[], b: readonly number[], t: number) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
 
-/** Each cell's place: rows top to bottom (A, the front row, first), the upper panel line over the lower. */
+/**
+ * The map is drawn as the model is seen from the front (from the north, as the default camera looks):
+ * row A, the front row, at the bottom and row D at the top, each row's upper panel line over its lower.
+ */
+const rowTop = (row: number) => (MAP.rows - 1 - row) * (MAP.up * CH + ROW_GAP);
 const PLACES = CELLS.map((c) => ({
   x: LABEL_W + c.col * CW + INSET / 2,
-  y: c.row * (MAP.up * CH + ROW_GAP) + (MAP.up - 1 - c.level) * CH + INSET / 2,
+  y: rowTop(c.row) + (MAP.up - 1 - c.level) * CH + INSET / 2,
 }));
 
 /**
- * The solar plan as a map of the array: its four rows, each two panel lines of ten, with the row's
- * letter beside it. Each cell is one panel: pending or washed, with the soiling still on it shaded
+ * The solar plan as a map of the array: its four rows (row A at the bottom, as in the model), each two
+ * panel lines of ten, with the row's letter beside it. Each cell is one panel: pending or washed, with the soiling still on it shaded
  * amber. A chosen row keeps its colour and the rest fade back. The same props as the facade map, so
  * the window swaps one for the other.
  */
@@ -37,7 +41,7 @@ export const ArrayMap = memo(function ArrayMap({ cells, wash, debris, selected }
   return (
     <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-label={`Array map: rows A to D, two lines of ${MAP.cols} panels each, one cell per panel`} className="block h-auto w-full">
       {LETTERS.map((l, row) => (
-        <text key={l} x={0} y={row * (MAP.up * CH + ROW_GAP) + CH + 2} fontSize={5.6} fill="#5e584f" fontWeight={600}>
+        <text key={l} x={0} y={rowTop(row) + CH + 2} fontSize={5.6} fill="#5e584f" fontWeight={600}>
           {l}
         </text>
       ))}

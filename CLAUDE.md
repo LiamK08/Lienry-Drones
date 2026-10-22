@@ -14,7 +14,9 @@ are claimed anywhere. Statistics come only from `src/content/stats.ts`, each cit
 primary source. The imagery is AI-generated. The owner removed the Concept render captions on
 26 September 2026, so no image or film carries one, and `npm run check:rules` fails if one returns.
 The coded software preview carries Demo data and an illustrative-model note.
-No new or replacement media without the user's instructions.
+No new or replacement media without the user's instructions. The software window's own recordings
+(`public/video/<model>-view-*`, recorded from the coded model by `scripts/record-software-view.mjs`)
+are part of the window, not imagery: each model's window brings its own (check 14 lists the stems).
 
 Layout (since 20 October 2026, the owner's brief): the site follows refresh.tech's page
 templates, section order and interaction patterns, in Lienry's own words, fonts, colours and
