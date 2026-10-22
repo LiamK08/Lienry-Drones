@@ -26,6 +26,15 @@ export const solarPage = {
       image: { id: "y2-story-panels", alt: "The drone over rooftop panels, half the array already clean", position: "50% 45%" },
     },
     {
+      id: "software",
+      title: "Every row planned, washed and tracked",
+      paragraphs: [
+        "The scan becomes a model of the array in the desktop software. It sets the pressure for solar glass, plans two passes along each row and follows the wash live, with soiling shaded where it has built up. This is a demo array with demo data.",
+      ],
+      checks: ["A model of every row from the scan", "Pressure set for solar glass", "Live wash progress, row by row", "Soiling shaded where it has built up"],
+      link: { label: "Lienry Desktop", href: "/download" },
+    },
+    {
       id: "rows",
       title: "Rooftop arrays and solar farm rows",
       paragraphs: ["From a home's roof to a row of ground-mounted panels, the clean runs with nobody on site."],

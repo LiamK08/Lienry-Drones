@@ -10,8 +10,50 @@ import { Building, type Clock, type Fade } from "./software/Building";
 import { Fleet } from "./software/Fleet";
 import { Structure } from "./software/Structure";
 import { CAMERA, fitDistance, presetBounds, presetPosition, type CameraPreset } from "./software/layout";
+import { CAMERA as SOLAR_CAMERA, SWAY as SOLAR_SWAY, presetBounds as solarBounds } from "./solar/layout";
+import { SolarField } from "./solar/SolarField";
+import { SolarFleet } from "./solar/SolarFleet";
 import type { SceneControl } from "./software/control";
-import type { ZoneId } from "@/content/software";
+import type { ModelId } from "@/components/software/models";
+
+type ContentProps = { controlRef: RefObject<SceneControl>; clockRef: RefObject<Clock>; fadeRef: RefObject<Fade> };
+
+type Shadows = { position: [number, number, number]; scale: number; far: number; blur: number; opacity: number };
+type Sway = { from: number; to: number; drag: [number, number] };
+
+/**
+ * Each model's camera views (the overview and one per zone), what each must keep in frame, how the
+ * overview moves (a full slow orbit, or a sway between two azimuths), the contact shadows under it,
+ * and what it draws.
+ */
+const SCENES: Record<ModelId, { camera: Record<string, CameraPreset>; bounds: (id: string) => THREE.Vector3[]; sway: Sway | null; shadows: Shadows; Content: (p: ContentProps) => React.ReactNode }> = {
+  building: {
+    camera: CAMERA,
+    bounds: (id) => presetBounds(id as keyof typeof CAMERA),
+    sway: null,
+    shadows: { position: [0, 0.01, 0], scale: 100, far: 20, blur: 2.2, opacity: 0.6 },
+    Content: (p) => (
+      <>
+        <Structure />
+        <Building {...p} />
+        <Fleet {...p} />
+      </>
+    ),
+  },
+  solar: {
+    camera: SOLAR_CAMERA,
+    bounds: solarBounds,
+    sway: SOLAR_SWAY,
+    // The tables stand under 1.5m, so a shallow shadow camera: each row casts a firm shadow on the ground.
+    shadows: { position: [2, 0.01, 0], scale: 64, far: 2.2, blur: 1.6, opacity: 0.7 },
+    Content: (p) => (
+      <>
+        <SolarField {...p} />
+        <SolarFleet {...p} />
+      </>
+    ),
+  },
+};
 
 const deg = (d: number) => (d * Math.PI) / 180;
 const FLIGHT_MS = 1500;
@@ -42,20 +84,26 @@ function Sky() {
 }
 
 /** Slow auto orbit with damping between 25 and 70 degrees, no zoom, no pan, and camera flights to each zone. */
-function Rig({ controlRef, clockRef, flyingRef }: { controlRef: RefObject<SceneControl>; clockRef: RefObject<Clock>; flyingRef: RefObject<boolean> }) {
+function Rig({ model, controlRef, clockRef, flyingRef }: { model: ModelId; controlRef: RefObject<SceneControl>; clockRef: RefObject<Clock>; flyingRef: RefObject<boolean> }) {
+  const scene = SCENES[model];
   const get = useThree((s) => s.get);
   const size = useThree((s) => s.size);
   const controls = useRef<OrbitControls | null>(null);
   const flight = useRef<{ from: THREE.Vector3; to: THREE.Vector3; fromT: THREE.Vector3; toT: THREE.Vector3; start: number } | null>(null);
   const pauseUntil = useRef(0);
-  const current = useRef<"overview" | ZoneId>("overview");
+  const current = useRef<string>("overview");
+  const swayDir = useRef(1);
   const follow = isCapture() && new URLSearchParams(window.location.search).has("follow");
 
-  const place = (id: "overview" | ZoneId, out: THREE.Vector3): CameraPreset => {
-    const preset = CAMERA[id];
+  const place = (id: string, out: THREE.Vector3): CameraPreset => {
+    const preset = scene.camera[id];
     const { camera } = get();
     const fov = (camera as THREE.PerspectiveCamera).fov ?? 35;
-    presetPosition(preset, out, fitDistance(preset, presetBounds(id), size.width / Math.max(1, size.height), fov));
+    const aspect = size.width / Math.max(1, size.height);
+    // A swaying overview keeps everything in frame across the whole sway, not only where it starts.
+    const azimuths = id === "overview" && scene.sway ? [preset.azimuth, scene.sway.from, scene.sway.to] : [preset.azimuth];
+    const distance = Math.max(...azimuths.map((azimuth) => fitDistance({ ...preset, azimuth }, scene.bounds(id), aspect, fov)));
+    presetPosition(preset, out, distance);
     return preset;
   };
 
@@ -70,8 +118,12 @@ function Rig({ controlRef, clockRef, flyingRef }: { controlRef: RefObject<SceneC
     c.maxPolarAngle = deg(70);
     c.autoRotate = true;
     c.autoRotateSpeed = isCapture() ? 0.12 : 0.32;
-    c.target.set(...CAMERA.overview.target);
-    presetPosition(CAMERA.overview, camera.position);
+    if (scene.sway) {
+      c.minAzimuthAngle = scene.sway.drag[0];
+      c.maxAzimuthAngle = scene.sway.drag[1];
+    }
+    c.target.set(...scene.camera.overview.target);
+    presetPosition(scene.camera.overview, camera.position);
     c.update();
     // On touch devices the page must keep scrolling over the model, so the orbit is automatic only.
     if (window.matchMedia("(pointer: coarse)").matches) {
@@ -102,7 +154,7 @@ function Rig({ controlRef, clockRef, flyingRef }: { controlRef: RefObject<SceneC
       c.dispose();
       controls.current = null;
     };
-  }, [get, controlRef]);
+  }, [get, controlRef, scene]);
 
   // Fit the current preset to the canvas on mount and whenever it is resized.
   useEffect(() => {
@@ -147,6 +199,15 @@ function Rig({ controlRef, clockRef, flyingRef }: { controlRef: RefObject<SceneC
     }
     flyingRef.current = flight.current !== null;
     c.autoRotate = control.active && !fl && t > pauseUntil.current;
+    const sway = scene.sway;
+    if (sway && c.autoRotate) {
+      // Turn back at each end of the sway, easing into the turn. A positive speed lowers the azimuth.
+      const az = c.getAzimuthalAngle();
+      if (az >= sway.to) swayDir.current = 1;
+      else if (az <= sway.from) swayDir.current = -1;
+      const edge = az > sway.from && az < sway.to ? Math.min(az - sway.from, sway.to - az) : deg(6);
+      c.autoRotateSpeed = swayDir.current * (isCapture() ? 0.12 : 0.32) * THREE.MathUtils.clamp(edge / deg(6), 0.15, 1);
+    }
     c.update(dt);
     control.azimuth = c.getAzimuthalAngle();
   });
@@ -228,7 +289,8 @@ function FirstFrame({ onFirstFrame }: { onFirstFrame: () => void }) {
   return null;
 }
 
-export default function SoftwareScene({ controlRef, onFirstFrame }: { controlRef: RefObject<SceneControl>; onFirstFrame?: () => void }) {
+export default function SoftwareScene({ model = "building", controlRef, onFirstFrame }: { model?: ModelId; controlRef: RefObject<SceneControl>; onFirstFrame?: () => void }) {
+  const { Content, shadows } = SCENES[model];
   const clockRef = useRef<Clock>({ t: 0, dt: 0 });
   const fadeRef = useRef<Fade>({ scan: 0, wash: 1, debris: 1, zones: 0 });
   const flyingRef = useRef(false);
@@ -257,11 +319,9 @@ export default function SoftwareScene({ controlRef, onFirstFrame }: { controlRef
       <directionalLight position={[45, 70, 35]} intensity={1.7} color="#fff3e2" />
       <directionalLight position={[-40, 25, -20]} intensity={0.45} color="#dcedf0" />
       <directionalLight position={[-25, 35, 70]} intensity={0.55} color="#ffffff" />
-      <Structure />
-      <Building controlRef={controlRef} clockRef={clockRef} fadeRef={fadeRef} />
-      <Fleet controlRef={controlRef} clockRef={clockRef} fadeRef={fadeRef} />
-      <ContactShadows position={[0, 0.01, 0]} scale={100} far={20} blur={2.2} opacity={0.6} resolution={1024} frames={1} color="#1c1a17" />
-      <Rig controlRef={controlRef} clockRef={clockRef} flyingRef={flyingRef} />
+      <Content controlRef={controlRef} clockRef={clockRef} fadeRef={fadeRef} />
+      <ContactShadows {...shadows} resolution={1024} frames={1} color="#1c1a17" />
+      <Rig model={model} controlRef={controlRef} clockRef={clockRef} flyingRef={flyingRef} />
       <Driver controlRef={controlRef} clockRef={clockRef} fadeRef={fadeRef} flyingRef={flyingRef} />
       {onFirstFrame ? <FirstFrame onFirstFrame={onFirstFrame} /> : null}
     </Canvas>

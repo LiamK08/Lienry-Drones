@@ -1,7 +1,8 @@
 // Record the software view for phones and reduced motion: 12 s of the model, stepped one frame at a
 // time so the recording is deterministic however slowly the headless renderer draws.
-// Usage: node scripts/record-software-view.mjs [baseUrl] [wide|tall] [--encode-only]
-// Output: public/video/software-view-<variant>.{mp4,webm} and -poster.jpg
+// Usage: node scripts/record-software-view.mjs [baseUrl] [wide|tall] [--model=building|solar] [--encode-only]
+// Output: public/video/<stem>-<variant>.{mp4,webm} and -poster.jpg, where the stem is software-view
+// (the building, recorded on /download) or solar-view (the solar array, recorded on /solar).
 import { execFileSync } from "node:child_process";
 import { mkdirSync, readdirSync, rmSync, statSync } from "node:fs";
 import path from "node:path";
@@ -15,6 +16,10 @@ const sharp = require("sharp");
 
 const base = process.argv[2] ?? "http://localhost:3011";
 const only = process.argv[3] && !process.argv[3].startsWith("--") ? process.argv[3] : undefined;
+const MODELS = { building: { page: "/download", stem: "software-view" }, solar: { page: "/solar", stem: "solar-view" } };
+const modelArg = process.argv.find((a) => a.startsWith("--model="))?.slice("--model=".length) ?? "building";
+const model = MODELS[modelArg];
+if (!model) throw new Error(`Unknown model ${modelArg}: use ${Object.keys(MODELS).join(" or ")}`);
 const FPS = 24;
 const SECONDS = 12;
 const POSTER_AT = 6.5;
@@ -30,13 +35,13 @@ const variants = {
 };
 
 async function record(name, v) {
-  const frames = path.resolve(".next/cache/software-view-frames", name);
+  const frames = path.resolve(".next/cache", `${model.stem}-frames`, name);
   rmSync(frames, { recursive: true, force: true });
   mkdirSync(frames, { recursive: true });
   const browser = await chromium.launch({ args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"] });
   const page = await browser.newPage({ viewport: { width: v.width, height: v.height }, deviceScaleFactor: v.dpr });
   page.on("pageerror", (e) => console.log("pageerror:", e.message));
-  await page.goto(`${base}/download?capture=${name}`, { waitUntil: "networkidle" });
+  await page.goto(`${base}${model.page}?capture=${name}`, { waitUntil: "networkidle" });
   await page.addStyleTag({
     content: `[data-model-view] { width: ${v.view[0]}px !important; height: ${v.view[1]}px !important; aspect-ratio: auto !important; max-width: none !important; justify-self: start; }
       [data-model-view] > :not(:first-child) { display: none !important; }`,
@@ -71,9 +76,9 @@ async function record(name, v) {
 async function encode(name, frames, v) {
   // A canvas a row or two taller than its box is cropped to the exact frame the window is built around.
   const vf = `scale=${v.scale}:-2,crop=${v.scale}:${v.out}`;
-  const mp4 = path.join(out, `software-view-${name}.mp4`);
-  const webm = path.join(out, `software-view-${name}.webm`);
-  const poster = path.join(out, `software-view-${name}-poster.jpg`);
+  const mp4 = path.join(out, `${model.stem}-${name}.mp4`);
+  const webm = path.join(out, `${model.stem}-${name}.webm`);
+  const poster = path.join(out, `${model.stem}-${name}-poster.jpg`);
   execFileSync(ffmpeg, ["-y", "-loglevel", "error", "-framerate", String(FPS), "-i", path.join(frames, "%04d.jpg"), "-vf", vf, "-c:v", "libx264", "-crf", "27", "-preset", "slow", "-profile:v", "high", "-pix_fmt", "yuv420p", "-movflags", "+faststart", "-an", mp4]);
   execFileSync(ffmpeg, ["-y", "-loglevel", "error", "-framerate", String(FPS), "-i", path.join(frames, "%04d.jpg"), "-vf", vf, "-c:v", "libvpx-vp9", "-crf", "38", "-b:v", "0", "-deadline", "good", "-cpu-used", "2", "-row-mt", "1", "-pix_fmt", "yuv420p", "-an", webm]);
   // The poster is the phone LCP image on /download: mozjpeg at 76 keeps it near 55 KB.
@@ -86,7 +91,7 @@ await Promise.all(
   Object.entries(variants)
     .filter(([name]) => !only || only === name)
     .map(async ([name, v]) => {
-      const cached = path.resolve(".next/cache/software-view-frames", name);
+      const cached = path.resolve(".next/cache", `${model.stem}-frames`, name);
       const frames = process.argv.includes("--encode-only") ? cached : await record(name, v);
       console.log(`${name}: ${readdirSync(frames).length - 1} frames captured, encoding`);
       await encode(name, frames, v);

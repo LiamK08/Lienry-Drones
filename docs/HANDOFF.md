@@ -1,4 +1,4 @@
-# Handoff, 21 October 2026
+# Handoff, 22 October 2026
 
 Read this first in a new session, then `CLAUDE.md`. Update this file at the end of each session.
 
@@ -84,6 +84,31 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
   (about 20 minutes in software GL; it captures the model on /download at a fixed view size, crops to
   1020x756 and 720x900 and writes the posters with mozjpeg 76; `--encode-only` re-encodes from
   `.next/cache/software-view-frames`). Re-record whenever the model's look changes.
+- Also 22 October (owner's request): /solar has its own software window, a demo solar array instead
+  of the building (`<SoftwareWindow model="solar" />`, the "Every row planned, washed and tracked"
+  row). The window is generic over a model (`src/components/software/models.ts`: project, zones,
+  cells, status lines, map, legend, recordings; `SCENES` in `three/SoftwareScene.tsx`: cameras,
+  framing, sway, contact shadows, content). The array (`three/solar/`): four rows of 2 x 10 landscape
+  modules tilted 20° north on galvanised posts, rafters and rails, a combiner box at each row end and
+  the tether reel on a concrete pad in front. The module glass is drawn in a shader (half-cut cells,
+  busbars, frame; the cell grid fades out when it is too small to draw cleanly) and carries its own
+  soiling as a warm matte film, heaviest along the lower frame, that the wash clears to deep blue
+  glass. The drone hovers about a metre over the line it washes, nearly level and facing the glass,
+  with a fan of spray down onto it; upper line west to east, lower line back, then over the table to
+  the next row; its tether lies in the aisle in front of the row. The scan sweeps west to east. The
+  overview sways between two azimuths instead of circling (the backs of the panels say nothing), and
+  its framing is fitted across the whole sway. The map is an SVG array map (rows A to D). Recordings:
+  `node scripts/record-software-view.mjs http://localhost:3000 --model=solar` writes
+  `public/video/solar-view-{wide,tall}` and posters (about 17 minutes). Check 13 now expects the
+  window on /solar too.
+- Also 22 October (owner's request): the /homes-and-rentals app demo is interactive. Nothing is
+  ticked at first; the visitor chooses Driveway, Solar panels and/or Windows, starts the clean, and
+  each chosen area washes in turn (about 2.5 s each, instant under reduced motion) while the picture
+  beside it follows: the house before, each chosen area being washed, then the house after, with a
+  caption chip (`AppPanel` `useCleanDemo`, `LandlordStory`). The row's media column is wider
+  (`FeatureRows` `wideMedia`: 7 of 12 columns from 1280, 8 of 12 from 1024) and the picture shows on
+  phones too, under the app. The windows picture is `p3-house`, so the materials row above it now
+  shows `p4-rental` (check 14: no picture in two frames on a route in any state).
 - The owner said the imagery is not good enough yet and will be redone in Higgsfield later. Until
   they say so, keep the current stills and film in the new layouts.
 

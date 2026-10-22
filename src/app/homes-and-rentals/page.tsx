@@ -20,8 +20,8 @@ export const metadata: Metadata = pageMetadata(
 
 /**
  * /homes-and-rentals: the solutions template. The hero, the strip, one white run of four feature
- * rows (the pod, the materials, the app with its five beats, and two cited figures with the cited
- * note), safety on paper, the questions on white, then the closing panel.
+ * rows (the pod, the materials, the app as an interactive demo on a wider media column, and two cited
+ * figures with the cited note), safety on paper, the questions on white, then the closing panel.
  */
 export default function HomesPage() {
   const { hero, strip, rows, stats, safety, close } = homesPage;
@@ -31,8 +31,9 @@ export default function HomesPage() {
       id: "app",
       title: landlordStory.headline,
       paragraphs: [landlordStory.intro],
-      checks: landlordStory.beats.map((b) => b.title),
+      checks: landlordStory.steps,
       media: <LandlordAppFrame />,
+      wideMedia: true,
     },
     {
       id: "australia",

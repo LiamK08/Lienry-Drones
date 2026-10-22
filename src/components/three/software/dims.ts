@@ -1,4 +1,4 @@
-import type { ZoneId } from "@/content/software";
+import type { BuildingZoneId as ZoneId } from "@/content/software";
 
 // The building's dimensions and its debris, without three.js, so the window can draw the facade map
 // before (or without) the WebGL chunk. layout.ts re-exports all of it for the scene.

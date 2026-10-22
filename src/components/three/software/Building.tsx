@@ -5,7 +5,7 @@ import { useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import { useLayoutEffect, useMemo, useRef, type RefObject } from "react";
 import * as THREE from "three";
 import type { Line2, LineSegments2 } from "three-stdlib";
-import { zones, type ZoneId } from "@/content/software";
+import { zones, type BuildingZoneId as ZoneId } from "@/content/software";
 import { BAYS_E, BAYS_N, D, FLOORS, H, PANELS, PARAPET_H, RECESS, ROOF_Y, ROUTE, W, cellIndex, debrisAt, faceFrame, zoneOutline, type Face } from "./layout";
 import { PALETTE, heatTexture, makeDebrisMaterial, makeGlassMaterial, makePointsMaterial, washTexture } from "./materials";
 import type { SceneControl } from "./control";

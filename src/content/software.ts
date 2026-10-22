@@ -48,10 +48,13 @@ export const softwareDefaultStep: StepId = "clean";
 
 export const softwareStepsLabel = "Software steps";
 
-export type ZoneId = "north" | "east" | "roof" | "shopfront";
+export type BuildingZoneId = "north" | "east" | "roof" | "shopfront";
+export type SolarZoneId = "row-a" | "row-b" | "row-c" | "row-d";
+/** A zone of either model the window can show: the building's four, or the solar array's four rows. */
+export type ZoneId = BuildingZoneId | SolarZoneId;
 
-export type Zone = {
-  id: ZoneId;
+export type Zone<Id extends ZoneId = ZoneId> = {
+  id: Id;
   name: string;
   surface: string;
   preset: string;
@@ -60,14 +63,16 @@ export type Zone = {
   order: number;
 };
 
-export const zones: Zone[] = [
+export const zones: Zone<BuildingZoneId>[] = [
   { id: "north", name: "North facade", surface: "Curtain wall glass", preset: "Standard", pressure: "70 bar", order: 1 },
   { id: "east", name: "East facade", surface: "Curtain wall glass", preset: "Standard", pressure: "70 bar", order: 2 },
   { id: "roof", name: "Roof glazing", surface: "Laminated skylight", preset: "Gentle", pressure: "45 bar", order: 3 },
   { id: "shopfront", name: "Ground floor shopfront", surface: "Toughened glass", preset: "Low, wide fan", pressure: "35 bar", order: 4 },
 ];
 
-export const project = {
+export type Project = { name: string; app: string; view: string; scanAge: string; nextClean: string; debrisZones: number };
+
+export const project: Project = {
   name: "Demo building, 12 storeys",
   app: "Lienry Desktop",
   view: "Wash plan",
@@ -84,3 +89,23 @@ export const layers = [
 ] as const;
 
 export type LayerId = (typeof layers)[number]["id"];
+
+/**
+ * The solar array model: a demo ground-mounted array of four rows. Like the building, everything here
+ * is illustrative demo data. No copy names which Lienry system serves a solar farm (still open).
+ */
+export const solarZones: Zone<SolarZoneId>[] = [
+  { id: "row-a", name: "Row A", surface: "Solar glass", preset: "Solar", pressure: "30 bar", order: 1 },
+  { id: "row-b", name: "Row B", surface: "Solar glass", preset: "Solar", pressure: "30 bar", order: 2 },
+  { id: "row-c", name: "Row C", surface: "Solar glass", preset: "Solar", pressure: "30 bar", order: 3 },
+  { id: "row-d", name: "Row D", surface: "Solar glass", preset: "Solar", pressure: "30 bar", order: 4 },
+];
+
+export const solarProject: Project = {
+  name: "Demo array, 4 rows",
+  app: "Lienry Desktop",
+  view: "Wash plan",
+  scanAge: "1 day",
+  nextClean: "Sat 06:30",
+  debrisZones: 4,
+};

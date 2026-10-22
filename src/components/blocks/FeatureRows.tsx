@@ -27,6 +27,9 @@ export type FeatureRowItem = {
   aspect?: "4/3" | "16/9";
   /** The row's pill: a small white one (default) or the accent one with its arrow badge. */
   linkStyle?: "secondary" | "primary";
+  /** Solutions variant only: the media takes more of the row, 8 of 12 columns from 1024 and 7 of 12
+   *  from 1280, on the same rail and 40px gap (the /homes-and-rentals app demo). Default rows split 1:1. */
+  wideMedia?: boolean;
 };
 
 function Check({ filled }: { filled: boolean }) {
@@ -79,6 +82,10 @@ const layouts = {
   },
 } as const;
 
+// A solutions row with `wideMedia`: text 4 : media 8 from 1024, 5 : 7 from 1280, the media on its side.
+const wideGrid = (right: boolean) =>
+  `grid items-center gap-8 lg:gap-10 ${right ? "lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] xl:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]" : "lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] xl:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]"}`;
+
 /**
  * Feature rows: text beside a rounded picture, the side alternating row by row (the first row's
  * picture on the right). Text: the h2, paragraphs, a check list, a tinted callout,
@@ -88,6 +95,7 @@ const layouts = {
  * below 1024 the picture follows the text.
  * variant "solutions" (/commercial, /homes-and-rentals, /solar): 80 above the first row (0 on
  * phones, where the strip's own 80 does it), 120 under the last row (56 on phones), and below 1024 the text comes first, then its picture.
+ * A solutions row may opt into `wideMedia`, which gives its media the larger share of the row from 1024.
  */
 export function FeatureRows({
   id,
@@ -109,13 +117,22 @@ export function FeatureRows({
 }) {
   const solutions = variant === "solutions";
   const L = layouts[variant];
+  const wide = (r: FeatureRowItem) => solutions && !!r.wideMedia;
   // Phones ask for the picture's real width, inside the page margins.
   const mediaOf = (r: FeatureRowItem, right: boolean) => (
     <div className={L.media(right)}>
       {r.media ??
         (r.image ? (
           solutions ? (
-            <Picture id={r.image.id} alt={r.image.alt} position={r.image.position} aspect="5/4" aspectSm="5/4" rounded="image" sizes="(min-width: 1440px) 644px, (min-width: 1024px) 46vw, (min-width: 768px) calc(100vw - 3rem), calc(100vw - 2.5rem)" />
+            <Picture
+              id={r.image.id}
+              alt={r.image.alt}
+              position={r.image.position}
+              aspect="5/4"
+              aspectSm="5/4"
+              rounded="image"
+              sizes={wide(r) ? "(min-width: 1440px) 751px, (min-width: 1280px) 55vw, (min-width: 1024px) 62vw, (min-width: 768px) calc(100vw - 3rem), calc(100vw - 2.5rem)" : "(min-width: 1440px) 644px, (min-width: 1024px) 46vw, (min-width: 768px) calc(100vw - 3rem), calc(100vw - 2.5rem)"}
+            />
           ) : (
             <Picture id={r.image.id} alt={r.image.alt} position={r.image.position} aspect={r.aspect ?? "4/3"} aspectSm="4/3" rounded="card" sizes="(min-width: 1440px) 684px, (min-width: 1024px) 50vw, 100vw" />
           )
@@ -128,7 +145,7 @@ export function FeatureRows({
         const right = (i % 2 === 0) === (startSide === "right");
         return (
           <section key={r.id} id={r.id} aria-labelledby={`${r.id}-heading`} className="scroll-mt-24">
-            <div className={L.grid}>
+            <div className={wide(r) ? wideGrid(right) : L.grid}>
               <Reveal className={L.text(right)}>
                 <h2 id={`${r.id}-heading`} className="text-h3">
                   {r.title}

@@ -5,10 +5,9 @@ import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type CS
 import { useCanRender3d, useMediaQuery, useOnScreen } from "@/lib/hooks";
 import { captureVariant, isCapture, now, onTick } from "@/lib/clock";
 import { bindPlayback } from "@/lib/video";
-import { layers as LAYERS, project, zones, type LayerId, type StepId, type ZoneId } from "@/content/software";
+import { layers as LAYERS, type LayerId, type StepId, type ZoneId } from "@/content/software";
 import { DEFAULT_LAYERS, createControl, type HoverInfo, type Layers, type SceneControl } from "@/components/three/software/control";
-import { CELLS, CELL_COUNT, FLOORS, MAP } from "@/components/three/software/dims";
-import { FACADE_MAP_COLUMNS, FacadeMap } from "./FacadeMap";
+import { MODELS, type Activity, type ModelId, type WindowModel } from "./models";
 
 export type { StepId } from "@/content/software";
 
@@ -22,8 +21,6 @@ const HOLD_MS = 2600;
 const CAPTURE_CYCLE_MS = 10000;
 const CAPTURE_HOLD_MS = 2000;
 const noop = () => () => {};
-const PANELS_IN_PLAN = CELL_COUNT;
-const DEMO = { wash: 64, completed: 204 };
 /** The poster's fade once the live model has drawn its first frame. */
 const POSTER_FADE_MS = 200;
 /** The timeline thumb's width: the zone segments sit half of it in from each end, under its centre. */
@@ -38,36 +35,15 @@ const PRESET_LAYERS: Record<StepId, Layers> = {
   report: { scan: false, wash: true, debris: true, zones: false },
 };
 
-/** Each zone's facade-map cells. */
-const ZONE_CELLS = zones.map((z) => CELLS.flatMap((c, i) => (c.zone === z.id ? [i] : [])));
-
-/** Each zone's washed share in whole percent, in the order of `zones`. */
-function sharesOf(cells: ArrayLike<number>): number[] {
-  return ZONE_CELLS.map((ids) => Math.floor((100 * ids.filter((i) => cells[i] >= 0.999).length) / ids.length));
+/** Each zone's cells, and each zone's washed share in whole percent (in the order of the model's zones). */
+function deriveShares(model: WindowModel) {
+  const zoneCells = model.zones.map((z) => model.cellZones.flatMap((zone, i) => (zone === z.id ? [i] : [])));
+  const sharesOf = (cells: ArrayLike<number>) => zoneCells.map((ids) => Math.floor((100 * ids.filter((i) => cells[i] >= 0.999).length) / ids.length));
+  return { sharesOf, demoShares: sharesOf(model.demo.cells) };
 }
-
-/**
- * The recording's figures as a plan: the north face washed top down, then the east face's top floors,
- * to DEMO.completed panels. A floor is done when its second pass has crossed it: west to east on the
- * north face, south to north (right to left, seen from outside) on the east face.
- */
-function demoCells(): Float32Array {
-  const out = new Float32Array(CELL_COUNT);
-  let left = DEMO.completed;
-  for (const block of [MAP.north, MAP.east]) {
-    const floors = block === MAP.north ? FLOORS - 1 : FLOORS;
-    for (let k = 0; k < floors; k++) {
-      const floor = FLOORS - 1 - k;
-      for (let k2 = 0; k2 < block.cols && left > 0; k2++, left--) out[block.offset + floor * block.cols + (block === MAP.east ? block.cols - 1 - k2 : k2)] = 1;
-    }
-  }
-  return out;
-}
-const DEMO_CELLS = demoCells();
-const DEMO_SHARES = sharesOf(DEMO_CELLS);
+const SHARES: Record<ModelId, ReturnType<typeof deriveShares>> = { building: deriveShares(MODELS.building), solar: deriveShares(MODELS.solar) };
 
 type Hover = { info: NonNullable<HoverInfo>; x: number; y: number };
-type Activity = NonNullable<SceneControl["activity"]>;
 
 /**
  * The live scene's life: off (not mounted), starting (mounted, not drawn yet), painted (first frame
@@ -84,6 +60,8 @@ export type SoftwareWindowProps = {
   priority?: boolean;
   /** "inset": the window sits in a frame of its own (ProductClose), so it takes the frame's inner corner and no shadow. */
   frame?: "bare" | "inset";
+  /** Which model the window runs: the 12-storey building (default) or the four-row solar array. */
+  model?: ModelId;
 };
 
 /** Whether the window runs the live WebGL model: a capable device from 768px, and motion allowed. */
@@ -147,14 +125,6 @@ function Fact({ label, value }: { label: string; value: string }) {
   );
 }
 
-/** The two lines the model's status chip shows for a leg of the route. */
-function legLines(a: Activity, complete: boolean): [string, string] {
-  if (complete) return ["Clean complete", `${PANELS_IN_PLAN} of ${PANELS_IN_PLAN} panels washed`];
-  const name = zones.find((z) => z.id === a.zone)?.name ?? "";
-  const where = a.zone === "roof" ? `Row ${a.pass + 1} of 2` : `Level ${a.floor + 1} · pass ${a.pass + 1} of 2`;
-  return [`${a.moving ? "Moving to" : "Washing"} ${name}`, where];
-}
-
 /**
  * The desktop software as a window: the title bar, the layer bar, the model, the wash route's zones,
  * the inspector (the clean's progress, the facade map and its figures) and the wash timeline, then
@@ -182,14 +152,17 @@ function legLines(a: Activity, complete: boolean): [string, string] {
  * row underneath takes the band's colours. The recording has no poster attribute: a lazy `<img>`
  * under the video stands in until its first frame.
  */
-export function SoftwareWindow({ preset, priority = false, frame = "bare" }: SoftwareWindowProps) {
+export function SoftwareWindow({ preset, priority = false, frame = "bare", model = "building" }: SoftwareWindowProps) {
+  const M = MODELS[model];
+  const { sharesOf, demoShares } = SHARES[model];
+  const { project, zones } = M;
   const can3d = useCanRender3d();
   const reduce = useMediaQuery("(prefers-reduced-motion: reduce)");
   const wide = useMediaQuery("(min-width: 768px)");
   const finePointer = useMediaQuery("(pointer: fine)");
   const [nearRef, near] = useOnScreen<HTMLDivElement>("600px 0px 600px 0px");
   const [viewRef, onScreen] = useOnScreen<HTMLDivElement>("0px");
-  const controlRef = useRef(createControl());
+  const controlRef = useRef(createControl(M.cellCount));
   const needleRef = useRef<SVGSVGElement>(null);
   const northRef = useRef<HTMLSpanElement>(null);
   const [layers, setLayers] = useState<Layers>(() => ({ ...PRESET_LAYERS[preset ?? "clean"] }));
@@ -201,7 +174,7 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare" }: Sof
   const [shares, setShares] = useState<number[]>(() => zones.map(() => 0));
   const [mapVersion, setMapVersion] = useState(0);
   // The model's cells as the map last drew them: copied from the scene's each time they change.
-  const [liveCells] = useState(() => new Float32Array(CELL_COUNT));
+  const [liveCells] = useState(() => new Float32Array(M.cellCount));
   const [activity, setActivity] = useState<Activity | null>(null);
   const [spans, setSpans] = useState<SceneControl["spans"]>(null);
   const [hover, setHover] = useState<Hover | null>(null);
@@ -228,7 +201,7 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare" }: Sof
       if (preset === "report") {
         setPlaying(false);
         setWash(100);
-        setCompleted(PANELS_IN_PLAN);
+        setCompleted(M.cellCount);
       }
     }
   }
@@ -368,7 +341,7 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare" }: Sof
     if (capture) return onTick(tick);
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [live, onScreen, playing, liveCells]);
+  }, [live, onScreen, playing, liveCells, sharesOf]);
 
   // The image may have loaded before hydration, when its onLoad had no listener yet.
   useEffect(() => {
@@ -419,10 +392,10 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare" }: Sof
     control.requestFrame();
   };
 
-  const pct = live ? wash : DEMO.wash;
-  const done = live ? completed : DEMO.completed;
-  const cells = live ? liveCells : DEMO_CELLS;
-  const zoneShares = live ? shares : DEMO_SHARES;
+  const pct = live ? wash : M.demo.wash;
+  const done = live ? completed : M.demo.completed;
+  const cells = live ? liveCells : M.demo.cells;
+  const zoneShares = live ? shares : demoShares;
   const variant = wide ? "wide" : "tall";
   const tall = capture === "tall";
   const showsPlaying = playing && !reduce;
@@ -430,8 +403,8 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare" }: Sof
   // Whole percent, rounded down, so 100% shows only once the clean is complete.
   const shownPct = Math.floor(pct);
   const status = !live ? null : complete ? "Complete" : !layers.wash ? "Wash hidden" : showsPlaying ? "In progress" : "Paused";
-  const lines = live && layers.wash && activity ? legLines(activity, complete) : null;
-  const segments = spans ? zones.map((z) => ({ id: z.id, from: spans[z.id][0], to: spans[z.id][1] })) : [{ id: "all", from: 0, to: 1 }];
+  const lines = live && layers.wash && activity ? M.legLines(activity, complete) : null;
+  const segments = spans ? zones.map((z) => ({ id: z.id, from: spans[z.id]?.[0] ?? 0, to: spans[z.id]?.[1] ?? 1 })) : [{ id: "all", from: 0, to: 1 }];
   const activeZone = live && layers.wash && !complete && activity && !activity.moving ? activity.zone : null;
 
   const pause = (
@@ -447,7 +420,7 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare" }: Sof
   );
 
   return (
-    <div ref={nearRef} data-ui="" data-software-preview data-preset={preset} data-live={live ? "" : undefined} data-painted={live && (paint === "painted" || paint === "settled") ? "" : undefined}>
+    <div ref={nearRef} data-ui="" data-software-preview data-model={model} data-preset={preset} data-live={live ? "" : undefined} data-painted={live && (paint === "painted" || paint === "settled") ? "" : undefined}>
       <div
         role="group"
         aria-label={`${project.app}, demo window`}
@@ -535,12 +508,12 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare" }: Sof
             {live ? (
               <>
                 <div className="absolute inset-0" aria-hidden="true">
-                  {paint !== "off" ? <SoftwareScene controlRef={controlRef} onFirstFrame={onFirstFrame} /> : null}
+                  {paint !== "off" ? <SoftwareScene model={model} controlRef={controlRef} onFirstFrame={onFirstFrame} /> : null}
                 </div>
                 {paint !== "settled" ? (
                   // The recording's poster is 1020x756: contained, so the roof and the base stay in frame.
                   <img
-                    src="/video/software-view-wide-poster.jpg"
+                    src={`/video/${M.video}-wide-poster.jpg`}
                     alt=""
                     aria-hidden="true"
                     decoding="async"
@@ -577,7 +550,7 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare" }: Sof
                   key={`${variant}-poster`}
                   ref={posterRef}
                   onLoad={() => setPosterShown(true)}
-                  src={`/video/software-view-${variant}-poster.jpg`}
+                  src={`/video/${M.video}-${variant}-poster.jpg`}
                   alt=""
                   aria-hidden="true"
                   loading={priority ? "eager" : "lazy"}
@@ -597,10 +570,10 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare" }: Sof
                   playsInline
                   preload={posterShown ? "metadata" : "none"}
                   controls={reduce}
-                  aria-label="Recording of the software view: the model of a 12-storey building being scanned and washed"
+                  aria-label={M.recordingLabel}
                 >
-                  <source src={`/video/software-view-${variant}.webm`} type="video/webm" />
-                  <source src={`/video/software-view-${variant}.mp4`} type="video/mp4" />
+                  <source src={`/video/${M.video}-${variant}.webm`} type="video/webm" />
+                  <source src={`/video/${M.video}-${variant}.mp4`} type="video/mp4" />
                 </video>
               </>
             )}
@@ -620,7 +593,7 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare" }: Sof
                   <span className="text-right text-ink">{hover.info.lastWashed}</span>
                   {hover.info.debris > 0.2 ? (
                     <>
-                      <span className="text-muted">Debris build-up</span>
+                      <span className="text-muted">{M.debrisHover}</span>
                       <span className="readout text-right text-debris-text">{Math.round(hover.info.debris * 100)}%</span>
                     </>
                   ) : null}
@@ -633,7 +606,9 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare" }: Sof
             <div className="flex flex-col border-t border-hairline @min-[38rem]:col-start-1 @min-[38rem]:row-start-2 @min-[56rem]:row-start-1 @min-[56rem]:border-r @min-[56rem]:border-t-0">
               <div className="hidden items-baseline justify-between px-4 pb-3 pt-4 @min-[56rem]:flex">
                 <p className="label text-muted">Wash route</p>
-                <span className="text-caption text-muted">{zones.length} zones</span>
+                <span className="text-caption text-muted">
+                  {zones.length} {M.zoneNoun.many}
+                </span>
               </div>
               <ol className="grid grid-cols-2 gap-px bg-hairline @min-[26rem]:@max-[38rem]:grid-cols-4 @min-[38rem]:grid-cols-4 @min-[56rem]:grid-cols-1 @min-[56rem]:border-y @min-[56rem]:border-hairline">
                 {zones.map((z, i) => {
@@ -700,7 +675,8 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare" }: Sof
                 })}
               </ol>
               <p className="mt-auto hidden px-4 py-3 text-caption text-muted @min-[56rem]:block">
-                Two passes per floor, top down.{live ? " Select a zone to fly to it." : ""}
+                {M.routeNote}
+                {live ? ` Select a ${M.zoneNoun.one} to fly to it.` : ""}
               </p>
             </div>
           )}
@@ -728,34 +704,37 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare" }: Sof
                     <span className="block h-full bg-glass" style={{ width: `${pct}%` }} />
                   </span>
                   <p className="mt-2 text-caption text-muted">
-                    <span className="readout text-ink">{done}</span> of {PANELS_IN_PLAN} panels washed
+                    <span className="readout text-ink">{done}</span> of {M.cellCount} panels washed
                   </p>
                 </div>
 
                 <dl className="order-3 mt-auto border-t border-hairline px-4 py-1.5">
                   <Fact label="Scan age" value={project.scanAge} />
-                  <Fact label="Debris zones found" value={String(project.debrisZones)} />
+                  <Fact label={M.debrisFact} value={String(project.debrisZones)} />
                   <Fact label="Next scheduled clean" value={project.nextClean} />
                 </dl>
               </div>
 
               <div className="order-2 border-t border-hairline px-4 py-4 @min-[26rem]:@max-[38rem]:col-start-2 @min-[26rem]:@max-[38rem]:row-start-1 @min-[26rem]:@max-[38rem]:border-l @min-[26rem]:@max-[38rem]:border-t-0">
-                <p className="label text-muted">Facade map</p>
+                <p className="label text-muted">{M.mapLabel}</p>
                 <div className="mt-3">
-                  <FacadeMap cells={cells} version={live ? mapVersion : -1} wash={live ? layers.wash : true} debris={live ? layers.debris : true} selected={live ? selected : null} />
+                  <M.Map cells={cells} version={live ? mapVersion : -1} wash={live ? layers.wash : true} debris={live ? layers.debris : true} selected={live ? selected : null} />
                 </div>
-                <div aria-hidden="true" className="mt-1.5 grid text-[0.6875rem] text-muted" style={{ gridTemplateColumns: FACADE_MAP_COLUMNS }}>
-                  <span>North</span>
-                  <span />
-                  <span>East</span>
-                  <span />
-                  <span className="whitespace-nowrap">Roof</span>
-                </div>
+                {M.mapAxis ? (
+                  <div aria-hidden="true" className="mt-1.5 grid text-[0.6875rem] text-muted" style={{ gridTemplateColumns: M.mapAxis.columns }}>
+                    {M.mapAxis.labels.map((l, i) => (
+                      <span key={i} className="whitespace-nowrap">
+                        {l}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
                 <ul className="mt-3 grid grid-cols-2 gap-x-3 gap-y-1 text-[0.6875rem] text-muted @max-[26rem]:grid-cols-4">
-                  <Swatch colour="var(--color-glass)">Washed</Swatch>
-                  <Swatch colour="#7fb0b9">One pass</Swatch>
-                  <Swatch colour="#e4ded3">Pending</Swatch>
-                  <Swatch colour="#e0a13a">Debris</Swatch>
+                  {M.legend.map((l) => (
+                    <Swatch key={l.label} colour={l.colour}>
+                      {l.label}
+                    </Swatch>
+                  ))}
                 </ul>
               </div>
             </div>
@@ -817,7 +796,7 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare" }: Sof
         <p className="text-caption text-fg-muted">Model is illustrative. The software will render each property from its scan.</p>
         <details className="text-caption text-fg-muted md:w-md" onToggle={(e) => setReadoutsOpen(e.currentTarget.open)}>
           <summary className="link cursor-pointer">Inspect panel data</summary>
-          {readoutsOpen ? <PanelReadouts /> : null}
+          {readoutsOpen ? <PanelReadouts model={model} /> : null}
         </details>
       </div>
     </div>

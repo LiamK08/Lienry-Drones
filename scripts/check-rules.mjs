@@ -51,8 +51,8 @@
 //     the caption from every image and film on 26 September 2026.
 // 13  Coded demos: each software window shows "Demo data" and the illustrative-model note beneath it
 //     once, and its panel data keeps its Demo data line; the app panel (role="group") shows "Demo data"
-//     and its note. Windows on /platform, /commercial and /download, the app panel on
-//     /homes-and-rentals.
+//     and its note. Windows on /platform, /commercial, /solar (its solar array) and /download, the app
+//     panel on /homes-and-rentals.
 // 14  Media: every /media/ path in the served HTML and JS is a manifest id (variants --name-w and
 //     renditions --r included); all 29 appear on the site but those SPEC.unplaced lists (each with its
 //     reason, reported as a note, and a failure once it is placed again so the list stays true); no id shows in two frames on a route in any
@@ -200,6 +200,7 @@ const SPEC = {
     "/platform": { windows: 1 },
     "/commercial": { windows: 1 },
     "/homes-and-rentals": { apps: 1 },
+    "/solar": { windows: 1 },
     "/download": { windows: 1 },
   },
   // D2 check 33: words that would turn the visitor's own figures into a Lienry claim.

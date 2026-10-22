@@ -1,5 +1,5 @@
 import type { ZoneId } from "@/content/software";
-import { CELL_COUNT } from "./dims";
+
 
 export type Layers = { scan: boolean; wash: boolean; debris: boolean; zones: boolean };
 
@@ -37,7 +37,7 @@ export type SceneControl = {
   /** The leg of the route the drone is on, written by the scene each frame; null until it has drawn. */
   activity: { zone: ZoneId; floor: number; pass: number; moving: boolean } | null;
   /** Where each zone's washing starts and ends along the route (0 to 1), written once by the scene. */
-  spans: Record<ZoneId, [number, number]> | null;
+  spans: Partial<Record<ZoneId, [number, number]>> | null;
   /** The camera's azimuth about the building in radians (0 looks at the north face), written by the scene each frame; NaN until it has drawn. */
   azimuth: number;
   /** Set by the scene: request one frame when nothing else is animating. */
@@ -47,7 +47,8 @@ export type SceneControl = {
 
 export const DEFAULT_LAYERS: Layers = { scan: false, wash: true, debris: true, zones: false };
 
-export function createControl(): SceneControl {
+/** `cells` is the model's cell count: the facade map's panels, or the array map's. */
+export function createControl(cellCount: number): SceneControl {
   return {
     wash: 0,
     layers: { ...DEFAULT_LAYERS },
@@ -58,7 +59,7 @@ export function createControl(): SceneControl {
     visible: false,
     stats: { completed: 0, total: 0 },
     drone: { x: 0, y: 0, z: 0 },
-    cells: new Float32Array(CELL_COUNT),
+    cells: new Float32Array(cellCount),
     activity: null,
     spans: null,
     azimuth: NaN,

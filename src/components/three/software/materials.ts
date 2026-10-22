@@ -77,6 +77,87 @@ export function makeGlassMaterial(): THREE.MeshPhysicalMaterial {
 }
 
 /**
+ * Solar glass: monocrystalline modules, each 6 by 12 cells (half-cut, so two blocks of 6 by 6 with a
+ * gap down the middle), thin busbars and a dark backsheet between the cells, inside an anodised frame.
+ * The cell grid fades to its average where a cell is smaller than a few pixels, so the array never
+ * shimmers. Per instance: `aState` (washed, sweep, scanned, hovered) and `aDust`, the module's own
+ * soiling. Unwashed, the glass carries a matte warm film, heavier towards the lower frame where the
+ * rain leaves it, and loses most of its reflection; the wash takes it back to deep blue glass with a
+ * wet sheen just behind the spray.
+ */
+export function makeSolarMaterial(): THREE.MeshPhysicalMaterial {
+  const m = new THREE.MeshPhysicalMaterial({
+    color: new THREE.Color("#ffffff"),
+    metalness: 0.05,
+    roughness: 0.1,
+    ior: 1.5,
+    // The anti-reflective coating gives solar glass its blue cast in reflection.
+    specularColor: new THREE.Color("#9fb6e2"),
+    envMapIntensity: 0.85,
+    clearcoat: 0.4,
+    clearcoatRoughness: 0.05,
+  });
+  m.onBeforeCompile = (shader) => {
+    shader.vertexShader = shader.vertexShader
+      .replace("#include <common>", "#include <common>\nattribute vec4 aState;\nattribute float aDust;\nvarying vec4 vState;\nvarying vec2 vPanelUv;\nvarying float vVar;\nvarying float vDust;")
+      .replace("#include <uv_vertex>", "#include <uv_vertex>\nvState = aState;\nvDust = aDust;\nvPanelUv = uv;\nvVar = fract(sin(float(gl_InstanceID) * 78.233) * 43758.5453);");
+    shader.fragmentShader = shader.fragmentShader
+      .replace("#include <common>", "#include <common>\nvarying vec4 vState;\nvarying vec2 vPanelUv;\nvarying float vVar;\nvarying float vDust;\nfloat frameMask;\nfloat film;")
+      .replace(
+        "#include <color_fragment>",
+        `#include <color_fragment>
+        // The frame: 30mm round a 2000 x 1000 module.
+        vec2 edgeM = min(vPanelUv, 1.0 - vPanelUv) * vec2(2.0, 1.0);
+        float fwF = fwidth(vPanelUv.y) * 0.75;
+        frameMask = 1.0 - smoothstep(0.03 - fwF, 0.03 + fwF, min(edgeM.x, edgeM.y));
+        // The cells inside it: 12 across, 6 up, half-cut, so a wider gap down the middle.
+        vec2 inner = clamp((vPanelUv - vec2(0.016, 0.032)) / vec2(0.968, 0.936), 0.0, 1.0);
+        vec2 grid = inner * vec2(12.0, 6.0);
+        vec2 cellUv = fract(grid);
+        vec2 fw = max(fwidth(grid), vec2(1e-4));
+        // How much of the cell detail survives at this size on screen: none once a cell is under ~6px.
+        float detail = 1.0 - smoothstep(0.08, 0.22, max(fw.x, fw.y));
+        vec2 gapD = min(cellUv, 1.0 - cellUv);
+        float gx = 1.0 - smoothstep(0.03 - fw.x, 0.03 + fw.x, gapD.x);
+        float gy = 1.0 - smoothstep(0.05 - fw.y, 0.05 + fw.y, gapD.y);
+        float mid = 1.0 - smoothstep(0.012 - fw.x / 12.0, 0.012 + fw.x / 12.0, abs(inner.x - 0.5));
+        float gap = max(max(gx, gy), mid);
+        float bus = 0.0;
+        for (int k = 1; k < 4; k++) bus = max(bus, 1.0 - smoothstep(0.0, 0.012 + fw.x, abs(cellUv.x - float(k) * 0.25)));
+        vec3 cellC = vec3(0.007, 0.02, 0.07) * (0.9 + 0.2 * vVar);
+        vec3 gapC = vec3(0.13, 0.15, 0.19);
+        vec3 avg = mix(cellC, gapC, 0.12);
+        vec3 cell = mix(cellC, vec3(0.34, 0.37, 0.42), bus * 0.22);
+        cell = mix(cell, gapC, gap);
+        cell = mix(avg, cell, detail);
+        vec3 surface = mix(cell, vec3(0.52, 0.55, 0.58), frameMask);
+        // The film: the module's own soiling, heaviest along the lower frame, with a little grain.
+        float n = fract(sin(dot(floor(vPanelUv * vec2(90.0, 45.0)), vec2(12.9898, 78.233))) * 43758.5453);
+        film = clamp(0.38 + 0.5 * vDust + 0.35 * exp(-vPanelUv.y / 0.12) + (n - 0.5) * 0.08, 0.0, 1.0) * (1.0 - vState.x);
+        vec3 dust = vec3(0.45, 0.38, 0.29);
+        diffuseColor.rgb = mix(surface, dust, film * 0.58 * (1.0 - frameMask * 0.5));
+        diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.42, 0.66, 0.72), vState.z * 0.3);
+        diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.30, 0.62, 0.70), vState.w * 0.5);`,
+      )
+      .replace("#include <roughnessmap_fragment>", "#include <roughnessmap_fragment>\nroughnessFactor = mix(mix(roughnessFactor, 0.78, film), 0.34, frameMask);")
+      .replace("#include <metalnessmap_fragment>", "#include <metalnessmap_fragment>\nmetalnessFactor = mix(metalnessFactor, 0.85, frameMask);")
+      .replace(
+        "#include <lights_physical_fragment>",
+        "#include <lights_physical_fragment>\nmaterial.clearcoat *= (1.0 - 0.85 * film) * (1.0 - frameMask);\nmaterial.clearcoatRoughness = mix(material.clearcoatRoughness, 0.5, film);",
+      )
+      .replace(
+        "#include <emissivemap_fragment>",
+        `#include <emissivemap_fragment>
+        // Just behind the spray the glass runs wet: a bright sheen that fades as it dries.
+        float band = 1.0 - smoothstep(0.0, 0.3, abs((vPanelUv.x + vPanelUv.y * 0.25) - (vState.y * 1.6 - 0.2)));
+        totalEmissiveRadiance += vec3(0.62, 0.78, 0.82) * (band * 0.9 + 0.25) * vState.y * (1.0 - vState.y) * 2.0 * (1.0 - frameMask);`,
+      );
+  };
+  m.customProgramCacheKey = () => "lienry-solar-3";
+  return m;
+}
+
+/**
  * The frame: dark back-painted spandrels at each floor, anodised aluminium mullions and copings,
  * metal parapet cladding, a grey roof membrane and galvanised plant. The dock keeps its own finishes.
  */
@@ -95,6 +176,12 @@ export const surfaces = {
   pad: new THREE.MeshStandardMaterial({ color: "#e4ded3", roughness: 1, metalness: 0 }),
   tether: new THREE.MeshStandardMaterial({ color: PALETTE.glassDeep, roughness: 0.6, metalness: 0.1 }),
   lightOn: new THREE.MeshBasicMaterial({ color: "#ffffff" }),
+  /** A module's body under its glass: the anodised frame's sides and the backsheet. */
+  module: new THREE.MeshStandardMaterial({ color: "#3a3f45", roughness: 0.4, metalness: 0.7, envMapIntensity: 1 }),
+  /** Hot-dip galvanised posts and rails under the solar tables. */
+  galvanised: new THREE.MeshStandardMaterial({ color: "#a9adaf", roughness: 0.45, metalness: 0.8, envMapIntensity: 1.1 }),
+  /** The concrete pad the reel stands on. */
+  concrete: new THREE.MeshStandardMaterial({ color: "#d3cfc6", roughness: 0.95, metalness: 0 }),
 };
 
 /**
@@ -130,8 +217,8 @@ export function makeDebrisMaterial(heat: THREE.Texture, washMap: THREE.DataTextu
   });
 }
 
-/** The scan point cloud: points show only below the sweep plane, brightest just under it. */
-export function makePointsMaterial(dpr: number): THREE.ShaderMaterial {
+/** The scan point cloud: points show only below (or, along x, west of) the sweep plane, brightest just behind it. */
+export function makePointsMaterial(dpr: number, axis: "x" | "y" = "y"): THREE.ShaderMaterial {
   return new THREE.ShaderMaterial({
     transparent: true,
     depthWrite: false,
@@ -145,7 +232,7 @@ export function makePointsMaterial(dpr: number): THREE.ShaderMaterial {
     vertexShader: `
       uniform float uSize; varying float vY;
       void main() {
-        vY = position.y;
+        vY = ${axis === "x" ? "position.x" : "position.y"};
         vec4 mv = modelViewMatrix * vec4(position, 1.0);
         gl_PointSize = uSize * (60.0 / -mv.z);
         gl_Position = projectionMatrix * mv;
@@ -164,19 +251,34 @@ export function makePointsMaterial(dpr: number): THREE.ShaderMaterial {
   });
 }
 
-/** The ground: a disc that fades to nothing at its edge so it sits inside the page gradient. */
-export function makeGroundMaterial(): THREE.ShaderMaterial {
+/**
+ * The ground: a disc that fades to nothing at its edge so it sits inside the page gradient. `grain`
+ * (0 for the building's paving) mottles it, at the scale of `size` metres across, like dry ground
+ * under an array.
+ */
+export function makeGroundMaterial(outer = "#e3ddd1", inner = "#ebe6db", grain = 0, size = 180): THREE.ShaderMaterial {
   return new THREE.ShaderMaterial({
     transparent: true,
     depthWrite: false,
-    uniforms: { uColor: { value: new THREE.Color("#e3ddd1") }, uInner: { value: new THREE.Color("#ebe6db") } },
+    uniforms: { uColor: { value: new THREE.Color(outer) }, uInner: { value: new THREE.Color(inner) }, uGrain: { value: grain }, uSize: { value: size } },
     vertexShader: `varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
     fragmentShader: `
-      uniform vec3 uColor; uniform vec3 uInner; varying vec2 vUv;
+      uniform vec3 uColor; uniform vec3 uInner; uniform float uGrain; uniform float uSize; varying vec2 vUv;
+      float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+      float noise(vec2 p) {
+        vec2 i = floor(p); vec2 f = fract(p); f = f * f * (3.0 - 2.0 * f);
+        return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y);
+      }
       void main() {
         float r = length(vUv - 0.5) * 2.0;
         float a = 1.0 - smoothstep(0.35, 1.0, r);
-        gl_FragColor = vec4(mix(uInner, uColor, smoothstep(0.0, 0.6, r)), a);
+        vec3 c = mix(uInner, uColor, smoothstep(0.0, 0.6, r));
+        if (uGrain > 0.0) {
+          vec2 m = vUv * uSize;
+          float n = noise(m * 0.18) * 0.55 + noise(m * 0.7) * 0.3 + noise(m * 2.6) * 0.15;
+          c *= 1.0 + (n - 0.5) * uGrain;
+        }
+        gl_FragColor = vec4(c, a);
         #include <colorspace_fragment>
       }`,
   });

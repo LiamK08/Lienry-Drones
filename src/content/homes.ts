@@ -29,7 +29,7 @@ export const homesPage = {
         "The property is mapped first, so the drone knows every surface it can reach. As it cleans it identifies each material and adjusts its pressure, and you can change it in the app.",
       ],
       checks: ["A detailed scan of the property", "Glass, panels, render, roofing and paving", "Pressure you can adjust"],
-      image: { id: "p3-house", alt: "The home drone washing the front windows of a suburban house", position: "50% 45%" },
+      image: { id: "p4-rental", alt: "The home drone washing the rooftop solar panels of a brick rental townhouse, the ground pod by the side fence", position: "50% 32%" },
     },
   ],
   stats: {
@@ -53,32 +53,43 @@ export const homesPage = {
   close: { headline: "Tell us about your property. We reply personally.", action: { label: "Register interest", href: "/register-interest?type=homeowner" } },
 };
 
-/** The app, told as five beats of one clean. A beat's `app` is the state the app panel shows with it. */
+/**
+ * The app row: the story's steps beside the interactive app panel, and the picture beside the panel.
+ * The picture follows the demo: before a clean, each chosen area while the drone washes it, then after.
+ */
 export const landlordStory = {
   headline: "Your property. Wherever you are.",
   intro: "You own a rental in Sydney and live overseas. It needs a clean before the next tenant.",
-  beats: [
-    { title: "Open the app.", body: "The property is already mapped, every surface in reach.", imageId: "y1-story-before", app: "map" },
-    { title: "Choose the areas.", body: "Only the driveway and the panels. The drone sets each pressure.", imageId: "y1-story-before", app: "select" },
-    { title: "Tap start.", body: "The pod powers the drone and the tether feeds it water.", imageId: "y2-story-panels", app: "start" },
-    { title: "It cleans. Nobody is there.", body: "No cleaners to book and no one on site.", imageId: "y3-story-driveway", app: "progress" },
-    { title: "Ready for the next tenant.", body: "The progress reaches your phone, wherever you are.", imageId: "y5-story-done", app: "done" },
-  ],
-  alts: {
-    "y1-story-before": "A rental house before its clean, the ground pod closed beside the garden tap",
-    "y2-story-panels": "The drone washing the rooftop solar panels, half the array clean and wet",
-    "y3-story-driveway": "The drone washing the concrete driveway of the rental house",
-    "y5-story-done": "The rental house after its clean, the ground pod open by the garden tap",
-  } as Record<string, string>,
+  steps: ["Choose the areas to clean.", "Tap start, wherever you are.", "Watch each area clean in turn.", "See the house after the clean."],
+  pictures: {
+    before: { id: "y1-story-before", alt: "A rental house before its clean, the ground pod closed beside the garden tap", chip: "Before the clean" },
+    driveway: { id: "y3-story-driveway", alt: "The drone washing the concrete driveway of the rental house", chip: "Washing the driveway" },
+    panels: { id: "y2-story-panels", alt: "The drone washing the rooftop solar panels, half the array clean and wet", chip: "Washing the solar panels" },
+    windows: { id: "p3-house", alt: "The home drone washing the front windows of a house", chip: "Washing the windows" },
+    after: { id: "y5-story-done", alt: "The rental house after its clean, the ground pod open by the garden tap", chip: "After the clean" },
+  },
 };
 
-/** Strings for the illustrative app panel. Demo data: nothing here is a real property or a real clean. */
+/**
+ * Strings for the illustrative app panel. Demo data: nothing here is a real property or a real clean.
+ * `{areas}`, `{area}`, `{i}` and `{n}` are filled in by the panel.
+ */
 export const appPanel = {
   property: "Rental, Sydney",
-  prompt: "Choose the areas for this clean",
-  rows: ["Driveway", "Solar panels", "Windows"],
-  rowState: { select: "Selected", start: "Starting", progress: ["31%", "64%"], done: "Complete" },
-  buttons: { map: "Choose surfaces", select: "Start clean", start: "See progress", progress: "See the finished clean", done: "Start again" },
-  status: { map: "Choose the areas for this clean.", select: "Driveway and solar panels selected.", start: "Clean started.", progress: "Cleaning in progress: driveway 31%, solar panels 64%.", done: "Clean complete." },
+  prompt: "Choose the areas to clean",
+  areas: [
+    { id: "driveway", name: "Driveway", phrase: "the driveway" },
+    { id: "panels", name: "Solar panels", phrase: "the solar panels" },
+    { id: "windows", name: "Windows", phrase: "the windows" },
+  ],
+  rowState: { complete: "Complete", skipped: "Not in this clean" },
+  buttons: { start: "Start clean", running: "Cleaning…", again: "Clean again", choose: "Choose again" },
+  line: {
+    none: "Choose at least one area to start.",
+    chosen: "Ready to clean {areas}.",
+    running: "Cleaning {area}, {i} of {n}.",
+    done: "Clean complete for {areas}.",
+  },
+  live: { started: "Clean started for {areas}.", areaDone: "{area} complete." },
   note: "Illustrative app interface.",
-};
+} as const;

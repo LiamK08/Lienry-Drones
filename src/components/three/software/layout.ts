@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import type { ZoneId } from "@/content/software";
+import type { BuildingZoneId as ZoneId, ZoneId as AnyZoneId } from "@/content/software";
 import { BAYS_E, BAYS_N, D, FLOORS, FLOOR_H, GLASS_H, H, LANTERN, ROOF_Y, SLAB_H, W, debrisAt, zoneFor, type Face } from "./dims";
 
 export * from "./dims";
@@ -53,7 +53,8 @@ const LAST_WASHED: Record<string, string> = { north: "14 days ago", east: "14 da
  * between zones (round the corner, over the parapet, down to the shopfront), not the short step
  * between two passes of one zone.
  */
-export type Leg = { zone: ZoneId; floor: number; pass: number; moving: boolean };
+/** `zone` is any model's zone (the solar array reuses this type); `floor` is a floor, or the array's row. */
+export type Leg = { zone: AnyZoneId; floor: number; pass: number; moving: boolean };
 
 export type Route = {
   points: THREE.Vector3[];
@@ -63,7 +64,7 @@ export type Route = {
   /** One per segment (points[i] to points[i + 1]): a pass, or the move to the pass after it. */
   legs: Leg[];
   /** Where each zone's washing starts and ends along the route (progress, 0 to 1). */
-  spans: Record<ZoneId, [number, number]>;
+  spans: Partial<Record<AnyZoneId, [number, number]>>;
 };
 
 function buildPanels(): Panel[] {
@@ -197,7 +198,7 @@ function buildRoute(panels: Panel[]): Route {
     legs.push({ zone, floor: next.floor, pass: next.pass, moving: !own && !!washed && zoneFor(washed.face, washed.floor) !== zone });
     if (own) washed = own;
   }
-  const spans = {} as Record<ZoneId, [number, number]>;
+  const spans: Partial<Record<ZoneId, [number, number]>> = {};
   for (const p of panels) {
     if (!p.zone || !p.washAt.length) continue;
     const span = (spans[p.zone] ??= [1, 0]);

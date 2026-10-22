@@ -9,6 +9,7 @@ import { FaqCentered } from "@/components/blocks/FaqCentered";
 import { FeatureRows } from "@/components/blocks/FeatureRows";
 import { FiguresBlock } from "@/components/blocks/SafetyBlock";
 import { WordStrip } from "@/components/blocks/WordStrip";
+import { SoftwareWindow } from "@/components/software/SoftwareWindow";
 import { CITED_NOTE, pickStats } from "@/components/sections/StatBand";
 
 export const metadata: Metadata = pageMetadata(
@@ -17,16 +18,18 @@ export const metadata: Metadata = pageMetadata(
 );
 
 /**
- * /solar: the solutions template. The hero, the strip, one white run of feature rows, the three
- * cited soiling figures on paper (with the cited note), the questions on white, then the closing panel.
+ * /solar: the solutions template. The hero, the strip, one white run of feature rows (the software
+ * window's solar model in the second), the three cited soiling figures on paper (with the cited
+ * note), the questions on white, then the closing panel.
  */
 export default function SolarPage() {
   const { hero, strip, stats, rows, close } = solarPage;
+  const items = rows.map((r) => (r.id === "software" ? { ...r, media: <SoftwareWindow model="solar" /> } : r));
   return (
     <>
       <CenterHero mobileLines={3} leadLines={{ phone: 4, wide: 2 }} eyebrow={hero.eyebrow} headline={hero.headline} emphasis={hero.emphasis} lead={hero.lead} primary={hero.primary} />
       <WordStrip label={strip.label} items={strip.items} />
-      <FeatureRows id="features" variant="solutions" eyebrow="Features" items={rows} />
+      <FeatureRows id="features" variant="solutions" eyebrow="Features" items={items} />
       <FiguresBlock
         id="soiling"
         eyebrow={stats.eyebrow}
