@@ -75,6 +75,15 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
   the video's painted rect but rounds the image's, so the recording's first frame could be one row
   larger than its poster image and take over as LCP. The recording now loads only after its poster
   has loaded, and sits 1px short at the top (`SoftwareWindow`, commented). Keep both.
+- 22 October: the 3D building reads as a real glass tower (owner's request): dark reflective glass
+  that varies pane to pane, with a lit ceiling and some part-drawn blinds behind it; dusty, hazy glass
+  until the wash clears it (so washed panes are the dark ones, as on the facade map); dark spandrels,
+  aluminium mullions and copings, metal parapet cladding, a grey roof membrane
+  (`three/software/materials.ts`, `Structure.tsx`). The phone and reduced-motion recordings and both
+  posters were re-recorded to match: `node scripts/record-software-view.mjs http://localhost:3000`
+  (about 20 minutes in software GL; it captures the model on /download at a fixed view size, crops to
+  1020x756 and 720x900 and writes the posters with mozjpeg 76; `--encode-only` re-encodes from
+  `.next/cache/software-view-frames`). Re-record whenever the model's look changes.
 - The owner said the imagery is not good enough yet and will be redone in Higgsfield later. Until
   they say so, keep the current stills and film in the new layouts.
 
