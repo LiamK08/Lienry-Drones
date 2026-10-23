@@ -111,6 +111,12 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
   (`FeatureRows` `wideMedia`: 7 of 12 columns from 1280, 8 of 12 from 1024) and the picture shows on
   phones too, under the app. The windows picture is `p3-house`, so the materials row above it now
   shows `p4-rental` (check 14: no picture in two frames on a route in any state).
+- 23 October (owner's request): /solar no longer names the desktop software (the software row says
+  "the software" and links to /platform#software; the array's window title reads "Lienry"). The
+  interval row and its picture are gone; its words joined the row above ("Rooftop arrays and solar
+  farm rows, on your interval"). Less white space: solution feature rows 80 apart (64 on phones) with
+  96 under the last, the solution pages' FAQ 64 above and 80 below (48 on phones), and a condensed
+  footer (pictures at 80%, smaller logo and gaps). /solar went from 6,382 to 5,399px at 1440.
 - Gates on 22 October: typecheck, lint and build pass; `check:layout` (1440, 390, 1024 and 768),
   `check:rules` (with motion on /solar and /homes-and-rentals, without on the rest), `check:a11y` and
   `perf:vitals` pass on /solar, /homes-and-rentals, /commercial, /download and /platform.

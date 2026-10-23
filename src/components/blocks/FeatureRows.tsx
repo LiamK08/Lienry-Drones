@@ -50,7 +50,7 @@ function Check({ filled }: { filled: boolean }) {
 }
 
 // The two layouts. "default" is /platform's, unchanged. "solutions" is the solution pages' features
-// run: a 1328px rail, 40 between the columns and 100 between the rows from 1024, 5:4 pictures with
+// run: a 1328px rail, 40 between the columns and 80 between the rows from 1024 (64 below), 5:4 pictures with
 // the 8px image corners, near-black 14px copy at 1.2, and the picture before the text on phones.
 const layouts = {
   default: {
@@ -67,7 +67,7 @@ const layouts = {
   },
   solutions: {
     rail: "mx-auto w-full max-w-[83rem]",
-    rows: "flex flex-col gap-20 lg:gap-[6.25rem]",
+    rows: "flex flex-col gap-16 lg:gap-20",
     grid: "grid items-center gap-8 lg:grid-cols-2 lg:gap-10",
     // Text, then picture, in the DOM and below 1024 (as on /platform), so on phones the first picture
     // stays under the fold and the hero text remains the LCP element; from 1024 a left-hand picture
@@ -94,7 +94,7 @@ const wideGrid = (right: boolean) =>
  * variant "default" (/platform): the band's own padding, the 1392px grid, 4:3 or 16:9 pictures, and
  * below 1024 the picture follows the text.
  * variant "solutions" (/commercial, /homes-and-rentals, /solar): 80 above the first row (0 on
- * phones, where the strip's own 80 does it), 120 under the last row (56 on phones), and below 1024 the text comes first, then its picture.
+ * phones, where the strip's own 80 does it), 96 under the last row (56 on phones), and below 1024 the text comes first, then its picture.
  * A solutions row may opt into `wideMedia`, which gives its media the larger share of the row from 1024.
  */
 export function FeatureRows({
@@ -210,7 +210,7 @@ export function FeatureRows({
 
   if (solutions) {
     return (
-      <Band id={id} tone={tone} pad="none" ariaLabel="Features" className="pt-0 pb-14 md:pt-20 lg:pb-[7.5rem]">
+      <Band id={id} tone={tone} pad="none" ariaLabel="Features" className="pt-0 pb-14 md:pt-20 lg:pb-24">
         <div className={L.rail}>
           {rows}
         </div>

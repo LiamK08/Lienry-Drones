@@ -101,9 +101,11 @@ export const solarZones: Zone<SolarZoneId>[] = [
   { id: "row-d", name: "Row D", surface: "Solar glass", preset: "Solar", pressure: "30 bar", order: 4 },
 ];
 
+// The array's window names no app: which system serves solar farms is not decided, so nothing on
+// /solar points at the commercial system's desktop software.
 export const solarProject: Project = {
   name: "Demo array, 4 rows",
-  app: "Lienry Desktop",
+  app: "Lienry",
   view: "Wash plan",
   scanAge: "1 day",
   nextClean: "Sat 06:30",

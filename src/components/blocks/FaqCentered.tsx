@@ -5,11 +5,11 @@ import { Headline } from "@/components/ui/SectionHead";
 import { Reveal } from "@/components/ui/Reveal";
 
 // "section" is the band rhythm; "tight" runs into the band below (/platform); "page" is the solution
-// pages' 88 above and 150 below (56 on phones).
+// pages' 64 above and 80 below (48 on phones), kept compact at the owner's request.
 const spacings = {
   section: "",
   tight: "pb-6 pt-20 lg:pt-[7.5rem]",
-  page: "pt-[5.5rem] pb-[9.375rem] max-md:py-14",
+  page: "pt-16 pb-20 max-md:py-12",
 } as const;
 
 /**
@@ -42,7 +42,7 @@ export function FaqCentered({
               <Headline text="Frequently asked questions" emphasis="questions" />
             </h2>
           </Reveal>
-          <div className={`mx-auto mt-10 ${narrow ? "max-w-[37.5rem]" : ""}`}>
+          <div className={`mx-auto ${space === "page" ? "mt-8" : "mt-10"} ${narrow ? "max-w-[37.5rem]" : ""}`}>
             <FaqRows id={id} items={items} />
           </div>
         </div>
