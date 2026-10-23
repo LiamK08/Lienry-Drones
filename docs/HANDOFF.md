@@ -127,9 +127,10 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
 
 - They want results fast. Prefer to build, check, commit and push over long plans or multi-agent
   workflows: earlier sessions lost work to restarts mid-workflow.
-- Since 22 October the owner deploys themselves: push changes to the feature branch only, never to
-  `main`. They review the branch's Vercel preview, then merge it into `main` from their own terminal.
-  Tell them the branch name when the work is pushed.
+- Deploy it yourself, always (the owner's call, 23 October): once the checks pass, push the branch,
+  then run `git push origin <branch>:main` as a separate command. A combined command was refused once.
+  The owner will also edit the site in VS Code on their own computer, so `git pull` before starting
+  and expect commits on `main` that did not come from a Claude session.
 - Keep the replies short. End with what changed and what you need from them.
 
 ## Running the site and the checks in a fresh container
