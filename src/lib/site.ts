@@ -253,11 +253,13 @@ export const footer = {
       { label: "ChatGPT", base: "https://chatgpt.com/?q=" },
       { label: "Claude", base: "https://claude.ai/new?q=" },
       { label: "Perplexity", base: "https://www.perplexity.ai/search?q=" },
-      { label: "Google AI Mode", base: "https://www.google.com/search?udm=50&q=" },
+      { label: "Google AI", base: "https://www.google.com/search?udm=50&q=" },
       { label: "Grok", base: "https://grok.com/?q=" },
     ].map((l) => ({
       label: l.label,
-      href: l.base + encodeURIComponent("What is Lienry Drones (lienrydrones.com), and how does its resident drone clean a building's exterior with nobody on site?"),
+      href:
+        l.base +
+        encodeURIComponent("Lienry Drones (lienrydrones.com) is a pre-launch Australian company. From its website, what is it building, and how would its resident drone clean a building's exterior with nobody on site?"),
     })),
   },
 } as const;

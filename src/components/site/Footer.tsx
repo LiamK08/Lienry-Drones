@@ -5,7 +5,8 @@ import { Picture } from "@/components/ui/Picture";
 import { Mark } from "@/components/ui/Wordmark";
 
 // The round pictures that drift across the top of the footer: each one's still, its reference diameter
-// (drawn at 80% of it from 768, a quarter of it on phones) and how far it sits below the row's top edge.
+// (drawn at 80% of it from 768, and at 80% of the reference's half-size phone circles, so 40%, below)
+// and how far it sits below the row's top edge.
 const CIRCLES = [
   { id: "p1-tower", d: 18.75, y: 0 },
   { id: "s1-dock", d: 15.625, y: 2.5 },
@@ -19,14 +20,14 @@ const CIRCLES = [
 
 function Circles({ hidden }: { hidden?: boolean }) {
   return (
-    <ul aria-hidden={hidden || undefined} className="flex shrink-0 items-start gap-[5.5rem] pr-[5.5rem] md:gap-14 md:pr-14">
+    <ul aria-hidden={hidden || undefined} className="flex shrink-0 items-start gap-[1.625rem] pr-[1.625rem] md:gap-14 md:pr-14">
       {CIRCLES.map((c) => (
         <li
           key={c.id}
           style={{ "--d": `${c.d}rem`, "--y": `${c.y}rem` } as CSSProperties}
-          className="mt-[calc(var(--y)*0.25)] size-[calc(var(--d)*0.25)] shrink-0 overflow-hidden rounded-pill md:mt-[calc(var(--y)*0.8)] md:size-[calc(var(--d)*0.8)]"
+          className="mt-[calc(var(--y)*0.4)] size-[calc(var(--d)*0.4)] shrink-0 overflow-hidden rounded-pill md:mt-[calc(var(--y)*0.8)] md:size-[calc(var(--d)*0.8)]"
         >
-          <Picture id={c.id} alt="" aspect="1/1" rounded="none" sizes="(min-width: 768px) 240px, 75px" />
+          <Picture id={c.id} alt="" aspect="1/1" rounded="none" sizes="(min-width: 768px) 240px, 120px" />
         </li>
       ))}
     </ul>
@@ -35,8 +36,8 @@ function Circles({ hidden }: { hidden?: boolean }) {
 
 /**
  * The footer, on near-black: a row of round pictures drifting slowly across the top over a soft
- * teal glow, then the logo set large with the tagline in Inter italic and, over the fourth column, a
- * row of "Ask AI about Lienry" pills, four link columns under small grey headings, a hairline, and the
+ * teal glow, then the logo set large with the tagline in Inter italic and, at the right, one row of
+ * "Ask AI about Lienry" pills, four link columns under small grey headings, a hairline, and the
  * copyright line with the legal links. Under reduced motion the
  * row stands still. Condensed on 23 October at the owner's request: smaller pictures, logo and gaps.
  */
@@ -45,7 +46,7 @@ export function Footer() {
     <footer data-tone="ink" className="on-dark relative isolate overflow-hidden bg-[#0f0d0e] pb-16 text-white md:pb-8">
       <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-12 -z-10 size-[26rem] -translate-x-1/2 rounded-pill bg-accent/25 blur-[110px] md:top-16 md:size-[38rem]" />
       <div aria-hidden="true" className="flex overflow-hidden pt-16 md:pt-[4.5rem]">
-        <div className="marquee flex w-max [animation-duration:70s]">
+        <div className="marquee flex w-max [animation-duration:30s] md:[animation-duration:60s]">
           <Circles />
           <Circles hidden />
         </div>
@@ -53,7 +54,7 @@ export function Footer() {
 
       <div className="mx-auto mt-10 w-full max-w-[75rem] px-5 md:mt-12 xl:px-0">
         <div className="grid gap-y-8 md:grid-cols-4 md:items-end md:gap-x-6">
-          <div className="md:col-span-3">
+          <div className="md:col-span-2">
             <div className="flex items-center gap-3 md:gap-4">
               <Mark className="h-11 w-auto md:h-16" />
               <p aria-hidden="true" className="max-w-none font-display text-[3rem] leading-none tracking-[-0.02em] md:text-[4.25rem]">
@@ -62,8 +63,8 @@ export function Footer() {
             </div>
             <p className="mt-3 max-w-none font-[family-name:var(--font-inter-italic)] text-[1.125rem] italic tracking-[-0.02em] md:text-[1.375rem]">{footer.tagline}</p>
           </div>
-          {/* Ask an AI assistant about Lienry: text pills that open each one with the question filled in. */}
-          <div>
+          {/* Ask an AI assistant about Lienry: text pills, on one row at the right, each opening its assistant with the question filled in. */}
+          <div className="md:col-span-2 md:justify-self-end">
             <p id="footer-ask-ai" className="text-[0.8125rem] font-medium leading-[1.2] text-[#8a8a8a]">
               {footer.askAi.label}
             </p>
@@ -74,10 +75,10 @@ export function Footer() {
                     href={l.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex h-9 items-center rounded-pill border border-white/10 bg-white/[0.05] px-3.5 text-[0.8125rem] text-white/85 transition-[background-color,border-color,color] duration-200 hover:border-white/30 hover:bg-white/[0.1] hover:text-white"
+                    aria-label={`Ask ${l.label} about Lienry (opens in a new tab)`}
+                    className="flex h-8 items-center rounded-pill border border-white/10 bg-white/[0.05] px-3 text-[0.75rem] text-white/85 transition-[background-color,border-color,color] duration-200 hover:border-white/30 hover:bg-white/[0.1] hover:text-white"
                   >
                     {l.label}
-                    <span className="sr-only"> (opens in a new tab)</span>
                   </a>
                 </li>
               ))}
