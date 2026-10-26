@@ -142,16 +142,24 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
     expanding row (600ms, about 4.7 times). Below 1200 a carousel inside the rail (one up, two from
     768) with round previous and next buttons around pager dots (`ui/Pager.tsx`), and a play button on
     each card that opens its panel inside the card.
-  - Step stage (`StepTimer`): each step has a coded demo panel (scan, plan, clean, re-scan, report) on
-    the picture's darker right side from 1024, and below the picture on a night stage under 1024.
+  - Step stage (`StepTimer`): each step has a coded demo panel that follows the software's one demo
+    building (`src/content/software.ts`) on the window's own `FacadeMap`: scanned floor by floor,
+    planned zone by zone, washed along the route, re-scanned with the debris shaded, on record. From
+    1024 the stage is 483px tall and the picture fades (a mask) into the night stage where the panel
+    stands; below 1024 the panel sits under the picture. Finished steps' rules stay full; on phones the
+    five tabs share one row, one word each. The reference's camera push-in was left out: check 21 reads
+    a zooming panel as an element moving with the scroll.
   - Settings band (`SystemCards`): back to the full honest story cards (icon and name, meta, the
     statement, the part that does the work, three figures, note, a whole-card link) under a pill to
     /platform, a two-up track with the pager from 768 to 1199. This reverses the 21 October "less"
     call under the new brief. The figures are now `.numeral`, so check 11 reads them: commercial.ts
     `designFacts` holds the design-intent ones and their note; the solar ones are cited, each with its
     source link, beside the cited note.
-  - Explore: what each page is in place of the reference's dates, the two tags under the title in
-    sentence case, sentence-case filter chips, the reference's picture proportions.
+  - Explore: twelve honest link cards (pages and anchors that exist), what each page is in place of
+    the reference's dates, two tags under every title, sentence-case filters. "All" shows six (one of
+    each kind at least: `explore.all`), lead plus two below 1200; a filter shows an even grid (four at
+    most on a phone). The filter is kept in `?explore=` (pushState, Back works). Each picture appears
+    nowhere else on the home page (check 14) and no open pod sits beside a closed one.
   - FAQ card: "Book a call" (`BookingCard`): the call's facts, a calendar of the coming five weeks
     (weekdays from tomorrow to four weeks out), six times, then the enquiry form with the time over it.
     The time travels with the enquiry (`preferredTime`, `source: "booking"`); nothing is booked until a
