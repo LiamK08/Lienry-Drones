@@ -161,15 +161,33 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
     most on a phone). The filter is kept in `?explore=` (pushState, Back works). Each picture appears
     nowhere else on the home page (check 14) and no open pod sits beside a closed one.
   - FAQ card: "Book a call" (`BookingCard`): the call's facts, a calendar of the coming five weeks
-    (weekdays from tomorrow to four weeks out), six times, then the enquiry form with the time over it.
-    The time travels with the enquiry (`preferredTime`, `source: "booking"`); nothing is booked until a
-    person confirms it by email. "Register interest instead" skips the time.
+    (weekdays from tomorrow to four weeks out, in Sydney: `src/lib/booking.ts`), six Sydney times with
+    the visitor's own time beside them when their zone differs, then a short form (name, email, I am a,
+    organisation, video or phone, phone number, "What should we cover?") with the time over it. The
+    request travels structured (`preferredDate`, `preferredSlot`, `timeZone`, `callBy`, `source:
+    "booking"`); the route refuses a closed day or time (422, "That time is no longer open"). Nothing is
+    booked until a person confirms it by email. "Register interest instead" skips the time. The card
+    holds one height from 1200 (the steps share one grid cell).
+  - FAQ rows: richer answers (an opening line, labelled points, a closing line) for surfaces, height,
+    safety, the app and the pilot; the answer's height animates open where the browser can
+    (`::details-content`, off under reduced motion); the plus turns to a cross. Cost is unchanged.
+  - Safety panel: side by side from 1200, edge to edge below; equal tile rows; the pill turns white on
+    hover (`Button invert`).
   - Footer: an "Ask AI about Lienry" row (ChatGPT, Claude, Perplexity, Google AI Mode, Grok), text
     pills only, each opening the assistant with a question about Lienry filled in. Gemini has no
     prefill, so Google AI Mode stands in.
   - Not replicated: refresh's films in the cards and the stage (no new media without the owner; coded
     panels stand in), its customer logos, quotes and results, certification badges, Intercom chat and
-    the third-party booking embed.
+    the third-party booking embed. Left with the first part (header and menus, untouched): the header
+    going clear over the hero, feature cards in the menus, the burger's morph, smooth scrolling.
+  - A three-lens review (correctness, accessibility, honesty and consistency) with each finding
+    verified was run on the whole change and its confirmed findings fixed (hydration-safe reduced
+    motion, the verdict judged only on what is answered, focus kept through the send and booking steps,
+    the phone strip never covering focus, one live line per panel).
+  - Gates on 26 October: typecheck, lint and build pass; `check:layout` passes on all 12 routes at
+    1440, 390, 1024 and 768; `check:rules` (with motion) on all 12 routes; `check:a11y` on all 12
+    routes; `npm run contrast` at 1440 and 390 (film frames and the white bound); `perf:vitals`
+    (three runs each) passes on home, the other pages are running.
 
 ## How the owner works
 
