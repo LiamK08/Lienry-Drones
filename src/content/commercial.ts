@@ -56,3 +56,20 @@ export const commercialPage = {
   },
   close: { headline: "A small number of buildings, first. Is yours one of them?", action: { label: "Book a pilot conversation", href: "/register-interest?type=commercial" } },
 };
+
+/**
+ * The design-intent figures the home settings cards show (src/content/home.ts systems), with the note
+ * they carry. check:rules (check 11) reads this export to accept each figure beside its term and note;
+ * any other figure must be a cited stat or demo data.
+ */
+export const designFacts = {
+  note: "Design intent. Concept stage.",
+  items: [
+    { term: "Building height", value: "<70", unit: "m" },
+    { term: "Re-scan interval", value: "2", unit: "days" },
+    { term: "People at height", value: "0" },
+    { term: "Surface types", value: "5" },
+    { term: "Ground pod", value: "1" },
+    { term: "Crews to book", value: "0" },
+  ],
+};

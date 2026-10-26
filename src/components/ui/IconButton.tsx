@@ -7,6 +7,8 @@ export type IconButtonProps = {
   unavailable?: boolean;
   /** Fill with the surface colour (a control over media, e.g. FilmPause inside `on-dark on-film`). */
   filled?: boolean;
+  /** A round button (the home reason cards' carousel) instead of the square. */
+  round?: boolean;
   onClick?: () => void;
   /** The glyph: an aria-hidden svg at size-4. */
   children: ReactNode;
@@ -19,7 +21,7 @@ export type IconButtonProps = {
  * colour on hover. Pressed moves it 1px down; unavailable fades it to 40% and ignores clicks, keeping
  * focus where it is.
  */
-export function IconButton({ label, unavailable = false, filled = false, onClick, children, className = "", ...rest }: IconButtonProps) {
+export function IconButton({ label, unavailable = false, filled = false, round = false, onClick, children, className = "", ...rest }: IconButtonProps) {
   return (
     <button
       type="button"
@@ -29,7 +31,7 @@ export function IconButton({ label, unavailable = false, filled = false, onClick
       onClick={() => {
         if (!unavailable) onClick?.();
       }}
-      className={`inline-flex size-11 shrink-0 items-center justify-center rounded-hard border border-control text-fg ${filled ? "bg-surface" : ""} transition-[background-color,color,border-color,translate] duration-200 ease-instrument motion-reduce:transition-none hover:border-fg hover:bg-fg hover:text-surface active:translate-y-px motion-reduce:active:translate-y-0 aria-disabled:cursor-default aria-disabled:opacity-40 aria-disabled:hover:border-control aria-disabled:hover:bg-transparent aria-disabled:hover:text-fg aria-disabled:active:translate-y-0 ${className}`}
+      className={`inline-flex size-11 shrink-0 items-center justify-center ${round ? "rounded-pill" : "rounded-hard"} border border-control text-fg ${filled ? "bg-surface" : ""} transition-[background-color,color,border-color,translate] duration-200 ease-instrument motion-reduce:transition-none hover:border-fg hover:bg-fg hover:text-surface active:translate-y-px motion-reduce:active:translate-y-0 aria-disabled:cursor-default aria-disabled:opacity-40 aria-disabled:hover:border-control aria-disabled:hover:bg-transparent aria-disabled:hover:text-fg aria-disabled:active:translate-y-0 ${className}`}
       {...rest}
     >
       {children}

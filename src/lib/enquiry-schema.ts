@@ -38,6 +38,10 @@ export const enquirySchema = z.object({
   propertyType: z.enum(propertyTypes).optional().or(z.literal("")),
   location: z.string().trim().max(120).optional().or(z.literal("")),
   message: z.string().trim().max(2000).optional().or(z.literal("")),
+  // Where it was sent from: the enquiry form (the default) or the fit check's "Email me my result".
+  source: z.enum(["form", "fit-check", "booking"]).optional(),
+  // The booking card's requested call time, as the visitor read it (e.g. "Tuesday 27 October, 10:30 am, Sydney time").
+  preferredTime: z.string().trim().max(80).optional().or(z.literal("")),
   // Honeypot: real users never fill this.
   company: z.string().max(0).optional().or(z.literal("")),
 });

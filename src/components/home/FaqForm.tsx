@@ -1,15 +1,15 @@
-import { Suspense } from "react";
 import { faq } from "@/content/home";
 import { faqFor } from "@/content/faq";
 import { FaqRows } from "@/components/blocks/FaqRows";
-import { EnquiryForm } from "@/components/forms/EnquiryForm";
+import { BookingCard } from "@/components/forms/BookingCard";
 import { Band, Container } from "@/components/ui/Band";
 import { Headline } from "@/components/ui/SectionHead";
 import { Reveal } from "@/components/ui/Reveal";
 
 /**
  * The questions on paper, beside the ask: the head and the rows on the left, and on the right a card
- * that holds the enquiry form under an accent title bar (sticky from 1024).
+ * under an accent title bar (sticky from 1024) that books a call: a day, a time, then the enquiry form
+ * (BookingCard). A person confirms the time by email.
  */
 export function FaqForm() {
   return (
@@ -28,12 +28,10 @@ export function FaqForm() {
           </div>
           <div className="lg:sticky lg:top-[calc(var(--nav-h)+1.5rem)] lg:self-start">
             <div className="overflow-hidden rounded-card border border-line bg-white">
-              <p className="max-w-none bg-accent py-3 text-center font-display text-[1.25rem] text-white">{faq.formTitle}</p>
+              <h3 className="bg-accent py-3 text-center text-[1.25rem] leading-[1.4] tracking-[-0.01em] text-white">{faq.formTitle}</h3>
               <div className="p-6 md:p-8">
                 <p className="mb-6 text-small text-muted">{faq.formNote}</p>
-                <Suspense fallback={<div className="h-96" aria-hidden="true" />}>
-                  <EnquiryForm />
-                </Suspense>
+                <BookingCard />
               </div>
             </div>
           </div>

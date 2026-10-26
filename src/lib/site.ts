@@ -245,4 +245,19 @@ export const footer = {
   ],
   legal: "© 2026 Lienry Drones. Sydney, Australia.",
   legalLinks: [{ href: "/privacy", label: "Privacy policy" }],
+  // Ask an AI assistant about Lienry: each link opens the assistant with the question filled in. Named
+  // in text only, never with the assistants' marks, so nothing reads as an endorsement.
+  askAi: {
+    label: "Ask AI about Lienry",
+    links: [
+      { label: "ChatGPT", base: "https://chatgpt.com/?q=" },
+      { label: "Claude", base: "https://claude.ai/new?q=" },
+      { label: "Perplexity", base: "https://www.perplexity.ai/search?q=" },
+      { label: "Google AI Mode", base: "https://www.google.com/search?udm=50&q=" },
+      { label: "Grok", base: "https://grok.com/?q=" },
+    ].map((l) => ({
+      label: l.label,
+      href: l.base + encodeURIComponent("What is Lienry Drones (lienrydrones.com), and how does its resident drone clean a building's exterior with nobody on site?"),
+    })),
+  },
 } as const;

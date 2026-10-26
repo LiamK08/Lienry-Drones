@@ -37,7 +37,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true });
   }
 
-  const enquiry = { ...parsed.data, company: undefined, receivedAt: new Date().toISOString(), source: `${siteUrl}/register-interest` };
+  const enquiry = { ...parsed.data, company: undefined, receivedAt: new Date().toISOString(), source: parsed.data.source === "fit-check" ? `${siteUrl}/#fit-check` : parsed.data.source === "booking" ? `${siteUrl}/#faq` : `${siteUrl}/register-interest` };
   const webhook = process.env.ENQUIRY_WEBHOOK_URL;
   if (webhook) {
     try {

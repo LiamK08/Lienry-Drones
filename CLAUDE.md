@@ -21,7 +21,8 @@ are part of the window, not imagery: each model's window brings its own (check 1
 Layout (since 20 October 2026, the owner's brief): the site follows refresh.tech's page
 templates, section order and interaction patterns, in Lienry's own words, fonts, colours and
 media. White ground, a warm paper band and a pale accent tint; Lienry's glass teal is the one
-accent; near-black for the dark band and the footer. Section heads may be centred.
+accent; near-black for the dark band and the footer. Status tones are not accents: the debris amber and
+the fit check's soft red (`fit-*` tokens) mark a Partly or a No and the score's zones, nothing else. Section heads may be centred.
 
 Type: two families only, both open-licensed and self-hosted: PT Serif (regular and italic) for
 headings, display lines and the footer logo, and Inter for everything else (its italic only in the
@@ -44,6 +45,10 @@ content inside the rail and the 20px phone margins, the band palette and Band's 
 honesty checks (11 claims, 12 captions, 22 titles, 24 enquiry labels, 44 no ReFresh or Legora)
 never relax. Change a check only together with the rule here that it encodes. Hero headings hold
 their fallback-font line count on phones (`holdLines`), or the web font arriving shifts the page.
+
+Sticky: only the header, a column under it (a nav, or a block holding a heading, nav or form), and,
+below 1024, the fit check's score strip (`data-fit-strip`), which sticks to the bottom of the screen inside
+its card's question column (the owner's brief, 26 October 2026). Check 21 encodes it.
 
 Header contrast: `npm run contrast -- <frame>` proves the bar stays legible over the hero
 film. Run it after touching the header, the hero scrim or the primary button.

@@ -71,6 +71,8 @@
 //     scroll (what an infinite animation moves, by transform, translate, offset, inset or margin, is
 //     not sampled) and no figure counts up. The form clause is wider than the spec's "holds a heading
 //     or is a nav": the home FAQ's sticky block is its enquiry card (FaqForm.tsx), which has no heading.
+//     Below 1024 the fit check's score strip ([data-fit-strip], FitCheck.tsx) may stick to the bottom of
+//     the screen inside its card's question column, as the reference's does (CLAUDE.md, 26 Oct 2026).
 // 22  Titles and links: every route's <title> is its own, "What the page is | Lienry Drones", exactly as
 //     pageTitle in src/lib/site.ts builds it. Its one canonical link and its og:url are its own address;
 //     og:title and twitter:title are the title without the brand; og:description and
@@ -1079,7 +1081,9 @@ function pageLib() {
     for (const el of document.body.querySelectorAll("*")) {
       const cs = getComputedStyle(el);
       if ((cs.position === "sticky" || cs.position === "fixed") && !rendered(el)) continue;
-      if (cs.position === "sticky" && !(header && header.contains(el))) {
+      // The fit check's score strip, bottom-sticky inside its card's question column below 1024.
+      const fitStrip = el.matches("[data-fit-strip]") && innerWidth < 1024 && !!el.closest("main") && !el.querySelector("[data-band], section");
+      if (cs.position === "sticky" && !(header && header.contains(el)) && !fitStrip) {
         const below = parseFloat(cs.top) >= navH - 0.5;
         const holds = el.matches("nav") || !!el.querySelector("h1, h2, h3, h4, h5, h6, nav, form");
         const isBand = el.matches("[data-band], section, main") || mainBlocks.has(el) || !!el.querySelector("[data-band], section");

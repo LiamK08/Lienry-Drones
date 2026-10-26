@@ -28,6 +28,13 @@
   --color-debris-text: #8a5210;
   /* Error text on ink 6.10:1, on ink-raised 5.55:1. */
   --color-debris-on-dark: #d08a3a;
+  /* The fit check's answer and zone tones: a No, a Partly (on the debris tones) and their pale fills. */
+  --color-fit-no: #a3402e;
+  --color-fit-no-bar: #c95a43;
+  --color-fit-no-soft: #fbebe7;
+  --color-fit-no-edge: #e8b4a8;
+  --color-fit-partly-soft: #fbf1df;
+  --color-fit-partly-edge: #e5c28c;
   --color-hairline: #dcd5c8;
   --color-border-strong: #857d70;
   --color-white: #ffffff;
@@ -361,9 +368,9 @@
     animation: bubble-drift 10s ease-in-out infinite;
   }
 
-  /* Why Lienry's cards (from 1024, with a pointer): while one card is open, the other cards' titles
+  /* Why Lienry's cards (from 1200, with a pointer): while one card is open, the other cards' titles
      fade out, so a narrow card never shows a clipped title. */
-  @media (min-width: 64rem) and (hover: hover) {
+  @media (min-width: 75rem) and (hover: hover) {
     .why-row .why-text { transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1); }
     .why-row:hover .why-text,
     .why-row:has(li:focus-visible) .why-text { opacity: 0; }
@@ -372,6 +379,21 @@
   }
   @media (prefers-reduced-motion: reduce) {
     .why-row .why-text { transition: none; }
+  }
+
+  /* The fit check: a point it raises rises 8px into place as it joins the list; the empty panel's
+     arrow nudges toward the questions (left beside them, up when they sit below on a phone). */
+  @keyframes gap-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes nudge-x {
+    0%, 100% { translate: 0 0; }
+    50% { translate: -4px 0; }
+  }
+  @keyframes nudge-y {
+    0%, 100% { translate: 0 0; }
+    50% { translate: 0 4px; }
   }
 
   /* The step timer's rule: fills left to right over one step. */

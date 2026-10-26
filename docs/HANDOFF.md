@@ -1,4 +1,4 @@
-# Handoff, 22 October 2026
+# Handoff, 26 October 2026
 
 Read this first in a new session, then `CLAUDE.md`. Update this file at the end of each session.
 
@@ -122,6 +122,46 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
   `perf:vitals` pass on /solar, /homes-and-rentals, /commercial, /download and /platform.
 - The owner said the imagery is not good enough yet and will be redone in Higgsfield later. Until
   they say so, keep the current stills and film in the new layouts.
+- 26 October (owner's request: "go through the first page of refresh and replicate it, leave the first
+  part"): the home page below the hero and strip was compared section by section with refresh.tech's
+  current home (a seven-agent audit at 1440 and 390, every state) and rebuilt to its features, in
+  Lienry's words and media. The hero and the strip are untouched. Eyebrows, header pills and the hero's
+  pills stay out (owner's earlier calls).
+  - Fit check (`FitCheck`, card layout): a live score out of 100 from the first answer (the three
+    building questions weigh 20, the four about the clean 10; Partly counts half), a three-zone bar
+    (Worth a conversation / A likely fit / A strong fit, split at 40 and 75), answer pills in their own
+    tones (Yes tint, Partly debris amber, No a soft red: new `fit-*` tokens), up to three points it
+    raises (the Nos first) as short phrases, a callout before the first answer, a panel that holds one
+    height, "Start again", and "Send me my result": name and email in the panel, posted with the score
+    and answers to /api/enquiry (`source: "fit-check"`). On phones the result comes first and a strip
+    (`data-fit-strip`) sticks to the bottom of the screen with the score while it is off screen; check
+    21 and CLAUDE.md allow it. The band washes from tint to white. /fit-check's column shares the
+    score, bar and points. Nothing counts up (check 21).
+  - Reason cards (`ExpandCards`): the open card shows a coded demo panel above its title
+    (`DemoPanels.tsx`, demo data, no film), on a near-black left side; from 1200 (not 1024) they are the
+    expanding row (600ms, about 4.7 times). Below 1200 a carousel inside the rail (one up, two from
+    768) with round previous and next buttons around pager dots (`ui/Pager.tsx`), and a play button on
+    each card that opens its panel inside the card.
+  - Step stage (`StepTimer`): each step has a coded demo panel (scan, plan, clean, re-scan, report) on
+    the picture's darker right side from 1024, and below the picture on a night stage under 1024.
+  - Settings band (`SystemCards`): back to the full honest story cards (icon and name, meta, the
+    statement, the part that does the work, three figures, note, a whole-card link) under a pill to
+    /platform, a two-up track with the pager from 768 to 1199. This reverses the 21 October "less"
+    call under the new brief. The figures are now `.numeral`, so check 11 reads them: commercial.ts
+    `designFacts` holds the design-intent ones and their note; the solar ones are cited, each with its
+    source link, beside the cited note.
+  - Explore: what each page is in place of the reference's dates, the two tags under the title in
+    sentence case, sentence-case filter chips, the reference's picture proportions.
+  - FAQ card: "Book a call" (`BookingCard`): the call's facts, a calendar of the coming five weeks
+    (weekdays from tomorrow to four weeks out), six times, then the enquiry form with the time over it.
+    The time travels with the enquiry (`preferredTime`, `source: "booking"`); nothing is booked until a
+    person confirms it by email. "Register interest instead" skips the time.
+  - Footer: an "Ask AI about Lienry" row (ChatGPT, Claude, Perplexity, Google AI Mode, Grok), text
+    pills only, each opening the assistant with a question about Lienry filled in. Gemini has no
+    prefill, so Google AI Mode stands in.
+  - Not replicated: refresh's films in the cards and the stage (no new media without the owner; coded
+    panels stand in), its customer logos, quotes and results, certification badges, Intercom chat and
+    the third-party booking embed.
 
 ## How the owner works
 
@@ -204,7 +244,9 @@ NODE_USE_ENV_PROXY=1 node scripts/perf-vitals.mjs http://localhost:3000 [routes]
   `FeatureRows variant="solutions"`, `FitCheck layout="column"`, `CostCalculator layout="listing"`,
   `EnquiryTypeTabs` (with `EnquiryTypeProvider`).
 - **Home** (`src/components/home`): `Hero`, `Strip` (marquee), `WhyFit`, `ExpandCards`, `StepTimer`,
-  `SystemCards`, `Explore`, `SafetyPanel`, `FaqForm`; `LandlordStory` is used on /homes-and-rentals.
+  `SystemCards`, `Explore`, `SafetyPanel`, `FaqForm`; `DemoPanels` (the coded panels in the reason
+  cards and the step stage); `LandlordStory` is used on /homes-and-rentals. `forms/BookingCard` is the
+  FAQ band's call booking; `ui/Pager` the carousel buttons and dots.
 - **Earlier sections still in use**: `StatBand` (cited figures), `CostCalculator`, `PageHero` (404),
   `Faq` types.
 - **Copy:** one module per route in `src/content` (`tools.ts` for /fit-check and /calculator). Menus
@@ -222,6 +264,9 @@ NODE_USE_ENV_PROXY=1 node scripts/perf-vitals.mjs http://localhost:3000 [routes]
 5. Lienry Desktop: the installer URLs and version for `src/lib/download.ts`, and whether signing in
    needs a software plan.
 6. `c2-commercial-clip`: show it on a page again, or retire it from the manifest?
+7. Is `ENQUIRY_WEBHOOK_URL` set in production? Without it /api/enquiry answers 503, so the booking
+   card, the fit check's "Send me my result" and the enquiry form all show their "could not send" line.
+8. Are the fit check's red and amber answer tones acceptable beside the one teal accent?
 
 ## Owner's calls left open by the second pass
 

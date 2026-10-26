@@ -1,72 +1,190 @@
 "use client";
 
+import { useRef, useState } from "react";
+import { useReducedMotion } from "motion/react";
 import { benefits } from "@/content/home";
+import { CardPanel, type CardPanelId } from "@/components/home/DemoPanels";
 import { Icon } from "@/components/blocks/Icon";
 import { Band, Container } from "@/components/ui/Band";
+import { Pager, pagerKeys, stepTrack, usePager } from "@/components/ui/Pager";
 import { Picture } from "@/components/ui/Picture";
 import { SectionHead } from "@/components/ui/SectionHead";
+import { useMediaQuery } from "@/lib/hooks";
+
+// The width from which the cards stand in one expanding row, as the reference's desktop does (1200).
+const ROW = "(min-width: 75rem)";
+/** Moves focus to the close button as a card's demo opens. */
+const focusOnMount = (el: HTMLButtonElement | null) => el?.focus();
 
 /**
- * Why Lienry: five tall cards in a row, 4px apart. From 1024 the card under the pointer (or holding
- * focus) widens to about four times the others over 700ms and its two-line description fades in just
- * after; the row keeps its height. Each picture is drawn once at the open card's width, centred, and
- * the card is a window onto it, so widening pans the picture out to its sides instead of scaling it
- * up. While one card is open the others' titles fade, so a narrow card never shows a clipped one.
- * Below 1024 the row is a swipe
- * track of single cards with every description shown.
+ * Why Lienry: five tall cards. From 1200 they stand in one row, 4px apart: the card under the pointer
+ * (or holding focus) widens to about 4.7 times the others over 600ms, its near-black left side darkens
+ * in under the text, its two-line description fades in with the grow, and just after, its coded panel
+ * (demo data, DemoPanels) fades in above the title and plays through. Each picture is drawn once at the
+ * open card's width, centred, and the card is a window onto it, so widening pans the picture out to its
+ * sides instead of scaling it up. While one card is open the others' titles fade.
+ *
+ * Below 1200 the row is a carousel inside the rail: one card a view on phones, two from 768, with every
+ * description shown, a round play button on each card that opens its panel inside the card (Escape or
+ * the close button shut it, and moving to another card does too), and under the track the previous and
+ * next buttons around a pager of dots that follow the scroll.
  */
 export function ExpandCards() {
+  // The card open in the row (under the pointer or holding focus), so its panel plays.
+  const [open, setOpen] = useState<number | null>(null);
+  // The card whose panel is open on the carousel.
+  const [shown, setShown] = useState<number | null>(null);
+  const row = useMediaQuery(ROW);
+  const reduce = useReducedMotion() ?? false;
+  const trackRef = useRef<HTMLUListElement>(null);
+  const { index, positions } = usePager(trackRef, benefits.cards.length, !row);
+  const [current, setCurrent] = useState(index);
+
+  // Moving to another card closes the one shown.
+  if (current !== index) {
+    setCurrent(index);
+    setShown(null);
+  }
+
+  const step = (to: number) => stepTrack(trackRef.current, to, reduce);
+
   return (
     <Band id="why" tone="plaster" labelledBy="benefits-heading">
       <Container>
         <SectionHead id="benefits-heading" layout="center" size="h1" eyebrow={benefits.eyebrow} headline={benefits.headline} intro={benefits.intro} />
       </Container>
-      <ul
-        tabIndex={0}
-        aria-label={benefits.headline}
-        // Home and End move the phone track to its ends (a focused scroller only scrolls vertically on them).
-        onKeyDown={(e) => {
-          if (e.key !== "Home" && e.key !== "End") return;
-          e.preventDefault();
-          e.currentTarget.scrollTo({ left: e.key === "End" ? e.currentTarget.scrollWidth : 0 });
-        }}
-        className="why-row no-scrollbar @container -mx-(--page-margin) mt-(--head-gap) flex snap-x snap-mandatory gap-2 overflow-x-auto px-(--page-margin) lg:mx-4 lg:gap-1 lg:overflow-visible lg:px-0">
-        {benefits.cards.map((c) => (
-          <li
-            key={c.title}
-            tabIndex={0}
-            aria-labelledby={`why-${c.icon}`}
-            aria-describedby={`why-${c.icon}-body`}
-            className="group relative h-[28rem] w-[80%] shrink-0 snap-start overflow-hidden rounded-card outline-offset-2 sm:w-[46%] lg:h-[31.25rem] lg:w-auto lg:min-w-0 lg:flex-1 lg:transition-[flex-grow] lg:duration-[700ms] lg:ease-[cubic-bezier(0.4,0,0.2,1)] lg:hover:grow-[4] lg:focus-visible:grow-[4] motion-reduce:transition-none"
-          >
-            {/* From 1024: the open card's width (half the row less its four 4px gaps), centred on the card. */}
-            <Picture
-              id={c.image.id}
-              alt={c.image.alt}
-              position={c.image.position}
-              fit="fill"
-              rounded="none"
-              sizes="(min-width: 1024px) 50vw, 80vw"
-              className="absolute inset-0 lg:left-1/2 lg:right-auto lg:w-[calc((100cqw-1rem)/2)] lg:-translate-x-1/2"
-            />
-            <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(to_top,rgba(18,17,16,0.8)_0%,rgba(18,17,16,0.15)_45%,rgba(18,17,16,0.25)_100%)]" />
-            <span className="absolute left-5 top-5 text-white">
-              <Icon name={c.icon} />
-            </span>
-            <div className="why-text absolute inset-x-5 bottom-5 text-white">
-              <h3 id={`why-${c.icon}`} className="max-w-[14rem] text-[1.75rem] leading-[1.1]">
-                {c.title}
-              </h3>
-              <p
-                id={`why-${c.icon}-body`}
-                className="mt-2 max-w-md text-small text-white/85 lg:max-h-0 lg:overflow-hidden lg:opacity-0 lg:transition-[opacity,max-height] lg:duration-[600ms] lg:group-hover:delay-150 lg:group-hover:max-h-20 lg:group-hover:opacity-100 lg:group-focus-visible:max-h-20 lg:group-focus-visible:opacity-100"
-              >
-                {c.body}
-              </p>
-            </div>
-          </li>
-        ))}
-      </ul>
+      <div className="mx-auto mt-(--head-gap) w-full max-w-grid min-[75rem]:max-w-none">
+        <ul
+          ref={trackRef}
+          id="why-track"
+          tabIndex={0}
+          aria-label={benefits.headline}
+          onKeyDown={(e) => {
+            if (!row) pagerKeys(e, index, positions, step);
+          }}
+          className="why-row no-scrollbar @container -mx-2 -my-2 flex snap-x snap-mandatory scroll-px-2 gap-4 overflow-x-auto px-2 py-2 min-[75rem]:mx-4 min-[75rem]:my-0 min-[75rem]:gap-1 min-[75rem]:overflow-visible min-[75rem]:p-0"
+        >
+          {benefits.cards.map((c, i) => (
+            <li
+              key={c.title}
+              tabIndex={0}
+              aria-labelledby={`why-${c.icon}`}
+              aria-describedby={`why-${c.icon}-body`}
+              onMouseEnter={() => setOpen(i)}
+              onMouseLeave={() => setOpen((o) => (o === i ? null : o))}
+              onFocus={(e) => e.target === e.currentTarget && e.currentTarget.matches(":focus-visible") && setOpen(i)}
+              onBlur={() => setOpen((o) => (o === i ? null : o))}
+              onKeyDown={(e) => {
+                if (e.key === "Escape" && shown === i) {
+                  setShown(null);
+                  document.getElementById(`why-${c.icon}-play`)?.focus();
+                }
+              }}
+              className="group relative h-[28rem] w-full shrink-0 snap-start overflow-hidden rounded-card bg-night outline-offset-2 md:w-[calc((100%-1rem)/2)] min-[75rem]:h-[31.25rem] min-[75rem]:w-auto min-[75rem]:min-w-0 min-[75rem]:flex-1 min-[75rem]:transition-[flex-grow] min-[75rem]:duration-[600ms] min-[75rem]:ease-settle min-[75rem]:hover:grow-[4.7] min-[75rem]:focus-visible:grow-[4.7] motion-reduce:transition-none"
+            >
+              {/* From 1200: the open card's width (about 54% of the row less its four 4px gaps), centred on the card. */}
+              <Picture
+                id={c.image.id}
+                alt={c.image.alt}
+                position={c.image.position}
+                fit="fill"
+                rounded="none"
+                sizes="(min-width: 1200px) 54vw, (min-width: 768px) 50vw, 100vw"
+                className="absolute inset-0 min-[75rem]:left-1/2 min-[75rem]:right-auto min-[75rem]:w-[calc((100cqw-1rem)*0.54)] min-[75rem]:-translate-x-1/2"
+              />
+              <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(to_top,rgba(18,17,16,0.8)_0%,rgba(18,17,16,0.15)_45%,rgba(18,17,16,0.25)_100%)]" />
+              {/* From 1200 the open card's left side darkens to near-black under its text and panel. */}
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 hidden bg-[linear-gradient(90deg,var(--color-night)_0%,rgba(18,17,16,0.85)_14%,transparent_58%)] opacity-0 transition-opacity duration-[600ms] ease-settle group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none min-[75rem]:block"
+              />
+              <span className="absolute left-5 top-5 text-white">
+                <Icon name={c.icon} className="size-7" />
+              </span>
+              <ReasonPanel
+                id={c.icon as CardPanelId}
+                title={c.title}
+                row={row}
+                open={open === i}
+                shown={shown === i}
+                onShow={() => setShown(i)}
+                onHide={() => {
+                  setShown(null);
+                  document.getElementById(`why-${c.icon}-play`)?.focus();
+                }}
+              />
+              <div className={`why-text absolute inset-x-5 bottom-5 text-white transition-opacity duration-200 motion-reduce:transition-none ${shown === i ? "opacity-0" : ""}`}>
+                <h3 id={`why-${c.icon}`} className="max-w-[14rem] text-[1.75rem] leading-[1.1] min-[75rem]:max-w-[16rem]">
+                  {c.title}
+                </h3>
+                <p
+                  id={`why-${c.icon}-body`}
+                  className="mt-2 max-w-md text-small text-white/85 min-[75rem]:max-h-0 min-[75rem]:overflow-hidden min-[75rem]:opacity-0 min-[75rem]:transition-[opacity,max-height] min-[75rem]:duration-[300ms,600ms] min-[75rem]:group-hover:delay-75 min-[75rem]:group-hover:max-h-20 min-[75rem]:group-hover:opacity-100 min-[75rem]:group-focus-visible:max-h-20 min-[75rem]:group-focus-visible:opacity-100"
+                >
+                  {c.body}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ul>
+
+        {/* Below 1200: previous, the pager and next, centred under the track. */}
+        <Pager trackId="why-track" index={index} positions={positions} go={step} noun="reason" className="mt-6 min-[75rem]:hidden" />
+      </div>
     </Band>
+  );
+}
+
+/**
+ * A reason card's panel. In the row (from 1200) it fades in above the title once the card has opened and
+ * plays while it stays open. On the carousel a round play button opens it inside the card, over the
+ * dimmed picture, with a close button; it plays while open.
+ */
+function ReasonPanel({ id, title, row, open, shown, onShow, onHide }: { id: CardPanelId; title: string; row: boolean; open: boolean; shown: boolean; onShow: () => void; onHide: () => void }) {
+  const panelId = `why-${id}-panel`;
+  return (
+    <>
+      <div
+        aria-hidden="true"
+        className="absolute bottom-[7.25rem] left-5 hidden w-[17.5rem] opacity-0 transition-opacity duration-500 group-hover:opacity-100 group-hover:delay-300 group-focus-visible:opacity-100 group-focus-visible:delay-300 motion-reduce:transition-none motion-reduce:delay-0 min-[75rem]:block"
+      >
+        <CardPanel id={id} active={row && open} />
+      </div>
+      {row ? null : (
+        <>
+          <button
+            id={`why-${id}-play`}
+            type="button"
+            aria-label={`Show the demo: ${title}`}
+            aria-expanded={shown}
+            aria-controls={panelId}
+            onClick={onShow}
+            className={`absolute left-1/2 top-[42%] flex size-[3.75rem] min-[75rem]:hidden -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-pill bg-night/75 text-white transition-[background-color,opacity] duration-200 hover:bg-night/90 motion-reduce:transition-none ${shown ? "pointer-events-none opacity-0" : ""}`}
+          >
+            <svg aria-hidden="true" viewBox="0 0 24 24" className="ml-1 size-6" fill="currentColor">
+              <path d="M8 5.5v13l10.5-6.5L8 5.5Z" />
+            </svg>
+          </button>
+          <div id={panelId} hidden={!shown} className="absolute inset-0 flex items-center justify-center bg-night/85 p-5 min-[75rem]:hidden">
+            {shown ? (
+              <>
+                <CardPanel id={id} active />
+                <button
+                  ref={focusOnMount}
+                  type="button"
+                  aria-label={`Close the demo: ${title}`}
+                  onClick={onHide}
+                  className="absolute right-3 top-3 flex size-11 items-center justify-center rounded-pill bg-white text-ink transition-[background-color] duration-200 hover:bg-paper"
+                >
+                  <svg aria-hidden="true" viewBox="0 0 16 16" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round">
+                    <path d="m4 4 8 8m0-8-8 8" />
+                  </svg>
+                </button>
+              </>
+            ) : null}
+          </div>
+        </>
+      )}
+    </>
   );
 }

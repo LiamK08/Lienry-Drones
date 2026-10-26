@@ -35,8 +35,9 @@ function Circles({ hidden }: { hidden?: boolean }) {
 
 /**
  * The footer, on near-black: a row of round pictures drifting slowly across the top over a soft
- * teal glow, then the logo set large with the tagline in Inter italic, four link columns under small
- * grey headings, a hairline, and the copyright line with the legal links. Under reduced motion the
+ * teal glow, then the logo set large with the tagline in Inter italic and, over the fourth column, a
+ * row of "Ask AI about Lienry" pills, four link columns under small grey headings, a hairline, and the
+ * copyright line with the legal links. Under reduced motion the
  * row stands still. Condensed on 23 October at the owner's request: smaller pictures, logo and gaps.
  */
 export function Footer() {
@@ -51,13 +52,38 @@ export function Footer() {
       </div>
 
       <div className="mx-auto mt-10 w-full max-w-[75rem] px-5 md:mt-12 xl:px-0">
-        <div className="flex items-center gap-3 md:gap-4">
-          <Mark className="h-11 w-auto md:h-16" />
-          <p aria-hidden="true" className="max-w-none font-display text-[3rem] leading-none tracking-[-0.02em] md:text-[4.25rem]">
-            {brand.name.split(" ")[0]}
-          </p>
+        <div className="grid gap-y-8 md:grid-cols-4 md:items-end md:gap-x-6">
+          <div className="md:col-span-3">
+            <div className="flex items-center gap-3 md:gap-4">
+              <Mark className="h-11 w-auto md:h-16" />
+              <p aria-hidden="true" className="max-w-none font-display text-[3rem] leading-none tracking-[-0.02em] md:text-[4.25rem]">
+                {brand.name.split(" ")[0]}
+              </p>
+            </div>
+            <p className="mt-3 max-w-none font-[family-name:var(--font-inter-italic)] text-[1.125rem] italic tracking-[-0.02em] md:text-[1.375rem]">{footer.tagline}</p>
+          </div>
+          {/* Ask an AI assistant about Lienry: text pills that open each one with the question filled in. */}
+          <div>
+            <p id="footer-ask-ai" className="text-[0.8125rem] font-medium leading-[1.2] text-[#8a8a8a]">
+              {footer.askAi.label}
+            </p>
+            <ul aria-labelledby="footer-ask-ai" className="mt-3 flex flex-wrap gap-2">
+              {footer.askAi.links.map((l) => (
+                <li key={l.label}>
+                  <a
+                    href={l.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex h-9 items-center rounded-pill border border-white/10 bg-white/[0.05] px-3.5 text-[0.8125rem] text-white/85 transition-[background-color,border-color,color] duration-200 hover:border-white/30 hover:bg-white/[0.1] hover:text-white"
+                  >
+                    {l.label}
+                    <span className="sr-only"> (opens in a new tab)</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
-        <p className="mt-3 max-w-none font-[family-name:var(--font-inter-italic)] text-[1.125rem] italic tracking-[-0.02em] md:text-[1.375rem]">{footer.tagline}</p>
 
         <nav aria-label="Footer" className="mt-8 grid gap-y-10 md:mt-10 md:grid-cols-4 md:gap-x-6">
           {footer.groups.map((g) => (

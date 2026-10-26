@@ -1,13 +1,44 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode, type RefObject } from "react";
 import { fitCheck } from "@/content/home";
+import { enquirySchema } from "@/lib/enquiry-schema";
 import { Button } from "@/components/ui/Button";
+import { Field, describedBy, fieldControl } from "@/components/ui/Field";
 
 type Answer = (typeof fitCheck.answers)[number]["id"];
+type Zone = (typeof fitCheck.panel.zones)[number]["id"];
+type Question = (typeof fitCheck.groups)[number]["questions"][number];
 
-const all = fitCheck.groups.flatMap((g) => g.questions);
+const all: Question[] = fitCheck.groups.flatMap((g) => g.questions);
 const scoreOf = (a: Answer) => fitCheck.answers.find((x) => x.id === a)?.score ?? 0;
+const { zones, verdicts } = fitCheck.panel;
+/** Moves focus into the send form's first field as it opens. */
+const focusOnMount = (el: HTMLInputElement | null) => el?.focus();
+
+/** The score out of 100: each question's weight, in full for a Yes and by half for a Partly. */
+const percent = (answers: Record<string, Answer>) => Math.round(all.reduce((s, q) => s + (answers[q.id] ? q.weight * scoreOf(answers[q.id]) : 0), 0));
+const verdictFor = (pct: number) => verdicts.find((v) => pct >= v.min) ?? verdicts[verdicts.length - 1];
+/** The points to talk through: every No in question order, or, with none, the Partlys; three at most. */
+const gapsOf = (answers: Record<string, Answer>) => {
+  const nos = all.filter((q) => answers[q.id] === "no");
+  return (nos.length ? nos : all.filter((q) => answers[q.id] === "partly")).slice(0, 3);
+};
+
+// A chosen answer takes its own tone: Yes the accent tint, Partly the warm debris tone, No a soft red.
+const chosen: Record<Answer, string> = {
+  yes: "border-accent/40 bg-tint text-accent",
+  partly: "border-fit-partly-edge bg-fit-partly-soft text-debris-text",
+  no: "border-fit-no-edge bg-fit-no-soft text-fit-no",
+};
+const forced = "forced-colors:forced-color-adjust-none forced-colors:border-[Highlight] forced-colors:bg-[Highlight] forced-colors:text-[HighlightText]";
+
+// The score bar's zones: the pale track of each, its fill while the score sits in it, and its label.
+const zoneTone: Record<Zone, { track: string; fill: string; text: string }> = {
+  low: { track: "bg-fit-no-soft", fill: "bg-fit-no-bar", text: "text-fit-no" },
+  mid: { track: "bg-fit-partly-soft", fill: "bg-debris", text: "text-debris-text" },
+  high: { track: "bg-tint", fill: "bg-accent", text: "text-accent" },
+};
 
 export type FitCheckProps = {
   /** Prefixes the radio names and label ids. Column: the group headings are `${id}-g0`, `${id}-g1`. */
@@ -23,19 +54,35 @@ export type FitCheckProps = {
 
 /**
  * The fit check: seven questions in two groups, each answered Yes, Partly or No with a row of small
- * pills (a radio group per question), beside a panel that scores the answers live. The panel names
- * the verdict once all seven are answered and lists the questions marked Partly or No. Indicative only.
+ * pills (a radio group per question). A chosen pill takes its answer's tone. The score out of 100 is
+ * live from the first answer (it changes at once, never counting up), over a bar in three zones that
+ * fills to it in the colour of the zone it reaches. Under it, the zone's lead line and up to three
+ * points the answers raise (the Nos first), or a clear line when there are none. Indicative only.
+ *
+ * The home card: the questions beside an inset result panel from 1024; on smaller screens the panel
+ * comes first, and once a question is answered a strip at the foot of the card keeps the score in view
+ * (sticky to the bottom of the screen while the panel is off it) with a button back to the result. The
+ * panel holds one height in every state. "Send me my result" opens a short form in the panel (name and
+ * email) that sends the answers with the score through the enquiry route, to be answered by a person;
+ * "Start again" clears every answer. The column layout links on instead.
  */
 export function FitCheck({ id = "fit", layout = "card", intro, badge }: FitCheckProps) {
   const [answers, setAnswers] = useState<Record<string, Answer>>({});
   const answered = Object.keys(answers).length;
-  const score = Object.values(answers).reduce((s, a) => s + scoreOf(a), 0);
+  const pct = percent(answers);
   const done = answered === all.length;
-  const verdict = fitCheck.panel.verdicts.find((v) => score >= v.min) ?? fitCheck.panel.verdicts[fitCheck.panel.verdicts.length - 1];
-  const gaps = all.filter((q) => answers[q.id] && answers[q.id] !== "yes");
+  const verdict = verdictFor(pct);
+  const gaps = gapsOf(answers);
+  const count = fitCheck.panel.answered.replace("{n}", String(answered));
+  const pick = (q: string, a: Answer) => setAnswers((s) => ({ ...s, [q]: a }));
+  const scoreRef = useRef<HTMLDivElement>(null);
+  const firstRef = useRef<HTMLInputElement>(null);
+  const restart = () => {
+    setAnswers({});
+    firstRef.current?.focus();
+  };
 
   if (layout === "column") {
-    const count = fitCheck.panel.answered.replace("{n}", String(answered));
     return (
       <>
         <div
@@ -81,10 +128,10 @@ export function FitCheck({ id = "fit", layout = "card", intro, badge }: FitCheck
                             <label
                               key={a.id}
                               className={`relative flex h-[38px] cursor-pointer items-center rounded-pill border px-4 text-small shadow-[0_1px_2px_rgb(0_0_0/0.06)] transition-[background-color,border-color,color] duration-200 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus ${
-                                on ? "border-accent bg-accent text-white forced-colors:forced-color-adjust-none forced-colors:border-[Highlight] forced-colors:bg-[Highlight] forced-colors:text-[HighlightText]" : "border-line bg-white text-ink hover:border-ink"
+                                on ? `${chosen[a.id]} ${forced}` : "border-line bg-white text-ink hover:border-ink"
                               }`}
                             >
-                              <input type="radio" name={`${id}-${q.id}`} value={a.id} checked={on} onChange={() => setAnswers((s) => ({ ...s, [q.id]: a.id }))} className="sr-only" />
+                              <input type="radio" name={`${id}-${q.id}`} value={a.id} checked={on} onChange={() => pick(q.id, a.id)} className="sr-only" />
                               {a.label}
                             </label>
                           );
@@ -98,35 +145,14 @@ export function FitCheck({ id = "fit", layout = "card", intro, badge }: FitCheck
           ))}
 
           <div className="mt-12 rounded-card border border-line bg-white p-6 shadow-[0_1px_2px_rgb(0_0_0/0.06)]">
-            <div aria-live="polite">
-              <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                <p className="text-label font-medium uppercase tracking-[0.08em] text-accent">{fitCheck.panel.label}</p>
-                <p className="text-caption text-muted">{count}</p>
-              </div>
-              {done ? (
-                <div className="mt-4">
-                  <p className="font-display text-[3rem] leading-none text-ink">
-                    {score % 1 ? score.toFixed(1) : score}
-                    <span className="text-[1.5rem] text-muted"> / 7</span>
-                  </p>
-                  <p className="mt-3 font-display text-[1.5rem] leading-[1.2] tracking-[-0.01em] text-ink">{verdict.title}</p>
-                  <p className="mt-2 text-small text-muted">{verdict.body}</p>
-                  {gaps.length ? (
-                    <div className="mt-5">
-                      <p className="text-caption font-medium text-ink">{fitCheck.panel.gaps}</p>
-                      <ul className="mt-2 space-y-1">
-                        {gaps.map((q) => (
-                          <li key={q.id} className="text-caption text-muted">
-                            · {q.text}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ) : null}
-                </div>
-              ) : (
-                <p className="mt-3 text-small text-muted">{answered ? `${all.length - answered} to go.` : fitCheck.panel.empty}</p>
-              )}
+            <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+              <p className="text-label font-medium uppercase tracking-[0.08em] text-accent">{fitCheck.panel.label}</p>
+              <p className="text-caption text-muted">{count}</p>
+            </div>
+            <Score pct={pct} className="mt-4" size="sm" />
+            <ZoneBar pct={pct} answered={answered} done={done} className="mt-5" />
+            <div aria-live="polite" className="mt-6">
+              <Result answered={answered} done={done} verdict={verdict} gaps={gaps} answers={answers} />
             </div>
           </div>
 
@@ -148,35 +174,43 @@ export function FitCheck({ id = "fit", layout = "card", intro, badge }: FitCheck
   }
 
   return (
-    <div className="grid overflow-hidden rounded-panel border border-line bg-white shadow-[0_32px_64px_-48px_rgb(0_0_0/0.35)] lg:grid-cols-[1.25fr_1fr]">
-      <div className="p-6 md:p-10">
+    <div className="grid rounded-panel border border-white bg-white/60 shadow-[inset_0_1px_0_rgb(255_255_255/0.8),0_30px_80px_-30px_rgb(15_106_124/0.25)] lg:grid-cols-[minmax(0,1fr)_minmax(0,29.875rem)]">
+      <div className="p-6 md:p-10 lg:col-start-1 lg:row-start-1 lg:py-12 lg:pl-12 lg:pr-6">
         <h3 className="text-h3">{fitCheck.title}</h3>
         <p className="mt-2 text-small text-muted">{fitCheck.intro}</p>
-        {fitCheck.groups.map((g) => (
+        {fitCheck.groups.map((g, gi) => (
           <fieldset key={g.label} className="mt-8">
             <legend className="text-label font-medium uppercase tracking-[0.08em] text-muted">{g.label}</legend>
             <ol className="mt-2">
-              {g.questions.map((q) => {
+              {g.questions.map((q, qi) => {
                 const n = all.findIndex((x) => x.id === q.id) + 1;
                 return (
-                  <li key={q.id} className="flex flex-col gap-3 border-b border-line py-4 last:border-b-0 sm:flex-row sm:items-center sm:justify-between">
-                    <span id={`${id}-${q.id}`} className="flex gap-3 text-small text-ink">
-                      <span aria-hidden="true" className="w-4 shrink-0 text-muted">
+                  <li key={q.id} className="flex flex-col gap-2.5 border-b border-line py-3.5 last:border-b-0 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+                    <span id={`${id}-${q.id}`} className="flex gap-3 text-body font-medium leading-[1.3] text-ink">
+                      <span aria-hidden="true" className="w-4 shrink-0 text-small font-normal leading-[1.5] text-muted">
                         {n}
                       </span>
                       {q.text}
                     </span>
-                    <span role="radiogroup" aria-labelledby={`${id}-${q.id}`} className="flex shrink-0 gap-2 pl-7 sm:pl-0">
-                      {fitCheck.answers.map((a) => {
+                    <span role="radiogroup" aria-labelledby={`${id}-${q.id}`} className="flex w-full shrink-0 gap-1.5 pl-7 sm:w-auto sm:pl-0">
+                      {fitCheck.answers.map((a, ai) => {
                         const on = answers[q.id] === a.id;
                         return (
                           <label
                             key={a.id}
-                            className={`relative flex h-8 cursor-pointer items-center rounded-pill border px-3.5 text-caption transition-[background-color,border-color,color] duration-200 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus ${
-                              on ? "border-accent bg-accent text-white" : "border-line bg-white text-ink hover:border-ink"
+                            className={`relative flex h-9 flex-1 cursor-pointer items-center justify-center rounded-pill border text-small font-medium transition-[background-color,border-color,color] duration-200 motion-reduce:transition-none has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus sm:h-8 sm:w-[4.25rem] sm:flex-none ${
+                              on ? `${chosen[a.id]} ${forced}` : "border-line bg-white text-muted hover:border-ink hover:text-ink"
                             }`}
                           >
-                            <input type="radio" name={`${id}-${q.id}`} value={a.id} checked={on} onChange={() => setAnswers((s) => ({ ...s, [q.id]: a.id }))} className="sr-only" />
+                            <input
+                              ref={gi === 0 && qi === 0 && ai === 0 ? firstRef : undefined}
+                              type="radio"
+                              name={`${id}-${q.id}`}
+                              value={a.id}
+                              checked={on}
+                              onChange={() => pick(q.id, a.id)}
+                              className="sr-only"
+                            />
                             {a.label}
                           </label>
                         );
@@ -188,54 +222,319 @@ export function FitCheck({ id = "fit", layout = "card", intro, badge }: FitCheck
             </ol>
           </fieldset>
         ))}
+        {/* Sticky within this column, so it rides along the questions and stops at their foot. */}
+        {answered ? <FitStrip pct={pct} answered={answered} done={done} count={count} scoreRef={scoreRef} /> : null}
       </div>
 
-      <div className="flex flex-col bg-paper p-6 md:p-10">
-        <div className="flex items-center justify-between">
-          <p className="text-label font-medium uppercase tracking-[0.08em] text-accent">{fitCheck.panel.label}</p>
-          <p className="text-caption text-muted">{fitCheck.panel.answered.replace("{n}", String(answered))}</p>
-        </div>
-        <div aria-live="polite" className="flex flex-1 flex-col justify-center py-10 text-center">
-          {done ? (
-            <>
-              <p className="font-display text-[4rem] leading-none text-ink">
-                {score % 1 ? score.toFixed(1) : score}
-                <span className="text-h3 text-muted"> / 7</span>
-              </p>
-              <p className="mt-4 text-h3">{verdict.title}</p>
-              <p className="mx-auto mt-2 max-w-sm text-small text-muted">{verdict.body}</p>
-              {gaps.length ? (
-                <div className="mx-auto mt-6 max-w-sm text-left">
-                  <p className="text-caption font-medium text-ink">{fitCheck.panel.gaps}</p>
-                  <ul className="mt-2 space-y-1">
-                    {gaps.map((q) => (
-                      <li key={q.id} className="text-caption text-muted">
-                        · {q.text}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
-            </>
-          ) : (
-            <>
-              <p aria-hidden="true" className="font-display text-[5rem] leading-none text-accent/40">
-                ?
-              </p>
-              <p className="mx-auto mt-4 max-w-xs text-small text-muted">{answered ? `${all.length - answered} to go.` : fitCheck.panel.empty}</p>
-            </>
-          )}
-        </div>
-        <div className="flex flex-col gap-3">
-          <Button href={fitCheck.panel.primary.href} size="lg" className="w-full">
-            {fitCheck.panel.primary.label}
-          </Button>
-          <Button href={fitCheck.panel.secondary.href} variant="secondary" size="lg" className="w-full">
-            {fitCheck.panel.secondary.label}
-          </Button>
-          <p className="mt-1 text-caption text-muted">{fitCheck.panel.note}</p>
-        </div>
+      <ResultPanel pct={pct} answered={answered} done={done} verdict={verdict} gaps={gaps} answers={answers} count={count} scoreRef={scoreRef} onRestart={restart} />
+    </div>
+  );
+}
+
+type ResultProps = {
+  answered: number;
+  done: boolean;
+  verdict: (typeof verdicts)[number];
+  gaps: Question[];
+  answers: Record<string, Answer>;
+  className?: string;
+};
+
+/** The big score: the figure in the serif, then "/ 100". The live line beside it reads it out. */
+function Score({ pct, size = "lg", className = "" }: { pct: number; size?: "lg" | "sm"; className?: string }) {
+  return (
+    <p className={`flex items-baseline gap-2 font-display text-ink ${className}`}>
+      <span className={`${size === "lg" ? "text-[5rem] md:text-[6rem]" : "text-[3.5rem]"} leading-none tracking-[-0.05em] tabular-nums`}>{pct}</span>
+      <span className="text-[1.5rem] leading-none text-muted">/ 100</span>
+    </p>
+  );
+}
+
+/**
+ * The three-zone bar: each zone's pale track, the fill up to the score in the reached zone's colour,
+ * and the labels: the reached zone's in its colour, the others muted; it is set heavier once all seven
+ * are answered, so the colour shows the live zone and the weight confirms the final one.
+ */
+function ZoneBar({ pct, answered, done, className = "" }: { pct: number; answered: number; done: boolean; className?: string }) {
+  const at = answered ? verdictFor(pct).zone : null;
+  const fill = at ? zoneTone[at].fill : "";
+  return (
+    <div aria-hidden="true" className={className}>
+      <div className="relative flex h-1.5 gap-0.5 overflow-hidden rounded-pill">
+        {zones.map((z, i) => {
+          const to = zones[i + 1]?.from ?? 100;
+          const width = to - z.from;
+          // The share of this zone the score has passed.
+          const filled = Math.max(0, Math.min(1, (pct - z.from) / width));
+          return (
+            <span key={z.id} style={{ flexBasis: `${width}%` }} className={`relative h-full min-w-0 grow overflow-hidden ${zoneTone[z.id].track} forced-colors:bg-[GrayText]`}>
+              <span
+                style={{ width: `${filled * 100}%` }}
+                className={`absolute inset-y-0 left-0 transition-[width,background-color] duration-500 ease-instrument motion-reduce:transition-none forced-colors:bg-[Highlight] ${fill}`}
+              />
+            </span>
+          );
+        })}
       </div>
+      <div className="mt-2 flex gap-0.5">
+        {zones.map((z, i) => {
+          const to = zones[i + 1]?.from ?? 100;
+          return (
+            <span
+              key={z.id}
+              style={{ flexBasis: `${to - z.from}%` }}
+              className={`min-w-0 grow text-caption leading-[1.2] transition-[color] duration-300 motion-reduce:transition-none ${at === z.id ? zoneTone[z.id].text : "text-muted"} ${at === z.id && done ? "font-semibold" : ""}`}
+            >
+              {z.label}
+            </span>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/** What the answers mean so far: a prompt before the first, then the lead line and up to three points to talk through. */
+function Result({ answered, done, verdict, gaps, answers, className = "" }: ResultProps) {
+  if (!answered) {
+    return (
+      <div className={`flex items-start gap-4 rounded-card border border-accent bg-tint p-5 ${className}`}>
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 16 16"
+          className="mt-1 size-4 shrink-0 rotate-90 animate-[nudge-y_1.4s_ease-in-out_infinite] text-accent lg:rotate-0 lg:animate-[nudge-x_1.4s_ease-in-out_infinite] motion-reduce:animate-none"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.75"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M13 8H3m4.5-4.5L3 8l4.5 4.5" />
+        </svg>
+        <span>
+          <span className="block text-body font-medium leading-[1.3] text-ink">
+            <span className="lg:hidden">{fitCheck.panel.prompt.title.narrow}</span>
+            <span className="hidden lg:inline">{fitCheck.panel.prompt.title.wide}</span>
+          </span>
+          <span className="mt-1 block text-small text-muted">{fitCheck.panel.prompt.body}</span>
+        </span>
+      </div>
+    );
+  }
+  return (
+    <div className={className}>
+      <p className="text-body text-ink">
+        {done ? verdict.body : verdict.lead} {gaps.length ? fitCheck.panel.gaps : null}
+      </p>
+      {gaps.length ? (
+        <ul className="mt-3">
+          {gaps.map((q) => (
+            <GapRow key={q.id} q={q} no={answers[q.id] === "no"} />
+          ))}
+        </ul>
+      ) : (
+        <p className="mt-2 text-small text-muted">{fitCheck.panel.clear}</p>
+      )}
+    </div>
+  );
+}
+
+/** One point to talk through: a round mark (a cross for a No, a dash for a Partly) and its phrase. It rises in as it joins. */
+function GapRow({ q, no, still = false }: { q: Question; no: boolean; still?: boolean }) {
+  return (
+    <li className={`flex items-center gap-3 border-b border-accent/10 py-2.5 text-small text-ink last:border-b-0 ${still ? "" : "animate-[gap-in_400ms_cubic-bezier(0.22,1,0.36,1)_both] motion-reduce:animate-none"}`}>
+      <span aria-hidden="true" className={`flex size-6 shrink-0 items-center justify-center rounded-pill ${no ? "bg-fit-no-soft text-fit-no" : "bg-fit-partly-soft text-debris-text"}`}>
+        <svg viewBox="0 0 16 16" className="size-3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <path d={no ? "m5 5 6 6m0-6-6 6" : "M4.5 8h7"} />
+        </svg>
+      </span>
+      <span>
+        <span className="sr-only">{no ? "No: " : "Partly: "}</span>
+        {q.gap}
+      </span>
+    </li>
+  );
+}
+
+// The tallest the result can be: the longest verdict line and the three longest points. A hidden copy
+// holds the panel at that height in every state, so the actions under it never move.
+const longestLine = [...verdicts.flatMap((v) => [v.lead, v.body])].sort((a, b) => b.length - a.length)[0];
+const longestGaps = [...all].sort((a, b) => b.gap.length - a.gap.length).slice(0, 3);
+
+/**
+ * The home card's result panel: the score with the count beside it while some are answered, the bar,
+ * the result, then the two actions, "Start again" once anything is answered, and the note. "Send me my
+ * result" swaps the result and actions for a two-field form that sends the answers with the score; the
+ * reply comes from a person. Everything that changes is announced politely.
+ */
+function ResultPanel({ pct, count, scoreRef, onRestart, ...result }: ResultProps & { pct: number; count: string; scoreRef: RefObject<HTMLDivElement | null>; onRestart: () => void }) {
+  const { send } = fitCheck.panel;
+  const [mode, setMode] = useState<"result" | "form" | "sending" | "sent" | "failed">("result");
+  const [errors, setErrors] = useState<Partial<Record<"name" | "email", string>>>({});
+  const uid = useId();
+  const fid = (name: string) => `${uid}-${name}`;
+  const zone = zones.find((z) => z.id === verdictFor(pct).zone)?.label;
+  const partway = result.answered > 0 && !result.done;
+
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const form = new FormData(e.currentTarget);
+    const lines = all.map((q, i) => `${i + 1}. ${q.text}: ${fitCheck.answers.find((a) => a.id === result.answers[q.id])?.label ?? "Not answered"}`);
+    const parsed = enquirySchema.safeParse({
+      type: "commercial",
+      source: "fit-check",
+      name: form.get("name"),
+      email: form.get("email"),
+      company: form.get("company") ?? "",
+      message: [`Fit check: ${pct} / 100 (${zone}), ${count}.`, ...lines].join("\n"),
+    });
+    if (!parsed.success) {
+      const next: typeof errors = {};
+      for (const issue of parsed.error.issues) {
+        const key = String(issue.path[0]);
+        if (key === "name" || key === "email") next[key] ??= issue.message;
+      }
+      setErrors(next);
+      const first = (["name", "email"] as const).find((k) => next[k]);
+      if (first) document.getElementById(fid(first))?.focus();
+      return;
+    }
+    setErrors({});
+    setMode("sending");
+    try {
+      const res = await fetch("/api/enquiry", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(parsed.data) });
+      setMode(res.ok ? "sent" : "failed");
+    } catch {
+      setMode("failed");
+    }
+  }
+
+  const input = (name: "name" | "email", label: string, props: React.ComponentPropsWithRef<"input">) => (
+    <Field id={fid(name)} label={label} error={errors[name]}>
+      <input id={fid(name)} name={name} className={fieldControl} aria-invalid={errors[name] ? true : undefined} aria-describedby={describedBy(fid(name), undefined, errors[name])} {...props} />
+    </Field>
+  );
+
+  return (
+    <div className="order-first m-3 flex flex-col rounded-card border border-accent/15 bg-white p-6 md:m-4 md:p-9 lg:order-none lg:col-start-2 lg:row-start-1 lg:my-6 lg:ml-0 lg:mr-6">
+      <div ref={scoreRef} tabIndex={-1} className="flex items-end justify-between gap-4 focus-visible:outline-none">
+        <Score pct={pct} />
+        {partway ? <p className="pb-1 text-caption text-muted">{count}</p> : null}
+      </div>
+      <p aria-live="polite" className="sr-only">
+        {result.answered ? `Score ${pct} out of 100: ${zone}. ${count}.` : ""}
+      </p>
+      <ZoneBar pct={pct} answered={result.answered} done={result.done} className="mt-6" />
+
+      {mode === "result" ? (
+        <>
+          <div className="mt-7 grid flex-1">
+            <div aria-hidden="true" className="pointer-events-none invisible [grid-area:1/1]">
+              <p className="text-body">
+                {longestLine} {fitCheck.panel.gaps}
+              </p>
+              <ul className="mt-3">
+                {longestGaps.map((q) => (
+                  <GapRow key={q.id} q={q} no still />
+                ))}
+              </ul>
+            </div>
+            <div aria-live="polite" className="[grid-area:1/1]">
+              <Result {...result} />
+            </div>
+          </div>
+          <div className="mt-8 flex flex-col gap-3">
+            <Button size="lg" className="w-full" onClick={() => setMode("form")}>
+              {send.open}
+            </Button>
+            <Button href={fitCheck.panel.secondary.href} variant="secondary" size="lg" className="w-full">
+              {fitCheck.panel.secondary.label}
+            </Button>
+          </div>
+        </>
+      ) : mode === "sent" ? (
+        <div role="status" className="mt-7 flex-1">
+          <p className="font-display text-[1.5rem] leading-[1.2] tracking-[-0.01em] text-ink">{send.sent.title}</p>
+          <p className="mt-2 text-small text-muted">{send.sent.body}</p>
+        </div>
+      ) : (
+        <form noValidate onSubmit={onSubmit} aria-labelledby={fid("title")} className="mt-7 flex flex-1 flex-col">
+          <p id={fid("title")} className="font-display text-[1.5rem] leading-[1.2] tracking-[-0.01em] text-ink">
+            {send.title}
+          </p>
+          <p className="mt-2 text-small text-muted">{send.body}</p>
+          <div className="mt-5 grid gap-4">
+            {input("name", "Name", { autoComplete: "name", ref: focusOnMount })}
+            {input("email", "Email", { type: "email", autoComplete: "email", inputMode: "email" })}
+          </div>
+          <div className="hidden" aria-hidden="true">
+            <label htmlFor={fid("company")}>Company</label>
+            <input id={fid("company")} name="company" tabIndex={-1} autoComplete="off" />
+          </div>
+          {mode === "failed" ? (
+            <p role="alert" className="mt-4 text-small text-error">
+              {send.failed}
+            </p>
+          ) : null}
+          <div className="mt-auto flex flex-col gap-3 pt-8">
+            <Button type="submit" size="lg" className="w-full" aria-disabled={mode === "sending" || undefined}>
+              {mode === "sending" ? send.sending : send.submit}
+            </Button>
+            <Button variant="secondary" size="lg" className="w-full" onClick={() => setMode("result")}>
+              {send.back}
+            </Button>
+          </div>
+        </form>
+      )}
+      <div className="mt-4 flex flex-col items-center gap-1 text-center">
+        <p className="text-caption text-muted">{fitCheck.panel.note}</p>
+        {result.answered && mode === "result" ? (
+          <Button variant="tertiary" onClick={onRestart}>
+            {fitCheck.panel.restart}
+          </Button>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Below 1024: the strip at the foot of the card once a question is answered. It sticks 12px above the
+ * bottom of the screen while the result panel's score is off screen, and stops at the card's foot. It
+ * shows the count (the zone once all seven are answered) over the score, and a button that brings the
+ * result back into view under the bar and moves the focus to it (at once under reduced motion).
+ */
+function FitStrip({ pct, answered, done, count, scoreRef }: { pct: number; answered: number; done: boolean; count: string; scoreRef: RefObject<HTMLDivElement | null> }) {
+  const [scoreOnScreen, setScoreOnScreen] = useState(true);
+  useEffect(() => {
+    const el = scoreRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([entry]) => setScoreOnScreen(entry.isIntersecting), { rootMargin: "-56px 0px 0px 0px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [scoreRef]);
+  const zone = zones.find((z) => z.id === verdictFor(pct).zone)?.label;
+  const back = () => {
+    const el = scoreRef.current;
+    if (!el) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const nav = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--nav-h")) || 56;
+    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - nav - 24, behavior: reduce ? "auto" : "smooth" });
+    el.focus({ preventScroll: true });
+  };
+  return (
+    <div
+      data-fit-strip=""
+      aria-hidden={scoreOnScreen || undefined}
+      className={`sticky bottom-3 z-10 mt-4 flex items-center justify-between gap-4 rounded-card border border-line bg-white px-4 py-2.5 shadow-[0_6px_20px_rgb(15_106_124/0.12)] transition-[opacity] duration-200 motion-reduce:transition-none lg:hidden ${scoreOnScreen ? "pointer-events-none opacity-0" : "opacity-100"}`}
+    >
+      <span className="min-w-0">
+        <span className="block text-caption leading-tight text-muted">{done ? zone : answered ? count : ""}</span>
+        <span className="block text-body font-medium leading-tight text-ink tabular-nums">{pct} / 100</span>
+      </span>
+      <Button variant="secondary" size="sm" onClick={back} tabIndex={scoreOnScreen ? -1 : undefined}>
+        {fitCheck.panel.strip.see}
+      </Button>
     </div>
   );
 }

@@ -26,7 +26,16 @@ const typeCard = radioCard.replace("items-start gap-4", "items-center gap-3").re
  * radios and the short fields pair up, which suits the 480px card on /register-interest, the home
  * card (390 wide at 1024, wider above) and a phone alike.
  */
-export function EnquiryForm() {
+export type EnquiryFormProps = {
+  /** The booking card's chosen call time: sent with the enquiry (source "booking") for a person to confirm. */
+  preferredTime?: string;
+  /** The submit label. Default "Register interest". */
+  submitLabel?: string;
+  /** The confirmation that replaces the form. Default the register page's. */
+  success?: { headline: string; body: string };
+};
+
+export function EnquiryForm({ preferredTime, submitLabel = "Register interest", success = registerPage.success }: EnquiryFormProps = {}) {
   const [type, setType] = useEnquiryType();
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "failed">("idle");
@@ -37,7 +46,8 @@ export function EnquiryForm() {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
     const raw = Object.fromEntries(form.entries());
-    const parsed = enquirySchema.safeParse({ ...raw, type, updates: form.get("updates") === "on" });
+    const booking = preferredTime ? { source: "booking", preferredTime } : {};
+    const parsed = enquirySchema.safeParse({ ...raw, ...booking, type, updates: form.get("updates") === "on" });
     if (!parsed.success) {
       const next: Errors = {};
       for (const issue of parsed.error.issues) next[String(issue.path[0])] = issue.message;
@@ -60,9 +70,9 @@ export function EnquiryForm() {
     return (
       <div data-form-success="" role="status" className="border-t border-rule pt-8">
         <h2 ref={focusOnMount} tabIndex={-1} className="text-h3 focus-visible:outline-none">
-          {registerPage.success.headline}
+          {success.headline}
         </h2>
-        <p className="mt-4 text-body text-fg-muted">{registerPage.success.body}</p>
+        <p className="mt-4 text-body text-fg-muted">{success.body}</p>
       </div>
     );
   }
@@ -139,7 +149,7 @@ export function EnquiryForm() {
 
       <div className="flex flex-col items-start gap-4 @[24rem]:flex-row @[24rem]:items-center @[24rem]:gap-6">
         <Button type="submit" size="lg" disabled={status === "sending"} aria-busy={status === "sending"}>
-          {status === "sending" ? "Sending…" : "Register interest"}
+          {status === "sending" ? "Sending…" : submitLabel}
         </Button>
         <p id={`${id}-note`} className="text-caption text-fg-muted">
           We only use your details to reply. See our <TextLink href="/privacy">privacy policy</TextLink>.
