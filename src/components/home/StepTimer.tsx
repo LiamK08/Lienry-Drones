@@ -114,6 +114,7 @@ export function StepTimer() {
               ))}
             </div>
           </div>
+          <p className="mt-3 max-w-none text-caption text-muted">{how.note}</p>
         </div>
       </Container>
     </Band>

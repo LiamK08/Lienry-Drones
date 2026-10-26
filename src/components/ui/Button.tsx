@@ -37,9 +37,9 @@ const off: Record<ButtonVariant, string> = {
 
 const arrowPath = <path d="M3 8h10M8.5 3.5 13 8l-4.5 4.5" />;
 
-/** The round badge a primary or secondary pill leads with. */
-function Badge({ variant, size }: { variant: ButtonVariant; size: ButtonSize }) {
-  const tone = variant === "secondary" ? "bg-ink text-white" : "bg-white text-accent";
+/** The round badge a primary or secondary pill leads with. Inverted, it turns accent as the pill turns white. */
+function Badge({ variant, size, invert = false }: { variant: ButtonVariant; size: ButtonSize; invert?: boolean }) {
+  const tone = variant === "secondary" ? "bg-ink text-white" : `bg-white text-accent ${invert ? "transition-[background-color,color] duration-200 group-hover/btn:bg-accent group-hover/btn:text-white motion-reduce:transition-none" : ""}`;
   const dim = size === "sm" ? "size-6" : size === "md" ? "size-[2.125rem]" : "size-9";
   return (
     <span aria-hidden="true" className={`flex ${dim} shrink-0 items-center justify-center rounded-pill ${tone}`}>
@@ -86,6 +86,8 @@ type CommonProps = {
   onDark?: boolean;
   /** Primary and secondary: a round arrow badge before the label. Tertiary: an arrow after it. */
   arrow?: boolean;
+  /** Primary on a near-black panel: the pill turns white with an accent label on hover, the badge accent. */
+  invert?: boolean;
   className?: string;
   children: ReactNode;
 };
@@ -100,9 +102,11 @@ export type ButtonProps = ButtonLinkProps | ButtonButtonProps;
  * (type "button" unless given). Root carries `data-button={variant}` for the checks.
  */
 export function Button(props: ButtonProps) {
-  const { variant = "primary", size = "md", arrow = false, className = "", children } = props;
+  const { variant = "primary", size = "md", arrow = false, invert = false, className = "", children } = props;
   const badge = arrow && variant !== "tertiary";
-  const cls = `${base} ${variant === "tertiary" ? "" : `${sizes[size]} ${pad[badge ? "badge" : "plain"][size]}`} ${variants[variant]} ${off[variant]} ${className}`;
+  // Inverted, the pill's own hover darkening gives way to the white turn (one hover background, no tie).
+  const look = invert && variant === "primary" ? `${variants.primary.replace("hover:bg-action-hover", "")} hover:border-white hover:bg-white hover:text-accent` : variants[variant];
+  const cls = `${base} ${variant === "tertiary" ? "" : `${sizes[size]} ${pad[badge ? "badge" : "plain"][size]}`} ${look} ${off[variant]} ${className}`;
   // Pills roll their label up on hover: two copies in one clipped grid cell, the second (aria-hidden)
   // waiting a line below. Nothing is positioned, so contrast tools read the label against the pill.
   const roll = "[grid-area:1/1] flex items-center justify-center gap-2 transition-transform duration-300 ease-instrument motion-reduce:transition-none";
@@ -119,13 +123,13 @@ export function Button(props: ButtonProps) {
     );
   const content = (
     <>
-      {badge ? <Badge variant={variant} size={size} /> : null}
+      {badge ? <Badge variant={variant} size={size} invert={invert} /> : null}
       {label}
       {arrow && variant === "tertiary" ? <Arrow /> : null}
     </>
   );
   if ("href" in props && typeof props.href === "string") {
-    const { href, variant: _v, size: _s, frozen: _f, onDark: _d, arrow: _a, className: _c, children: _ch, ...rest } = props;
+    const { href, variant: _v, size: _s, frozen: _f, onDark: _d, arrow: _a, invert: _i, className: _c, children: _ch, ...rest } = props;
     // In-page anchors use a native link: next/link scrolls to the target but leaves focus on the link,
     // so keyboard and screen-reader users never reach the section. Native fragment navigation moves
     // the focus start point to the target. A file download is native too: next/link would treat the
@@ -143,7 +147,7 @@ export function Button(props: ButtonProps) {
       </Link>
     );
   }
-  const { variant: _v, size: _s, frozen: _f, onDark: _d, arrow: _a, className: _c, children: _ch, ...rest } = props as ButtonButtonProps;
+  const { variant: _v, size: _s, frozen: _f, onDark: _d, arrow: _a, invert: _i, className: _c, children: _ch, ...rest } = props as ButtonButtonProps;
   return (
     <button type="button" className={cls} data-button={variant} {...rest}>
       {content}

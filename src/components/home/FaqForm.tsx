@@ -7,7 +7,8 @@ import { Headline } from "@/components/ui/SectionHead";
 import { Reveal } from "@/components/ui/Reveal";
 
 /**
- * The questions on paper, beside the ask: the head and the rows on the left, and on the right a card
+ * The questions on paper, beside the ask: the head and the rows on the left (the wider column from
+ * 1200, as the reference's), and on the right a card
  * under an accent title bar (sticky from 1024) that books a call: a day, a time, then the enquiry form
  * (BookingCard). A person confirms the time by email.
  */
@@ -15,14 +16,14 @@ export function FaqForm() {
   return (
     <Band id="faq" tone="paper" pad="compact" labelledBy="faq-heading">
       <Container>
-        <div className="grid gap-12 lg:grid-cols-[1fr_1fr] lg:gap-16">
+        <div className="grid gap-12 lg:grid-cols-[1fr_1fr] lg:gap-16 min-[75rem]:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)] min-[75rem]:gap-[3.75rem]">
           <div>
             <Reveal animate y={10}>
               <h2 id="faq-heading" className="em-accent text-h2s">
                 <Headline text={faq.headline} emphasis={faq.emphasis} />
               </h2>
             </Reveal>
-            <div className="mt-8">
+            <div className="mt-8 lg:mt-12">
               <FaqRows id="faq" items={faqFor("platform")} />
             </div>
           </div>

@@ -3,6 +3,7 @@
 import { useId, useState } from "react";
 import { enquirySchema, enquiryTypes, enquiryTypeLabels, propertyCounts, propertyTypes } from "@/lib/enquiry-schema";
 import { registerPage } from "@/content/register";
+import { booking } from "@/content/home";
 import { useEnquiryType } from "@/components/forms/EnquiryTypeTabs";
 import { Button } from "@/components/ui/Button";
 import { Field, SelectField, checkInput, choiceBox, choiceInput, describedBy, fieldArea, fieldControl, radioCard } from "@/components/ui/Field";
@@ -22,35 +23,49 @@ const typeCard = radioCard.replace("items-start gap-4", "items-center gap-3").re
  * and picks the organisation field's label. Errors sit under their control and focus moves to the
  * first; on success the form is replaced by a panel whose heading takes the focus.
  *
+ * `variant="booking"` is the home booking card's short step: name and email, the type (a select) and
+ * the organisation, how to call (video or phone, which then needs the number) and what to cover. With a `call` it
+ * sends the chosen Sydney day and time, the visitor's zone and the call method (source "booking"); if
+ * the route says the time is no longer open, `onSlotRejected` hears why.
+ *
  * The layout follows the form's own width (a container query), not the viewport: from 384px the
  * radios and the short fields pair up, which suits the 480px card on /register-interest, the home
  * card (390 wide at 1024, wider above) and a phone alike.
  */
 export type EnquiryFormProps = {
-  /** The booking card's chosen call time: sent with the enquiry (source "booking") for a person to confirm. */
-  preferredTime?: string;
+  /** "full" (default): /register-interest's form. "booking": the booking card's short step. */
+  variant?: "full" | "booking";
+  /** The booking card's chosen call: its Sydney day (yyyy-mm-dd), its time and the visitor's zone. */
+  call?: { date: string; slot: string; timeZone?: string };
+  /** Hears the route's reason when a requested time is no longer open. */
+  onSlotRejected?: (message: string) => void;
+  /** Hears that the enquiry was sent (the booking card then drops its ways back). */
+  onSent?: () => void;
   /** The submit label. Default "Register interest". */
   submitLabel?: string;
   /** The confirmation that replaces the form. Default the register page's. */
   success?: { headline: string; body: string };
 };
 
-export function EnquiryForm({ preferredTime, submitLabel = "Register interest", success = registerPage.success }: EnquiryFormProps = {}) {
+export function EnquiryForm({ variant = "full", call, onSlotRejected, onSent, submitLabel = "Register interest", success = registerPage.success }: EnquiryFormProps = {}) {
   const [type, setType] = useEnquiryType();
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "failed">("idle");
+  const [callBy, setCallBy] = useState<"video" | "phone">("video");
   const id = useId();
   const fid = (name: string) => `${id}-${name}`;
+  const short = variant === "booking";
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (status === "sending") return;
     const form = new FormData(e.currentTarget);
     const raw = Object.fromEntries(form.entries());
-    const booking = preferredTime ? { source: "booking", preferredTime } : {};
-    const parsed = enquirySchema.safeParse({ ...raw, ...booking, type, updates: form.get("updates") === "on" });
+    const request = call ? { source: "booking", preferredDate: call.date, preferredSlot: call.slot, timeZone: call.timeZone, callBy } : {};
+    const parsed = enquirySchema.safeParse({ ...raw, ...request, type, updates: form.get("updates") === "on" });
     if (!parsed.success) {
       const next: Errors = {};
-      for (const issue of parsed.error.issues) next[String(issue.path[0])] = issue.message;
+      for (const issue of parsed.error.issues) next[String(issue.path[0])] ??= issue.message;
       setErrors(next);
       const first = Object.keys(next)[0];
       document.getElementById(fid(first))?.focus();
@@ -60,7 +75,17 @@ export function EnquiryForm({ preferredTime, submitLabel = "Register interest", 
     setStatus("sending");
     try {
       const res = await fetch("/api/enquiry", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(parsed.data) });
+      if (res.status === 422 && onSlotRejected) {
+        const body = (await res.json().catch(() => null)) as { issues?: { path: string[]; message: string }[] } | null;
+        const slot = body?.issues?.find((i) => i.path[0] === "preferredDate");
+        if (slot) {
+          setStatus("idle");
+          onSlotRejected(slot.message);
+          return;
+        }
+      }
       setStatus(res.ok ? "sent" : "failed");
+      if (res.ok) onSent?.();
     } catch {
       setStatus("failed");
     }
@@ -92,6 +117,7 @@ export function EnquiryForm({ preferredTime, submitLabel = "Register interest", 
 
   return (
     <form onSubmit={onSubmit} noValidate className="@container flex flex-col gap-6" aria-describedby={`${id}-note`}>
+      {short ? null : (
       <fieldset>
         <legend className="text-small font-medium text-fg">I am a</legend>
         <div className="mt-4 grid gap-2 @[24rem]:grid-cols-2">
@@ -105,47 +131,87 @@ export function EnquiryForm({ preferredTime, submitLabel = "Register interest", 
           ))}
         </div>
       </fieldset>
+      )}
 
-      <div className="grid gap-x-4 gap-y-5 @[24rem]:grid-cols-2">
-        {text("name", "Name", { autoComplete: "name", required: true })}
-        {text("email", "Email", { type: "email", autoComplete: "email", required: true })}
-        {text("phone", "Phone (optional)", { type: "tel", autoComplete: "tel" })}
-        {text("organisation", `${type === "investor" ? "Fund or firm" : type === "commercial" ? "Company or strata" : "Organisation"} (optional)`, { autoComplete: "organization" })}
-        {/* The investor's count label wraps at 211px, so this pair aligns on its controls. */}
-        <div className="self-end">
-          <Field id={fid("propertyType")} label="Property type">
-            <SelectField id={fid("propertyType")} name="propertyType" options={propertyTypes} placeholder="Choose one" defaultValue="" />
+      {short ? (
+        <div className="grid gap-x-4 gap-y-5 @[24rem]:grid-cols-2">
+          {text("name", "Name", { autoComplete: "name", required: true })}
+          {text("email", "Email", { type: "email", autoComplete: "email", required: true })}
+          <Field id={fid("type")} label="I am a">
+            <SelectField id={fid("type")} options={enquiryTypes.map((t) => enquiryTypeLabels[t])} value={enquiryTypeLabels[type]} onChange={(label) => setType(enquiryTypes.find((t) => enquiryTypeLabels[t] === label) ?? type)} />
           </Field>
+          {text("organisation", `${type === "investor" ? "Fund or firm" : type === "commercial" ? "Company or strata" : "Organisation"} (optional)`, { autoComplete: "organization" })}
+          {call ? (
+            <fieldset className="@[24rem]:col-span-2">
+              <legend className="text-small font-medium text-fg">{booking.callBy.legend}</legend>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                {(["video", "phone"] as const).map((c) => (
+                  <label key={c} className={`${typeCard} text-small text-fg`}>
+                    <span className={choiceBox}>
+                      <input type="radio" name="callBy" value={c} checked={callBy === c} onChange={() => setCallBy(c)} className={choiceInput} />
+                    </span>
+                    {booking.callBy[c]}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          ) : null}
+          {/* Always there with a call, so choosing Phone never moves the form: it is required only then. */}
+          {call ? text("phone", callBy === "phone" ? "Phone" : "Phone (optional)", { type: "tel", autoComplete: "tel", required: callBy === "phone" }) : null}
+          <div className="@[24rem]:col-span-2">
+            <Field id={fid("message")} label={booking.cover.label}>
+              <textarea id={fid("message")} name="message" rows={3} className={fieldArea.replace("min-h-32", "min-h-24")} placeholder={booking.cover.placeholder} />
+            </Field>
+          </div>
+          <div className="hidden" aria-hidden="true">
+            <label htmlFor={fid("company")}>Company</label>
+            <input id={fid("company")} name="company" tabIndex={-1} autoComplete="off" />
+          </div>
         </div>
-        <div className="self-end">
-          <Field id={fid("propertyCount")} label={type === "investor" ? "Properties you would like to see it on" : "How many properties"}>
-            <SelectField id={fid("propertyCount")} name="propertyCount" options={propertyCounts} placeholder="Choose one" defaultValue="" />
-          </Field>
+      ) : (
+        <div className="grid gap-x-4 gap-y-5 @[24rem]:grid-cols-2">
+          {text("name", "Name", { autoComplete: "name", required: true })}
+          {text("email", "Email", { type: "email", autoComplete: "email", required: true })}
+          {text("phone", "Phone (optional)", { type: "tel", autoComplete: "tel" })}
+          {text("organisation", `${type === "investor" ? "Fund or firm" : type === "commercial" ? "Company or strata" : "Organisation"} (optional)`, { autoComplete: "organization" })}
+          {/* The investor's count label wraps at 211px, so this pair aligns on its controls. */}
+          <div className="self-end">
+            <Field id={fid("propertyType")} label="Property type">
+              <SelectField id={fid("propertyType")} name="propertyType" options={propertyTypes} placeholder="Choose one" defaultValue="" />
+            </Field>
+          </div>
+          <div className="self-end">
+            <Field id={fid("propertyCount")} label={type === "investor" ? "Properties you would like to see it on" : "How many properties"}>
+              <SelectField id={fid("propertyCount")} name="propertyCount" options={propertyCounts} placeholder="Choose one" defaultValue="" />
+            </Field>
+          </div>
+          {text("location", "Suburb or city", { autoComplete: "address-level2", placeholder: "Sydney" })}
+          <div className="@[24rem]:col-span-2">
+            <Field id={fid("message")} label="Anything else">
+              <textarea
+                id={fid("message")}
+                name="message"
+                rows={4}
+                className={fieldArea}
+                placeholder={type === "investor" ? "Fund, stage, and what you would like to see." : "How many buildings, which surfaces, and when."}
+              />
+            </Field>
+          </div>
+          <div className="hidden" aria-hidden="true">
+            <label htmlFor={fid("company")}>Company</label>
+            <input id={fid("company")} name="company" tabIndex={-1} autoComplete="off" />
+          </div>
         </div>
-        {text("location", "Suburb or city", { autoComplete: "address-level2", placeholder: "Sydney" })}
-        <div className="@[24rem]:col-span-2">
-          <Field id={fid("message")} label="Anything else">
-            <textarea
-              id={fid("message")}
-              name="message"
-              rows={4}
-              className={fieldArea}
-              placeholder={type === "investor" ? "Fund, stage, and what you would like to see." : "How many buildings, which surfaces, and when."}
-            />
-          </Field>
-        </div>
-        <div className="hidden" aria-hidden="true">
-          <label htmlFor={fid("company")}>Company</label>
-          <input id={fid("company")} name="company" tabIndex={-1} autoComplete="off" />
-        </div>
-      </div>
+      )}
 
+      {short ? null : (
       <label className="flex cursor-pointer items-start gap-4 text-small text-fg-muted transition-[color] duration-200 ease-instrument hover:text-fg motion-reduce:transition-none">
         <span className={choiceBox}>
           <input type="checkbox" name="updates" className={checkInput} />
         </span>
         <span className="max-w-prose">Keep me posted as the pilot program takes shape. No marketing lists, and you can stop any time.</span>
       </label>
+      )}
 
       <div className="flex flex-col items-start gap-4 @[24rem]:flex-row @[24rem]:items-center @[24rem]:gap-6">
         <Button type="submit" size="lg" disabled={status === "sending"} aria-busy={status === "sending"}>

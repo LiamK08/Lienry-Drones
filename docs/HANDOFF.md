@@ -139,7 +139,7 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
     score, bar and points. Nothing counts up (check 21).
   - Reason cards (`ExpandCards`): the open card shows a coded demo panel above its title
     (`DemoPanels.tsx`, demo data, no film), on a near-black left side; from 1200 (not 1024) they are the
-    expanding row (600ms, about 4.7 times). Below 1200 a carousel inside the rail (one up, two from
+    expanding row (still 700ms, the owner's half-speed call; about 4.7 times). Below 1200 a carousel inside the rail (one up, two from
     768) with round previous and next buttons around pager dots (`ui/Pager.tsx`), and a play button on
     each card that opens its panel inside the card.
   - Step stage (`StepTimer`): each step has a coded demo panel that follows the software's one demo

@@ -2,9 +2,9 @@
 
 import { useEffect, useId, useRef, useState, type ReactNode, type RefObject } from "react";
 import { fitCheck } from "@/content/home";
-import { enquirySchema } from "@/lib/enquiry-schema";
+import { enquirySchema, enquiryTypeLabels, enquiryTypes } from "@/lib/enquiry-schema";
 import { Button } from "@/components/ui/Button";
-import { Field, describedBy, fieldControl } from "@/components/ui/Field";
+import { Field, SelectField, describedBy, fieldControl } from "@/components/ui/Field";
 
 type Answer = (typeof fitCheck.answers)[number]["id"];
 type Zone = (typeof fitCheck.panel.zones)[number]["id"];
@@ -18,11 +18,25 @@ const focusOnMount = (el: HTMLInputElement | null) => el?.focus();
 
 /** The score out of 100: each question's weight, in full for a Yes and by half for a Partly. */
 const percent = (answers: Record<string, Answer>) => Math.round(all.reduce((s, q) => s + (answers[q.id] ? q.weight * scoreOf(answers[q.id]) : 0), 0));
-const verdictFor = (pct: number) => verdicts.find((v) => pct >= v.min) ?? verdicts[verdicts.length - 1];
-/** The points to talk through: every No in question order, or, with none, the Partlys; three at most. */
+const BUILDING = new Set<string>(fitCheck.groups[0].questions.map((q) => q.id));
+/**
+ * The verdict for the answers so far. All seven answered, it is the score's; partway, it is judged on
+ * the share of the weight answered, so a first Yes never reads as a poor fit. A No on a building
+ * question (a hard requirement) caps it at the low verdict, a Partly there at the middle one.
+ */
+function verdictFor(answers: Record<string, Answer>) {
+  const asked = all.filter((q) => answers[q.id]);
+  const weight = asked.reduce((s, q) => s + q.weight, 0);
+  const share = weight ? Math.round((percent(answers) / weight) * 100) : 0;
+  const capped = asked.some((q) => BUILDING.has(q.id) && answers[q.id] === "no") ? 39 : asked.some((q) => BUILDING.has(q.id) && answers[q.id] === "partly") ? 74 : 100;
+  const pct = Math.min(asked.length === all.length ? percent(answers) : share, capped);
+  return verdicts.find((v) => pct >= v.min) ?? verdicts[verdicts.length - 1];
+}
+/** The points to talk through, three at most: every No in question order, then the Partlys, the building's first. */
 const gapsOf = (answers: Record<string, Answer>) => {
   const nos = all.filter((q) => answers[q.id] === "no");
-  return (nos.length ? nos : all.filter((q) => answers[q.id] === "partly")).slice(0, 3);
+  const partlys = all.filter((q) => answers[q.id] === "partly").sort((a, b) => b.weight - a.weight);
+  return [...nos, ...partlys].slice(0, 3);
 };
 
 // A chosen answer takes its own tone: Yes the accent tint, Partly the warm debris tone, No a soft red.
@@ -56,8 +70,9 @@ export type FitCheckProps = {
  * The fit check: seven questions in two groups, each answered Yes, Partly or No with a row of small
  * pills (a radio group per question). A chosen pill takes its answer's tone. The score out of 100 is
  * live from the first answer (it changes at once, never counting up), over a bar in three zones that
- * fills to it in the colour of the zone it reaches. Under it, the zone's lead line and up to three
- * points the answers raise (the Nos first), or a clear line when there are none. Indicative only.
+ * fills to it in the verdict's colour (verdictFor: judged on the share answered while partway, capped by
+ * a No or a Partly on a building question). Under it, the verdict's lead line and up to three points the
+ * answers raise (the Nos first, then the Partlys), or a clear line when there are none. Indicative only.
  *
  * The home card: the questions beside an inset result panel from 1024; on smaller screens the panel
  * comes first, and once a question is answered a strip at the foot of the card keeps the score in view
@@ -71,7 +86,7 @@ export function FitCheck({ id = "fit", layout = "card", intro, badge }: FitCheck
   const answered = Object.keys(answers).length;
   const pct = percent(answers);
   const done = answered === all.length;
-  const verdict = verdictFor(pct);
+  const verdict = verdictFor(answers);
   const gaps = gapsOf(answers);
   const count = fitCheck.panel.answered.replace("{n}", String(answered));
   const pick = (q: string, a: Answer) => setAnswers((s) => ({ ...s, [q]: a }));
@@ -150,7 +165,7 @@ export function FitCheck({ id = "fit", layout = "card", intro, badge }: FitCheck
               <p className="text-caption text-muted">{count}</p>
             </div>
             <Score pct={pct} className="mt-4" size="sm" />
-            <ZoneBar pct={pct} answered={answered} done={done} className="mt-5" />
+            <ZoneBar pct={pct} zone={answered ? verdict.zone : null} done={done} className="mt-5" />
             <div aria-live="polite" className="mt-6">
               <Result answered={answered} done={done} verdict={verdict} gaps={gaps} answers={answers} />
             </div>
@@ -223,7 +238,7 @@ export function FitCheck({ id = "fit", layout = "card", intro, badge }: FitCheck
           </fieldset>
         ))}
         {/* Sticky within this column, so it rides along the questions and stops at their foot. */}
-        {answered ? <FitStrip pct={pct} answered={answered} done={done} count={count} scoreRef={scoreRef} /> : null}
+        {answered ? <FitStrip pct={pct} answered={answered} done={done} count={count} zone={verdict.zone} scoreRef={scoreRef} /> : null}
       </div>
 
       <ResultPanel pct={pct} answered={answered} done={done} verdict={verdict} gaps={gaps} answers={answers} count={count} scoreRef={scoreRef} onRestart={restart} />
@@ -251,12 +266,11 @@ function Score({ pct, size = "lg", className = "" }: { pct: number; size?: "lg" 
 }
 
 /**
- * The three-zone bar: each zone's pale track, the fill up to the score in the reached zone's colour,
- * and the labels: the reached zone's in its colour, the others muted; it is set heavier once all seven
- * are answered, so the colour shows the live zone and the weight confirms the final one.
+ * The three-zone bar: each zone's pale track, the fill up to the score in the verdict's colour, and the
+ * labels: the verdict's in its colour, the others muted; it is set heavier once all seven are
+ * answered, so the colour shows the live verdict and the weight confirms the final one.
  */
-function ZoneBar({ pct, answered, done, className = "" }: { pct: number; answered: number; done: boolean; className?: string }) {
-  const at = answered ? verdictFor(pct).zone : null;
+function ZoneBar({ pct, zone: at, done, className = "" }: { pct: number; zone: Zone | null; done: boolean; className?: string }) {
   const fill = at ? zoneTone[at].fill : "";
   return (
     <div aria-hidden="true" className={className}>
@@ -302,7 +316,7 @@ function Result({ answered, done, verdict, gaps, answers, className = "" }: Resu
         <svg
           aria-hidden="true"
           viewBox="0 0 16 16"
-          className="mt-1 size-4 shrink-0 rotate-90 animate-[nudge-y_1.4s_ease-in-out_infinite] text-accent lg:rotate-0 lg:animate-[nudge-x_1.4s_ease-in-out_infinite] motion-reduce:animate-none"
+          className="mt-1 size-4 shrink-0 -rotate-90 animate-[nudge-y_1.4s_ease-in-out_infinite] text-accent lg:rotate-0 lg:animate-[nudge-x_1.4s_ease-in-out_infinite] motion-reduce:animate-none"
           fill="none"
           stroke="currentColor"
           strokeWidth="1.75"
@@ -373,15 +387,17 @@ function ResultPanel({ pct, count, scoreRef, onRestart, ...result }: ResultProps
   const [errors, setErrors] = useState<Partial<Record<"name" | "email", string>>>({});
   const uid = useId();
   const fid = (name: string) => `${uid}-${name}`;
-  const zone = zones.find((z) => z.id === verdictFor(pct).zone)?.label;
+  const zone = zones.find((z) => z.id === result.verdict.zone)?.label;
   const partway = result.answered > 0 && !result.done;
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (mode === "sending") return;
     const form = new FormData(e.currentTarget);
     const lines = all.map((q, i) => `${i + 1}. ${q.text}: ${fitCheck.answers.find((a) => a.id === result.answers[q.id])?.label ?? "Not answered"}`);
     const parsed = enquirySchema.safeParse({
-      type: "commercial",
+      // The select shows each type's label; the enquiry carries its id.
+      type: enquiryTypes.find((t) => enquiryTypeLabels[t] === form.get("type")) ?? "commercial",
       source: "fit-check",
       name: form.get("name"),
       email: form.get("email"),
@@ -424,7 +440,7 @@ function ResultPanel({ pct, count, scoreRef, onRestart, ...result }: ResultProps
       <p aria-live="polite" className="sr-only">
         {result.answered ? `Score ${pct} out of 100: ${zone}. ${count}.` : ""}
       </p>
-      <ZoneBar pct={pct} answered={result.answered} done={result.done} className="mt-6" />
+      <ZoneBar pct={pct} zone={result.answered ? result.verdict.zone : null} done={result.done} className="mt-6" />
 
       {mode === "result" ? (
         <>
@@ -444,7 +460,7 @@ function ResultPanel({ pct, count, scoreRef, onRestart, ...result }: ResultProps
             </div>
           </div>
           <div className="mt-8 flex flex-col gap-3">
-            <Button size="lg" className="w-full" onClick={() => setMode("form")}>
+            <Button size="lg" className="w-full" aria-disabled={!result.answered || undefined} onClick={() => result.answered && setMode("form")}>
               {send.open}
             </Button>
             <Button href={fitCheck.panel.secondary.href} variant="secondary" size="lg" className="w-full">
@@ -466,6 +482,9 @@ function ResultPanel({ pct, count, scoreRef, onRestart, ...result }: ResultProps
           <div className="mt-5 grid gap-4">
             {input("name", "Name", { autoComplete: "name", ref: focusOnMount })}
             {input("email", "Email", { type: "email", autoComplete: "email", inputMode: "email" })}
+            <Field id={fid("type")} label={send.who}>
+              <SelectField id={fid("type")} name="type" options={enquiryTypes.map((t) => enquiryTypeLabels[t])} defaultValue={enquiryTypeLabels.commercial} />
+            </Field>
           </div>
           <div className="hidden" aria-hidden="true">
             <label htmlFor={fid("company")}>Company</label>
@@ -477,7 +496,7 @@ function ResultPanel({ pct, count, scoreRef, onRestart, ...result }: ResultProps
             </p>
           ) : null}
           <div className="mt-auto flex flex-col gap-3 pt-8">
-            <Button type="submit" size="lg" className="w-full" aria-disabled={mode === "sending" || undefined}>
+            <Button type="submit" size="lg" className="w-full" disabled={mode === "sending"} aria-busy={mode === "sending" || undefined}>
               {mode === "sending" ? send.sending : send.submit}
             </Button>
             <Button variant="secondary" size="lg" className="w-full" onClick={() => setMode("result")}>
@@ -504,7 +523,7 @@ function ResultPanel({ pct, count, scoreRef, onRestart, ...result }: ResultProps
  * shows the count (the zone once all seven are answered) over the score, and a button that brings the
  * result back into view under the bar and moves the focus to it (at once under reduced motion).
  */
-function FitStrip({ pct, answered, done, count, scoreRef }: { pct: number; answered: number; done: boolean; count: string; scoreRef: RefObject<HTMLDivElement | null> }) {
+function FitStrip({ pct, answered, done, count, zone: at, scoreRef }: { pct: number; answered: number; done: boolean; count: string; zone: Zone; scoreRef: RefObject<HTMLDivElement | null> }) {
   const [scoreOnScreen, setScoreOnScreen] = useState(true);
   useEffect(() => {
     const el = scoreRef.current;
@@ -513,7 +532,7 @@ function FitStrip({ pct, answered, done, count, scoreRef }: { pct: number; answe
     io.observe(el);
     return () => io.disconnect();
   }, [scoreRef]);
-  const zone = zones.find((z) => z.id === verdictFor(pct).zone)?.label;
+  const zone = zones.find((z) => z.id === at)?.label;
   const back = () => {
     const el = scoreRef.current;
     if (!el) return;

@@ -21,8 +21,9 @@ are part of the window, not imagery: each model's window brings its own (check 1
 Layout (since 20 October 2026, the owner's brief): the site follows refresh.tech's page
 templates, section order and interaction patterns, in Lienry's own words, fonts, colours and
 media. White ground, a warm paper band and a pale accent tint; Lienry's glass teal is the one
-accent; near-black for the dark band and the footer. Status tones are not accents: the debris amber and
-the fit check's soft red (`fit-*` tokens) mark a Partly or a No and the score's zones, nothing else. Section heads may be centred.
+accent; near-black for the dark band and the footer. Status tones are not accents: the debris amber marks
+debris, and with the fit check's soft red (`fit-*` tokens) a Partly or a No and the score's zones; never
+a second accent. Section heads may be centred.
 
 Type: two families only, both open-licensed and self-hosted: PT Serif (regular and italic) for
 headings, display lines and the footer logo, and Inter for everything else (its italic only in the

@@ -1,28 +1,78 @@
 // The one bank of questions and answers. Every page's FAQ is a set of ids from this bank, so an answer
-// reads the same wherever it appears. Final in the design-pass foundation: page packages pick a set,
-// they never edit an answer. Each answer runs to two lines at 1440, and every claim is in
-// docs/SITE-PLAN.md or is marked "still being finalised".
+// reads the same wherever it appears: page packages pick a set, they never edit an answer. Since 26
+// October an answer may open with a line, list labelled points and close with a line, as the
+// reference's do. Every claim is in docs/SITE-PLAN.md or the site's own content, or is marked "still
+// being finalised".
 import type { Action } from "@/lib/types";
+import type { FaqPoint } from "@/components/sections/Faq";
 
 export type FaqId = "surfaces" | "height" | "safety" | "weather" | "water" | "roof" | "approvals" | "app" | "pilot" | "cost";
 
-export type FaqEntry = { id: FaqId; q: string; a: string; link?: Action };
+export type FaqEntry = { id: FaqId; q: string; a: string; points?: readonly FaqPoint[]; after?: string; link?: Action };
 
 export const faqIntro = "Straight answers, including what is still being finalised.";
 
 export const faqItems: readonly FaqEntry[] = [
-  { id: "surfaces", q: "Which surfaces does it clean?", a: "Glass, solar panels, walls, roofing and driveways. The drone sets its pressure for each material." },
-  { id: "height", q: "How tall a building can it clean?", a: "The commercial system is designed for buildings under 70 metres, working from a capsule on the roof." },
-  { id: "safety", q: "How is it kept safe?", a: "It works on a tether, with an obstacle-avoidance camera and onboard surface checks. Fail-safes are still being finalised." },
+  {
+    id: "surfaces",
+    q: "Which surfaces does it clean?",
+    a: "Five kinds of exterior, each at the pressure set for it:",
+    points: [
+      { label: "Glass", text: "facades, windows and roof glazing" },
+      { label: "Solar panels", text: "rooftop arrays and solar farm rows, at the pressure set for solar glass" },
+      { label: "Walls", text: "render and other wall finishes" },
+      { label: "Roofing", text: "metal roofing among them" },
+      { label: "Driveways", text: "on the home system, chosen in the app" },
+    ],
+    after: "The drone sets its pressure for each material before it washes.",
+  },
+  {
+    id: "height",
+    q: "How tall a building can it clean?",
+    a: "The commercial system is designed for buildings under 70 metres:",
+    points: [
+      { label: "Where it lives", text: "a weatherproof capsule on the roof" },
+      { label: "How it reaches the facade", text: "on a tether fed from above, so it never carries water" },
+      { label: "How often it looks", text: "a re-scan every two days, which you can change" },
+    ],
+  },
+  {
+    id: "safety",
+    q: "How is it kept safe?",
+    a: "It is designed so nobody works at height:",
+    points: [
+      { label: "Tether", text: "water and power stay connected, so nothing is carried" },
+      { label: "Obstacle camera", text: "avoidance built into the drone" },
+      { label: "Surface checks", text: "onboard, on every pass" },
+      { label: "Weatherproof dock", text: "shelter between cleans" },
+    ],
+    after: "Fail-safes are still being finalised.",
+  },
   { id: "weather", q: "What happens in bad weather?", a: "Between cleans it shelters in a weatherproof capsule or waterproof pod. Its weather limits are still being finalised." },
   { id: "water", q: "How much water does it use?", a: "On the roof system the tether is fed from above. Water use per clean is still being finalised." },
   { id: "roof", q: "Does it need rooftop access?", a: "On commercial buildings it lives in a capsule on the roof. What the roof needs is still being finalised." },
   { id: "approvals", q: "What permissions will it need?", a: "We do not claim any approvals. Lienry is at concept stage, and what each site will need is still being finalised." },
-  { id: "app", q: "What does the app do?", a: "On the home system the app starts a clean from anywhere and picks the areas. Its release is still being finalised." },
+  {
+    id: "app",
+    q: "What does the app do?",
+    a: "On the home system the app runs the clean:",
+    points: [
+      { label: "Start a clean", text: "from anywhere, with nobody booked" },
+      { label: "Choose the areas", text: "the driveway, the solar panels, the windows, or all three" },
+      { label: "Follow it", text: "each area as it is washed, then the house after" },
+    ],
+    after: "Its release is still being finalised.",
+  },
   {
     id: "pilot",
     q: "How does the pilot program work?",
-    a: "We are preparing a pilot program for commercial buildings under 70 metres. Dates and terms are still being finalised.",
+    a: "We are preparing a pilot program for commercial buildings under 70 metres:",
+    points: [
+      { label: "Who it is for", text: "building owners and facilities managers in Sydney" },
+      { label: "What runs", text: "the roof capsule, its tether and the desktop software" },
+      { label: "The first step", text: "a conversation about your building" },
+    ],
+    after: "Dates and terms are still being finalised.",
     link: { label: "Book a pilot conversation", href: "/register-interest?type=commercial" },
   },
   {

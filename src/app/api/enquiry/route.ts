@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { enquirySchema } from "@/lib/enquiry-schema";
 import { siteUrl } from "@/lib/site";
+import { booking } from "@/content/home";
+import { BOOKING_ZONE, isOpenDay, longDay, slotInstant, sydneyToday } from "@/lib/booking";
 
 // Stub: validates the enquiry and forwards it to ENQUIRY_WEBHOOK_URL when set,
 // otherwise returns an unavailable response so nobody is told an enquiry was delivered.
@@ -37,7 +39,20 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true });
   }
 
-  const enquiry = { ...parsed.data, company: undefined, receivedAt: new Date().toISOString(), source: parsed.data.source === "fit-check" ? `${siteUrl}/#fit-check` : parsed.data.source === "booking" ? `${siteUrl}/#faq` : `${siteUrl}/register-interest` };
+  // A requested call: the day must be open (a weekday from tomorrow to the card's last day, in Sydney)
+  // and the time one the card offers. The reply then has the readable time and the instant to confirm.
+  let call: { preferredTime: string; preferredStart: string } | null = null;
+  if (parsed.data.preferredDate && parsed.data.preferredSlot) {
+    const { preferredDate: day, preferredSlot: slot } = parsed.data;
+    const start = slotInstant(day, slot);
+    if (!start || !(booking.times as readonly string[]).includes(slot) || !isOpenDay(day, sydneyToday(), booking.daysAhead)) {
+      return NextResponse.json({ ok: false, error: "Validation failed", issues: [{ path: ["preferredDate"], message: booking.closed }] }, { status: 422 });
+    }
+    call = { preferredTime: `${longDay(day)}, ${slot} Sydney time`, preferredStart: start.toISOString() };
+  }
+
+  const source = parsed.data.source === "fit-check" ? `${siteUrl}/#fit-check` : parsed.data.source === "booking" ? `${siteUrl}/#faq` : `${siteUrl}/register-interest`;
+  const enquiry = { ...parsed.data, ...call, bookingZone: call ? BOOKING_ZONE : undefined, company: undefined, receivedAt: new Date().toISOString(), source };
   const webhook = process.env.ENQUIRY_WEBHOOK_URL;
   if (webhook) {
     try {

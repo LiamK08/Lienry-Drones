@@ -126,7 +126,7 @@ export function SystemCards() {
           })}
         </ul>
         {/* From 768 to 1199: previous, the pager and next under the track. */}
-        <Pager trackId="systems-track" index={index} positions={positions} go={go} noun="setting" className="mt-6 hidden md:flex min-[75rem]:hidden" />
+        <Pager trackId="systems-track" index={index} positions={positions} count={systems.cards.length} go={go} noun="setting" className="mt-6 hidden md:flex min-[75rem]:hidden" />
       </Container>
     </Band>
   );

@@ -18,7 +18,7 @@ const focusOnMount = (el: HTMLButtonElement | null) => el?.focus();
 
 /**
  * Why Lienry: five tall cards. From 1200 they stand in one row, 4px apart: the card under the pointer
- * (or holding focus) widens to about 4.7 times the others over 600ms, its near-black left side darkens
+ * (or holding focus) widens to about 4.7 times the others over 700ms (the owner's half-speed call), its near-black left side darkens
  * in under the text, its two-line description fades in with the grow, and just after, its coded panel
  * (demo data, DemoPanels) fades in above the title and plays through. Each picture is drawn once at the
  * open card's width, centred, and the card is a window onto it, so widening pans the picture out to its
@@ -80,7 +80,7 @@ export function ExpandCards() {
                   document.getElementById(`why-${c.icon}-play`)?.focus();
                 }
               }}
-              className="group relative h-[28rem] w-full shrink-0 snap-start overflow-hidden rounded-card bg-night outline-offset-2 md:w-[calc((100%-1rem)/2)] min-[75rem]:h-[31.25rem] min-[75rem]:w-auto min-[75rem]:min-w-0 min-[75rem]:flex-1 min-[75rem]:transition-[flex-grow] min-[75rem]:duration-[600ms] min-[75rem]:ease-settle min-[75rem]:hover:grow-[4.7] min-[75rem]:focus-visible:grow-[4.7] motion-reduce:transition-none"
+              className="group relative h-[28rem] w-full shrink-0 snap-start overflow-hidden rounded-card bg-night outline-offset-2 md:w-[calc((100%-1rem)/2)] min-[75rem]:h-[31.25rem] min-[75rem]:w-auto min-[75rem]:min-w-0 min-[75rem]:flex-1 min-[75rem]:transition-[flex-grow] min-[75rem]:duration-[700ms] min-[75rem]:ease-[cubic-bezier(0.4,0,0.2,1)] min-[75rem]:hover:grow-[4.7] min-[75rem]:focus-visible:grow-[4.7] motion-reduce:transition-none"
             >
               {/* From 1200: the open card's width (about 54% of the row less its four 4px gaps), centred on the card. */}
               <Picture
@@ -96,7 +96,7 @@ export function ExpandCards() {
               {/* From 1200 the open card's left side darkens to near-black under its text and panel. */}
               <div
                 aria-hidden="true"
-                className="absolute inset-0 hidden bg-[linear-gradient(90deg,var(--color-night)_0%,rgba(18,17,16,0.85)_14%,transparent_58%)] opacity-0 transition-opacity duration-[600ms] ease-settle group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none min-[75rem]:block"
+                className="absolute inset-0 hidden bg-[linear-gradient(90deg,var(--color-night)_0%,rgba(18,17,16,0.85)_14%,transparent_58%)] opacity-0 transition-opacity duration-[700ms] ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none min-[75rem]:block"
               />
               <span className="absolute left-5 top-5 text-white">
                 <Icon name={c.icon} className="size-7" />
@@ -129,7 +129,8 @@ export function ExpandCards() {
         </ul>
 
         {/* Below 1200: previous, the pager and next, centred under the track. */}
-        <Pager trackId="why-track" index={index} positions={positions} go={step} noun="reason" className="mt-6 min-[75rem]:hidden" />
+        <Pager trackId="why-track" index={index} positions={positions} count={benefits.cards.length} go={step} noun="reason" className="mt-6 min-[75rem]:hidden" />
+        <p className="mx-auto mt-4 max-w-none text-center text-caption text-muted min-[75rem]:mt-5">{benefits.note}</p>
       </div>
     </Band>
   );

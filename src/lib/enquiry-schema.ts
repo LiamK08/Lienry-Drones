@@ -40,10 +40,18 @@ export const enquirySchema = z.object({
   message: z.string().trim().max(2000).optional().or(z.literal("")),
   // Where it was sent from: the enquiry form (the default) or the fit check's "Email me my result".
   source: z.enum(["form", "fit-check", "booking"]).optional(),
-  // The booking card's requested call time, as the visitor read it (e.g. "Tuesday 27 October, 10:30 am, Sydney time").
-  preferredTime: z.string().trim().max(80).optional().or(z.literal("")),
+  // The booking card's requested call: its Sydney day and time (one of the offered times), the visitor's
+  // own zone, and how they would like the call. The route checks the day is open and builds the reply's
+  // readable time and its instant; nothing is booked until a person confirms it.
+  preferredDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  preferredSlot: z.string().regex(/^\d{1,2}:\d{2} (am|pm)$/).optional(),
+  timeZone: z.string().trim().max(64).optional(),
+  callBy: z.enum(["video", "phone"]).optional(),
   // Honeypot: real users never fill this.
   company: z.string().max(0).optional().or(z.literal("")),
+}).superRefine((v, ctx) => {
+  if (v.callBy === "phone" && !v.phone) ctx.addIssue({ code: "custom", path: ["phone"], message: "Please enter a phone number for the call." });
+  if (!!v.preferredDate !== !!v.preferredSlot) ctx.addIssue({ code: "custom", path: ["preferredDate"], message: "Please pick a day and a time." });
 });
 
 export type EnquiryInput = z.infer<typeof enquirySchema>;

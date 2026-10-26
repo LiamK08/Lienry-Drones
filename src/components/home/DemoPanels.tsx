@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
-import { useReducedMotion } from "motion/react";
 import { FacadeMap } from "@/components/software/FacadeMap";
 import { CELLS } from "@/components/three/software/dims";
-import { project, zones } from "@/content/software";
+import { project, solarZones, zones } from "@/content/software";
+import { usePrefersReducedMotion } from "@/lib/hooks";
 
 // Small coded product panels for the home page: the reason cards show one when a card opens, and the
 // step stage shows one beside each step, as the reference shows short screen recordings there. They
@@ -16,7 +16,9 @@ import { project, zones } from "@/content/software";
  * `beats`. Under reduced motion every panel stands finished, shown or not, so nothing in it changes.
  */
 function useBeat(beats: number, active: boolean, ms: number) {
-  const reduce = useReducedMotion();
+  // Read as a store with a false server snapshot, so hydration always renders beat 0 and the finished
+  // state follows on the next render.
+  const reduce = usePrefersReducedMotion();
   const [beat, setBeat] = useState(0);
   const finished = !!reduce;
   useEffect(() => {
@@ -124,28 +126,26 @@ function MoreOften({ beat }: { beat: number }) {
         })}
       </span>
       <span className="mt-auto">
-        <Rows beat={beat} from={4} items={[{ text: "Debris found on Friday", tone: "debris" }, { text: "Clean planned for Saturday" }]} />
+        <Rows beat={beat} from={4} items={[{ text: "Debris found on the last scan", tone: "debris" }, { text: "Next clean", note: project.nextClean }]} />
       </span>
     </Shell>
   );
 }
 
 function RightPressure({ beat }: { beat: number }) {
-  const rows = [
-    { name: "Glass", to: 28, level: "Low" },
-    { name: "Solar panels", to: 32, level: "Low" },
-    { name: "Render", to: 56, level: "Medium" },
-    { name: "Roofing", to: 62, level: "Medium" },
-    { name: "Driveway", to: 92, level: "High" },
-  ];
+  // The software's own presets (src/content/software.ts): each surface's bar against the strongest.
+  const rows = [...zones.filter((z) => z.id !== "east"), solarZones[0]].map((z) => ({ name: z.surface, preset: z.preset, bar: parseInt(z.pressure, 10) }));
+  const top = Math.max(...rows.map((r) => r.bar));
   return (
-    <Shell size="card" label="Water pressure set for each surface, from low on glass to high on the driveway." title="Pressure by surface">
+    <Shell size="card" label="Water pressure set for each surface by its preset, gentlest on solar glass." title="Pressure by surface" sub="Presets in the software">
       <ul className="flex flex-1 flex-col justify-between">
         {rows.map((r, i) => (
-          <li key={r.name} className="grid grid-cols-[5.5rem_1fr_3.25rem] items-center gap-2 text-caption leading-tight">
-            <span>{r.name}</span>
-            <Bar to={beat >= i + 1 ? r.to : 0} />
-            <span className={`text-right text-muted ${appear} ${shown(beat >= i + 1)}`}>{r.level}</span>
+          <li key={r.name} className="grid grid-cols-[minmax(0,1fr)_4.5rem] items-center gap-x-2 text-caption leading-tight">
+            <span className="truncate">{r.name}</span>
+            <span className={`text-right text-muted ${appear} ${shown(beat >= i + 1)}`}>{r.preset.split(",")[0]}</span>
+            <span className="col-span-2 mt-1">
+              <Bar to={beat >= i + 1 ? (r.bar / top) * 100 : 0} />
+            </span>
           </li>
         ))}
       </ul>
@@ -184,18 +184,18 @@ function FromAnywhere({ beat }: { beat: number }) {
 
 function OnRecord({ beat }: { beat: number }) {
   return (
-    <Shell size="card" label="The clean history: three cleans washed and the next one due." title="Clean history" sub="Desktop software">
+    <Shell size="card" label="The clean history: three zones washed and the next clean due." title="Clean history" sub="Desktop software">
       <Rows
         beat={beat}
         items={[
-          { text: "North facade", note: "Mon" },
-          { text: "Roof glazing", note: "Wed" },
-          { text: "East facade", note: "Fri" },
+          { text: "North facade", note: "Washed" },
+          { text: "East facade", note: "Washed" },
+          { text: "Roof glazing", note: "Washed" },
         ]}
       />
       <span className={`mt-auto flex items-center justify-between rounded-[0.5rem] bg-paper px-2.5 py-2 text-caption ${appear} ${shown(beat >= 4)}`}>
         <span className="text-muted">Next clean</span>
-        <span className="font-medium">Sunday</span>
+        <span className="font-medium">{project.nextClean}</span>
       </span>
     </Shell>
   );
@@ -325,7 +325,7 @@ function Check({ beat, map }: { beat: number; map: boolean }) {
       status={`Last scan ${project.scanAge} ago`}
       map={map ? <FacadeMap cells={NONE} version={0} wash={false} debris={beat >= 2} selected={null} /> : null}
     >
-      <Rows beat={beat} from={3} items={[{ text: `Debris on ${project.debrisZones} zones`, tone: "debris" }, { text: "Added to the next clean" }]} />
+      <Rows beat={beat} from={3} items={[{ text: `Debris on ${project.debrisZones} areas`, tone: "debris" }, { text: "Added to the next clean" }]} />
     </Stage>
   );
 }
@@ -333,12 +333,12 @@ function Check({ beat, map }: { beat: number; map: boolean }) {
 function Report({ beat, map }: { beat: number; map: boolean }) {
   return (
     <Stage
-      label="The clean report: every zone of the demo building washed, and the next clean due."
+      label="The clean report: every zone of the demo building washed, the debris the re-scan found queued, and the next clean due."
       title="Clean report"
       status="On record"
       map={map ? <FacadeMap cells={ALL} version={1} wash debris={false} selected={null} /> : null}
     >
-      <Rows beat={beat} items={[{ text: `Washed: ${zones.length} zones` }, { text: "Debris cleared" }, { text: "Next clean", note: project.nextClean }]} />
+      <Rows beat={beat} items={[{ text: `Washed: ${zones.length} zones` }, { text: `Debris on ${project.debrisZones} areas, queued`, tone: "debris" }, { text: "Next clean", note: project.nextClean }]} />
     </Stage>
   );
 }

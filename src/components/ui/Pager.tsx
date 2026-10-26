@@ -56,7 +56,10 @@ export function pagerKeys(e: KeyboardEvent<HTMLElement>, index: number, position
  * Under a track, centred: round previous and next buttons around a pager of dots, one per position,
  * each in a 24px target, the current one a wider accent pill. At the ends a button is unavailable.
  */
-export function Pager({ trackId, index, positions, go, noun, className = "" }: { trackId: string; index: number; positions: number; go: (to: number) => void; noun: string; className?: string }) {
+export function Pager({ trackId, index, positions, count, go, noun, className = "" }: { trackId: string; index: number; positions: number; count: number; go: (to: number) => void; noun: string; className?: string }) {
+  // Each dot names the items it brings into view: "Show reason 2 of 5", or two up, "Show reasons 3 and 4 of 5".
+  const inView = Math.max(1, count - positions + 1);
+  const name = (p: number) => (inView === 1 ? `Show ${noun} ${p + 1} of ${count}` : inView === 2 ? `Show ${noun}s ${p + 1} and ${p + 2} of ${count}` : `Show ${noun}s ${p + 1} to ${p + inView} of ${count}`);
   return (
     <div className={`flex items-center justify-center gap-3 ${className}`}>
       <IconButton round label={`Previous ${noun}`} aria-controls={trackId} unavailable={index <= 0} onClick={() => go(index - 1)}>
@@ -67,7 +70,7 @@ export function Pager({ trackId, index, positions, go, noun, className = "" }: {
           <li key={p}>
             <button
               type="button"
-              aria-label={`Show ${noun} ${p + 1} of ${positions}`}
+              aria-label={name(p)}
               aria-current={p === index || undefined}
               aria-controls={trackId}
               onClick={() => go(p)}

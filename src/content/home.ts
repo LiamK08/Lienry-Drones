@@ -83,9 +83,11 @@ export const fitCheck = {
       { id: "mid", from: 40, label: "A likely fit" },
       { id: "high", from: 75, label: "A strong fit" },
     ],
-    // The verdict once all seven are answered, by score out of 100; before that, the zone's lead line.
+    // The verdict once all seven are answered, by score out of 100; before that, the zone's lead line,
+    // judged on the share of the weight answered so far. A No on a building question caps the verdict at
+    // "Worth a conversation" and a Partly there at "A likely fit": they are the site's hard requirements.
     verdicts: [
-      { min: 75, zone: "high", title: "A strong fit", lead: "Your building matches the design closely so far.", body: "Your building matches the design closely. Register interest and we will be in touch about the pilot." },
+      { min: 75, zone: "high", title: "A strong fit", lead: "Your building matches the design closely so far.", body: "Your building matches the design closely. Tell us about it and we will be in touch about the pilot." },
       { min: 40, zone: "mid", title: "A likely fit", lead: "Most of it matches so far.", body: "Most of it matches. The points below are worth a conversation before a pilot." },
       { min: 0, zone: "low", title: "Worth a conversation", lead: "Some of it may not match the design yet.", body: "Some of it may not match the design yet. Tell us about the building and we will say what we can." },
     ],
@@ -100,6 +102,7 @@ export const fitCheck = {
     send: {
       open: "Send me my result",
       title: "Send me my result",
+      who: "I am a",
       body: "We read every one and reply personally with your result and what a pilot would need.",
       submit: "Send my result",
       sending: "Sending",
@@ -116,6 +119,8 @@ export const benefits = {
   eyebrow: "Why Lienry",
   headline: "What changes when the drone lives on site.",
   intro: "Five things a resident system does that a booked crew cannot.",
+  // Under the cards: their panels are coded previews (CLAUDE.md: Demo data and an illustrative note).
+  note: "The panels are illustrative interfaces with demo data.",
   cards: [
     {
       icon: "shield",
@@ -160,6 +165,8 @@ export const how = {
   headline: "From scan to report, on its own.",
   emphasis: "on its own.",
   intro: "Every clean follows the same five steps, planned on a model of your building.",
+  // Under the stage: its panels are coded previews of the software's demo building.
+  note: "Demo data. The building is illustrative; the software will model each property from its scan.",
   label: "Steps of a clean",
   steps: [
     { id: "scan", n: "01", short: "Scan", who: "The drone", tab: "Scans it", title: "Maps the building first.", body: "Structure and dimensions, before the first clean.", image: { id: "s4-scan", alt: "The drone holding off the corner of a glass building to scan it", position: "50% 40%" } },
@@ -188,7 +195,7 @@ export const systems = {
       id: "commercial",
       icon: "building",
       name: "Commercial",
-      meta: ["Office and apartment buildings", "Under 70 m"],
+      meta: ["Office and apartment buildings", "Pilot in preparation"],
       statement: "A capsule on the roof feeds the drone from above, and the desktop software runs the whole building.",
       part: { icon: "dock", name: "Roof capsule", line: "Shelters, powers and feeds the drone" },
       figures: [
@@ -203,7 +210,7 @@ export const systems = {
       id: "homes",
       icon: "home",
       name: "Homes and rentals",
-      meta: ["Houses and rentals", "Ground pod"],
+      meta: ["Houses and rentals", "Home system"],
       statement: "A ground pod powers the drone and feeds it water. You start the clean from your phone.",
       part: { icon: "phone", name: "Phone app", line: "Pick the areas, then start the clean" },
       figures: [
@@ -223,7 +230,7 @@ export const systems = {
       part: { icon: "sliders", name: "Solar glass setting", line: "Pressure and passes set for panels" },
       // Cited figures from src/content/stats.ts, by id, each with a short label and source name for the card.
       cited: [
-        { id: "unsw-soiling", label: "Lost to dust, AU farms studied", source: "Prasad et al." },
+        { id: "unsw-soiling", label: "Lost to dust, Australian farms", source: "Prasad et al." },
         { id: "iea-soiling", label: "Global output lost to soiling", source: "IEA PVPS" },
         { id: "cer-rooftop", label: "Suitable homes with solar", source: "CER" },
       ],
@@ -247,17 +254,17 @@ export const explore = {
   link: { label: "See the six parts", href: "/platform#parts" },
   filters: [
     { id: "all", label: "All" },
-    { id: "systems", label: "Systems" },
+    { id: "solutions", label: "Solutions" },
     { id: "platform", label: "Platform" },
     { id: "tools", label: "Tools" },
     { id: "company", label: "Company" },
   ],
   all: ["commercial", "homes", "platform", "fit-check", "solar", "company"],
   cards: [
-    { id: "commercial", kind: "Systems", meta: "Solution page", tag: "Commercial", title: "A capsule on the roof, and nobody on a rope", href: "/commercial", image: { id: "c1-commercial-hero", alt: "The roof capsule on a plant deck at dawn", position: "75% 50%" } },
-    { id: "homes", kind: "Systems", meta: "Solution page", tag: "Homes", title: "Homes and rentals, cleaned from your phone", href: "/homes-and-rentals", image: { id: "ho1-homes-hero", alt: "The ground pod beside a house, the drone washing a window", position: "45% 50%" } },
-    { id: "solar", kind: "Systems", meta: "Solution page", tag: "Solar", title: "Solar panels at the right pressure", href: "/solar", image: { id: "so2-solar-closeup", alt: "Water beading on a clean solar panel", position: "50% 50%" } },
-    { id: "soiling", kind: "Systems", meta: "Cited figures", tag: "Soiling", title: "What dust costs a solar array", href: "/solar#soiling", image: { id: "so1-solar-hero", alt: "The drone washing a row of ground-mounted solar panels in the morning mist", position: "60% 55%" } },
+    { id: "commercial", kind: "Solutions", meta: "Solution page", tag: "Commercial", title: "A capsule on the roof, and nobody on a rope", href: "/commercial", image: { id: "c1-commercial-hero", alt: "The roof capsule on a plant deck at dawn", position: "75% 50%" } },
+    { id: "homes", kind: "Solutions", meta: "Solution page", tag: "Homes", title: "Homes and rentals, cleaned from your phone", href: "/homes-and-rentals", image: { id: "ho1-homes-hero", alt: "The ground pod beside a house, the drone washing a window", position: "45% 50%" } },
+    { id: "solar", kind: "Solutions", meta: "Solution page", tag: "Solar", title: "Solar panels at the right pressure", href: "/solar", image: { id: "so2-solar-closeup", alt: "Water beading on a clean solar panel", position: "50% 50%" } },
+    { id: "soiling", kind: "Solutions", meta: "Cited figures", tag: "Soiling", title: "What dust costs a solar array", href: "/solar#soiling", image: { id: "so1-solar-hero", alt: "The drone washing a row of ground-mounted solar panels in the morning mist", position: "60% 55%" } },
     { id: "platform", kind: "Platform", meta: "Platform overview", tag: "Six parts", title: "Six parts of one platform", href: "/platform", image: { id: "m2-capsule-master", alt: "The roof capsule open, the drone on its cradle", position: "50% 50%" } },
     { id: "dock", kind: "Platform", meta: "Platform part", tag: "Dock", title: "A home on the property", href: "/platform#dock", image: { id: "s1-dock", alt: "The roof capsule's lid closing over the drone on a wet roof", position: "50% 55%" } },
     { id: "tether", kind: "Platform", meta: "Platform part", tag: "Tether", title: "Water and power, always connected", href: "/platform#tether", image: { id: "s2-tether", alt: "The drone's tether rising from its fitting past a wet glass facade", position: "50% 60%" } },
@@ -295,8 +302,9 @@ export const faq = {
 
 /**
  * The booking card beside the questions: pick a weekday and a time for a 20 minute call, then leave
- * your details. Lienry has no booking service, so nothing is booked on the spot: the time travels with
- * the enquiry and a person confirms it by email. Times are Sydney time.
+ * your details. Lienry has no booking service, so nothing is booked on the spot: the day and time travel
+ * with the enquiry and a person confirms them by email. Times are Sydney time; a visitor elsewhere also
+ * sees each in their own.
  */
 export const booking = {
   who: "Lienry Drones",
@@ -307,15 +315,20 @@ export const booking = {
     { icon: "globe", text: "Sydney time" },
   ],
   pick: "Pick a day",
+  allDays: "All days",
   times: ["9:30 am", "10:30 am", "11:30 am", "1:30 pm", "2:30 pm", "3:30 pm"],
   // Weekdays from tomorrow, up to four weeks out.
   daysAhead: 28,
+  yours: "your time",
   skip: "Rather not pick a time? Register interest instead.",
   change: "Change",
+  callBy: { legend: "Call me by", video: "Video call", phone: "Phone" },
+  cover: { label: "What should we cover?", placeholder: "Your building, which surfaces, and when." },
   submit: "Request this time",
   note: "Nothing is booked until we confirm it by email.",
+  closed: "That time is no longer open. Please pick another.",
   success: (when: string) => ({
     headline: "Request sent.",
-    body: `We will confirm ${when} by email. Nothing is booked until we reply.`,
+    body: `We will reply by email to confirm ${when}, or to offer another time. Nothing is booked until we reply.`,
   }),
 };

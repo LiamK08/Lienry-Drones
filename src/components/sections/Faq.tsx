@@ -3,7 +3,11 @@ import { Band, Container } from "@/components/ui/Band";
 import { Button } from "@/components/ui/Button";
 import { SectionHead } from "@/components/ui/SectionHead";
 
-export type FaqItem = { id: string; q: string; a: string; link?: Action };
+/** One labelled point under an answer's opening line, e.g. "Tether: water and power, always connected". */
+export type FaqPoint = { label: string; text: string };
+
+/** An answer: its opening line, then optional labelled points and a closing line, then an optional link. */
+export type FaqItem = { id: string; q: string; a: string; points?: readonly FaqPoint[]; after?: string; link?: Action };
 
 export type FaqProps = {
   /** The band's id; the heading is `${id}-heading` and each item `${id}-${item.id}`. */
