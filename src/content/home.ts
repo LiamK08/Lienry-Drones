@@ -235,22 +235,37 @@ export const systems = {
 };
 
 /**
- * The dark band of link cards into the rest of the site. Filters by kind. Lienry has no articles, so
- * where the reference dates each card, `meta` says what the page is.
+ * The dark band of link cards into the rest of the site, filtered by kind. Lienry has no articles, so
+ * where the reference dates each card, `meta` says what the page is. Every card links to a page or an
+ * anchor that exists, and each picture appears nowhere else on the home page (check 14), with no open
+ * ground pod beside the closed ones (the pod pairing rule). `all` is the six that "All" shows, one of
+ * each kind at least; a filter shows its own, six at most.
  */
 export const explore = {
   eyebrow: "Explore",
   headline: "Inside the platform",
-  link: { label: "See the platform", href: "/platform" },
-  filters: ["All", "Systems", "Platform", "Tools", "Company"],
+  link: { label: "See the six parts", href: "/platform#parts" },
+  filters: [
+    { id: "all", label: "All" },
+    { id: "systems", label: "Systems" },
+    { id: "platform", label: "Platform" },
+    { id: "tools", label: "Tools" },
+    { id: "company", label: "Company" },
+  ],
+  all: ["commercial", "homes", "platform", "fit-check", "solar", "company"],
   cards: [
-    { kind: "Systems", meta: "Solution page", tag: "Commercial", title: "A capsule on the roof, and nobody on a rope", href: "/commercial", image: { id: "c1-commercial-hero", alt: "The roof capsule on a plant deck at dawn", position: "75% 50%" } },
-    { kind: "Systems", meta: "Solution page", tag: "Homes", title: "Homes and rentals, cleaned from your phone", href: "/homes-and-rentals", image: { id: "ho1-homes-hero", alt: "The ground pod beside a house, the drone washing a window", position: "45% 50%" } },
-    { kind: "Systems", meta: "Solution page", tag: "Solar", title: "Solar panels at the right pressure", href: "/solar", image: { id: "so2-solar-closeup", alt: "Water beading on a clean solar panel", position: "50% 50%" } },
-    { kind: "Platform", meta: "Platform overview", tag: "Platform", title: "Six parts of one platform", href: "/platform", image: { id: "m2-capsule-master", alt: "The roof capsule open, the drone on its cradle", position: "50% 50%" } },
-    { kind: "Tools", meta: "Tool · 1 minute", tag: "Fit check", title: "Seven questions: is your building a fit?", href: "/fit-check", image: { id: "p5-solar-farm", alt: "The drone low over a solar farm row", position: "50% 60%" } },
-    { kind: "Tools", meta: "Tool · your own figures", tag: "Calculator", title: "What outsourced cleaning adds up to", href: "/calculator", image: { id: "f4-dock", alt: "Rain beading on the closed lid of the roof capsule", position: "50% 50%" } },
-    { kind: "Company", meta: "About us", tag: "Company", title: "Why we are building Lienry", href: "/company", image: { id: "co1-company", alt: "A harbour-side street of mid-rise buildings at dawn", position: "50% 50%" } },
+    { id: "commercial", kind: "Systems", meta: "Solution page", tag: "Commercial", title: "A capsule on the roof, and nobody on a rope", href: "/commercial", image: { id: "c1-commercial-hero", alt: "The roof capsule on a plant deck at dawn", position: "75% 50%" } },
+    { id: "homes", kind: "Systems", meta: "Solution page", tag: "Homes", title: "Homes and rentals, cleaned from your phone", href: "/homes-and-rentals", image: { id: "ho1-homes-hero", alt: "The ground pod beside a house, the drone washing a window", position: "45% 50%" } },
+    { id: "solar", kind: "Systems", meta: "Solution page", tag: "Solar", title: "Solar panels at the right pressure", href: "/solar", image: { id: "so2-solar-closeup", alt: "Water beading on a clean solar panel", position: "50% 50%" } },
+    { id: "soiling", kind: "Systems", meta: "Cited figures", tag: "Soiling", title: "What dust costs a solar array", href: "/solar#soiling", image: { id: "so1-solar-hero", alt: "The drone washing a row of ground-mounted solar panels in the morning mist", position: "60% 55%" } },
+    { id: "platform", kind: "Platform", meta: "Platform overview", tag: "Six parts", title: "Six parts of one platform", href: "/platform", image: { id: "m2-capsule-master", alt: "The roof capsule open, the drone on its cradle", position: "50% 50%" } },
+    { id: "dock", kind: "Platform", meta: "Platform part", tag: "Dock", title: "A home on the property", href: "/platform#dock", image: { id: "s1-dock", alt: "The roof capsule's lid closing over the drone on a wet roof", position: "50% 55%" } },
+    { id: "tether", kind: "Platform", meta: "Platform part", tag: "Tether", title: "Water and power, always connected", href: "/platform#tether", image: { id: "s2-tether", alt: "The drone's tether rising from its fitting past a wet glass facade", position: "50% 60%" } },
+    { id: "drone", kind: "Platform", meta: "Platform part", tag: "Drone", title: "Built to wash, not to fly far", href: "/platform#drone", image: { id: "f3-surface", alt: "The drone's spray bar, pad and roller on a pane of glass", position: "50% 50%" } },
+    { id: "fit-check", kind: "Tools", meta: "Tool · 1 minute", tag: "Fit check", title: "Seven questions: is your building a fit?", href: "/fit-check", image: { id: "p5-solar-farm", alt: "The drone low over a solar farm row", position: "50% 60%" } },
+    { id: "calculator", kind: "Tools", meta: "Tool · your own figures", tag: "Calculator", title: "What outsourced cleaning adds up to", href: "/calculator", image: { id: "f4-dock", alt: "Rain beading on the closed lid of the roof capsule", position: "50% 50%" } },
+    { id: "company", kind: "Company", meta: "About us", tag: "Our story", title: "Why we are building Lienry", href: "/company", image: { id: "co1-company", alt: "A harbour-side street of mid-rise buildings at dawn", position: "50% 50%" } },
+    { id: "round", kind: "Company", meta: "Company", tag: "Pre-seed", title: "Concept stage, raising pre-seed, with a pilot next", href: "/company#round", image: { id: "f1-tether", alt: "The tether's metal coupling where it enters the underside of the drone", position: "43% 45%" } },
   ],
 };
 
