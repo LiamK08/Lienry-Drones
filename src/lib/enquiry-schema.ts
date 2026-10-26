@@ -37,7 +37,7 @@ export const enquirySchema = z.object({
     .or(z.literal("")),
   propertyType: z.enum(propertyTypes).optional().or(z.literal("")),
   location: z.string().trim().max(120).optional().or(z.literal("")),
-  message: z.string().trim().max(2000).optional().or(z.literal("")),
+  message: z.string().trim().max(2000, "Please keep this under 2,000 characters.").optional().or(z.literal("")),
   // Where it was sent from: the enquiry form (the default) or the fit check's "Email me my result".
   source: z.enum(["form", "fit-check", "booking"]).optional(),
   // The booking card's requested call: its Sydney day and time (one of the offered times), the visitor's

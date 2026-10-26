@@ -16,20 +16,28 @@ const { zones, verdicts } = fitCheck.panel;
 /** Moves focus into the send form's first field, or onto its confirmation, as it opens. */
 const focusOnMount = (el: HTMLElement | null) => el?.focus();
 
-/** The score out of 100: each question's weight, in full for a Yes and by half for a Partly. */
+/** The weighted sum: each question's weight, in full for a Yes and by half for a Partly. */
 const percent = (answers: Record<string, Answer>) => Math.round(all.reduce((s, q) => s + (answers[q.id] ? q.weight * scoreOf(answers[q.id]) : 0), 0));
 const BUILDING = new Set<string>(fitCheck.groups[0].questions.map((q) => q.id));
 /**
+ * The ceiling the building answers set. Those three are hard requirements: a No there holds the score
+ * (and so the verdict) under the middle zone, a Partly under the high one.
+ */
+const capOf = (answers: Record<string, Answer>) => {
+  const building = [...BUILDING].map((id) => answers[id]);
+  return building.includes("no") ? 39 : building.includes("partly") ? 74 : 100;
+};
+/** The score out of 100 as shown: the weighted sum under the building answers' ceiling, so the score, the bar and the verdict always agree. */
+const scoreFor = (answers: Record<string, Answer>) => Math.min(percent(answers), capOf(answers));
+/**
  * The verdict for the answers so far. All seven answered, it is the score's; partway, it is judged on
- * the share of the weight answered, so a first Yes never reads as a poor fit. A No on a building
- * question (a hard requirement) caps it at the low verdict, a Partly there at the middle one.
+ * the share of the weight answered (under the same ceiling), so a first Yes never reads as a poor fit.
  */
 function verdictFor(answers: Record<string, Answer>) {
   const asked = all.filter((q) => answers[q.id]);
   const weight = asked.reduce((s, q) => s + q.weight, 0);
   const share = weight ? Math.round((percent(answers) / weight) * 100) : 0;
-  const capped = asked.some((q) => BUILDING.has(q.id) && answers[q.id] === "no") ? 39 : asked.some((q) => BUILDING.has(q.id) && answers[q.id] === "partly") ? 74 : 100;
-  const pct = Math.min(asked.length === all.length ? percent(answers) : share, capped);
+  const pct = asked.length === all.length ? scoreFor(answers) : Math.min(share, capOf(answers));
   return verdicts.find((v) => pct >= v.min) ?? verdicts[verdicts.length - 1];
 }
 /** The points to talk through, three at most: every No in question order, then the Partlys, the building's first. */
@@ -72,9 +80,10 @@ export type FitCheckProps = {
  * The fit check: seven questions in two groups, each answered Yes, Partly or No with a row of small
  * pills (a radio group per question). A chosen pill takes its answer's tone. The score out of 100 is
  * live from the first answer (it changes at once, never counting up), over a bar in three zones that
- * fills to it in the verdict's colour (verdictFor: judged on the share answered while partway, capped by
- * a No or a Partly on a building question). Under it, the verdict's lead line and up to three points the
- * answers raise (the Nos first, then the Partlys), or a clear line when there are none. Indicative only.
+ * fills to it in the verdict's colour (verdictFor: judged on the share answered while partway). A No
+ * or a Partly on a building question caps the score and the verdict alike (capOf). Under it, the
+ * verdict's lead line and up to three points the answers raise (the Nos first, then the Partlys), or a
+ * clear line when there are none. Indicative only.
  *
  * The home card: the questions beside an inset result panel from 1024; on smaller screens the panel
  * comes first, and once a question is answered a strip at the foot of the card keeps the score in view
@@ -86,7 +95,7 @@ export type FitCheckProps = {
 export function FitCheck({ id = "fit", layout = "card", intro, badge }: FitCheckProps) {
   const [answers, setAnswers] = useState<Record<string, Answer>>({});
   const answered = Object.keys(answers).length;
-  const pct = percent(answers);
+  const pct = scoreFor(answers);
   const done = answered === all.length;
   const verdict = verdictFor(answers);
   const gaps = gapsOf(answers);

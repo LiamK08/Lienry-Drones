@@ -6,7 +6,7 @@ import { EnquiryForm } from "@/components/forms/EnquiryForm";
 import { Icon } from "@/components/blocks/Icon";
 import { Mark } from "@/components/ui/Wordmark";
 import { useMediaQuery } from "@/lib/hooks";
-import { BOOKING_ZONE, dayKey, isOpenDay, longDay, placeOf, slotInstant, sydneyToday, timeIn, weekday, type DayKey } from "@/lib/booking";
+import { BOOKING_ZONE, dayIn, dayKey, isOpenDay, longDay, placeOf, shortWeekday, slotInstant, sydneyToday, timeIn, weekday, type DayKey } from "@/lib/booking";
 
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 /** How many weeks the calendar shows, from the current week's Monday: enough to hold every open day. */
@@ -38,13 +38,17 @@ const focusOnMount = (el: HTMLElement | null) => el?.focus();
  * of the coming five weeks, Monday first, running on into the next month (weekdays from tomorrow to four
  * weeks out are open, in Sydney; the first day of a month carries its short name), then the open times
  * of the day picked, then the short enquiry step with the chosen time over it. Times are Sydney time;
- * where the visitor's own zone differs, each also reads in theirs. On a phone, picking a day swaps the
- * calendar for that day's times under "All days". The steps share one grid cell, so the card holds the
- * height of its tallest and never jumps; on a phone the details step mounts only when it is reached, so
- * the calendar is not left over a tall blank, and the card grows to it once.
+ * where the visitor's clock reads them differently, each also reads in theirs, with their own day when it
+ * falls on another (a Monday evening in London for a Tuesday morning in Sydney). On a phone, picking a
+ * day swaps the calendar for that day's times under "All days". The steps share one grid cell, so the
+ * card holds the height of its tallest and never jumps; on a phone the details step mounts when it is
+ * first reached and is then taken out of the flow while another step shows, so the calendar is not left
+ * over a tall blank and what was typed survives a change of time.
  *
  * Nothing is booked here: the day and time travel with the enquiry (source "booking"), the route checks
- * the day is still open, and a person confirms it by email. "Register interest instead" skips the time.
+ * the day is still open, and a person confirms it by email. If the day has closed meanwhile (it turned
+ * today while the card was open), the card goes back to the calendar with the route's line over it.
+ * "Register interest instead" skips the time.
  */
 export function BookingCard() {
   const today = useSyncExternalStore(noop, todayKey, () => "");
@@ -53,25 +57,40 @@ export function BookingCard() {
   const [day, setDay] = useState<DayKey | null>(null);
   const [time, setTime] = useState<string | null>(null);
   const [skip, setSkip] = useState(false);
+  // The route's line when the day asked for has closed; cleared once another day is picked.
   const [rejected, setRejected] = useState<string | null>(null);
   // Once the request is sent the card keeps its confirmation: no way back to change the time.
   const [sent, setSent] = useState(false);
+  // On a phone the details step mounts when first reached and then stays, so a change of time keeps
+  // what was typed (it is set by the buttons that open it).
+  const [reached, setReached] = useState(false);
   // Where focus goes once a step opens from a button in the step that closes (it turns inert).
-  const focusTo = useRef<"calendar" | "form" | null>(null);
-  const setFocusTo = (to: "calendar" | "form") => {
+  const focusTo = useRef<"calendar" | "form" | "rejected" | null>(null);
+  const setFocusTo = (to: "calendar" | "form" | "rejected") => {
     focusTo.current = to;
   };
   const monthRef = useRef<HTMLParagraphElement>(null);
   const formStartRef = useRef<HTMLButtonElement>(null);
+  const rejectedRef = useRef<HTMLParagraphElement>(null);
 
-  const elsewhere = zone !== BOOKING_ZONE;
-  const local = (d: DayKey, slot: string) => {
+  // A Sydney time as the visitor's clock reads it, or null where it reads the same (their zone keeps
+  // Sydney's clock that day). On another calendar day there the day goes with it: short on the time
+  // buttons ("3:30 pm Mon"), in full in the summary and the confirmation.
+  const local = (d: DayKey, slot: string, full = false) => {
     const at = slotInstant(d, slot);
-    return at && elsewhere ? `${timeIn(at, zone)} ${booking.yours}` : null;
+    if (!at) return null;
+    const t = timeIn(at, zone);
+    const k = dayIn(at, zone);
+    if (k === d && t === slot) return null;
+    return `${t}${k === d ? "" : ` ${full ? longDay(k) : shortWeekday(k)}`}`;
   };
+  // Whether the facts say the times show in the visitor's zone too: the day picked, or else tomorrow.
+  const shown = day ?? (today ? addDays(today, 1) : null);
+  const elsewhere = !!shown && booking.times.some((t) => local(shown, t) !== null);
   const step: "calendar" | "times" | "form" = skip || (day && time) ? "form" : phone && day ? "times" : "calendar";
   const call = day && time ? { date: day, slot: time, timeZone: zone } : undefined;
-  const yours = day && time ? local(day, time) : null;
+  const reading = day && time ? local(day, time, true) : null;
+  const yours = reading ? `${reading} ${booking.yours}` : null;
   const when = day && time ? `${longDay(day)} at ${time} Sydney time${yours ? ` (${yours})` : ""}` : "";
 
   // After React has lifted `inert` from the step that opened, focus its first line.
@@ -79,11 +98,15 @@ export function BookingCard() {
     const to = focusTo.current;
     if (!to) return;
     focusTo.current = null;
-    (to === "calendar" ? monthRef.current : formStartRef.current)?.focus();
+    (to === "calendar" ? monthRef.current : to === "rejected" ? rejectedRef.current : formStartRef.current)?.focus();
   }, [step]);
 
-  const pickTime = (t: string) => {
+  const pickDay = (d: DayKey | null) => {
     setRejected(null);
+    setDay(d);
+  };
+  const pickTime = (t: string) => {
+    setReached(true);
     setTime(t);
   };
 
@@ -92,15 +115,22 @@ export function BookingCard() {
       {/* The calendar, with the picked day's times under it (on a phone, their own step). */}
       <Step on={step === "calendar"}>
         <Facts elsewhere={elsewhere} zone={zone} />
-        <Calendar today={today} day={day} onPick={setDay} monthRef={monthRef} />
+        {rejected ? (
+          <p ref={rejectedRef} tabIndex={-1} className="mt-5 text-small font-medium text-error focus-visible:outline-none">
+            {rejected}
+          </p>
+        ) : null}
+        <Calendar today={today} day={day} onPick={pickDay} monthRef={monthRef} />
         {phone ? null : (
           // The times hold their room before a day is picked, so the card keeps its height.
           <div className="mt-5">
-            <Times day={day} rejected={rejected} local={local} onPick={pickTime} hidden={!day} />
+            <Times day={day} local={local} onPick={pickTime} hidden={!day} />
           </div>
         )}
         <Skip
           onSkip={() => {
+            setRejected(null);
+            setReached(true);
             setSkip(true);
             setFocusTo("form");
           }}
@@ -112,7 +142,7 @@ export function BookingCard() {
         <button
           type="button"
           onClick={() => {
-            setDay(null);
+            pickDay(null);
             setFocusTo("calendar");
           }}
           className="min-h-6 self-start text-small font-medium text-accent hover:underline hover:underline-offset-4"
@@ -124,18 +154,20 @@ export function BookingCard() {
             <p ref={focusOnMount} tabIndex={-1} className="mt-4 text-body font-semibold text-ink focus-visible:outline-none">
               {longDay(day)}
             </p>
+            {elsewhere ? <p className="mt-1 text-small text-muted">{shownIn(zone)}</p> : null}
             <p aria-live="polite" className="sr-only">{`${booking.times.length} times on ${longDay(day)}`}</p>
             <div className="mt-3">
-              <Times day={day} rejected={rejected} local={local} onPick={pickTime} heading={false} />
+              <Times day={day} local={local} onPick={pickTime} heading={false} />
             </div>
           </>
         ) : null}
       </Step>
 
       {/* The short enquiry step, with the chosen time over it. From 768 it shares the cell too, so the
-          card keeps one height; on a phone it mounts when reached and the card grows to it once. */}
-      {phone && step !== "form" ? null : (
-      <Step on={step === "form"}>
+          card keeps one height; on a phone it mounts when first reached (the card grows to it once) and
+          is then out of the flow while another step shows, keeping what was typed. */}
+      {phone && !reached ? null : (
+      <Step on={step === "form"} collapse={phone}>
         {day && time ? (
           <div ref={step === "form" ? focusOnMount : undefined} tabIndex={-1} className="mb-6 flex items-start justify-between gap-4 rounded-card border border-line bg-paper p-4 focus-visible:outline-none">
             <p className="flex items-start gap-3 text-small text-ink">
@@ -178,9 +210,14 @@ export function BookingCard() {
           <EnquiryForm
             variant="booking"
             call={call}
+            callFields={!skip}
             onSlotRejected={(message) => {
+              // The route refuses only a day that has closed (the card offers only open times), so
+              // every time on it would be refused too: back to the calendar, with the line over it.
               setRejected(message);
               setTime(null);
+              setDay(null);
+              setFocusTo("rejected");
             }}
             onSent={() => setSent(true)}
             submitLabel={call ? booking.submit : undefined}
@@ -194,14 +231,20 @@ export function BookingCard() {
   );
 }
 
-/** One step of the card: all share the grid's one cell, and a step not shown is invisible and inert. */
-function Step({ on, children }: { on: boolean; children: ReactNode }) {
+/**
+ * One step of the card: all share the grid's one cell, and a step not shown is invisible and inert.
+ * With `collapse` a step not shown also leaves the flow (display none), so it holds no room.
+ */
+function Step({ on, collapse = false, children }: { on: boolean; collapse?: boolean; children: ReactNode }) {
   return (
-    <div inert={!on} aria-hidden={!on || undefined} className={`flex flex-col [grid-area:1/1] ${on ? "" : "invisible"}`}>
+    <div inert={!on} aria-hidden={!on || undefined} className={`flex-col [grid-area:1/1] ${on ? "flex" : collapse ? "hidden" : "invisible flex"}`}>
       {children}
     </div>
   );
 }
+
+/** The zone line where the visitor's clock differs: "Sydney time, shown in London time too". */
+const shownIn = (zone: string) => `${booking.facts.find((f) => f.icon === "globe")?.text}, shown in ${placeOf(zone)} time too`;
 
 /** The call's facts: who, what, and the zone the times are in (and that they show in yours too). */
 function Facts({ elsewhere, zone }: { elsewhere: boolean; zone: string }) {
@@ -218,7 +261,7 @@ function Facts({ elsewhere, zone }: { elsewhere: boolean; zone: string }) {
         {booking.facts.map((f) => (
           <li key={f.text} className="flex items-center gap-2 text-small text-muted">
             <Icon name={f.icon} className="size-4 text-ink" />
-            {f.icon === "globe" && elsewhere ? `${f.text}, shown in ${placeOf(zone)} time too` : f.text}
+            {f.icon === "globe" && elsewhere ? shownIn(zone) : f.text}
           </li>
         ))}
       </ul>
@@ -279,15 +322,13 @@ function Calendar({ today, day, onPick, monthRef }: { today: DayKey; day: DayKey
   );
 }
 
-/** A day's six times, each with the visitor's own time under it when their zone differs. */
-function Times({ day, rejected, local, onPick, hidden = false, heading = true }: { day: DayKey | null; rejected: string | null; local: (d: DayKey, slot: string) => string | null; onPick: (t: string) => void; hidden?: boolean; heading?: boolean }) {
+/**
+ * A day's six times, each with the visitor's own reading under it where it differs (the zone line above
+ * says whose). Its name reads in full: "9:30 am Sydney time, 3:30 pm Mon your time".
+ */
+function Times({ day, local, onPick, hidden = false, heading = true }: { day: DayKey | null; local: (d: DayKey, slot: string) => string | null; onPick: (t: string) => void; hidden?: boolean; heading?: boolean }) {
   return (
     <div className={hidden ? "invisible" : ""} aria-hidden={hidden || undefined} inert={hidden}>
-      {rejected ? (
-        <p role="alert" className="mb-3 text-small text-error">
-          {rejected}
-        </p>
-      ) : null}
       {heading ? <p className="text-small font-medium text-ink">{day ? longDay(day) : booking.pick}</p> : null}
       <ul aria-label={day ? `Times on ${longDay(day)}` : booking.pick} className={`${heading ? "mt-3" : ""} grid grid-cols-2 gap-2 @[22rem]:grid-cols-3`}>
         {booking.times.map((t) => {
@@ -300,7 +341,15 @@ function Times({ day, rejected, local, onPick, hidden = false, heading = true }:
                 className="flex min-h-10 w-full flex-col items-center justify-center rounded-pill border border-line px-2 py-1.5 text-small leading-tight text-ink transition-[background-color,border-color,color] duration-200 hover:border-accent hover:text-accent"
               >
                 {t}
-                {yours ? <span className="text-caption text-muted">{yours}</span> : null}
+                {yours ? (
+                  <>
+                    <span className="sr-only"> Sydney time, </span>
+                    <span className="text-caption text-muted">
+                      {yours}
+                      <span className="sr-only"> {booking.yours}</span>
+                    </span>
+                  </>
+                ) : null}
               </button>
             </li>
           );

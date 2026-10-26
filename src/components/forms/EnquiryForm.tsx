@@ -37,6 +37,9 @@ export type EnquiryFormProps = {
   variant?: "full" | "booking";
   /** The booking card's chosen call: its Sydney day (yyyy-mm-dd), its time and the visitor's zone. */
   call?: { date: string; slot: string; timeZone?: string };
+  /** Keeps the call's own fields (how to call, the number) while the time is being changed and `call`
+   *  is unset, so what was typed in them survives. The booking card sets it unless the time is skipped. */
+  callFields?: boolean;
   /** Hears the route's reason when a requested time is no longer open. */
   onSlotRejected?: (message: string) => void;
   /** Hears that the enquiry was sent (the booking card then drops its ways back). */
@@ -47,7 +50,7 @@ export type EnquiryFormProps = {
   success?: { headline: string; body: string };
 };
 
-export function EnquiryForm({ variant = "full", call, onSlotRejected, onSent, submitLabel = "Register interest", success = registerPage.success }: EnquiryFormProps = {}) {
+export function EnquiryForm({ variant = "full", call, callFields = false, onSlotRejected, onSent, submitLabel = "Register interest", success = registerPage.success }: EnquiryFormProps = {}) {
   const [type, setType] = useEnquiryType();
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "failed">("idle");
@@ -55,6 +58,7 @@ export function EnquiryForm({ variant = "full", call, onSlotRejected, onSent, su
   const id = useId();
   const fid = (name: string) => `${id}-${name}`;
   const short = variant === "booking";
+  const withCall = !!call || callFields;
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -102,16 +106,11 @@ export function EnquiryForm({ variant = "full", call, onSlotRejected, onSent, su
     );
   }
 
+  // A control's error state: marked invalid and pointed at its error line.
+  const invalid = (name: string) => ({ "aria-invalid": errors[name] ? true : undefined, "aria-describedby": describedBy(fid(name), undefined, errors[name]) });
   const text = (name: string, label: string, props: React.ComponentPropsWithoutRef<"input"> = {}) => (
     <Field id={fid(name)} label={label} error={errors[name]}>
-      <input
-        id={fid(name)}
-        name={name}
-        className={fieldControl}
-        aria-invalid={errors[name] ? true : undefined}
-        aria-describedby={describedBy(fid(name), undefined, errors[name])}
-        {...props}
-      />
+      <input id={fid(name)} name={name} className={fieldControl} {...invalid(name)} {...props} />
     </Field>
   );
 
@@ -141,7 +140,7 @@ export function EnquiryForm({ variant = "full", call, onSlotRejected, onSent, su
             <SelectField id={fid("type")} options={enquiryTypes.map((t) => enquiryTypeLabels[t])} value={enquiryTypeLabels[type]} onChange={(label) => setType(enquiryTypes.find((t) => enquiryTypeLabels[t] === label) ?? type)} />
           </Field>
           {text("organisation", `${type === "investor" ? "Fund or firm" : type === "commercial" ? "Company or strata" : "Organisation"} (optional)`, { autoComplete: "organization" })}
-          {call ? (
+          {withCall ? (
             <fieldset className="@[24rem]:col-span-2">
               <legend className="text-small font-medium text-fg">{booking.callBy.legend}</legend>
               <div className="mt-3 grid grid-cols-2 gap-2">
@@ -157,10 +156,10 @@ export function EnquiryForm({ variant = "full", call, onSlotRejected, onSent, su
             </fieldset>
           ) : null}
           {/* Always there with a call, so choosing Phone never moves the form: it is required only then. */}
-          {call ? text("phone", callBy === "phone" ? "Phone" : "Phone (optional)", { type: "tel", autoComplete: "tel", required: callBy === "phone" }) : null}
+          {withCall ? text("phone", callBy === "phone" ? "Phone" : "Phone (optional)", { type: "tel", autoComplete: "tel", required: callBy === "phone" }) : null}
           <div className="@[24rem]:col-span-2">
-            <Field id={fid("message")} label={booking.cover.label}>
-              <textarea id={fid("message")} name="message" rows={3} className={fieldArea.replace("min-h-32", "min-h-24")} placeholder={booking.cover.placeholder} />
+            <Field id={fid("message")} label={booking.cover.label} error={errors.message}>
+              <textarea id={fid("message")} name="message" rows={3} maxLength={2000} className={fieldArea.replace("min-h-32", "min-h-24")} placeholder={booking.cover.placeholder} {...invalid("message")} />
             </Field>
           </div>
           <div className="hidden" aria-hidden="true">
@@ -187,11 +186,13 @@ export function EnquiryForm({ variant = "full", call, onSlotRejected, onSent, su
           </div>
           {text("location", "Suburb or city", { autoComplete: "address-level2", placeholder: "Sydney" })}
           <div className="@[24rem]:col-span-2">
-            <Field id={fid("message")} label="Anything else">
+            <Field id={fid("message")} label="Anything else" error={errors.message}>
               <textarea
                 id={fid("message")}
                 name="message"
                 rows={4}
+                maxLength={2000}
+                {...invalid("message")}
                 className={fieldArea}
                 placeholder={type === "investor" ? "Fund, stage, and what you would like to see." : "How many buildings, which surfaces, and when."}
               />

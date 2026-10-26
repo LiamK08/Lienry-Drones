@@ -326,7 +326,7 @@ export const booking = {
   cover: { label: "What should we cover?", placeholder: "Your building, which surfaces, and when." },
   submit: "Request this time",
   note: "Nothing is booked until we confirm it by email.",
-  closed: "That time is no longer open. Please pick another.",
+  closed: "That day is no longer open. Please pick another.",
   success: (when: string) => ({
     headline: "Request sent.",
     body: `We will reply by email to confirm ${when}, or to offer another time. Nothing is booked until we reply.`,

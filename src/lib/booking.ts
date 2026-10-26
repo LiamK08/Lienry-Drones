@@ -16,11 +16,14 @@ function partsIn(instant: Date, timeZone: string) {
   return { y: get("year"), m: get("month"), d: get("day"), h: get("hour") % 24, min: get("minute") };
 }
 
-/** Today in Sydney, as a key. */
-export const sydneyToday = (now = new Date()): DayKey => {
-  const p = partsIn(now, BOOKING_ZONE);
+/** An instant's calendar day in a zone, as a key. */
+export const dayIn = (instant: Date, timeZone: string): DayKey => {
+  const p = partsIn(instant, timeZone);
   return dayKey(p.y, p.m, p.d);
 };
+
+/** Today in Sydney, as a key. */
+export const sydneyToday = (now = new Date()): DayKey => dayIn(now, BOOKING_ZONE);
 
 /** "10:30 am" as 24-hour hours and minutes. */
 export function parseSlot(slot: string) {
@@ -74,6 +77,12 @@ export const timeIn = (instant: Date, timeZone: string) =>
 export const longDay = (k: DayKey) => {
   const [y, m, d] = k.split("-").map(Number);
   return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString("en-AU", { timeZone: "UTC", weekday: "long", day: "numeric", month: "long" });
+};
+
+/** A day key's weekday read short, as "Mon". */
+export const shortWeekday = (k: DayKey) => {
+  const [y, m, d] = k.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString("en-AU", { timeZone: "UTC", weekday: "short" });
 };
 
 /** A zone's place name, e.g. "Perth" for Australia/Perth. */
