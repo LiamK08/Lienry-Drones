@@ -128,7 +128,8 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
   Lienry's words and media. The hero and the strip are untouched. Eyebrows, header pills and the hero's
   pills stay out (owner's earlier calls).
   - Fit check (`FitCheck`, card layout): a live score out of 100 from the first answer (the three
-    building questions weigh 20, the four about the clean 10; Partly counts half), a three-zone bar
+    building questions weigh 20, the four about the clean 10; Partly counts half; a No on a building
+    question holds the score and verdict under 40, a Partly there under 75), a three-zone bar
     (Worth a conversation / A likely fit / A strong fit, split at 40 and 75), answer pills in their own
     tones (Yes tint, Partly debris amber, No a soft red: new `fit-*` tokens), up to three points it
     raises (the Nos first) as short phrases, a callout before the first answer, a panel that holds one
@@ -162,12 +163,14 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
     nowhere else on the home page (check 14) and no open pod sits beside a closed one.
   - FAQ card: "Book a call" (`BookingCard`): the call's facts, a calendar of the coming five weeks
     (weekdays from tomorrow to four weeks out, in Sydney: `src/lib/booking.ts`), six Sydney times with
-    the visitor's own time beside them when their zone differs, then a short form (name, email, I am a,
-    organisation, video or phone, phone number, "What should we cover?") with the time over it. The
-    request travels structured (`preferredDate`, `preferredSlot`, `timeZone`, `callBy`, `source:
-    "booking"`); the route refuses a closed day or time (422, "That time is no longer open"). Nothing is
-    booked until a person confirms it by email. "Register interest instead" skips the time. The card
-    holds one height from 1200 (the steps share one grid cell).
+    the visitor's own reading under each where their clock differs (with their day when it falls on
+    another: a Tuesday morning in Sydney reads "Mon" in London and the Americas), then a short form
+    (name, email, I am a, organisation, video or phone, phone number, "What should we cover?") with the
+    time over it. What is typed survives "Change". The request travels structured (`preferredDate`,
+    `preferredSlot`, `timeZone`, `callBy`, `source: "booking"`); the route refuses a day that has closed
+    (422, "That day is no longer open"), and the card goes back to the calendar with that line focused.
+    Nothing is booked until a person confirms it by email. "Register interest instead" skips the time.
+    The card holds one height from 1200 (the steps share one grid cell).
   - FAQ rows: richer answers (an opening line, labelled points, a closing line) for surfaces, height,
     safety, the app and the pilot; the answer's height animates open where the browser can
     (`::details-content`, off under reduced motion); the plus turns to a cross. Cost is unchanged.
@@ -183,11 +186,15 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
   - A three-lens review (correctness, accessibility, honesty and consistency) with each finding
     verified was run on the whole change and its confirmed findings fixed (hydration-safe reduced
     motion, the verdict judged only on what is answered, focus kept through the send and booking steps,
-    the phone strip never covering focus, one live line per panel).
+    the phone strip never covering focus, one live line per panel). A second review of the later
+    commits, before deploy, found the booking card's missing visitor day, the refused day kept
+    selected, phone details lost on "Change", the message box's silent length error and the fit check's
+    uncapped score; all fixed and re-checked in the browser in three zones.
   - Gates on 26 October: typecheck, lint and build pass; `check:layout` passes on all 12 routes at
     1440, 390, 1024 and 768; `check:rules` (with motion) on all 12 routes; `check:a11y` on all 12
     routes; `npm run contrast` at 1440 and 390 (film frames and the white bound); `perf:vitals`
-    (three runs each) passes on home, the other pages are running.
+    (three runs each) on all 11 pages. After the pre-deploy fixes, layout, rules and a11y pass again
+    on /, /fit-check and /register-interest.
 
 ## How the owner works
 
