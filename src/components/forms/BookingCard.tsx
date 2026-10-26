@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useRef, useState, useSyncExternalStore, type ReactNode, type RefObject } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode, type RefObject } from "react";
 import { booking } from "@/content/home";
 import { EnquiryForm } from "@/components/forms/EnquiryForm";
 import { Icon } from "@/components/blocks/Icon";
@@ -30,6 +30,20 @@ const monthName = (k: DayKey, style: "long" | "short" = "long") => {
   return new Date(Date.UTC(y, m - 1, 1)).toLocaleDateString("en-AU", { timeZone: "UTC", month: style });
 };
 
+/**
+ * A Sydney time as a zone's clock reads it, or null where it reads the same (the zone keeps Sydney's
+ * clock that day). On another calendar day there the day goes with it: short on the time buttons
+ * ("3:30 pm Mon"), in full in the summary and the confirmation ("3:30 pm Monday 26 October").
+ */
+function readingIn(zone: string, d: DayKey, slot: string, full = false) {
+  const at = slotInstant(d, slot);
+  if (!at) return null;
+  const t = timeIn(at, zone);
+  const k = dayIn(at, zone);
+  if (k === d && t === slot) return null;
+  return `${t}${k === d ? "" : ` ${full ? longDay(k) : shortWeekday(k)}`}`;
+}
+
 /** Moves focus to a step's heading or summary as it opens. */
 const focusOnMount = (el: HTMLElement | null) => el?.focus();
 
@@ -57,8 +71,11 @@ export function BookingCard() {
   const [day, setDay] = useState<DayKey | null>(null);
   const [time, setTime] = useState<string | null>(null);
   const [skip, setSkip] = useState(false);
-  // The route's line when the day asked for has closed; cleared once another day is picked.
+  // The route's line when the day asked for has closed; it stays over the calendar while another day is
+  // found and clears as the calendar step closes, so it never moves the calendar under the pointer.
   const [rejected, setRejected] = useState<string | null>(null);
+  // While a request is out, the ways back hold still, so the confirmation always names what was sent.
+  const [sending, setSending] = useState(false);
   // Once the request is sent the card keeps its confirmation: no way back to change the time.
   const [sent, setSent] = useState(false);
   // On a phone the details step mounts when first reached and then stays, so a change of time keeps
@@ -73,20 +90,15 @@ export function BookingCard() {
   const formStartRef = useRef<HTMLButtonElement>(null);
   const rejectedRef = useRef<HTMLParagraphElement>(null);
 
-  // A Sydney time as the visitor's clock reads it, or null where it reads the same (their zone keeps
-  // Sydney's clock that day). On another calendar day there the day goes with it: short on the time
-  // buttons ("3:30 pm Mon"), in full in the summary and the confirmation.
-  const local = (d: DayKey, slot: string, full = false) => {
-    const at = slotInstant(d, slot);
-    if (!at) return null;
-    const t = timeIn(at, zone);
-    const k = dayIn(at, zone);
-    if (k === d && t === slot) return null;
-    return `${t}${k === d ? "" : ` ${full ? longDay(k) : shortWeekday(k)}`}`;
-  };
-  // Whether the facts say the times show in the visitor's zone too: the day picked, or else tomorrow.
-  const shown = day ?? (today ? addDays(today, 1) : null);
-  const elsewhere = !!shown && booking.times.some((t) => local(shown, t) !== null);
+  const local = (d: DayKey, slot: string, full = false) => readingIn(zone, d, slot, full);
+  // Whether the facts say the times show in the visitor's zone too: if any open day reads differently,
+  // worked out once over the whole window, so the line never changes as days are picked (Brisbane
+  // matches Sydney until Sydney's daylight saving starts). Clocks change at night, so a day's first
+  // time stands for all six.
+  const elsewhere = useMemo(
+    () => !!today && Array.from({ length: booking.daysAhead }, (_, i) => addDays(today, i + 1)).some((d) => isOpenDay(d, today, booking.daysAhead) && readingIn(zone, d, booking.times[0]) !== null),
+    [today, zone],
+  );
   const step: "calendar" | "times" | "form" = skip || (day && time) ? "form" : phone && day ? "times" : "calendar";
   const call = day && time ? { date: day, slot: time, timeZone: zone } : undefined;
   const reading = day && time ? local(day, time, true) : null;
@@ -102,10 +114,12 @@ export function BookingCard() {
   }, [step]);
 
   const pickDay = (d: DayKey | null) => {
-    setRejected(null);
+    // On a phone a day opens its own step, so the line can go now; elsewhere it waits for a time.
+    if (phone) setRejected(null);
     setDay(d);
   };
   const pickTime = (t: string) => {
+    setRejected(null);
     setReached(true);
     setTime(t);
   };
@@ -154,7 +168,7 @@ export function BookingCard() {
             <p ref={focusOnMount} tabIndex={-1} className="mt-4 text-body font-semibold text-ink focus-visible:outline-none">
               {longDay(day)}
             </p>
-            {elsewhere ? <p className="mt-1 text-small text-muted">{shownIn(zone)}</p> : null}
+            {local(day, booking.times[0]) ? <p className="mt-1 text-small text-muted">{shownIn(zone)}</p> : null}
             <p aria-live="polite" className="sr-only">{`${booking.times.length} times on ${longDay(day)}`}</p>
             <div className="mt-3">
               <Times day={day} local={local} onPick={pickTime} heading={false} />
@@ -182,12 +196,13 @@ export function BookingCard() {
             {sent ? null : (
               <button
                 type="button"
+                disabled={sending}
                 onClick={() => {
                   setTime(null);
                   // On a phone the day's times open with their heading focused; elsewhere, the calendar.
                   if (!phone) setFocusTo("calendar");
                 }}
-                className="min-h-6 shrink-0 text-small font-medium text-accent hover:underline hover:underline-offset-4"
+                className="min-h-6 shrink-0 text-small font-medium text-accent enabled:hover:underline enabled:hover:underline-offset-4 disabled:text-muted"
               >
                 {booking.change}
               </button>
@@ -197,11 +212,12 @@ export function BookingCard() {
           <button
             ref={formStartRef}
             type="button"
+            disabled={sending}
             onClick={() => {
               setSkip(false);
               setFocusTo("calendar");
             }}
-            className="mb-6 min-h-6 self-start text-small font-medium text-accent hover:underline hover:underline-offset-4"
+            className="mb-6 min-h-6 self-start text-small font-medium text-accent enabled:hover:underline enabled:hover:underline-offset-4 disabled:text-muted"
           >
             ← {booking.pick}
           </button>
@@ -219,6 +235,7 @@ export function BookingCard() {
               setDay(null);
               setFocusTo("rejected");
             }}
+            onSending={setSending}
             onSent={() => setSent(true)}
             submitLabel={call ? booking.submit : undefined}
             success={call ? booking.success(when) : undefined}

@@ -44,13 +44,15 @@ export type EnquiryFormProps = {
   onSlotRejected?: (message: string) => void;
   /** Hears that the enquiry was sent (the booking card then drops its ways back). */
   onSent?: () => void;
+  /** Hears when a request goes out and when it is answered (the booking card holds its ways back meanwhile). */
+  onSending?: (sending: boolean) => void;
   /** The submit label. Default "Register interest". */
   submitLabel?: string;
   /** The confirmation that replaces the form. Default the register page's. */
   success?: { headline: string; body: string };
 };
 
-export function EnquiryForm({ variant = "full", call, callFields = false, onSlotRejected, onSent, submitLabel = "Register interest", success = registerPage.success }: EnquiryFormProps = {}) {
+export function EnquiryForm({ variant = "full", call, callFields = false, onSlotRejected, onSent, onSending, submitLabel = "Register interest", success = registerPage.success }: EnquiryFormProps = {}) {
   const [type, setType] = useEnquiryType();
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "failed">("idle");
@@ -77,6 +79,7 @@ export function EnquiryForm({ variant = "full", call, callFields = false, onSlot
     }
     setErrors({});
     setStatus("sending");
+    onSending?.(true);
     try {
       const res = await fetch("/api/enquiry", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(parsed.data) });
       if (res.status === 422 && onSlotRejected) {
@@ -84,14 +87,17 @@ export function EnquiryForm({ variant = "full", call, callFields = false, onSlot
         const slot = body?.issues?.find((i) => i.path[0] === "preferredDate");
         if (slot) {
           setStatus("idle");
+          onSending?.(false);
           onSlotRejected(slot.message);
           return;
         }
       }
       setStatus(res.ok ? "sent" : "failed");
+      onSending?.(false);
       if (res.ok) onSent?.();
     } catch {
       setStatus("failed");
+      onSending?.(false);
     }
   }
 
