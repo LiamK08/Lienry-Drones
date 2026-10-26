@@ -193,8 +193,8 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
   - Gates on 26 October: typecheck, lint and build pass; `check:layout` passes on all 12 routes at
     1440, 390, 1024 and 768; `check:rules` (with motion) on all 12 routes; `check:a11y` on all 12
     routes; `npm run contrast` at 1440 and 390 (film frames and the white bound); `perf:vitals`
-    (three runs each) on all 11 pages. After the pre-deploy fixes, layout, rules and a11y pass again
-    on /, /fit-check and /register-interest.
+    (three runs each) on all 11 pages. After the pre-deploy fixes, layout, rules, a11y and perf pass
+    again on /, /fit-check and /register-interest. PR screenshots: `docs/screenshots/refresh-home/`.
 
 ## How the owner works
 
