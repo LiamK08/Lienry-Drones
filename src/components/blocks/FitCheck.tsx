@@ -13,8 +13,8 @@ type Question = (typeof fitCheck.groups)[number]["questions"][number];
 const all: Question[] = fitCheck.groups.flatMap((g) => g.questions);
 const scoreOf = (a: Answer) => fitCheck.answers.find((x) => x.id === a)?.score ?? 0;
 const { zones, verdicts } = fitCheck.panel;
-/** Moves focus into the send form's first field as it opens. */
-const focusOnMount = (el: HTMLInputElement | null) => el?.focus();
+/** Moves focus into the send form's first field, or onto its confirmation, as it opens. */
+const focusOnMount = (el: HTMLElement | null) => el?.focus();
 
 /** The score out of 100: each question's weight, in full for a Yes and by half for a Partly. */
 const percent = (answers: Record<string, Answer>) => Math.round(all.reduce((s, q) => s + (answers[q.id] ? q.weight * scoreOf(answers[q.id]) : 0), 0));
@@ -40,10 +40,12 @@ const gapsOf = (answers: Record<string, Answer>) => {
 };
 
 // A chosen answer takes its own tone: Yes the accent tint, Partly the warm debris tone, No a soft red.
+// The chosen pill also takes a solid edge in its own tone (6:1 or more on white) and the heavier weight,
+// so the choice never rests on colour alone.
 const chosen: Record<Answer, string> = {
-  yes: "border-accent/40 bg-tint text-accent",
-  partly: "border-fit-partly-edge bg-fit-partly-soft text-debris-text",
-  no: "border-fit-no-edge bg-fit-no-soft text-fit-no",
+  yes: "border-accent bg-tint font-semibold text-accent",
+  partly: "border-debris-text bg-fit-partly-soft font-semibold text-debris-text",
+  no: "border-fit-no bg-fit-no-soft font-semibold text-fit-no",
 };
 const forced = "forced-colors:forced-color-adjust-none forced-colors:border-[Highlight] forced-colors:bg-[Highlight] forced-colors:text-[HighlightText]";
 
@@ -167,7 +169,7 @@ export function FitCheck({ id = "fit", layout = "card", intro, badge }: FitCheck
             <Score pct={pct} className="mt-4" size="sm" />
             <ZoneBar pct={pct} zone={answered ? verdict.zone : null} done={done} className="mt-5" />
             <div aria-live="polite" className="mt-6">
-              <Result answered={answered} done={done} verdict={verdict} gaps={gaps} answers={answers} />
+              <Result answered={answered} done={done} verdict={verdict} gaps={gaps} answers={answers} place="column" />
             </div>
           </div>
 
@@ -213,8 +215,8 @@ export function FitCheck({ id = "fit", layout = "card", intro, badge }: FitCheck
                         return (
                           <label
                             key={a.id}
-                            className={`relative flex h-9 flex-1 cursor-pointer items-center justify-center rounded-pill border text-small font-medium transition-[background-color,border-color,color] duration-200 motion-reduce:transition-none has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus sm:h-8 sm:w-[4.25rem] sm:flex-none ${
-                              on ? `${chosen[a.id]} ${forced}` : "border-line bg-white text-muted hover:border-ink hover:text-ink"
+                            className={`relative flex h-9 flex-1 cursor-pointer items-center justify-center rounded-pill border text-small transition-[background-color,border-color,color] duration-200 motion-reduce:transition-none has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus sm:h-8 sm:w-[4.25rem] sm:flex-none ${
+                              on ? `${chosen[a.id]} ${forced}` : "border-line bg-white font-medium text-muted hover:border-ink hover:text-ink"
                             }`}
                           >
                             <input
@@ -247,6 +249,8 @@ export function FitCheck({ id = "fit", layout = "card", intro, badge }: FitCheck
 }
 
 type ResultProps = {
+  /** Where the questions sit from the result: beside it, or below it on a phone ("card"), or above it ("column"). */
+  place?: "card" | "column";
   answered: number;
   done: boolean;
   verdict: (typeof verdicts)[number];
@@ -309,14 +313,14 @@ function ZoneBar({ pct, zone: at, done, className = "" }: { pct: number; zone: Z
 }
 
 /** What the answers mean so far: a prompt before the first, then the lead line and up to three points to talk through. */
-function Result({ answered, done, verdict, gaps, answers, className = "" }: ResultProps) {
+function Result({ answered, done, verdict, gaps, answers, place = "card", className = "" }: ResultProps) {
   if (!answered) {
     return (
       <div className={`flex items-start gap-4 rounded-card border border-accent bg-tint p-5 ${className}`}>
         <svg
           aria-hidden="true"
           viewBox="0 0 16 16"
-          className="mt-1 size-4 shrink-0 -rotate-90 animate-[nudge-y_1.4s_ease-in-out_infinite] text-accent lg:rotate-0 lg:animate-[nudge-x_1.4s_ease-in-out_infinite] motion-reduce:animate-none"
+          className={`mt-1 size-4 shrink-0 text-accent motion-reduce:animate-none ${place === "column" ? "rotate-90" : "-rotate-90 animate-[nudge-y_1.4s_ease-in-out_infinite] lg:rotate-0 lg:animate-[nudge-x_1.4s_ease-in-out_infinite]"}`}
           fill="none"
           stroke="currentColor"
           strokeWidth="1.75"
@@ -327,8 +331,14 @@ function Result({ answered, done, verdict, gaps, answers, className = "" }: Resu
         </svg>
         <span>
           <span className="block text-body font-medium leading-[1.3] text-ink">
-            <span className="lg:hidden">{fitCheck.panel.prompt.title.narrow}</span>
-            <span className="hidden lg:inline">{fitCheck.panel.prompt.title.wide}</span>
+            {place === "column" ? (
+              fitCheck.panel.prompt.title.above
+            ) : (
+              <>
+                <span className="lg:hidden">{fitCheck.panel.prompt.title.narrow}</span>
+                <span className="hidden lg:inline">{fitCheck.panel.prompt.title.wide}</span>
+              </>
+            )}
           </span>
           <span className="mt-1 block text-small text-muted">{fitCheck.panel.prompt.body}</span>
         </span>
@@ -455,12 +465,12 @@ function ResultPanel({ pct, count, scoreRef, onRestart, ...result }: ResultProps
                 ))}
               </ul>
             </div>
-            <div aria-live="polite" className="[grid-area:1/1]">
+            <div className="[grid-area:1/1]">
               <Result {...result} />
             </div>
           </div>
           <div className="mt-8 flex flex-col gap-3">
-            <Button size="lg" className="w-full" aria-disabled={!result.answered || undefined} onClick={() => result.answered && setMode("form")}>
+            <Button id={fid("open")} size="lg" className="w-full" aria-disabled={!result.answered || undefined} onClick={() => result.answered && setMode("form")}>
               {send.open}
             </Button>
             <Button href={fitCheck.panel.secondary.href} variant="secondary" size="lg" className="w-full">
@@ -470,7 +480,9 @@ function ResultPanel({ pct, count, scoreRef, onRestart, ...result }: ResultProps
         </>
       ) : mode === "sent" ? (
         <div role="status" className="mt-7 flex-1">
-          <p className="font-display text-[1.5rem] leading-[1.2] tracking-[-0.01em] text-ink">{send.sent.title}</p>
+          <p ref={focusOnMount} tabIndex={-1} className="font-display text-[1.5rem] leading-[1.2] tracking-[-0.01em] text-ink focus-visible:outline-none">
+            {send.sent.title}
+          </p>
           <p className="mt-2 text-small text-muted">{send.sent.body}</p>
         </div>
       ) : (
@@ -499,7 +511,16 @@ function ResultPanel({ pct, count, scoreRef, onRestart, ...result }: ResultProps
             <Button type="submit" size="lg" className="w-full" disabled={mode === "sending"} aria-busy={mode === "sending" || undefined}>
               {mode === "sending" ? send.sending : send.submit}
             </Button>
-            <Button variant="secondary" size="lg" className="w-full" onClick={() => setMode("result")}>
+            <Button
+              variant="secondary"
+              size="lg"
+              className="w-full"
+              onClick={() => {
+                setMode("result");
+                // Back on the result, focus returns to the button that opened the form.
+                requestAnimationFrame(() => document.getElementById(fid("open"))?.focus());
+              }}
+            >
               {send.back}
             </Button>
           </div>

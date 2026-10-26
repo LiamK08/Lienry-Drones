@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState, useSyncExternalStore, type ReactNode } from "react";
+import { Suspense, useEffect, useRef, useState, useSyncExternalStore, type ReactNode, type RefObject } from "react";
 import { booking } from "@/content/home";
 import { EnquiryForm } from "@/components/forms/EnquiryForm";
 import { Icon } from "@/components/blocks/Icon";
@@ -56,6 +56,13 @@ export function BookingCard() {
   const [rejected, setRejected] = useState<string | null>(null);
   // Once the request is sent the card keeps its confirmation: no way back to change the time.
   const [sent, setSent] = useState(false);
+  // Where focus goes once a step opens from a button in the step that closes (it turns inert).
+  const focusTo = useRef<"calendar" | "form" | null>(null);
+  const setFocusTo = (to: "calendar" | "form") => {
+    focusTo.current = to;
+  };
+  const monthRef = useRef<HTMLParagraphElement>(null);
+  const formStartRef = useRef<HTMLButtonElement>(null);
 
   const elsewhere = zone !== BOOKING_ZONE;
   const local = (d: DayKey, slot: string) => {
@@ -67,6 +74,14 @@ export function BookingCard() {
   const yours = day && time ? local(day, time) : null;
   const when = day && time ? `${longDay(day)} at ${time} Sydney time${yours ? ` (${yours})` : ""}` : "";
 
+  // After React has lifted `inert` from the step that opened, focus its first line.
+  useEffect(() => {
+    const to = focusTo.current;
+    if (!to) return;
+    focusTo.current = null;
+    (to === "calendar" ? monthRef.current : formStartRef.current)?.focus();
+  }, [step]);
+
   const pickTime = (t: string) => {
     setRejected(null);
     setTime(t);
@@ -77,19 +92,31 @@ export function BookingCard() {
       {/* The calendar, with the picked day's times under it (on a phone, their own step). */}
       <Step on={step === "calendar"}>
         <Facts elsewhere={elsewhere} zone={zone} />
-        <Calendar today={today} day={day} onPick={setDay} />
+        <Calendar today={today} day={day} onPick={setDay} monthRef={monthRef} />
         {phone ? null : (
           // The times hold their room before a day is picked, so the card keeps its height.
           <div className="mt-5">
             <Times day={day} rejected={rejected} local={local} onPick={pickTime} hidden={!day} />
           </div>
         )}
-        <Skip onSkip={() => setSkip(true)} />
+        <Skip
+          onSkip={() => {
+            setSkip(true);
+            setFocusTo("form");
+          }}
+        />
       </Step>
 
       {/* A phone's times step: the day's times under a way back to every day. */}
       <Step on={step === "times"}>
-        <button type="button" onClick={() => setDay(null)} className="min-h-6 self-start text-small font-medium text-accent hover:underline hover:underline-offset-4">
+        <button
+          type="button"
+          onClick={() => {
+            setDay(null);
+            setFocusTo("calendar");
+          }}
+          className="min-h-6 self-start text-small font-medium text-accent hover:underline hover:underline-offset-4"
+        >
           ← {booking.allDays}
         </button>
         {step === "times" && day ? (
@@ -121,13 +148,29 @@ export function BookingCard() {
               </span>
             </p>
             {sent ? null : (
-              <button type="button" onClick={() => setTime(null)} className="min-h-6 shrink-0 text-small font-medium text-accent hover:underline hover:underline-offset-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setTime(null);
+                  // On a phone the day's times open with their heading focused; elsewhere, the calendar.
+                  if (!phone) setFocusTo("calendar");
+                }}
+                className="min-h-6 shrink-0 text-small font-medium text-accent hover:underline hover:underline-offset-4"
+              >
                 {booking.change}
               </button>
             )}
           </div>
         ) : sent ? null : (
-          <button type="button" onClick={() => setSkip(false)} className="mb-6 min-h-6 self-start text-small font-medium text-accent hover:underline hover:underline-offset-4">
+          <button
+            ref={formStartRef}
+            type="button"
+            onClick={() => {
+              setSkip(false);
+              setFocusTo("calendar");
+            }}
+            className="mb-6 min-h-6 self-start text-small font-medium text-accent hover:underline hover:underline-offset-4"
+          >
             ← {booking.pick}
           </button>
         )}
@@ -184,14 +227,14 @@ function Facts({ elsewhere, zone }: { elsewhere: boolean; zone: string }) {
 }
 
 /** The five weeks from this week's Monday, with the open days as buttons. */
-function Calendar({ today, day, onPick }: { today: DayKey; day: DayKey | null; onPick: (d: DayKey) => void }) {
+function Calendar({ today, day, onPick, monthRef }: { today: DayKey; day: DayKey | null; onPick: (d: DayKey) => void; monthRef: RefObject<HTMLParagraphElement | null> }) {
   const start = today ? addDays(today, -((weekday(today) + 6) % 7)) : null;
   const cells = start ? Array.from({ length: WEEKS * 7 }, (_, i) => addDays(start, i)) : Array.from({ length: WEEKS * 7 }, () => null);
   const end = start ? addDays(start, WEEKS * 7 - 1) : null;
   const span = start && end ? (partsOf(start)[1] === partsOf(end)[1] ? `${monthName(start)} ${partsOf(start)[0]}` : `${monthName(start)} – ${monthName(end)} ${partsOf(end)[0]}`) : booking.pick;
   return (
     <div className="mt-6 border-t border-line pt-5">
-      <p id="booking-month" className="text-body font-semibold text-ink">
+      <p ref={monthRef} id="booking-month" tabIndex={-1} className="text-body font-semibold text-ink focus-visible:outline-none">
         {span}
       </p>
       <div role="group" aria-labelledby="booking-month" className="mt-3 grid grid-cols-7 gap-1.5 text-center">

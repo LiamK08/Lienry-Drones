@@ -76,7 +76,7 @@ export const fitCheck = {
     answered: "{n} of 7 answered",
     empty: "Your result appears here as you answer.",
     // The empty panel's callout: the questions sit beside it from 1024 and below it on a phone.
-    prompt: { title: { wide: "Start with the seven questions on the left", narrow: "Start with the seven questions below" }, body: "Your score and the points worth a conversation show up here as you go." },
+    prompt: { title: { wide: "Start with the seven questions on the left", narrow: "Start with the seven questions below", above: "Start with the seven questions above" }, body: "Your score and the points worth a conversation show up here as you go." },
     // The score bar's zones, low to high: each runs from its own `from` to the next zone's.
     zones: [
       { id: "low", from: 0, label: "Worth a conversation" },

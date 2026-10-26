@@ -66,7 +66,7 @@ export function SystemCards() {
             return (
               <li
                 key={c.id}
-                className="group relative flex flex-col rounded-card border border-line bg-white p-6 has-[a[data-card-link]:focus-visible]:outline-2 has-[a[data-card-link]:focus-visible]:outline-offset-2 has-[a[data-card-link]:focus-visible]:outline-focus md:w-[calc((100%-1rem)/2)] md:shrink-0 md:snap-start md:p-7 min-[75rem]:w-auto"
+                className="group relative flex flex-col rounded-card border border-line bg-white p-6 md:w-[calc((100%-1rem)/2)] md:shrink-0 md:snap-start md:p-7 min-[75rem]:w-auto"
               >
                 <div className="flex items-center gap-2.5">
                   <span aria-hidden="true" className="text-accent">
@@ -98,12 +98,12 @@ export function SystemCards() {
                         <dt className="order-2 mt-1 text-label leading-[1.2] tracking-normal text-muted">
                           <span className="block min-[75rem]:min-h-[2.4em]">{f.label}</span>
                           {f.source ? (
-                            <a href={f.source.href} target="_blank" rel="noopener noreferrer" title={f.source.title} className="link relative z-10 mt-1 inline-block py-0.5">
+                            <a href={f.source.href} target="_blank" rel="noopener noreferrer" title={f.source.title} className="link relative z-10 mt-0.5 inline-flex min-h-6 items-center">
                               {f.source.label}
                             </a>
                           ) : (
                             // From 1200 the three cards stand side by side: hold the source line's height so the figure rows align.
-                            <span aria-hidden="true" className="invisible mt-1 hidden py-0.5 min-[75rem]:block">
+                            <span aria-hidden="true" className="invisible mt-0.5 hidden min-h-6 min-[75rem]:block">
                               &nbsp;
                             </span>
                           )}
@@ -116,7 +116,7 @@ export function SystemCards() {
                   <Link
                     href={c.link.href}
                     data-card-link=""
-                    className="mt-3 inline-flex min-h-6 items-center gap-1 text-small font-medium text-accent after:absolute after:inset-0 after:rounded-card after:content-[''] focus-visible:outline-none group-hover:underline group-hover:underline-offset-4"
+                    className="mt-3 inline-flex min-h-6 items-center gap-1 text-small font-medium text-accent after:absolute after:inset-0 after:rounded-card after:content-[''] focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-solid focus-visible:after:outline-focus group-hover:underline group-hover:underline-offset-4"
                   >
                     {c.link.label} <span aria-hidden="true">→</span>
                   </Link>

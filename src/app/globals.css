@@ -396,6 +396,14 @@
     50% { translate: 0 4px; }
   }
 
+  /* Below 1024, while the fit check's score strip shows at the foot of the screen, keyboard focus
+     scrolls clear of it (WCAG 2.4.11): the strip's band is reserved as scroll padding. */
+  @media (width < 64rem) {
+    html:has([data-fit-strip]:not([aria-hidden])) {
+      scroll-padding-bottom: 6rem;
+    }
+  }
+
   /* The FAQ rows: where the browser can animate a details element's content, the answer's height
      opens over 300ms and closes a little faster; elsewhere it opens at once, as before. */
   @supports selector(::details-content) {

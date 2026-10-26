@@ -159,6 +159,9 @@ function ReasonPanel({ id, title, row, open, shown, onShow, onHide }: { id: Card
             aria-label={`Show the demo: ${title}`}
             aria-expanded={shown}
             aria-controls={panelId}
+            // While its demo is open the button is hidden behind it: out of the tab order until it closes.
+            tabIndex={shown ? -1 : undefined}
+            aria-hidden={shown || undefined}
             onClick={onShow}
             className={`absolute left-1/2 top-[42%] flex size-[3.75rem] min-[75rem]:hidden -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-pill bg-night/75 text-white transition-[background-color,opacity] duration-200 hover:bg-night/90 motion-reduce:transition-none ${shown ? "pointer-events-none opacity-0" : ""}`}
           >
