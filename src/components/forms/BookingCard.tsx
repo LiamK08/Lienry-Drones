@@ -1,10 +1,9 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode, type RefObject } from "react";
+import { Fragment, Suspense, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode, type RefObject } from "react";
 import { booking } from "@/content/home";
 import { EnquiryForm } from "@/components/forms/EnquiryForm";
 import { Icon } from "@/components/blocks/Icon";
-import { Mark } from "@/components/ui/Wordmark";
 import { useMediaQuery } from "@/lib/hooks";
 import { BOOKING_ZONE, dayIn, dayKey, isOpenDay, longDay, placeOf, shortWeekday, slotInstant, sydneyToday, timeIn, weekday, type DayKey } from "@/lib/booking";
 
@@ -48,16 +47,19 @@ function readingIn(zone: string, d: DayKey, slot: string, full = false) {
 const focusOnMount = (el: HTMLElement | null) => el?.focus();
 
 /**
- * The booking card beside the questions, in steps like a scheduler's: the call's facts over a calendar
- * of the coming five weeks, Monday first, running on into the next month (weekdays from tomorrow to four
- * weeks out are open, in Sydney; the first day of a month carries its short name), then the open times
- * of the day picked, then the short enquiry step with the chosen time over it. Times are Sydney time;
+ * The booking card beside the questions, in steps like a scheduler's (its title sits in the card's body,
+ * FaqForm): the call's facts over a calendar of the coming five weeks, Monday first, running on into the
+ * next month (weekdays from tomorrow to four weeks out are open, in Sydney; where a month turns, its short
+ * name stands as muted text over the first day's column), then the day's times (shown muted under "Pick a
+ * day" until one is picked, so the card holds no blank), then the short enquiry step with the chosen time
+ * over it, in three lines. One selection state throughout: the accent edge on the pale tint, for the day
+ * and for the chosen call method; fields are white with the control edge. Times are Sydney time;
  * where the visitor's clock reads them differently, each also reads in theirs, with their own day when it
  * falls on another (a Monday evening in London for a Tuesday morning in Sydney). On a phone, picking a
- * day swaps the calendar for that day's times under "All days". The steps share one grid cell, so the
- * card holds the height of its tallest and never jumps; on a phone the details step mounts when it is
- * first reached and is then taken out of the flow while another step shows, so the calendar is not left
- * over a tall blank and what was typed survives a change of time.
+ * day swaps the calendar for that day's times under "All days". The steps share one grid cell; the
+ * details step leaves the flow while another step shows (on a phone it also mounts only once first
+ * reached), so the calendar is never left over a tall blank, the card grows only when the visitor opens
+ * the details, and what was typed survives a change of time.
  *
  * Nothing is booked here: the day and time travel with the enquiry (source "booking"), the route checks
  * the day is still open, and a person confirms it by email. If the day has closed meanwhile (it turned
@@ -125,7 +127,9 @@ export function BookingCard() {
   };
 
   return (
-    <div className="@container grid">
+    // White fields inside the card (the surface's field fill), and the form's chosen call method in the
+    // card's one selection state: the accent edge on the tint, as the picked day.
+    <div className="@container grid [--s-field:var(--color-white)] [&_label:has(input[type=radio]:checked)]:border-accent [&_label:has(input[type=radio]:checked)]:bg-tint [&_input[type=radio]]:accent-accent">
       {/* The calendar, with the picked day's times under it (on a phone, their own step). */}
       <Step on={step === "calendar"}>
         <Facts elsewhere={elsewhere} zone={zone} />
@@ -136,9 +140,10 @@ export function BookingCard() {
         ) : null}
         <Calendar today={today} day={day} onPick={pickDay} monthRef={monthRef} />
         {phone ? null : (
-          // The times hold their room before a day is picked, so the card keeps its height.
-          <div className="mt-5">
-            <Times day={day} local={local} onPick={pickTime} hidden={!day} />
+          // Before a day is picked the times show muted (inert) under "Pick a day", so the card keeps its
+          // height with nothing blank in it.
+          <div className="mt-6">
+            <Times day={day} local={local} onPick={pickTime} preview={!day} />
           </div>
         )}
         <Skip
@@ -177,20 +182,20 @@ export function BookingCard() {
         ) : null}
       </Step>
 
-      {/* The short enquiry step, with the chosen time over it. From 768 it shares the cell too, so the
-          card keeps one height; on a phone it mounts when first reached (the card grows to it once) and
-          is then out of the flow while another step shows, keeping what was typed. */}
+      {/* The short enquiry step, with the chosen time over it. It is out of the flow while another step
+          shows, so the calendar holds no blank under it, and it keeps what was typed; on a phone it also
+          mounts only when first reached. */}
       {phone && !reached ? null : (
-      <Step on={step === "form"} collapse={phone}>
+      <Step on={step === "form"} collapse>
         {day && time ? (
-          <div ref={step === "form" ? focusOnMount : undefined} tabIndex={-1} className="mb-6 flex items-start justify-between gap-4 rounded-card border border-line bg-paper p-4 focus-visible:outline-none">
-            <p className="flex items-start gap-3 text-small text-ink">
+          <div ref={step === "form" ? focusOnMount : undefined} tabIndex={-1} className="mb-6 flex items-start justify-between gap-4 rounded-card bg-tint p-4 focus-visible:outline-none">
+            {/* The chosen call in three lines: the day, the Sydney time, and the visitor's own where it differs. */}
+            <p className="flex items-start gap-3 text-small leading-[1.5] text-ink">
               <Icon name="clock" className="mt-0.5 size-4 shrink-0 text-accent" />
               <span>
                 <span className="block font-medium">{longDay(day)}</span>
-                <span className="block text-muted">
-                  {time} Sydney time{yours ? ` · ${yours}` : ""} · 20 minutes
-                </span>
+                <span className="block text-muted">{time} Sydney time</span>
+                {yours ? <span className="block text-muted">{yours}</span> : null}
               </span>
             </p>
             {sent ? null : (
@@ -260,78 +265,91 @@ function Step({ on, collapse = false, children }: { on: boolean; collapse?: bool
   );
 }
 
+
 /** The zone line where the visitor's clock differs: "Sydney time, shown in London time too". */
 const shownIn = (zone: string) => `${booking.facts.find((f) => f.icon === "globe")?.text}, shown in ${placeOf(zone)} time too`;
 
-/** The call's facts: who, what, and the zone the times are in (and that they show in yours too). */
+/** The call's facts under the card's title: how long, how, and the zone the times are in (and that they show in yours too). */
 function Facts({ elsewhere, zone }: { elsewhere: boolean; zone: string }) {
   return (
-    <>
-      <div className="flex items-center gap-2.5">
-        <span aria-hidden="true" className="flex size-8 items-center justify-center rounded-pill bg-accent text-white">
-          <Mark className="h-4 w-auto" />
-        </span>
-        <p className="text-small text-muted">{booking.who}</p>
-      </div>
-      <p className="mt-3 text-[1.25rem] font-semibold leading-tight tracking-[-0.02em] text-ink">{booking.title}</p>
-      <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1.5">
-        {booking.facts.map((f) => (
-          <li key={f.text} className="flex items-center gap-2 text-small text-muted">
-            <Icon name={f.icon} className="size-4 text-ink" />
-            {f.icon === "globe" && elsewhere ? shownIn(zone) : f.text}
-          </li>
-        ))}
-      </ul>
-    </>
+    <ul className="flex flex-wrap gap-x-5 gap-y-1.5">
+      {booking.facts.map((f) => (
+        <li key={f.text} className="flex items-center gap-2 text-small text-muted">
+          <Icon name={f.icon} className="size-4 text-ink" />
+          {f.icon === "globe" && elsewhere ? shownIn(zone) : f.text}
+        </li>
+      ))}
+    </ul>
   );
 }
 
-/** The five weeks from this week's Monday, with the open days as buttons. */
+// A day's round cell, as wide as its column allows up to 44px.
+const dayCell = "relative mx-auto flex aspect-square w-full max-w-11 items-center justify-center rounded-pill text-small";
+
+/**
+ * The five weeks from this week's Monday, with the open days as buttons: a hairline ring at rest, the
+ * accent edge on the tint once picked. Where a month turns after the first cell, a short row over that
+ * week names the new month, in muted text over its first day's column.
+ */
 function Calendar({ today, day, onPick, monthRef }: { today: DayKey; day: DayKey | null; onPick: (d: DayKey) => void; monthRef: RefObject<HTMLParagraphElement | null> }) {
   const start = today ? addDays(today, -((weekday(today) + 6) % 7)) : null;
   const cells = start ? Array.from({ length: WEEKS * 7 }, (_, i) => addDays(start, i)) : Array.from({ length: WEEKS * 7 }, () => null);
   const end = start ? addDays(start, WEEKS * 7 - 1) : null;
   const span = start && end ? (partsOf(start)[1] === partsOf(end)[1] ? `${monthName(start)} ${partsOf(start)[0]}` : `${monthName(start)} – ${monthName(end)} ${partsOf(end)[0]}`) : booking.pick;
+  const weeks = Array.from({ length: WEEKS }, (_, w) => cells.slice(w * 7, w * 7 + 7));
   return (
-    <div className="mt-6 border-t border-line pt-5">
+    <div className="mt-5 border-t border-line pt-5">
       <p ref={monthRef} id="booking-month" tabIndex={-1} className="text-body font-semibold text-ink focus-visible:outline-none">
         {span}
       </p>
-      <div role="group" aria-labelledby="booking-month" className="mt-3 grid grid-cols-7 gap-1.5 text-center">
+      <div role="group" aria-labelledby="booking-month" className="mt-3 grid grid-cols-7 gap-x-1 gap-y-1.5 text-center">
         {WEEKDAYS.map((w) => (
           <span key={w} aria-hidden="true" className="pb-1 text-caption text-muted">
             {w}
           </span>
         ))}
-        {cells.map((d, i) => {
-          if (!d) return <span key={i} aria-hidden="true" className="aspect-square" />;
-          const can = !!today && isOpenDay(d, today, booking.daysAhead);
-          const on = day === d;
-          const isToday = d === today;
-          // The first of a month after the first cell carries the month's short name on a small tag.
-          const turn = partsOf(d)[2] === 1 && i > 0 ? monthName(d, "short") : null;
-          const label = turn ? <span className="absolute left-1 top-1 rounded-hard bg-paper px-1 text-[0.6875rem] font-medium leading-tight text-ink">{turn}</span> : null;
-          if (!can) {
-            return (
-              <span key={i} aria-hidden="true" className="relative flex aspect-square items-center justify-center text-small text-muted">
-                {label}
-                {partsOf(d)[2]}
-                {isToday ? <span className="absolute bottom-1.5 size-1 rounded-pill bg-accent" /> : null}
-              </span>
-            );
-          }
+        {weeks.map((week, wi) => {
+          const turn = week.findIndex((d, di) => !!d && partsOf(d)[2] === 1 && wi * 7 + di > 0);
+          const turnDay = turn >= 0 ? week[turn] : null;
           return (
-            <button
-              key={i}
-              type="button"
-              aria-pressed={on}
-              aria-label={longDay(d)}
-              onClick={() => onPick(d)}
-              className={`relative flex aspect-square items-center justify-center rounded-[0.5rem] text-small font-semibold transition-[background-color,color,box-shadow] duration-200 motion-reduce:transition-none ${on ? "bg-accent text-white" : "bg-tint text-ink hover:ring-[1.5px] hover:ring-accent"}`}
-            >
-              {label}
-              {partsOf(d)[2]}
-            </button>
+            <Fragment key={wi}>
+              {turnDay ? (
+                <span aria-hidden="true" className="col-span-7 grid grid-cols-7 gap-x-1">
+                  <span style={{ gridColumnStart: turn + 1 }} className="text-caption font-medium leading-none text-muted">
+                    {monthName(turnDay, "short")}
+                  </span>
+                </span>
+              ) : null}
+              {week.map((d, di) => {
+                const i = wi * 7 + di;
+                if (!d) return <span key={i} aria-hidden="true" className={dayCell} />;
+                const can = !!today && isOpenDay(d, today, booking.daysAhead);
+                const on = day === d;
+                const isToday = d === today;
+                if (!can) {
+                  return (
+                    <span key={i} aria-hidden="true" className={`${dayCell} text-muted`}>
+                      {partsOf(d)[2]}
+                      {isToday ? <span className="absolute bottom-1 size-1 rounded-pill bg-accent" /> : null}
+                    </span>
+                  );
+                }
+                return (
+                  <button
+                    key={i}
+                    type="button"
+                    aria-pressed={on}
+                    aria-label={longDay(d)}
+                    onClick={() => onPick(d)}
+                    className={`${dayCell} border transition-[background-color,border-color,color] duration-200 motion-reduce:transition-none forced-colors:border-[ButtonBorder] ${
+                      on ? "border-accent bg-tint font-semibold text-accent ring-1 ring-inset ring-accent forced-colors:border-[Highlight] forced-colors:ring-0" : "border-line bg-white font-medium text-ink hover:border-accent hover:text-accent"
+                    }`}
+                  >
+                    {partsOf(d)[2]}
+                  </button>
+                );
+              })}
+            </Fragment>
           );
         })}
       </div>
@@ -341,11 +359,13 @@ function Calendar({ today, day, onPick, monthRef }: { today: DayKey; day: DayKey
 
 /**
  * A day's six times, each with the visitor's own reading under it where it differs (the zone line above
- * says whose). Its name reads in full: "9:30 am Sydney time, 3:30 pm Mon your time".
+ * says whose). Its name reads in full: "9:30 am Sydney time, 3:30 pm Mon your time". As a preview (no
+ * day picked yet) the six show muted with a dashed edge under "Pick a day", inert and hidden from
+ * assistive technology, so the card shows what comes next instead of holding a blank.
  */
-function Times({ day, local, onPick, hidden = false, heading = true }: { day: DayKey | null; local: (d: DayKey, slot: string) => string | null; onPick: (t: string) => void; hidden?: boolean; heading?: boolean }) {
+function Times({ day, local, onPick, preview = false, heading = true }: { day: DayKey | null; local: (d: DayKey, slot: string) => string | null; onPick: (t: string) => void; preview?: boolean; heading?: boolean }) {
   return (
-    <div className={hidden ? "invisible" : ""} aria-hidden={hidden || undefined} inert={hidden}>
+    <div aria-hidden={preview || undefined} inert={preview}>
       {heading ? <p className="text-small font-medium text-ink">{day ? longDay(day) : booking.pick}</p> : null}
       <ul aria-label={day ? `Times on ${longDay(day)}` : booking.pick} className={`${heading ? "mt-3" : ""} grid grid-cols-2 gap-2 @[22rem]:grid-cols-3`}>
         {booking.times.map((t) => {
@@ -355,7 +375,9 @@ function Times({ day, local, onPick, hidden = false, heading = true }: { day: Da
               <button
                 type="button"
                 onClick={() => onPick(t)}
-                className="flex min-h-10 w-full flex-col items-center justify-center rounded-pill border border-line px-2 py-1.5 text-small leading-tight text-ink transition-[background-color,border-color,color] duration-200 hover:border-accent hover:text-accent"
+                className={`flex min-h-10 w-full flex-col items-center justify-center rounded-pill border px-2 py-1.5 text-small leading-tight transition-[background-color,border-color,color] duration-200 motion-reduce:transition-none ${
+                  preview ? "border-dashed border-hairline text-muted" : "border-line bg-white text-ink hover:border-accent hover:text-accent"
+                }`}
               >
                 {t}
                 {yours ? (

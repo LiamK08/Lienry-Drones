@@ -17,7 +17,7 @@ const ROW = "(min-width: 75rem)";
 const focusOnMount = (el: HTMLButtonElement | null) => el?.focus();
 
 /**
- * Why Lienry: five tall cards. From 1200 they stand in one row, 4px apart: the card under the pointer
+ * Why Lienry: five tall cards. From 1200 they stand in one row on the rail, a gutter apart: the card under the pointer
  * (or holding focus) widens to about 4.7 times the others over 700ms (the owner's half-speed call), its near-black left side darkens
  * in under the text, its two-line description fades in with the grow, and just after, its coded panel
  * (demo data, DemoPanels) fades in above the title and plays through. Each picture is drawn once at the
@@ -51,9 +51,9 @@ export function ExpandCards() {
   return (
     <Band id="why" tone="plaster" labelledBy="benefits-heading">
       <Container>
-        <SectionHead id="benefits-heading" layout="center" size="h1" eyebrow={benefits.eyebrow} headline={benefits.headline} intro={benefits.intro} />
+        <SectionHead id="benefits-heading" layout="center" headline={benefits.headline} intro={benefits.intro} />
       </Container>
-      <div className="mx-auto mt-(--head-gap) w-full max-w-grid min-[75rem]:max-w-none">
+      <div className="mx-auto mt-(--head-gap) w-full max-w-grid">
         <ul
           ref={trackRef}
           id="why-track"
@@ -62,7 +62,7 @@ export function ExpandCards() {
           onKeyDown={(e) => {
             if (!row) pagerKeys(e, index, positions, step);
           }}
-          className="why-row no-scrollbar @container -mx-2 -my-2 flex snap-x snap-mandatory scroll-px-2 gap-4 overflow-x-auto px-2 py-2 min-[75rem]:mx-4 min-[75rem]:my-0 min-[75rem]:gap-1 min-[75rem]:overflow-visible min-[75rem]:p-0"
+          className="why-row no-scrollbar @container -mx-2 -my-2 flex snap-x snap-mandatory scroll-px-2 gap-4 overflow-x-auto px-2 py-2 min-[75rem]:mx-0 min-[75rem]:my-0 min-[75rem]:gap-(--gutter) min-[75rem]:overflow-visible min-[75rem]:p-0"
         >
           {benefits.cards.map((c, i) => (
             <li
@@ -80,9 +80,11 @@ export function ExpandCards() {
                   document.getElementById(`why-${c.icon}-play`)?.focus();
                 }
               }}
-              className="group relative h-[28rem] w-full shrink-0 snap-start overflow-hidden rounded-card bg-night outline-offset-2 md:w-[calc((100%-1rem)/2)] min-[75rem]:h-[31.25rem] min-[75rem]:w-auto min-[75rem]:min-w-0 min-[75rem]:flex-1 min-[75rem]:transition-[flex-grow] min-[75rem]:duration-[700ms] min-[75rem]:ease-[cubic-bezier(0.4,0,0.2,1)] min-[75rem]:hover:grow-[4.7] min-[75rem]:focus-visible:grow-[4.7] motion-reduce:transition-none"
+              // flex-grow is 1 at every width (the carousel's cards are held by their basis and never
+              // shrink), so crossing 1200 changes only the basis and never runs the grow transition.
+              className="group relative h-[28rem] shrink-0 grow basis-full snap-start overflow-hidden rounded-card bg-night outline-offset-2 md:basis-[calc((100%-1rem)/2)] min-[75rem]:h-[31.25rem] min-[75rem]:min-w-0 min-[75rem]:shrink min-[75rem]:basis-0 min-[75rem]:transition-[flex-grow] min-[75rem]:duration-[700ms] min-[75rem]:ease-[cubic-bezier(0.4,0,0.2,1)] min-[75rem]:hover:grow-[4.7] min-[75rem]:focus-visible:grow-[4.7] motion-reduce:transition-none"
             >
-              {/* From 1200: the open card's width (about 54% of the row less its four 4px gaps), centred on the card. */}
+              {/* From 1200: the open card's width (about 54% of the row less its four gutters), centred on the card. */}
               <Picture
                 id={c.image.id}
                 alt={c.image.alt}
@@ -90,13 +92,13 @@ export function ExpandCards() {
                 fit="fill"
                 rounded="none"
                 sizes="(min-width: 1200px) 54vw, (min-width: 768px) 50vw, 100vw"
-                className="absolute inset-0 min-[75rem]:left-1/2 min-[75rem]:right-auto min-[75rem]:w-[calc((100cqw-1rem)*0.54)] min-[75rem]:-translate-x-1/2"
+                className="absolute inset-0 min-[75rem]:left-1/2 min-[75rem]:right-auto min-[75rem]:w-[calc((100cqw-4*var(--gutter))*0.54)] min-[75rem]:-translate-x-1/2"
               />
-              <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(to_top,rgba(17,26,34,0.8)_0%,rgba(17,26,34,0.15)_45%,rgba(17,26,34,0.25)_100%)]" />
+              <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(to_top,color-mix(in_srgb,var(--color-night)_80%,transparent)_0%,color-mix(in_srgb,var(--color-night)_15%,transparent)_45%,color-mix(in_srgb,var(--color-night)_25%,transparent)_100%)]" />
               {/* From 1200 the open card's left side darkens to near-black under its text and panel. */}
               <div
                 aria-hidden="true"
-                className="absolute inset-0 hidden bg-[linear-gradient(90deg,var(--color-night)_0%,rgba(17,26,34,0.85)_14%,transparent_58%)] opacity-0 transition-opacity duration-[700ms] ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none min-[75rem]:block"
+                className="absolute inset-0 hidden bg-[linear-gradient(90deg,var(--color-night)_0%,color-mix(in_srgb,var(--color-night)_85%,transparent)_14%,transparent_58%)] opacity-0 transition-opacity duration-[700ms] ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none min-[75rem]:block"
               />
               <span className="absolute left-5 top-5 text-white">
                 <Icon name={c.icon} className="size-7" />
@@ -114,7 +116,7 @@ export function ExpandCards() {
                 }}
               />
               <div className={`why-text absolute inset-x-5 bottom-5 text-white transition-opacity duration-200 motion-reduce:transition-none ${shown === i ? "opacity-0" : ""}`}>
-                <h3 id={`why-${c.icon}`} className="max-w-[14rem] text-[1.75rem] leading-[1.1] min-[75rem]:max-w-[16rem]">
+                <h3 id={`why-${c.icon}`} className="max-w-[14rem] text-h3 min-[75rem]:max-w-[16rem]">
                   {c.title}
                 </h3>
                 <p
