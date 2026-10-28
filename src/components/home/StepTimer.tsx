@@ -171,8 +171,9 @@ export function StepTimer() {
             <div className="grid grid-cols-[minmax(0,1fr)] justify-items-center p-5 md:p-8 lg:col-span-5 lg:self-center lg:p-0">
               {how.steps.map((s, i) => {
                 const on = i === active;
-                const onWash = (done: boolean) => {
-                  setWashing(true);
+                // null: the page took the visitor's gesture (a scroll) and the map is the drone's again.
+                const onWash = (done: boolean | null) => {
+                  setWashing(done !== null);
                   setFinished(done ? i : null);
                 };
                 return (

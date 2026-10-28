@@ -47,7 +47,9 @@ function regroup(next: string, caret: number | null, prev: string, inputType: st
   let value = next;
   let at = caret;
   const digitsOf = (s: string) => s.replace(/\D/g, "");
-  if (at !== null && value.length === prev.length - 1 && digitsOf(value) === digitsOf(prev) && digitsOf(value) !== "") {
+  // Only a comma taken out on its own: deleting any other character ("1234." or "120x") deletes just that.
+  const commaGone = at !== null && value.length === prev.length - 1 && value === prev.slice(0, at) + prev.slice(at + 1) && prev[at] === ",";
+  if (at !== null && commaGone && digitsOf(value) === digitsOf(prev) && digitsOf(value) !== "") {
     if (inputType === "deleteContentForward") value = value.slice(0, at) + value.slice(at + 1);
     else if (at > 0) {
       value = value.slice(0, at - 1) + value.slice(at);

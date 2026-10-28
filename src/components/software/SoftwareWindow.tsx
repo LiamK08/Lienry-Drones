@@ -109,7 +109,7 @@ function LayerKey({ id }: { id: LayerId }) {
 function Swatch({ colour, children }: { colour: string; children: ReactNode }) {
   return (
     <li className="flex items-center gap-1.5">
-      <span aria-hidden="true" className="size-2 shrink-0" style={{ background: colour }} />
+      <span aria-hidden="true" className="size-2 shrink-0 forced-colors:forced-color-adjust-none" style={{ background: colour }} />
       {children}
     </li>
   );

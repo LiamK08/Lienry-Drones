@@ -236,11 +236,19 @@ const ALL = new Float32Array(CELLS.length).fill(1);
  * (with a note beside it), then the map and the step's rows. The map's box keeps its size while the
  * map itself is not mounted, so every panel is the same height whichever step is shown.
  */
-function Stage({ label, title, status, aside, interactive, map, below, children }: { label: string; title: string; status: string; aside?: ReactNode; interactive?: boolean; map: ReactNode; below?: ReactNode; children: ReactNode }) {
+function Stage({ label, title, status, widest, aside, interactive, map, below, children }: { label: string; title: string; status: string; widest?: string; aside?: ReactNode; interactive?: boolean; map: ReactNode; below?: ReactNode; children: ReactNode }) {
   return (
     <Shell size="stage" label={label} title={title} sub={project.name} interactive={interactive}>
       <span className="-mt-2 mb-3 flex min-w-0 items-center justify-between gap-3">
-        <span className="inline-flex shrink-0 rounded-pill bg-tint px-2 py-0.5 text-[0.6875rem] font-medium leading-tight text-accent">{status}</span>
+        {/* A status that changes keeps the width of its widest wording, so the note beside it never rewraps. */}
+        <span className="[display:inline-grid] shrink-0 justify-items-center rounded-pill bg-tint px-2 py-0.5 text-[0.6875rem] font-medium leading-tight text-accent">
+          <span className="[grid-area:1/1]">{status}</span>
+          {widest ? (
+            <span aria-hidden="true" className="invisible [grid-area:1/1]">
+              {widest}
+            </span>
+          ) : null}
+        </span>
         {aside ? <span className="min-w-0 text-right text-caption leading-tight text-muted">{aside}</span> : null}
       </span>
       <span className="block" style={{ aspectRatio: `${FACADE_MAP_SIZE.width} / ${FACADE_MAP_SIZE.height}` }}>
@@ -320,22 +328,23 @@ const LEGEND = [
  * over at any moment and wash the map themselves (WashMap.tsx). The count is plain text that changes
  * only with the visitor's input.
  */
-function Clean({ active, map, onWash }: { active: boolean; map: boolean; onWash?: (done: boolean) => void }) {
+function Clean({ active, map, onWash }: { active: boolean; map: boolean; onWash?: (done: boolean | null) => void }) {
   const reduce = usePrefersReducedMotion();
   const wash = useWash({ active, reduce, onWash });
   const keys = useId();
-  const line = wash.engaged ? (wash.complete ? `All ${wash.total} panels washed` : `${wash.washed} of ${wash.total} panels washed`) : wash.running ? `Now washing ${wash.running}` : wash.finished ? "Every zone washed" : "Ready to wash";
+  const line = wash.engaged ? (wash.complete ? "All panels washed" : `${wash.washed} of ${wash.total} panels washed`) : wash.running ? `Now washing ${wash.running}` : wash.paused ? `Paused on ${wash.paused}` : wash.finished ? "Every zone washed" : "Ready to wash";
   return (
     <Stage
       interactive
       label="Wash the demo building yourself: drag across a floor or tap one, or use the arrow keys."
       title="Washing the building"
-      status={wash.complete ? "Clean complete" : wash.engaged || wash.running ? "Washing" : "Ready"}
+      status={wash.complete ? "Clean complete" : wash.engaged || wash.running ? "Washing" : wash.paused ? "Paused" : "Ready"}
+      widest="Clean complete"
       aside={
         // Hidden, not removed, once the visitor has washed it all: on a phone it wraps, and the stage keeps its height.
         <span className={wash.engaged && wash.complete ? "invisible" : undefined}>
           <span className="group-has-[[role=slider]:focus-visible]/wash:hidden">Drag or tap a floor to wash it</span>
-          <span className="hidden group-has-[[role=slider]:focus-visible]/wash:inline">Arrow keys wash floor by floor</span>
+          <span className="hidden group-has-[[role=slider]:focus-visible]/wash:inline">Arrow keys wash a floor</span>
         </span>
       }
       map={
@@ -412,8 +421,9 @@ function BeatPanel({ id, active, map }: { id: keyof typeof BEAT_PANELS; active: 
 /**
  * A step's panel on the stage, playing while its step is shown. `map` mounts the facade map (the shown
  * step and the one fading out), so the page does not keep five maps of 320 cells alive. The clean's
- * panel is the visitor's to work; `onWash` hears each change they make to it, and whether it finished the wash.
+ * panel is the visitor's to work; `onWash` hears each change they make to it, and whether the map is all
+ * washed (null when a gesture the page took is undone).
  */
-export function StagePanel({ id, active, map, onWash }: { id: StagePanelId; active: boolean; map: boolean; onWash?: (done: boolean) => void }) {
+export function StagePanel({ id, active, map, onWash }: { id: StagePanelId; active: boolean; map: boolean; onWash?: (done: boolean | null) => void }) {
   return id === "clean" ? <Clean active={active} map={map} onWash={onWash} /> : <BeatPanel id={id} active={active} map={map} />;
 }

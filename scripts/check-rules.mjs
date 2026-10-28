@@ -107,7 +107,10 @@
 // 46  Page entrances (with the motion passes; CLAUDE.md "Page entrances", 28 Oct 2026): at each width,
 //     the first page of a visit (the first checked route other than /) has no entrance on <main>; the
 //     header's link home then brings the new <main> in with exactly one animation of at most
-//     SPEC.pageEnterMaxMs, while the header's box never changes; under reduced motion there is none.
+//     SPEC.pageEnterMaxMs, while the header's box never changes; the footer's link from / to a part of
+//     /platform (SPEC.pageEnterAnchor) brings it in with one animation that only fades (no transform in
+//     its keyframes) and lands at the scroll position a hard load of the same address does (within 2px);
+//     under reduced motion there is no entrance at all.
 // 44  References never load: no request from any page this script opens goes to refresh.tech,
 //     legora.com or a subdomain of either, and no address in the page (href, src, srcset, poster,
 //     action, data: a preconnect or a link makes no request) is on one; no text in the page (hidden
@@ -235,8 +238,10 @@ const SPEC = {
   introKey: "lienry:intro-seen",
   introOverlay: "[data-intro-overlay]",
   introMaxMs: 5000,
-  // Check 46 (CLAUDE.md "Page entrances"): the longest the new page's entrance may run.
+  // Check 46 (CLAUDE.md "Page entrances"): the longest the new page's entrance may run, and the footer
+  // link it follows from / to a page reached at an anchor.
   pageEnterMaxMs: 300,
+  pageEnterAnchor: "/platform#tether",
   // D2 check 33: words that would turn the visitor's own figures into a Lienry claim.
   calcClaims: /\b(sav(e|es|ing|ings)|ROI|payback|cheaper|less than|compared|with Lienry|Lienry('s)? (cost|price|fee))/i,
 };
@@ -2762,8 +2767,9 @@ async function introPass(width) {
 }
 
 // Check 46 (CLAUDE.md "Page entrances"): a move to another page of the site brings the new <main> in
-// with one short entrance while the header holds still; the first page of a visit never has one, nor
-// does any page under reduced motion. From a route other than home to home by the header's own link.
+// with one short entrance while the header holds still, and a page reached at an anchor only fades and
+// lands where a hard load does; the first page of a visit never has one, nor does any page under
+// reduced motion. From a route other than home to home by the header's own link, then on to an anchor.
 async function pagePass(width) {
   const failures = [];
   const notes = [];
@@ -2819,6 +2825,34 @@ async function pagePass(width) {
         notes.push(`entrance ${label}: ${seenLog.starts.map((st) => `${st.name} ${st.ms}ms`).join(", ") || "none"}`);
       }
       if (seenLog.boxes.length > 1) add(`the header moves or resizes during a page change ${label}`, seenLog.boxes.join(" | "));
+      // A page reached at an anchor (now from /, by the footer's link to a /platform part) only fades, so
+      // it lands where a hard load of the same address puts it.
+      const anchor = SPEC.pageEnterAnchor;
+      await page.evaluate(() => {
+        const log = { starts: [] };
+        window.__anchor = log;
+        document.addEventListener(
+          "animationstart",
+          (e) => {
+            if (e.target.id !== "main") return;
+            const anim = e.target.getAnimations().find((x) => x.animationName === e.animationName);
+            log.starts.push({ name: e.animationName, moves: !!anim?.effect.getKeyframes().some((k) => k.transform && k.transform !== "none") });
+          },
+          true,
+        );
+      });
+      await page.locator(`footer a[href="${anchor}"]`).first().click();
+      await page.waitForURL(opts.base + anchor, { timeout: 15000 });
+      await page.waitForTimeout(900);
+      const soft = await page.evaluate(() => ({ starts: window.__anchor.starts, y: Math.round(window.scrollY) }));
+      if (reduce) {
+        if (soft.starts.length) add(`a page entrance plays under reduced motion at an anchor ${label}`, JSON.stringify(soft.starts));
+      } else if (soft.starts.length !== 1 || soft.starts[0].moves) add(`a page reached at an anchor does not only fade in ${label}`, JSON.stringify(soft.starts));
+      const hard = await context.newPage();
+      await hard.goto(opts.base + anchor, { waitUntil: "load", timeout: 60000 });
+      await hard.waitForTimeout(900);
+      const hardY = await hard.evaluate(() => Math.round(window.scrollY));
+      if (Math.abs(hardY - soft.y) > 2) add(`a page reached at an anchor lands away from where a hard load puts it ${label}`, `${anchor}: scrollY ${soft.y} against ${hardY}`);
       await context.close();
     }
   } catch (err) {

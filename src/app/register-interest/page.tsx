@@ -45,7 +45,7 @@ export default function RegisterInterestPage() {
               <h1 id="register-heading" className={`em-accent text-h1 ${hold.className}`} style={hold.style}>
                 <Headline text={r.headline} emphasis={r.emphasis} />
               </h1>
-              {/* A word joiner after each hyphen keeps "pre-launch" whole. */}
+              {/* keepWhole keeps "pre-launch" whole by markup (a nowrap span), so copied text stays as written. */}
               <p className="mt-4 max-w-[36rem] text-pretty text-lead leading-[1.55] text-fg-muted">{keepWhole(r.lead)}</p>
               <ul className="mt-8 space-y-3">
                 {r.checks.map((c) => (

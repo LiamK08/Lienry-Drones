@@ -47,9 +47,10 @@ export type Wash = ReturnType<typeof useWash>;
 /**
  * The clean's state: the drone's own run while the step plays and nobody has touched the map, then
  * the visitor's map from the moment their input first washes it. `onWash` hears each change the
- * visitor makes, with `done` true when that change washed the last panel.
+ * visitor makes, with `done` true while every panel is washed, and null when a gesture the page took
+ * (a scroll) is undone and the map is the drone's again.
  */
-export function useWash({ active, reduce, onWash }: { active: boolean; reduce: boolean; onWash?: (done: boolean) => void }) {
+export function useWash({ active, reduce, onWash }: { active: boolean; reduce: boolean; onWash?: (done: boolean | null) => void }) {
   const [k, setK] = useState(0);
   const [mine, setMine] = useState<{ cells: Float32Array; version: number; front: FacadeRow | null } | null>(null);
   // The keyboard is on the map: the drone's run waits there, so the control's value holds still.
@@ -60,12 +61,17 @@ export function useWash({ active, reduce, onWash }: { active: boolean; reduce: b
   const version = useRef(0);
   const settle = useRef(0);
   const run = useRef(0);
+  // The gesture under way is the one that took the map from the drone's run, and a run undone that way
+  // carries on from where it was.
+  const took = useRef(false);
+  const resume = useRef(false);
 
   const auto = active && !reduce && mine === null;
   useEffect(() => {
     if (!auto) return;
     window.clearTimeout(settle.current);
-    run.current = 0;
+    if (!resume.current) run.current = 0;
+    resume.current = false;
     return () => {
       // Back to the start once the panel has faded out, so the next run opens on the unwashed map.
       settle.current = window.setTimeout(() => setK(0), 700);
@@ -85,11 +91,11 @@ export function useWash({ active, reduce, onWash }: { active: boolean; reduce: b
   // washed everything, so there is always something left to wash.
   const current = () => live.current ?? (k >= SWEEPS.length ? new Float32Array(TOTAL) : AUTO[k]);
   const show = (next: Float32Array, front: FacadeRow | null) => {
-    const before = live.current ? washedIn(live.current) : -1;
     live.current = next;
     version.current += 1;
     setMine({ cells: next, version: version.current, front });
-    onWash?.(before < TOTAL && washedIn(next) === TOTAL);
+    // A state, not an edge: a pass over a map already washed leaves the move-on to the check running.
+    onWash?.(washedIn(next) === TOTAL);
   };
   const commit = (next: Float32Array, front: FacadeRow | null, keep = true) => {
     if (keep) {
@@ -113,17 +119,32 @@ export function useWash({ active, reduce, onWash }: { active: boolean; reduce: b
     engaged: mine !== null,
     /** Where the drone is in its own run: null before it starts, while it waits and once it has finished. */
     running: mine === null && !held && k > 0 && k < SWEEPS.length ? zoneOf(SWEEPS[k - 1]).name : null,
+    /** Where the drone's run waits while the keyboard is on the map, or null. */
+    paused: mine === null && held && k > 0 && k < SWEEPS.length ? zoneOf(SWEEPS[k - 1]).name : null,
     finished: mine === null && k >= SWEEPS.length,
     front,
     /** The keyboard reaches the map (true) or leaves it: the drone's run waits for it meanwhile. */
     hold: setHeld,
     /** A gesture washes its first panel: the visitor takes over from what the map shows now. */
     begin() {
+      took.current = !live.current;
       if (!live.current) {
         live.current = current();
         setMine({ cells: live.current, version: version.current, front: null });
       }
       history.current.push(live.current);
+    },
+    /** The page took the gesture (a scroll): undo what it washed, and hand a map it took back to the run. */
+    cancel() {
+      const prev = history.current.pop();
+      if (took.current) {
+        took.current = false;
+        live.current = null;
+        resume.current = true;
+        setK(run.current);
+        setMine(null);
+        onWash?.(null);
+      } else if (prev) show(prev, null);
     },
     /** One pass over the cells a drag crossed (the gesture's state was kept at its first). */
     stroke(hit: number[]) {
@@ -232,32 +253,42 @@ export function WashSurface({ wash, label, describedBy }: { wash: Wash; label: s
     if (!d || d.id !== e.pointerId) return;
     // A mouse or pen moving with no button held has let go somewhere the map never heard: that press is over.
     if (e.pointerType !== "touch" && !(e.buttons & 1)) {
-      end(e, false);
+      end(e, "lost");
       return;
     }
     if (!d.started) {
       const dx = e.clientX - d.sx;
       const dy = e.clientY - d.sy;
-      if (Math.hypot(dx, dy) < 4) return;
-      // On touch only a sideways drag washes: an upward or downward one is the page's to scroll.
-      if (e.pointerType === "touch" && Math.abs(dy) >= Math.abs(dx)) return;
+      const touch = e.pointerType === "touch";
+      if (Math.hypot(dx, dy) < (touch ? 10 : 4)) return;
+      // On touch only a clearly sideways drag washes: an upward or downward one is the page's to scroll
+      // (and if the page takes it anyway, pointercancel undoes what it washed).
+      if (touch && Math.abs(dx) <= 1.5 * Math.abs(dy)) return;
       d.started = true;
       e.currentTarget.setPointerCapture(e.pointerId);
     }
     queue.current.push(p);
     schedule();
   };
-  const end = (e: PointerEvent<HTMLDivElement>, press: boolean) => {
+  // How a gesture ends: let go on the map ("up"), let go where the map never heard ("lost"), or taken
+  // by the page ("cancel": on touch or a pen, a scroll), which undoes what the gesture washed.
+  const end = (e: PointerEvent<HTMLDivElement>, how: "up" | "lost" | "cancel") => {
     const d = drag.current;
     if (!d || d.id !== e.pointerId) return;
+    const taken = how === "cancel" && e.pointerType !== "mouse";
+    if (taken) queue.current = [];
     if (frame.current) {
       cancelAnimationFrame(frame.current);
       flush();
     }
     drag.current = null;
     spray(false);
+    if (taken) {
+      if (d.begun) wash.cancel();
+      return;
+    }
     // A press or tap that never became a drag washes its floor.
-    if (press && !d.started) {
+    if (how === "up" && !d.started) {
       const cell = facadeCellAt(d.prev.x, d.prev.y);
       if (cell < 0) return;
       wash.begin();
@@ -296,8 +327,8 @@ export function WashSurface({ wash, label, describedBy }: { wash: Wash; label: s
       aria-valuetext={`${wash.washed} of ${wash.total} panels washed${wash.once ? `, ${wash.once} with one pass` : ""}`}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
-      onPointerUp={(e) => end(e, true)}
-      onPointerCancel={(e) => end(e, false)}
+      onPointerUp={(e) => end(e, "up")}
+      onPointerCancel={(e) => end(e, "cancel")}
       onPointerEnter={(e) => hover(true, e)}
       onPointerLeave={(e) => hover(false, e)}
       onKeyDown={onKeyDown}

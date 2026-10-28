@@ -52,7 +52,28 @@ export function PillarTabs({ id, headline, items }: { id: string; eyebrow?: stri
     };
     sync();
     window.addEventListener("hashchange", sync);
-    return () => window.removeEventListener("hashchange", sync);
+    // A link to a part from this same page (the menus, the footer) moves by pushState, which fires no
+    // hashchange: once the router has pushed the address (a frame or several) and made its own scroll on
+    // the next, sync to it as a load would.
+    let frame = 0;
+    const onClick = (e: MouseEvent) => {
+      const a = (e.target as Element | null)?.closest?.("a[href]") as HTMLAnchorElement | null;
+      if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const to = new URL(a.href, window.location.href);
+      if (to.origin !== window.location.origin || to.pathname !== window.location.pathname || !items.some((p) => `#${p.id}` === to.hash)) return;
+      cancelAnimationFrame(frame);
+      let frames = 0;
+      const wait = () => {
+        frame = requestAnimationFrame(window.location.hash === to.hash || ++frames > 60 ? () => (frame = requestAnimationFrame(sync)) : wait);
+      };
+      wait();
+    };
+    document.addEventListener("click", onClick, true);
+    return () => {
+      window.removeEventListener("hashchange", sync);
+      document.removeEventListener("click", onClick, true);
+      cancelAnimationFrame(frame);
+    };
   }, [id, items]);
 
   // The right-edge fade shows only while tabs wait past the edge of a scrolling row.
