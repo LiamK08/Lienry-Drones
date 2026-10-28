@@ -241,7 +241,7 @@ function Stage({ label, title, status, aside, interactive, map, below, children 
     <Shell size="stage" label={label} title={title} sub={project.name} interactive={interactive}>
       <span className="-mt-2 mb-3 flex min-w-0 items-center justify-between gap-3">
         <span className="inline-flex shrink-0 rounded-pill bg-tint px-2 py-0.5 text-[0.6875rem] font-medium leading-tight text-accent">{status}</span>
-        {aside ? <span className="min-w-0 truncate text-right text-caption leading-tight text-muted">{aside}</span> : null}
+        {aside ? <span className="min-w-0 text-right text-caption leading-tight text-muted">{aside}</span> : null}
       </span>
       <span className="block" style={{ aspectRatio: `${FACADE_MAP_SIZE.width} / ${FACADE_MAP_SIZE.height}` }}>
         {map}
@@ -307,12 +307,12 @@ function Plan({ beat, map }: { beat: number; map: boolean }) {
   );
 }
 
-/** The map's key on the hands-on clean: the cell states and the debris that takes a second pass. */
+/** The map's key on the hands-on clean: the cell states, and the debris the two passes wash off. */
 const LEGEND = [
   { label: "To wash", swatch: FACADE_PENDING_STRONG },
   { label: "One pass", swatch: "var(--color-map-half)" },
   { label: "Washed", swatch: "var(--color-glass)" },
-  { label: "Debris, two passes", swatch: "var(--color-debris)" },
+  { label: "Debris", swatch: "var(--color-debris)" },
 ] as const;
 
 /**
@@ -320,11 +320,11 @@ const LEGEND = [
  * over at any moment and wash the map themselves (WashMap.tsx). The count is plain text that changes
  * only with the visitor's input.
  */
-function Clean({ active, map, onDone }: { active: boolean; map: boolean; onDone?: () => void }) {
+function Clean({ active, map, onWash }: { active: boolean; map: boolean; onWash?: (done: boolean) => void }) {
   const reduce = usePrefersReducedMotion();
-  const wash = useWash({ active, reduce, onDone });
+  const wash = useWash({ active, reduce, onWash });
   const keys = useId();
-  const line = wash.engaged ? `${wash.washed} of ${wash.total} panels washed` : wash.running ? `Now washing ${wash.running}` : wash.finished ? "Every zone washed" : "Ready to wash";
+  const line = wash.engaged ? (wash.complete ? `All ${wash.total} panels washed` : `${wash.washed} of ${wash.total} panels washed`) : wash.running ? `Now washing ${wash.running}` : wash.finished ? "Every zone washed" : "Ready to wash";
   return (
     <Stage
       interactive
@@ -332,19 +332,18 @@ function Clean({ active, map, onDone }: { active: boolean; map: boolean; onDone?
       title="Washing the building"
       status={wash.complete ? "Clean complete" : wash.engaged || wash.running ? "Washing" : "Ready"}
       aside={
-        wash.engaged && wash.complete ? null : (
-          <>
-            <span className="group-has-[[role=slider]:focus-visible]/wash:hidden">Drag or tap a floor to wash it</span>
-            <span className="hidden group-has-[[role=slider]:focus-visible]/wash:inline">Arrow keys wash floor by floor</span>
-          </>
-        )
+        // Hidden, not removed, once the visitor has washed it all: on a phone it wraps, and the stage keeps its height.
+        <span className={wash.engaged && wash.complete ? "invisible" : undefined}>
+          <span className="group-has-[[role=slider]:focus-visible]/wash:hidden">Drag or tap a floor to wash it</span>
+          <span className="hidden group-has-[[role=slider]:focus-visible]/wash:inline">Arrow keys wash floor by floor</span>
+        </span>
       }
       map={
         map ? (
           <>
             <WashSurface wash={wash} label="Wash the demo facade" describedBy={keys} />
             <span id={keys} className="sr-only">
-              Drag across a floor, or tap one, to wash it. Right arrow washes the next floor, left arrow steps back, Home starts again and End washes every floor. A panel with debris on it takes two passes.
+              Drag across a floor, or tap one, to give it a pass. Each floor takes two passes. Right arrow gives the next floor a pass, left arrow steps back, Home starts again and End washes every floor.
             </span>
           </>
         ) : null
@@ -353,7 +352,7 @@ function Clean({ active, map, onDone }: { active: boolean; map: boolean; onDone?
         <span aria-hidden="true" className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[0.6875rem] leading-tight text-muted">
           {LEGEND.map((k) => (
             <span key={k.label} className="inline-flex items-center gap-1.5">
-              <span className="size-2" style={{ background: k.swatch }} />
+              <span className="size-2 forced-colors:forced-color-adjust-none" style={{ background: k.swatch }} />
               {k.label}
             </span>
           ))}
@@ -361,7 +360,7 @@ function Clean({ active, map, onDone }: { active: boolean; map: boolean; onDone?
       }
     >
       <span className="flex min-h-8 items-center justify-between gap-3 text-caption">
-        <span className="min-w-0 truncate">{line}</span>
+        <span className="min-w-0 leading-tight">{line}</span>
         {wash.engaged ? (
           <Button variant="secondary" size="sm" onClick={wash.reset} className="shrink-0">
             {wash.complete ? "Wash again" : "Reset"}
@@ -381,7 +380,7 @@ function Check({ beat, map }: { beat: number; map: boolean }) {
       label="The re-scan shading the zones of the demo building where debris has built up."
       title="Re-scan"
       status={`Last scan ${project.scanAge} ago`}
-      map={map ? <FacadeMap cells={NONE} version={0} wash={false} debris={beat >= 2} selected={null} ease strong /> : null}
+      map={map ? <FacadeMap cells={NONE} version={0} wash={false} debris={beat >= 2} selected={null} ease debrisLayer strong /> : null}
     >
       <Rows waiting beat={beat} from={3} items={[{ text: `Debris on ${project.debrisZones} areas`, tone: "debris" }, { text: "Added to the next clean" }]} />
     </Stage>
@@ -413,8 +412,8 @@ function BeatPanel({ id, active, map }: { id: keyof typeof BEAT_PANELS; active: 
 /**
  * A step's panel on the stage, playing while its step is shown. `map` mounts the facade map (the shown
  * step and the one fading out), so the page does not keep five maps of 320 cells alive. The clean's
- * panel is the visitor's to work; `onDone` hears when they finish washing it.
+ * panel is the visitor's to work; `onWash` hears each change they make to it, and whether it finished the wash.
  */
-export function StagePanel({ id, active, map, onDone }: { id: StagePanelId; active: boolean; map: boolean; onDone?: () => void }) {
-  return id === "clean" ? <Clean active={active} map={map} onDone={onDone} /> : <BeatPanel id={id} active={active} map={map} />;
+export function StagePanel({ id, active, map, onWash }: { id: StagePanelId; active: boolean; map: boolean; onWash?: (done: boolean) => void }) {
+  return id === "clean" ? <Clean active={active} map={map} onWash={onWash} /> : <BeatPanel id={id} active={active} map={map} />;
 }

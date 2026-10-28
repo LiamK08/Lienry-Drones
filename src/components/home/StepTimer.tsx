@@ -1,12 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties, type FocusEvent } from "react";
-import { useReducedMotion } from "motion/react";
 import { how } from "@/content/home";
 import { Band, Container } from "@/components/ui/Band";
 import { Picture } from "@/components/ui/Picture";
 import { SectionHead } from "@/components/ui/SectionHead";
-import { useOnScreen } from "@/lib/hooks";
+import { useOnScreen, usePrefersReducedMotion } from "@/lib/hooks";
 import { StagePanel, type StagePanelId } from "@/components/home/DemoPanels";
 
 const STEP_MS = 6000;
@@ -19,7 +18,8 @@ const DONE_MS = 2000;
  * the row reads as one progress bar; a soft marker glides to the chosen tab. After six seconds the next
  * step takes over, looping, while the band is on screen. Picking a tab shows it and restarts the timer
  * from there. The timer holds while the pointer is on the stage or the keyboard is in the steps (WCAG
- * 2.2.2), and under reduced motion nothing advances on its own.
+ * 2.2.2), and under reduced motion nothing advances on its own. Once the visitor washes the map on step
+ * 03, the stage stays there until they finish, pick a step or the band leaves the screen (WCAG 2.2.1).
  *
  * The stage: the step's picture with its title and line on a scrim at its foot, and beside it (from 1024,
  * on the night the picture fades into; below the picture on smaller screens) the step's coded panel
@@ -31,20 +31,26 @@ export function StepTimer() {
   const [cycle, setCycle] = useState(0);
   // The step fading out, so its panel keeps its map through the crossfade.
   const [previous, setPrevious] = useState<number | null>(null);
-  // The step whose panel the visitor finished (the clean), until another step is shown.
+  // The step whose panel the visitor finished (the clean), until another step is shown or they wash on.
   const [finished, setFinished] = useState<number | null>(null);
+  // The visitor is washing the clean's map: it holds the stage until another step is shown, a tab is
+  // picked or the band leaves the screen.
+  const [washing, setWashing] = useState(false);
   const [shownStep, setShownStep] = useState(active);
   if (shownStep !== active) {
     setPrevious(shownStep);
     setShownStep(active);
     setFinished(null);
+    setWashing(false);
   }
-  const reduce = useReducedMotion();
+  // Read as a store with a false server snapshot, so hydration matches the server's markup.
+  const reduce = usePrefersReducedMotion();
   const [ref, inView] = useOnScreen<HTMLDivElement>();
+  if (washing && !inView) setWashing(false);
   const running = inView && !reduce;
   const [pointerIn, setPointerIn] = useState(false);
   const [keyboardIn, setKeyboardIn] = useState(false);
-  const ticking = running && !pointerIn && !keyboardIn;
+  const ticking = running && !pointerIn && !keyboardIn && !washing;
 
   // The step's time left: a hold pauses it and the step carries on from there; leaving the screen,
   // or a new step, starts it whole. (This reset runs before the timer below in the same commit.)
@@ -62,7 +68,8 @@ export function StepTimer() {
     };
   }, [ticking, active, cycle]);
 
-  // The visitor washed the whole map on step 03: the check follows, unless the keyboard is still in it.
+  // The visitor washed the whole map on step 03: the check follows, unless the keyboard is still in it
+  // or they wash on (a reset, a step back) first.
   useEffect(() => {
     if (finished !== active || !running || keyboardIn) return;
     const t = window.setTimeout(() => setActive((i) => (i + 1) % how.steps.length), DONE_MS);
@@ -72,6 +79,7 @@ export function StepTimer() {
   const pick = (i: number) => {
     setActive(i);
     setCycle((c) => c + 1);
+    setWashing(false);
   };
   // The keyboard in the steps (focus there, and the last input a key) holds the timer; a click's focus does not.
   const onFocus = (e: FocusEvent<HTMLDivElement>) => setKeyboardIn(e.target.matches(":focus-visible"));
@@ -116,7 +124,7 @@ export function StepTimer() {
                     pick(to);
                     document.getElementById(`how-tab-${how.steps[to].id}`)?.focus();
                   }}
-                  className="group/tab relative min-w-0 rounded-[0.625rem] px-2 py-3 text-left md:rounded-card md:p-4"
+                  className="group/tab relative min-w-0 rounded-[0.625rem] px-2 py-3 text-left max-[359px]:px-1 md:rounded-card md:p-4"
                 >
                   <span aria-hidden="true" className="relative block h-[3px] overflow-hidden rounded-pill bg-line">
                     <span
@@ -125,14 +133,11 @@ export function StepTimer() {
                       style={on && !reduce ? { animationPlayState: ticking ? "running" : "paused" } : undefined}
                     />
                   </span>
-                  <span aria-hidden="true" className="mt-3 block text-caption leading-none tabular-nums text-muted md:mt-4 md:text-small md:leading-none">
-                    {s.n}
-                  </span>
-                  {/* On phones the five tabs share one row: the short name shows, the full one is kept for screen readers. */}
-                  <span aria-hidden="true" className={`mt-1.5 block truncate text-small transition-colors duration-200 md:hidden ${on ? "font-medium text-ink" : "text-muted group-hover/tab:text-ink"}`}>
-                    {s.short}
-                  </span>
-                  <span className={`sr-only md:not-sr-only md:mt-2 md:block md:truncate md:text-body md:leading-tight md:transition-colors md:duration-200 ${on ? "md:font-medium md:text-ink" : "md:text-muted md:group-hover/tab:text-ink"}`}>{s.tab}</span>
+                  <span className="mt-3 block text-caption leading-none tabular-nums text-muted md:mt-4 md:text-small md:leading-none">{s.n}</span>
+                  {/* On phones the five tabs share one row and show the short name, from 768 the full one: each
+                      tab is named by what it shows (WCAG 2.5.3). */}
+                  <span className={`mt-1.5 block truncate text-small transition-colors duration-200 md:hidden ${on ? "font-medium text-ink" : "text-muted group-hover/tab:text-ink"}`}>{s.short}</span>
+                  <span className={`hidden md:mt-2 md:block md:truncate md:text-body md:leading-tight md:transition-colors md:duration-200 ${on ? "md:font-medium md:text-ink" : "md:text-muted md:group-hover/tab:text-ink"}`}>{s.tab}</span>
                 </button>
               );
             })}
@@ -153,7 +158,9 @@ export function StepTimer() {
                 </div>
               ))}
               <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(to_top,color-mix(in_srgb,var(--color-night)_75%,transparent)_0%,transparent_55%)]" />
-              <div className="absolute inset-x-6 bottom-6 text-white md:inset-x-8 md:bottom-8 lg:right-auto lg:max-w-[26rem]">
+              {/* On phones a title can wrap high into the picture's bright upper half: the caption carries
+                  its own scrim there, from its foot to above its first line. */}
+              <div className="absolute inset-x-0 bottom-0 bg-[linear-gradient(to_top,color-mix(in_srgb,var(--color-night)_60%,transparent),color-mix(in_srgb,var(--color-night)_55%,transparent)_70%,transparent)] px-6 pb-6 pt-10 text-white md:inset-x-8 md:bottom-8 md:bg-none md:p-0 lg:right-auto lg:max-w-[26rem]">
                 <p className="font-display text-[1.5rem] leading-tight">{how.steps[active].title}</p>
                 <p className="mt-1 text-small leading-normal text-white/85">{how.steps[active].body}</p>
               </div>
@@ -164,9 +171,13 @@ export function StepTimer() {
             <div className="grid grid-cols-[minmax(0,1fr)] justify-items-center p-5 md:p-8 lg:col-span-5 lg:self-center lg:p-0">
               {how.steps.map((s, i) => {
                 const on = i === active;
+                const onWash = (done: boolean) => {
+                  setWashing(true);
+                  setFinished(done ? i : null);
+                };
                 return (
                   <div key={s.id} aria-hidden={!on} inert={!on} className={`flex w-full max-w-[21.25rem] justify-center transition-opacity duration-500 ease-instrument [grid-area:1/1] motion-reduce:transition-none md:max-w-[26rem] lg:max-w-[21.25rem] xl:max-w-[26rem] ${on ? "opacity-100" : "opacity-0"}`}>
-                    <StagePanel id={s.id as StagePanelId} active={on && inView} map={on || i === previous} onDone={s.id === "clean" ? () => setFinished(i) : undefined} />
+                    <StagePanel id={s.id as StagePanelId} active={on && inView} map={on || i === previous} onWash={s.id === "clean" ? onWash : undefined} />
                   </div>
                 );
               })}

@@ -1,28 +1,28 @@
 "use client";
 
 import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
-import { DEBRIS_SHOWN, FACADE_MAP_SIZE, FacadeMap, facadeCellAt, facadeRowOf, type FacadeRow } from "@/components/software/FacadeMap";
+import { FACADE_MAP_SIZE, FacadeMap, facadeCellAt, facadeRowOf, type FacadeRow } from "@/components/software/FacadeMap";
 import { CELLS } from "@/components/three/software/dims";
 import { zones } from "@/content/software";
 import { DroneGlyph } from "@/components/home/DroneGlyph";
 
 // The step stage's hands-on clean (step 03): the visitor washes the demo building's facade map. A drag
 // across a floor gives each panel it crosses one pass, a press or tap on a floor gives the whole floor
-// one, and the arrow keys wash the route floor by floor. A clean panel is washed in one pass; a panel
-// with debris on it takes both, as the model's "pass 2 of 2" does. Demo data on a coded map: no time,
-// speed or saving figures, and the count changes only with the visitor's input. Until the visitor
-// starts, the drone runs the route itself, floor by floor (never under reduced motion).
+// one, and the arrow keys wash the route floor by floor. Every panel takes two passes, as the model's
+// "pass 1 of 2" and "pass 2 of 2" do, and each pass washes off half the debris on it. Demo data on a
+// coded map: no time, speed or saving figures, and the count changes only with the visitor's input.
+// Until the visitor starts, the drone runs the route itself, floor by floor (never under reduced motion).
 
 const TOTAL = CELLS.length;
-const dirty = (i: number) => CELLS[i].debris > DEBRIS_SHOWN;
 
-/** One pass over `cells`: a panel is washed, or washed once if debris needs a second pass. */
+/** One pass over `cells`: a panel is washed once, or washed if it had its first pass. */
 function pass(from: Float32Array, cells: Iterable<number>): Float32Array {
   const next = Float32Array.from(from);
-  for (const i of cells) next[i] = next[i] >= 1 || !dirty(i) || next[i] >= 0.5 ? 1 : 0.5;
+  for (const i of cells) next[i] = next[i] >= 0.5 ? 1 : 0.5;
   return next;
 }
 const washedIn = (cells: Float32Array) => cells.reduce((n, v) => (v >= 1 ? n + 1 : n), 0);
+const onceIn = (cells: Float32Array) => cells.reduce((n, v) => (v > 0 && v < 1 ? n + 1 : n), 0);
 
 /** The floors in the order the window's clean runs them: each zone top down, then the next zone. */
 const ROUTE: FacadeRow[] = (() => {
@@ -35,10 +35,10 @@ const ROUTE: FacadeRow[] = (() => {
   }
   return rows;
 })();
-/** The drone's own run: every floor once, and a floor with debris on it twice. */
-const SWEEPS = ROUTE.flatMap((row) => (row.cells.some(dirty) ? [row, row] : [row]));
+/** The drone's own run: both passes of every floor, in about four seconds, inside the step's six. */
+const SWEEPS = ROUTE.flatMap((row) => [row, row]);
 const AUTO = SWEEPS.reduce<Float32Array[]>((states, row) => [...states, pass(states[states.length - 1], row.cells)], [new Float32Array(TOTAL)]);
-const SWEEP_MS = 130;
+const SWEEP_MS = 80;
 
 const zoneOf = (row: FacadeRow) => zones.find((z) => z.id === CELLS[row.cells[0]].zone) ?? zones[0];
 
@@ -46,48 +46,57 @@ export type Wash = ReturnType<typeof useWash>;
 
 /**
  * The clean's state: the drone's own run while the step plays and nobody has touched the map, then
- * the visitor's map from the moment they start. `onDone` is called when the visitor's input washes
- * the last panel.
+ * the visitor's map from the moment their input first washes it. `onWash` hears each change the
+ * visitor makes, with `done` true when that change washed the last panel.
  */
-export function useWash({ active, reduce, onDone }: { active: boolean; reduce: boolean; onDone?: () => void }) {
+export function useWash({ active, reduce, onWash }: { active: boolean; reduce: boolean; onWash?: (done: boolean) => void }) {
   const [k, setK] = useState(0);
   const [mine, setMine] = useState<{ cells: Float32Array; version: number; front: FacadeRow | null } | null>(null);
+  // The keyboard is on the map: the drone's run waits there, so the control's value holds still.
+  const [held, setHeld] = useState(false);
   // The visitor's map as the handlers last left it (state follows it), and the states to step back to.
   const live = useRef<Float32Array | null>(null);
   const history = useRef<Float32Array[]>([]);
   const version = useRef(0);
   const settle = useRef(0);
+  const run = useRef(0);
 
   const auto = active && !reduce && mine === null;
   useEffect(() => {
     if (!auto) return;
     window.clearTimeout(settle.current);
-    let n = 0;
-    const t = window.setInterval(() => {
-      n += 1;
-      setK(n);
-      if (n >= SWEEPS.length) window.clearInterval(t);
-    }, SWEEP_MS);
+    run.current = 0;
     return () => {
-      window.clearInterval(t);
       // Back to the start once the panel has faded out, so the next run opens on the unwashed map.
       settle.current = window.setTimeout(() => setK(0), 700);
     };
   }, [auto]);
+  useEffect(() => {
+    if (!auto || held) return;
+    const t = window.setInterval(() => {
+      run.current = Math.min(SWEEPS.length, run.current + 1);
+      setK(run.current);
+      if (run.current >= SWEEPS.length) window.clearInterval(t);
+    }, SWEEP_MS);
+    return () => window.clearInterval(t);
+  }, [auto, held]);
 
   // What the visitor takes over: the drone's run as far as it has gone, or a fresh map once it has
   // washed everything, so there is always something left to wash.
   const current = () => live.current ?? (k >= SWEEPS.length ? new Float32Array(TOTAL) : AUTO[k]);
-  const commit = (next: Float32Array, front: FacadeRow | null, keep = true) => {
+  const show = (next: Float32Array, front: FacadeRow | null) => {
     const before = live.current ? washedIn(live.current) : -1;
+    live.current = next;
+    version.current += 1;
+    setMine({ cells: next, version: version.current, front });
+    onWash?.(before < TOTAL && washedIn(next) === TOTAL);
+  };
+  const commit = (next: Float32Array, front: FacadeRow | null, keep = true) => {
     if (keep) {
       history.current.push(current());
       if (history.current.length > 100) history.current.shift();
     }
-    live.current = next;
-    version.current += 1;
-    setMine({ cells: next, version: version.current, front });
-    if (before < TOTAL && washedIn(next) === TOTAL) onDone?.();
+    show(next, front);
   };
 
   const cells = mine ? mine.cells : AUTO[k];
@@ -97,14 +106,18 @@ export function useWash({ active, reduce, onDone }: { active: boolean; reduce: b
     cells,
     version: mine ? 1000 + mine.version : k,
     washed,
+    /** The panels that have had one of their two passes. */
+    once: onceIn(cells),
     total: TOTAL,
     complete: washed === TOTAL,
     engaged: mine !== null,
-    /** Where the drone is in its own run: null before it starts and once it has finished. */
-    running: mine === null && k > 0 && k < SWEEPS.length ? zoneOf(SWEEPS[k - 1]).name : null,
+    /** Where the drone is in its own run: null before it starts, while it waits and once it has finished. */
+    running: mine === null && !held && k > 0 && k < SWEEPS.length ? zoneOf(SWEEPS[k - 1]).name : null,
     finished: mine === null && k >= SWEEPS.length,
     front,
-    /** A gesture starts: the visitor takes over from what the map shows now. */
+    /** The keyboard reaches the map (true) or leaves it: the drone's run waits for it meanwhile. */
+    hold: setHeld,
+    /** A gesture washes its first panel: the visitor takes over from what the map shows now. */
     begin() {
       if (!live.current) {
         live.current = current();
@@ -112,7 +125,7 @@ export function useWash({ active, reduce, onDone }: { active: boolean; reduce: b
       }
       history.current.push(live.current);
     },
-    /** One pass over the cells a drag crossed (the gesture's state was kept when it began). */
+    /** One pass over the cells a drag crossed (the gesture's state was kept at its first). */
     stroke(hit: number[]) {
       commit(pass(current(), hit), null, false);
     },
@@ -130,10 +143,7 @@ export function useWash({ active, reduce, onDone }: { active: boolean; reduce: b
     /** Back to the map before the last change. */
     back() {
       const prev = history.current.pop();
-      if (!prev) return;
-      live.current = prev;
-      version.current += 1;
-      setMine({ cells: prev, version: version.current, front: null });
+      if (prev) show(prev, null);
     },
     reset() {
       commit(new Float32Array(TOTAL), null);
@@ -145,13 +155,14 @@ export function useWash({ active, reduce, onDone }: { active: boolean; reduce: b
 }
 
 type Point = { x: number; y: number; px: number; py: number };
-type Drag = { id: number; sx: number; sy: number; started: boolean; last: number; prev: Point };
+type Drag = { id: number; sx: number; sy: number; started: boolean; begun: boolean; last: number; prev: Point };
 
 /**
  * The map as a control: a labelled slider (its value is the panels washed) that takes drags, presses
- * and taps, and the keyboard: Right or Up washes the next floor, Left or Down steps back, Home starts
- * again, End washes every floor. The drone glyph rides under a mouse or pen; on touch a sideways drag
- * washes and an upward or downward one still scrolls the page.
+ * and taps, and the keyboard: Right or Up gives the next floor a pass, Left or Down steps back, Home
+ * starts again, End washes every floor. The drone glyph rides under a mouse or pen; on touch a sideways
+ * drag washes and an upward or downward one still scrolls the page. Nothing is taken over until a
+ * gesture washes a panel, so a scroll that starts on the map, or a press in a gap, leaves it as it was.
  */
 export function WashSurface({ wash, label, describedBy }: { wash: Wash; label: string; describedBy: string }) {
   const box = useRef<HTMLDivElement>(null);
@@ -190,7 +201,12 @@ export function WashSurface({ wash, label, describedBy }: { wash: Wash; label: s
       }
       d.prev = p;
     }
-    if (hit.length) wash.stroke(hit);
+    if (!hit.length) return;
+    if (!d.begun) {
+      d.begun = true;
+      wash.begin();
+    }
+    wash.stroke(hit);
   };
   const schedule = () => {
     if (!frame.current) frame.current = requestAnimationFrame(flush);
@@ -200,8 +216,9 @@ export function WashSurface({ wash, label, describedBy }: { wash: Wash; label: s
   const onPointerDown = (e: PointerEvent<HTMLDivElement>) => {
     if (e.button !== 0) return;
     const p = at(e);
-    drag.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, started: false, last: -2, prev: p };
-    wash.begin();
+    drag.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, started: false, begun: false, last: -2, prev: p };
+    // A mouse or pen keeps the map until it lets go, wherever it goes, so every press ends here.
+    if (e.pointerType !== "touch") e.currentTarget.setPointerCapture(e.pointerId);
     spray(true);
   };
   const onPointerMove = (e: PointerEvent<HTMLDivElement>) => {
@@ -213,8 +230,17 @@ export function WashSurface({ wash, label, describedBy }: { wash: Wash; label: s
     }
     const d = drag.current;
     if (!d || d.id !== e.pointerId) return;
+    // A mouse or pen moving with no button held has let go somewhere the map never heard: that press is over.
+    if (e.pointerType !== "touch" && !(e.buttons & 1)) {
+      end(e, false);
+      return;
+    }
     if (!d.started) {
-      if (Math.hypot(e.clientX - d.sx, e.clientY - d.sy) < 4) return;
+      const dx = e.clientX - d.sx;
+      const dy = e.clientY - d.sy;
+      if (Math.hypot(dx, dy) < 4) return;
+      // On touch only a sideways drag washes: an upward or downward one is the page's to scroll.
+      if (e.pointerType === "touch" && Math.abs(dy) >= Math.abs(dx)) return;
       d.started = true;
       e.currentTarget.setPointerCapture(e.pointerId);
     }
@@ -233,7 +259,9 @@ export function WashSurface({ wash, label, describedBy }: { wash: Wash; label: s
     // A press or tap that never became a drag washes its floor.
     if (press && !d.started) {
       const cell = facadeCellAt(d.prev.x, d.prev.y);
-      if (cell >= 0) wash.floor(cell);
+      if (cell < 0) return;
+      wash.begin();
+      wash.floor(cell);
     }
   };
   const hover = (on: boolean, e: PointerEvent<HTMLDivElement>) => {
@@ -265,7 +293,7 @@ export function WashSurface({ wash, label, describedBy }: { wash: Wash; label: s
       aria-valuemin={0}
       aria-valuemax={wash.total}
       aria-valuenow={wash.washed}
-      aria-valuetext={`${wash.washed} of ${wash.total} panels washed`}
+      aria-valuetext={`${wash.washed} of ${wash.total} panels washed${wash.once ? `, ${wash.once} with one pass` : ""}`}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={(e) => end(e, true)}
@@ -273,9 +301,11 @@ export function WashSurface({ wash, label, describedBy }: { wash: Wash; label: s
       onPointerEnter={(e) => hover(true, e)}
       onPointerLeave={(e) => hover(false, e)}
       onKeyDown={onKeyDown}
+      onFocus={(e) => wash.hold(e.currentTarget.matches(":focus-visible"))}
+      onBlur={() => wash.hold(false)}
       className="group/map relative cursor-none touch-pan-y select-none rounded-hard"
     >
-      <FacadeMap cells={wash.cells} version={wash.version} wash debris selected={null} ease decorative strong />
+      <FacadeMap cells={wash.cells} version={wash.version} wash debris selected={null} ease debrisLayer decorative strong />
       <span aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-visible [container-type:size]">
         {rest ? (
           <span
