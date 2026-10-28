@@ -7,19 +7,20 @@ import { Headline } from "@/components/ui/SectionHead";
 import { Reveal } from "@/components/ui/Reveal";
 
 /**
- * The questions on paper, beside the ask: the head and the rows on the left (the wider column from
- * 1200, as the reference's), and on the right a card
- * under an accent title bar (sticky from 1024) that books a call: a day, a time, then the enquiry form
- * (BookingCard). A person confirms the time by email.
+ * The questions on paper, beside the ask, on the 12-column grid: the head (at the home section step)
+ * and the rows in columns 1-6, and in columns 8-12 (7-12 below 1200, so its form keeps two columns)
+ * one white card, sticky from 1024, that books a call:
+ * its title and a line in the card's body, then a day, a time and the enquiry form (BookingCard). A
+ * person confirms the time by email.
  */
 export function FaqForm() {
   return (
     <Band id="faq" tone="paper" pad="compact" labelledBy="faq-heading">
       <Container>
-        <div className="grid gap-12 lg:grid-cols-[1fr_1fr] lg:gap-16 min-[75rem]:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)] min-[75rem]:gap-[3.75rem]">
-          <div>
+        <div className="grid gap-12 lg:grid-12 lg:gap-y-0">
+          <div className="lg:col-span-6">
             <Reveal animate y={10}>
-              <h2 id="faq-heading" className="em-accent text-h2s">
+              <h2 id="faq-heading" className="text-h2">
                 <Headline text={faq.headline} emphasis={faq.emphasis} />
               </h2>
             </Reveal>
@@ -27,11 +28,11 @@ export function FaqForm() {
               <FaqRows id="faq" items={faqFor("platform")} />
             </div>
           </div>
-          <div className="lg:sticky lg:top-[calc(var(--nav-h)+1.5rem)] lg:self-start">
-            <div className="overflow-hidden rounded-card border border-line bg-white">
-              <h3 className="bg-accent py-3 text-center text-[1.25rem] leading-[1.4] tracking-[-0.01em] text-white">{faq.formTitle}</h3>
-              <div className="p-6 md:p-8">
-                <p className="mb-6 text-small text-muted">{faq.formNote}</p>
+          <div className="lg:sticky lg:top-[calc(var(--nav-h)+1.5rem)] lg:col-span-6 lg:col-start-7 lg:self-start min-[75rem]:col-span-5 min-[75rem]:col-start-8">
+            <div className="rounded-card border border-line bg-white p-6 md:p-8">
+              <h3 className="text-h3">{faq.formTitle}</h3>
+              <p className="mt-2 text-small text-muted">{faq.formNote}</p>
+              <div className="mt-6">
                 <BookingCard />
               </div>
             </div>
