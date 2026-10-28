@@ -60,7 +60,7 @@ export const platformPage = {
       image: { id: "m3-pod-master", alt: "The Lienry ground pod open beside a garden tap, the home drone inside", position: "35% 50%" },
     },
   ],
-  statement: { headline: "Every clean is planned on a model of the building, and nobody has to be on site.", action: { label: "Register interest", href: "/register-interest" } },
+  statement: { headline: "Every clean is planned on a model of the building, and nobody has to be on site", action: { label: "Register interest", href: "/register-interest" } },
   close: {
     headline: "See the software that runs it",
     body: "A demo building in the desktop software: the scan, the plan, the wash and the re-scan.",

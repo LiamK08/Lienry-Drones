@@ -5,19 +5,10 @@ export const fitCheckPage = {
     eyebrow: "Free fit check",
     headline: "See whether your building suits a resident drone",
     emphasis: "a resident drone",
-    image: { id: "s4-scan", alt: "The drone holding off the corner of a glass building to scan it", position: "50% 40%" },
+    /** Under the h1, over the check: what to answer for and what the result is. */
+    lead: "Answer for one building. It takes about a minute, and nothing is sent unless you ask for your result.",
   },
-  /** The check's opening lines, over the questions. `strong` is set bold in the first. */
-  intro: {
-    lines: [
-      "Seven questions from the design brief, scored as you go. It takes about a minute, and nothing is sent anywhere.",
-      "Answer for one building. The result is indicative: site requirements are still being finalised.",
-    ],
-    strong: "about a minute",
-    /** The tag beside the result's buttons. */
-    badge: "Nothing is sent anywhere",
-  },
-  /** What the check covers and what it is not, under the check. */
+  /** What the check covers and what it is not: a feature row under the check, beside the scan picture. */
   about: {
     headline: "What the fit check tells you",
     paragraphs: [
@@ -25,6 +16,7 @@ export const fitCheckPage = {
       "The result is indicative, not a site survey. Lienry is at concept stage and site requirements are still being finalised, so treat it as the start of a conversation.",
     ],
     link: { label: "See the platform", href: "/platform" },
+    image: { id: "s4-scan", alt: "The drone holding off the corner of a glass building to scan it", position: "50% 40%" },
   },
   faq: { headline: "Questions about the fit check" },
 };

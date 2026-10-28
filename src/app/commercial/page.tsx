@@ -25,9 +25,9 @@ export default function CommercialPage() {
   const items = rows.map((r) => (r.id === "software" ? { ...r, media: <SoftwareWindow /> } : r));
   return (
     <>
-      <CenterHero mobileLines={3} leadLines={{ phone: 4, wide: 2 }} eyebrow={hero.eyebrow} headline={hero.headline} emphasis={hero.emphasis} lead={hero.lead} primary={hero.primary} />
+      <CenterHero mobileLines={3} leadLines={{ phone: 4, wide: 2 }} headline={hero.headline} emphasis={hero.emphasis} lead={hero.lead} primary={hero.primary} />
       <WordStrip label={strip.label} items={strip.items} />
-      <FeatureRows id="features" variant="solutions" eyebrow="Features" items={items} />
+      <FeatureRows id="features" variant="solutions" items={items} />
       <SafetyBlock {...safety} />
       <FaqCentered items={faqFor("commercial")} spacing="page" narrow />
       <AccentPanel id="closing" headline={close.headline} action={close.action} band="close" />
