@@ -267,7 +267,16 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
     the demo, "Wash again" was overridden by the move-on, /company's header painted blue before
     hydration, Back with the phone menu open left the page un-inert, anchors after a page entrance landed
     8px under the bar, the debris tones and the 3D drone and dock finishes were still warm; the window's
-    recordings were re-recorded from the cooled model).
+    recordings were re-recorded from the cooled model). A second review of the fixes found nine more
+    (among them: a pass over a finished map cancelled the move-on, a wobbly phone scroll still took over
+    the map, /platform's same-page part links left the wrong tab, check 46 did not cover the anchor
+    case); all fixed and proved, and check 46 was shown to fail on an injected regression.
+  - Gates on 28 October: typecheck, lint and build pass; `check:layout` all 12 routes at 1440, 1024, 768
+    and 390 (the three known warnings); `check:rules` with motion all 12 routes (14, 45 and 46 included);
+    `check:a11y` all 12 routes; `npm run contrast` on four film frames at 1440 and 390; `perf:vitals`
+    alone, three runs each, all 11 pages (median LCP 1.87s home, 2.42s /platform and /download, the
+    rest 1.9-2.0s; CLS at most 0.065). TBT on home is 1.4s (not gated; the intro and the 3D window).
+    PR frames: `docs/screenshots/glass-and-sky/`.
 
 ## How the owner works
 
