@@ -1,5 +1,5 @@
 /**
- * A quiet strip under a hero: a small caption, 36, then words set in the serif, muted, on a slow loop
+ * A quiet strip under a hero: a small sentence-case caption (as the home strip's), 36, then words set in the serif, muted, on a slow loop
  * (the `.marquee` keyframes, 40s) inside a 1110px window that fades at both edges. The words say
  * what the system is designed for; they are not customers or partners. The list is in the DOM once
  * for screen readers; the moving copy is aria-hidden. Under reduced motion the copy and the fade go
@@ -23,7 +23,7 @@ export function WordStrip({ label, items }: { label: string; items: readonly str
   return (
     <section aria-label={label} data-band="for" data-tone="plaster" className="page-x relative bg-plaster pb-20 md:pb-[4.75rem]">
       <div className="mx-auto max-w-[69.375rem] text-center">
-        <p className="mx-auto max-w-none text-label leading-[1.4] font-normal uppercase tracking-[0.08em] text-muted max-md:text-[0.6875rem]">{label}</p>
+        <p className="mx-auto max-w-none text-caption text-muted md:text-small">{label}</p>
         <div className="mt-9 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_30%,black_70%,transparent)] motion-reduce:[mask-image:none]">
           {/* The loop moves by half the track: two lists, so even the shortest list (four words, about
               870px) fills the 1110px window at every point of the loop. */}

@@ -58,7 +58,7 @@ export type SoftwareWindowProps = {
   /** The window is in the first screen (/download): its stand-in frame is the page's LCP image, so it
    *  loads eagerly at high priority instead of lazily. */
   priority?: boolean;
-  /** "inset": the window sits in a frame of its own (ProductClose), so it takes the frame's inner corner and no shadow. */
+  /** "inset": the window sits in a frame of its own (/platform's closing band), so it takes the frame's inner corner and no shadow. */
   frame?: "bare" | "inset";
   /** Which model the window runs: the 12-storey building (default) or the four-row solar array. */
   model?: ModelId;

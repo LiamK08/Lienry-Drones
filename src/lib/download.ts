@@ -3,8 +3,9 @@
  * page reads everything it shows about the release from here.
  *
  * To put the buttons live, paste each installer's full URL and the version below, then change
- * `available` to true. While `available` is false both buttons show "Coming soon", disabled, beside
- * a Register interest link. A platform whose URL is still empty stays on "Coming soon" either way.
+ * `available` to true. While `available` is false the hero shows Register interest as its primary
+ * pill with a muted availability line under it ("Coming soon for Mac and Windows"), and no download
+ * button. A platform whose URL is still empty stays off either way.
  */
 export const desktopRelease = {
   /** The switch: true puts the download buttons live. */
