@@ -1,57 +1,45 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Action, ImageRef } from "@/lib/types";
 import { Band, Container } from "@/components/ui/Band";
 import { Button } from "@/components/ui/Button";
 import { Picture } from "@/components/ui/Picture";
 import { SectionHead } from "@/components/ui/SectionHead";
+import { useIndicator } from "@/components/home/useIndicator";
 
 export type Pillar = { id: string; tab: string; title: string; body: string; link?: Action; image: ImageRef };
 
-// useLayoutEffect warns during the server render; the indicator is measured only in the browser.
-const useIsoLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
-
 /**
- * The gliding selection indicator: the active tab's left edge and width inside its list, as --ix and
- * --iw for an aria-hidden bar that eases between tabs (240ms). Null until measured, so the server render
- * and a page without JavaScript keep the active tab's own underline. Re-measured when the list resizes
- * (the web font arriving, a rotation).
+ * On a phone's scrolling tab row, brings the chosen tab wholly into view inside the row only (never the
+ * page): clear of the page margin on the left, and clear of the right-edge fade unless it is the last tab.
  */
-function useIndicator(listRef: React.RefObject<HTMLElement | null>, active: number) {
-  const [box, setBox] = useState<{ x: number; w: number } | null>(null);
-  const measure = useCallback(() => {
-    const list = listRef.current;
-    const tab = list?.querySelectorAll<HTMLElement>("[role=tab]")[active];
-    if (!list || !tab) return;
-    setBox({ x: tab.offsetLeft, w: tab.offsetWidth });
-  }, [listRef, active]);
-  useIsoLayoutEffect(() => {
-    measure();
-  }, [measure]);
-  useEffect(() => {
-    const list = listRef.current;
-    if (!list || typeof ResizeObserver === "undefined") return;
-    const ro = new ResizeObserver(() => measure());
-    ro.observe(list);
-    return () => ro.disconnect();
-  }, [listRef, measure]);
-  return box;
+function revealTab(row: HTMLElement, tab: HTMLElement, last: boolean) {
+  if (row.scrollWidth <= row.clientWidth) return;
+  const style = getComputedStyle(row);
+  const r = row.getBoundingClientRect();
+  const t = tab.getBoundingClientRect();
+  const from = r.left + (parseFloat(style.paddingLeft) || 0);
+  const to = r.right - (last ? parseFloat(style.paddingRight) || 0 : 64);
+  const delta = t.left < from ? t.left - from : t.right > to ? t.right - to : 0;
+  if (!delta) return;
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  row.scrollTo({ left: row.scrollLeft + delta, behavior: reduce ? "auto" : "smooth" });
 }
 
 /**
  * The parts of the platform as text tabs over one panel: a rounded picture in columns 1-6 and the part's
- * title, a line and a pill in 8-12. A marker glides under the chosen tab and the panels crossfade
- * (240ms; at once under reduced motion). On phones the tab row scrolls sideways to the screen's edges and
- * fades at the right while more tabs wait there. Each panel's id is its part id, so a link such as
- * /platform#tether selects that tab and scrolls the band into view.
+ * title, a line and a pill in 8-12. A marker glides under the chosen tab (the shared useIndicator) and
+ * the panels crossfade (250ms; at once under reduced motion). On phones the tab row scrolls sideways to
+ * the screen's edges and fades at the right while more tabs wait there. Each panel's id is its part id,
+ * so a link such as /platform#tether selects that tab and scrolls the band into view.
  */
 export function PillarTabs({ id, headline, items }: { id: string; eyebrow?: string; headline: string; items: readonly Pillar[] }) {
   const [active, setActive] = useState(0);
   const listRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [more, setMore] = useState(false);
-  const box = useIndicator(listRef, active);
+  useIndicator(listRef, active);
 
   useEffect(() => {
     const sync = () => {
@@ -59,6 +47,8 @@ export function PillarTabs({ id, headline, items }: { id: string; eyebrow?: stri
       if (i < 0) return;
       setActive(i);
       document.getElementById(`${id}-heading`)?.scrollIntoView({ block: "start" });
+      const tab = document.getElementById(`${id}-tab-${items[i].id}`);
+      if (tab && scrollRef.current) revealTab(scrollRef.current, tab, i === items.length - 1);
     };
     sync();
     window.addEventListener("hashchange", sync);
@@ -84,18 +74,8 @@ export function PillarTabs({ id, headline, items }: { id: string; eyebrow?: stri
     setActive(i);
     const tab = document.getElementById(`${id}-tab-${items[i].id}`);
     if (focus) tab?.focus({ preventScroll: true });
-    // Bring a tab chosen past the edge of a scrolling row into view, inside the row only.
-    const row = scrollRef.current;
-    if (tab && row && row.scrollWidth > row.clientWidth) {
-      const left = tab.offsetLeft - parseFloat(getComputedStyle(row).paddingLeft || "0");
-      const right = tab.offsetLeft + tab.offsetWidth - row.clientWidth + parseFloat(getComputedStyle(row).paddingRight || "0");
-      const to = row.scrollLeft > left ? left : row.scrollLeft < right ? right : row.scrollLeft;
-      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      row.scrollTo({ left: to, behavior: reduce ? "auto" : "smooth" });
-    }
+    if (tab && scrollRef.current) revealTab(scrollRef.current, tab, i === items.length - 1);
   };
-
-  const indicator = box ? ({ "--ix": `${box.x}px`, "--iw": `${box.w}px` } as CSSProperties) : undefined;
 
   return (
     <Band id={id} tone="plaster" pad="tabs" labelledBy={`${id}-heading`}>
@@ -107,12 +87,13 @@ export function PillarTabs({ id, headline, items }: { id: string; eyebrow?: stri
             more ? "[mask-image:linear-gradient(to_right,black_calc(100%-4rem),transparent)]" : ""
           }`}
         >
-          <div ref={listRef} role="tablist" aria-label={headline} className="relative flex w-max min-w-full gap-7 border-b border-line md:justify-center">
+          <div ref={listRef} role="tablist" aria-label={headline} className="group/ind relative flex w-max min-w-full gap-7 border-b border-line md:justify-center">
             {items.map((p, i) => (
               <button
                 key={p.id}
                 type="button"
                 role="tab"
+                data-indicator-item=""
                 id={`${id}-tab-${p.id}`}
                 aria-selected={i === active}
                 aria-controls={p.id}
@@ -126,19 +107,18 @@ export function PillarTabs({ id, headline, items }: { id: string; eyebrow?: stri
                   select(next, true);
                 }}
                 className={`-mb-px shrink-0 border-b-2 pt-1 pb-3.5 text-body transition-[color,border-color] duration-200 motion-reduce:transition-none ${
-                  i === active ? `font-medium text-ink ${box ? "border-transparent" : "border-ink"}` : "border-transparent text-muted hover:text-ink"
+                  i === active ? "border-ink font-medium text-ink group-data-[indicator-ready]/ind:border-transparent" : "border-transparent text-muted hover:text-ink"
                 }`}
               >
                 {p.tab}
               </button>
             ))}
-            {box ? (
-              <span
-                aria-hidden="true"
-                style={indicator}
-                className="pointer-events-none absolute -bottom-px left-0 h-0.5 w-(--iw) translate-x-(--ix) rounded-pill bg-ink transition-[translate,width] duration-[240ms] ease-instrument motion-reduce:transition-none forced-colors:bg-[Highlight]"
-              />
-            ) : null}
+            {/* The marker: hidden until measured (useIndicator), when the chosen tab's own underline
+                gives way to it; it glides from then on (250ms; it jumps under reduced motion). */}
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute -bottom-px left-0 h-0.5 w-(--iw) translate-x-(--ix) rounded-pill bg-ink opacity-0 group-data-[indicator-ready]/ind:opacity-100 group-data-[indicator-ready]/ind:transition-[translate,width] group-data-[indicator-ready]/ind:duration-[250ms] group-data-[indicator-ready]/ind:ease-instrument motion-reduce:transition-none! forced-colors:bg-[Highlight]"
+            />
           </div>
         </div>
         {/* Every panel shares one grid cell, so the band keeps the tallest panel's height and switching
@@ -151,7 +131,7 @@ export function PillarTabs({ id, headline, items }: { id: string; eyebrow?: stri
               id={p.id}
               role="tabpanel"
               aria-labelledby={`${id}-tab-${p.id}`}
-              className={`[grid-area:1/1] transition-[opacity,visibility] duration-[240ms] ease-instrument motion-reduce:transition-none ${i === active ? "visible opacity-100" : "invisible opacity-0"}`}
+              className={`[grid-area:1/1] transition-[opacity,visibility] duration-[250ms] ease-instrument motion-reduce:transition-none ${i === active ? "visible opacity-100" : "invisible opacity-0"}`}
             >
               <div className="grid items-center gap-y-8 md:grid-cols-2 md:gap-x-(--gutter) lg:grid-12 lg:gap-y-0">
                 <Picture

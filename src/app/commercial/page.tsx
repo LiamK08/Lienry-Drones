@@ -25,7 +25,7 @@ export default function CommercialPage() {
   const items = rows.map((r) => (r.id === "software" ? { ...r, media: <SoftwareWindow /> } : r));
   return (
     <>
-      <CenterHero mobileLines={3} leadLines={{ phone: 4, wide: 2 }} headline={hero.headline} emphasis={hero.emphasis} lead={hero.lead} primary={hero.primary} />
+      <CenterHero mobileLines={3} leadLines={{ phone: 5, wide: 3 }} headline={hero.headline} emphasis={hero.emphasis} lead={hero.lead} primary={hero.primary} />
       <WordStrip label={strip.label} items={strip.items} />
       <FeatureRows id="features" variant="solutions" items={items} />
       <SafetyBlock {...safety} />

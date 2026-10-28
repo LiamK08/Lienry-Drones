@@ -36,7 +36,7 @@ export function AccentPanel({
       <h2 id={`${id}-heading`} className="text-h2s text-white">
         {headline}
       </h2>
-      <Button href={action.href} variant="secondary" arrow className="mt-8">
+      <Button href={action.href} variant="glass" arrow className="mt-8">
         {action.label}
       </Button>
     </div>

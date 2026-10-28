@@ -44,7 +44,8 @@ function Check() {
 // Every row sits on the page's 12-column grid from 1024, inside the one rail (Container): the text in 5
 // columns and the media in 6, one column apart, the side alternating; a wide-media row gives the text 4
 // and the media 8 (7 from 1280). Both cells share row 1, so the DOM order (text first) stays the reading
-// and phone order whichever side the media takes.
+// and phone order whichever side the media takes. Below 1024 the text keeps the paragraphs' 30rem measure,
+// so a callout card or the check list never runs wider than the copy above it.
 const cells = (right: boolean, wide: boolean) => {
   if (wide) {
     return right
@@ -122,7 +123,7 @@ export function FeatureRows({
         return (
           <section key={r.id} id={r.id} aria-labelledby={`${r.id}-heading`} className="scroll-mt-24">
             <div className="grid items-center gap-y-10 lg:grid-12 lg:gap-y-0">
-              <Reveal className={at.text}>
+              <Reveal className={`max-lg:max-w-[30rem] ${at.text}`}>
                 <h2 id={`${r.id}-heading`} className="text-h3">
                   {r.title}
                 </h2>

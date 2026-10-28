@@ -41,14 +41,14 @@ const columns = "mt-12 grid gap-y-10 md:mt-14 md:grid-cols-3 md:gap-x-(--gutter)
 const column = "border-t border-line pt-6";
 
 /**
- * The paper band of the solution pages (the reference's security slot), on the one rail: 88 above and
- * below from 1024 (64 from 768, 56 on phones). The head: the h2 at the inner section step (36) in
+ * The paper band of the solution pages (the reference's security slot), on the one rail, at Band's
+ * feature pad (88 above and below from 1024, 64 below it). The head: the h2 at the inner section step (36) in
  * columns 1-7, the aside in 9-12, bottom-aligned, from 1024. Then one picture, full width and 321px tall
  * from 1024, with the image corners, then three columns.
  */
 function PaperBand({ id, headline, aside, image, children }: { id: string; headline: string; aside: ReactNode; image: ImageRef; children: ReactNode }) {
   return (
-    <Band id={id} tone="paper" pad="none" labelledBy={`${id}-heading`} className="py-14 md:py-16 lg:py-[5.5rem]">
+    <Band id={id} tone="paper" pad="feature" labelledBy={`${id}-heading`}>
       <Container>
         <div className="grid gap-y-6 lg:grid-12 lg:items-end lg:gap-y-0">
           <h2 id={`${id}-heading`} className="text-h2s lg:col-span-7">
