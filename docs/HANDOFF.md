@@ -224,6 +224,39 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
     and 390; `check:rules` all 12 routes (check 45 included); `check:a11y` all 12 routes; `perf:vitals`
     all 11 pages; then rules, a11y and perf again on / with the final build. PR frames:
     `docs/screenshots/intro/`.
+- 28 October, later (owner's request: "change the colour scheme… a professional palette that matches the
+  idea… make it look far more professional… also adding cool features like the one we just added"; the
+  owner picked the recommended palette and asked for it pushed to main when done):
+  - **Glass and sky palette** (CLAUDE.md "Colour"): cool slate neutrals on a white ground, a cool mist
+    paper band, a pale glass-blue tint, the glass blue `#1f5d8c` as the one accent (its light step
+    `--color-accent-on-night` fills buttons on dark bands), deep slate night `#111a22` for every dark
+    band, the strip and the footer. Every literal colour (scrims, shadows, SVG and 3D map colours, the
+    icon, the manifest, og.png) was moved onto the palette; the 3D scene's materials and ground were
+    cooled and the software window's recordings re-recorded from the model (`record-software-view`).
+  - **Polish** (two audits of every page, then five builders, each in its own files): one button system
+    (md page calls to action, lg form submits, sm app UI; secondary pills carry an accent arrow badge;
+    `glass` is a solid white pill), round icon buttons, the header logo and the footer on the rail,
+    Inter menus with one tile tone, a scrim under the phone sheet, the bar clear over /company's hero;
+    running text at lead 18/1.55, body 16/1.6, small 14/1.5, h2 tracking -0.03em; every band on the one
+    rail; the italic accent only in each page's h1; no full stops on section heads. Home: the fit check as
+    one card with "0 of 7 answered", the booking card without its header slab, Explore's pill filters with
+    columns chosen by count, the systems cards' pill no longer overlapping, a lighter strip. Inner pages:
+    /company's story as one grid (half its old height), /calculator as one band with a summary panel
+    and an empty state, /register-interest's tabs as one scrolling row, /privacy on the grid with its
+    contents sticky beside the text and lettered lists, /download with Register interest as its primary
+    action and a status line (no disabled pill), /platform's close at the section step, one FAQ
+    treatment, the AccentPanel with a solid white pill and one static glow, /fit-check with the home
+    card. `FaqCards` and `ProductClose` are gone.
+  - **Features:** a gliding selection indicator (`src/components/home/useIndicator.ts`) on Explore's
+    filters, /platform's part tabs and /register-interest's tabs (the step stage's tabs glide in CSS);
+    "wash the facade yourself" on the home step stage's Clean step (`WashMap.tsx`: drag across a floor,
+    tap a floor, or the arrow keys on the map, a role=slider; debris needs two passes; Demo data kept);
+    page entrances (`PageTransition.tsx`: the new page fades and rises 8px over 220ms after a move
+    inside the site, never on a first page or under reduced motion; CLAUDE.md "Page entrances", check
+    46); the logo mark builds on hover and focus in the header and footer, like the intro.
+  - **Checks:** check 46 (page entrances) in `check:rules`; `npm run contrast` now models the current
+    header (rail logo, centred menus or the burger, the 30% veil and 56px scrim) and gates /company's
+    clear bar; the pager's dots sit 4px apart so a focus ring clears the active pill.
 
 ## How the owner works
 
@@ -300,15 +333,17 @@ NODE_USE_ENV_PROXY=1 node scripts/perf-vitals.mjs http://localhost:3000 [routes]
   `CenterHero` (solution pages), `BubbleHero` (company), `WordStrip`, `FeatureRows` (alternating rows
   with checks, callout, fact strip, or a node such as the software window), `PillarTabs` (the six
   parts; each panel id is the footer anchor), `SafetyBlock`, `AccentPanel` (inset or full bleed),
-  `FaqCentered` and `FaqRows`, `ProductClose` (the framed software window, `frame="inset"`), `FitCheck`, `Icon`,
-  `holdLines`; from the second pass `TitleHero` (/calculator), `FaqCards` (/fit-check),
+  `FaqCentered` and `FaqRows`, `LegalToc`, `FitCheck`, `Icon`,
+  `holdLines`; from the second pass `TitleHero` (/calculator; it takes children under its lead),
   `FiguresPanel` (cited figures in the solutions paper band), `SplitHero variant="compact"`,
   `FeatureRows variant="solutions"`, `FitCheck layout="column"`, `CostCalculator layout="listing"`,
   `EnquiryTypeTabs` (with `EnquiryTypeProvider`).
 - **Home** (`src/components/home`): `Hero`, `Strip` (marquee), `WhyFit`, `ExpandCards`, `StepTimer`,
   `SystemCards`, `Explore`, `SafetyPanel`, `FaqForm`; `DemoPanels` (the coded panels in the reason
-  cards and the step stage); `LandlordStory` is used on /homes-and-rentals. `forms/BookingCard` is the
-  FAQ band's call booking; `ui/Pager` the carousel buttons and dots.
+  cards and the step stage); `WashMap` (the Clean step's hands-on map), `DroneGlyph` (the intro's
+  quadcopter, shared), `useIndicator` (the gliding selection marker); `LandlordStory` is used on
+  /homes-and-rentals. `forms/BookingCard` is the FAQ band's call booking; `ui/Pager` the carousel
+  buttons and dots; `site/PageTransition` the keyed `<main>` and its entrance.
 - **Earlier sections still in use**: `StatBand` (cited figures), `CostCalculator`, `PageHero` (404),
   `Faq` types.
 - **Copy:** one module per route in `src/content` (`tools.ts` for /fit-check and /calculator). Menus
@@ -328,7 +363,7 @@ NODE_USE_ENV_PROXY=1 node scripts/perf-vitals.mjs http://localhost:3000 [routes]
 6. `c2-commercial-clip`: show it on a page again, or retire it from the manifest?
 7. Is `ENQUIRY_WEBHOOK_URL` set in production? Without it /api/enquiry answers 503, so the booking
    card, the fit check's "Send me my result" and the enquiry form all show their "could not send" line.
-8. Are the fit check's red and amber answer tones acceptable beside the one teal accent?
+8. Are the fit check's red and amber answer tones acceptable beside the one glass-blue accent?
 
 ## Owner's calls left open by the second pass
 
