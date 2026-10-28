@@ -42,7 +42,7 @@ export function TitleHero({ headline, emphasis, lead, mobileLines, feature }: Ti
   const hold = holdLines(mobileLines);
   return (
     <Band id="hero" as="header" tone="plaster" pad="none" labelledBy="hero-heading" className="overflow-hidden pt-[7.3125rem] pb-20 lg:pb-[4.6875rem]">
-      <div aria-hidden="true" className="pointer-events-none absolute -left-24 -top-10 size-[31rem] rounded-pill bg-[#d9c7a8]/25 blur-3xl" />
+      <div aria-hidden="true" className="pointer-events-none absolute -left-24 -top-10 size-[31rem] rounded-pill bg-accent-on-dark/25 blur-3xl" />
       <div aria-hidden="true" className="pointer-events-none absolute -right-10 -top-24 size-[37rem] rounded-pill bg-accent/10 blur-3xl" />
       <div className="relative mx-auto w-full max-w-[70rem] max-lg:pl-10">
         <h1 id="hero-heading" className={`em-accent text-h1 ${hold.className}`} style={hold.style}>

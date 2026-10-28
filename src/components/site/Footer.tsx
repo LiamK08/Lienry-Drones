@@ -43,7 +43,7 @@ function Circles({ hidden }: { hidden?: boolean }) {
  */
 export function Footer() {
   return (
-    <footer data-tone="ink" className="on-dark relative isolate overflow-hidden bg-[#0f0d0e] pb-16 text-white md:pb-8">
+    <footer data-tone="ink" className="on-dark relative isolate overflow-hidden bg-night pb-16 text-white md:pb-8">
       <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-12 -z-10 size-[26rem] -translate-x-1/2 rounded-pill bg-accent/25 blur-[110px] md:top-16 md:size-[38rem]" />
       <div aria-hidden="true" className="flex overflow-hidden pt-16 md:pt-[4.5rem]">
         <div className="marquee flex w-max [animation-duration:30s] md:[animation-duration:60s]">
@@ -65,7 +65,7 @@ export function Footer() {
           </div>
           {/* Ask an AI assistant about Lienry: text pills, on one row at the right, each opening its assistant with the question filled in. */}
           <div className="md:col-span-2 md:justify-self-end">
-            <p id="footer-ask-ai" className="text-[0.8125rem] font-medium leading-[1.2] text-[#8a8a8a]">
+            <p id="footer-ask-ai" className="text-[0.8125rem] font-medium leading-[1.2] text-muted-on-dark">
               {footer.askAi.label}
             </p>
             <ul aria-labelledby="footer-ask-ai" className="mt-3 flex flex-wrap gap-2">
@@ -89,7 +89,7 @@ export function Footer() {
         <nav aria-label="Footer" className="mt-8 grid gap-y-10 md:mt-10 md:grid-cols-4 md:gap-x-6">
           {footer.groups.map((g) => (
             <div key={g.id}>
-              <p id={`footer-${g.id}`} className="text-[0.8125rem] font-medium leading-[1.2] text-[#8a8a8a]">
+              <p id={`footer-${g.id}`} className="text-[0.8125rem] font-medium leading-[1.2] text-muted-on-dark">
                 {g.heading}
               </p>
               <ul aria-labelledby={`footer-${g.id}`} className="mt-[0.6875rem] flex flex-col gap-[0.8125rem]">

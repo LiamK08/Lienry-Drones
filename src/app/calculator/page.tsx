@@ -19,8 +19,8 @@ export default function CalculatorPage() {
   return (
     <>
       <TitleHero mobileLines={2} eyebrow={hero.eyebrow} headline={hero.headline} emphasis={hero.emphasis} lead={hero.lead} feature={{ image: hero.image, ...calculatorFeature }} />
-      {/* The tint at the reference's strength (#f5fafa): --color-tint is about 2.5x stronger and stays as it is. */}
-      <Band id="cost" tone="plaster" pad="none" labelledBy="cost-heading" className="bg-[#f5fafa]! pt-[1.5625rem] pb-[6.25rem] lg:pt-[3.125rem]">
+      {/* A pale band at the reference's strength: the cool paper (--color-tint is stronger and stays as it is). */}
+      <Band id="cost" tone="plaster" pad="none" labelledBy="cost-heading" className="bg-paper! pt-[1.5625rem] pb-[6.25rem] lg:pt-[3.125rem]">
         <h2 id="cost-heading" className="sr-only">
           {head.headline}
         </h2>

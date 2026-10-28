@@ -413,7 +413,7 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare", model
       onClick={() => setPlaying((p) => !p)}
       disabled={reduce}
       aria-label={showsPlaying ? "Pause preview" : "Play preview"}
-      className="flex size-8 shrink-0 items-center justify-center rounded-full border border-hairline bg-white text-ink shadow-[0_1px_2px_rgb(28_26_23/0.08)] transition-[background-color,border-color] duration-200 ease-instrument hover:border-border-strong hover:bg-raised disabled:opacity-40"
+      className="flex size-8 shrink-0 items-center justify-center rounded-full border border-hairline bg-white text-ink shadow-[0_1px_2px_rgb(17_26_34/0.08)] transition-[background-color,border-color] duration-200 ease-instrument hover:border-border-strong hover:bg-raised disabled:opacity-40"
     >
       <PlayIcon playing={showsPlaying} />
     </button>
@@ -424,7 +424,7 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare", model
       <div
         role="group"
         aria-label={`${project.app}, demo window`}
-        className={`on-light @container overflow-hidden border border-line bg-plaster text-fg ${frame === "inset" ? "rounded-[0.5rem]" : "rounded-[0.75rem] shadow-[0_1px_2px_rgb(28_26_23/0.05),0_28px_56px_-28px_rgb(28_26_23/0.22)]"}`}
+        className={`on-light @container overflow-hidden border border-line bg-plaster text-fg ${frame === "inset" ? "rounded-[0.5rem]" : "rounded-[0.75rem] shadow-[0_1px_2px_rgb(17_26_34/0.05),0_28px_56px_-28px_rgb(17_26_34/0.22)]"}`}
       >
         <div className="flex h-11 items-center justify-between gap-3 border-b border-hairline bg-raised px-3 @min-[38rem]:px-4">
           <div className="flex min-w-0 items-center gap-3">
@@ -466,7 +466,7 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare", model
                     aria-pressed={on}
                     onClick={() => toggle(l.id)}
                     className={`flex h-8 items-center gap-1.5 rounded-hard px-2.5 text-small transition-[background-color,color,box-shadow] duration-200 ease-instrument ${
-                      on ? "bg-white text-ink shadow-[0_0_0_1px_var(--color-border-strong),0_1px_2px_rgb(28_26_23/0.1)]" : "text-muted hover:text-ink"
+                      on ? "bg-white text-ink shadow-[0_0_0_1px_var(--color-border-strong),0_1px_2px_rgb(17_26_34/0.1)]" : "text-muted hover:text-ink"
                     }`}
                   >
                     <span className={`transition-opacity duration-200 ${on ? "opacity-100" : "opacity-40"}`}>
@@ -522,7 +522,7 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare", model
                   />
                 ) : null}
                 {lines && !tall ? (
-                  <div className="pointer-events-none absolute left-3 top-3 max-w-[calc(100%-5rem)] rounded-[0.5rem] border border-hairline bg-white px-3 py-2 shadow-[0_8px_20px_-10px_rgb(28_26_23/0.3)]">
+                  <div className="pointer-events-none absolute left-3 top-3 max-w-[calc(100%-5rem)] rounded-[0.5rem] border border-hairline bg-white px-3 py-2 shadow-[0_8px_20px_-10px_rgb(17_26_34/0.3)]">
                     <p className="flex items-center gap-2 text-caption font-medium text-ink">
                       <span aria-hidden="true" className={`size-1.5 shrink-0 rounded-full ${complete ? "bg-glass" : showsPlaying ? "bg-water" : "bg-border-strong"}`} />
                       <span className="truncate">{showsPlaying || complete ? lines[0] : `Paused · ${lines[0]}`}</span>
@@ -531,7 +531,7 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare", model
                   </div>
                 ) : null}
                 {tall ? null : (
-                  <div aria-hidden="true" className="pointer-events-none absolute right-3 top-3 size-11 rounded-full border border-hairline bg-white shadow-[0_8px_20px_-10px_rgb(28_26_23/0.3)]">
+                  <div aria-hidden="true" className="pointer-events-none absolute right-3 top-3 size-11 rounded-full border border-hairline bg-white shadow-[0_8px_20px_-10px_rgb(17_26_34/0.3)]">
                     <svg ref={needleRef} viewBox="0 0 44 44" className="absolute inset-0 size-full" style={{ transform: "rotate(220deg)" }}>
                       <path d="M22 13l3 9h-6z" fill="var(--color-glass)" />
                       <path d="M22 31l3-9h-6z" fill="var(--color-hairline)" />
@@ -579,7 +579,7 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare", model
             )}
             {hover ? (
               <div
-                className="pointer-events-none absolute z-10 w-56 rounded-[0.5rem] border border-hairline bg-white px-3 py-2.5 text-caption shadow-[0_12px_28px_-12px_rgb(28_26_23/0.35)]"
+                className="pointer-events-none absolute z-10 w-56 rounded-[0.5rem] border border-hairline bg-white px-3 py-2.5 text-caption shadow-[0_12px_28px_-12px_rgb(17_26_34/0.35)]"
                 style={{ left: hover.x, top: hover.y }}
                 aria-hidden="true"
               >

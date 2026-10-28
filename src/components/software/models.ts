@@ -100,8 +100,8 @@ const building: WindowModel = {
   mapAxis: { columns: FACADE_MAP_COLUMNS, labels: ["North", "", "East", "", "Roof"] },
   legend: [
     { colour: "var(--color-glass)", label: "Washed" },
-    { colour: "#7fb0b9", label: "One pass" },
-    { colour: "#e4ded3", label: "Pending" },
+    { colour: "#8db4d4", label: "One pass" },
+    { colour: "#dbe2e9", label: "Pending" },
     { colour: "#e0a13a", label: "Debris" },
   ],
   video: "software-view",
@@ -132,7 +132,7 @@ const solar: WindowModel = {
   mapAxis: null,
   legend: [
     { colour: "var(--color-glass)", label: "Washed" },
-    { colour: "#e4ded3", label: "Pending" },
+    { colour: "#dbe2e9", label: "Pending" },
     { colour: "#e0a13a", label: "Soiling" },
   ],
   video: "solar-view",

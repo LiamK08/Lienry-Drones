@@ -2,31 +2,43 @@
 
 @theme {
   --color-*: initial;
+  /* Glass and sky (the owner's palette, 28 October 2026): cool slate neutrals, one glass-blue accent,
+     deep slate for the dark bands and the footer. Ratios are WCAG contrast, computed. */
   --color-plaster: #ffffff;
-  --color-raised: #f8f7f4;
-  --color-paper: #f8f7f4;
-  --color-tint: #eaf2f3;
-  --color-night: #121110;
-  --color-line: #e8e4dc;
-  --color-accent: #0f6a7c;
-  --color-accent-hover: #0a5260;
-  --color-accent-on-dark: #8ed4e0;
-  --color-sunken: #e9e3d8;
-  --color-ink: #1c1a17;
-  --color-ink-raised: #26221d;
-  /* Primary hover on light: white label 11.60:1, a 1.50:1 step from ink. */
-  --color-ink-hover: #3d3832;
-  /* Primary hover on ink: ink label 10.35:1, a 1.46:1 step from plaster. */
-  --color-plaster-hover: #cfc7b8;
-  --color-muted: #5e584f;
-  --color-muted-on-dark: #a9a197;
-  --color-glass: #0f6a7c;
-  --color-glass-deep: #0d6072;
-  --color-glass-on-dark: #8ed4e0;
-  --color-water: #187566;
+  --color-raised: #f4f6f8;
+  --color-paper: #f4f6f8;
+  --color-mist: #eef2f6;
+  --color-tint: #eaf0f6;
+  --color-night: #111a22;
+  --color-line: #e0e6ec;
+  /* The one accent: white label 6.99:1, hover white 10.05:1 (a 1.44:1 step). */
+  --color-accent: #1f5d8c;
+  --color-accent-hover: #164569;
+  --color-accent-on-dark: #9ccaee;
+  /* The accent's fill on the dark bands: 3.36:1 on night, 3.22 on ink; white label 5.23:1. */
+  --color-accent-on-night: #2c71a5;
+  --color-sunken: #e3e9ef;
+  --color-ink: #141e28;
+  --color-ink-raised: #1d2834;
+  /* Primary hover on light: white label 10.45:1. */
+  --color-ink-hover: #33414f;
+  /* Primary hover on ink: ink label 10.77:1. */
+  --color-plaster-hover: #c5d0db;
+  --color-muted: #52606e;
+  --color-muted-on-dark: #98a6b4;
+  --color-glass: #1f5d8c;
+  --color-glass-deep: #164569;
+  --color-glass-on-dark: #9ccaee;
+  /* In progress in the software: a lighter step of the accent, not a new hue. */
+  --color-water: #4a8fc0;
+  /* Subject tags on the dark Explore cards: ink 12.88:1. */
+  --color-tag: #d4e3f0;
+  /* The software maps' cells: pending and one pass (washed is the glass). */
+  --color-map-pending: #dbe2e9;
+  --color-map-half: #8db4d4;
   --color-debris: #b9721c;
   --color-debris-text: #8a5210;
-  /* Error text on ink 6.10:1, on ink-raised 5.55:1. */
+  /* Error text on ink 5.92:1, on ink-raised 5.25:1. */
   --color-debris-on-dark: #d08a3a;
   /* The fit check's answer and zone tones: a No, a Partly (on the debris tones) and their pale fills. */
   --color-fit-no: #a3402e;
@@ -35,8 +47,8 @@
   --color-fit-no-edge: #e8b4a8;
   --color-fit-partly-soft: #fbf1df;
   --color-fit-partly-edge: #e5c28c;
-  --color-hairline: #dcd5c8;
-  --color-border-strong: #857d70;
+  --color-hairline: #d5dde5;
+  --color-border-strong: #758291;
   --color-white: #ffffff;
   --color-black: #000000;
   --color-transparent: transparent;
@@ -162,22 +174,22 @@
   /* Light surfaces. .on-light, .surface-raised and .surface-sunken restore light inside an ink band. */
   :root, .on-light, .surface-raised, .surface-sunken {
     --s-bg: var(--color-plaster);
-    --s-fg: var(--color-ink);                /* 15.14 on plaster */
-    --s-muted: var(--color-muted);           /* 6.14 plaster, 6.69 raised, 5.51 sunken */
+    --s-fg: var(--color-ink);                /* 16.85 on plaster */
+    --s-muted: var(--color-muted);           /* 6.45 plaster, 5.95 raised, 5.27 sunken */
     --s-rule: var(--color-hairline);         /* decorative rules only */
-    --s-control: var(--color-border-strong); /* control edges: 3.55 plaster, 3.86 raised, 3.18 sunken */
+    --s-control: var(--color-border-strong); /* control edges: 3.92 plaster, 3.62 raised, 3.20 sunken */
     --s-field: var(--color-raised);
-    --s-link: var(--color-glass);            /* 5.43 plaster, 5.92 raised, 4.88 sunken */
+    --s-link: var(--color-glass);            /* 6.99 plaster, 6.46 raised, 5.72 sunken */
     --s-link-hover: var(--color-glass-deep);
     --s-focus: var(--color-glass);
     --s-action: var(--color-accent);
-    --s-action-fg: var(--color-white);       /* 6.41 */
+    --s-action-fg: var(--color-white);       /* 6.99 */
     --s-action-hover: var(--color-accent-hover);
     --s-action-edge: transparent;
     --s-accent: var(--color-accent);
     --s-card: var(--color-white);
     --s-line: var(--color-line);
-    --s-error: var(--color-debris-text);     /* 5.56 plaster, 6.06 raised */
+    --s-error: var(--color-debris-text);     /* 6.37 plaster, 5.88 raised */
     --s-media: var(--color-sunken);
   }
   .surface-raised { --s-bg: var(--color-raised); background-color: var(--color-raised); color: var(--s-fg); }
@@ -185,22 +197,24 @@
 
   .on-dark, .surface-ink-raised {
     --s-bg: var(--color-ink);
-    --s-fg: var(--color-plaster);            /* 15.14 ink, 13.78 ink-raised */
-    --s-muted: var(--color-muted-on-dark);   /* 6.81 ink, 6.19 ink-raised */
-    --s-rule: rgb(243 239 231 / 0.2);
-    --s-control: var(--color-muted-on-dark); /* 6.81 / 6.19 */
+    --s-fg: var(--color-plaster);            /* 16.85 ink, 14.94 ink-raised, 17.58 night */
+    --s-muted: var(--color-muted-on-dark);   /* 6.78 ink, 6.01 ink-raised, 7.07 night */
+    --s-rule: rgb(214 225 236 / 0.2);
+    --s-control: var(--color-muted-on-dark); /* 6.78 / 6.01 */
     --s-field: var(--color-ink-raised);
-    --s-link: var(--color-glass-on-dark);    /* 10.45 / 9.51 */
+    --s-link: var(--color-glass-on-dark);    /* 9.71 / 8.61, 10.13 night */
     --s-link-hover: var(--color-plaster);
     --s-focus: var(--color-glass-on-dark);
-    --s-action: var(--color-accent);
-    --s-action-fg: var(--color-white);
-    --s-action-hover: var(--color-accent-hover);
+    /* The accent's lighter step, so the pill stands off the dark band (3.36:1 night); over film the
+       accent itself (.on-film). */
+    --s-action: var(--color-accent-on-night);
+    --s-action-fg: var(--color-white);       /* 5.23 */
+    --s-action-hover: var(--color-accent);   /* a 1.34:1 step */
     --s-action-edge: transparent;
     --s-accent: var(--color-accent-on-dark);
     --s-card: var(--color-ink-raised);
     --s-line: rgb(255 255 255 / 0.12);
-    --s-error: var(--color-debris-on-dark);  /* 6.10 / 5.55 */
+    --s-error: var(--color-debris-on-dark);  /* 5.92 / 5.25 */
     --s-media: var(--color-ink-raised);
   }
   .surface-ink-raised { --s-bg: var(--color-ink-raised); background-color: var(--color-ink-raised); color: var(--s-fg); }
@@ -612,7 +626,7 @@
     background: var(--color-white);
     border: 2px solid var(--color-glass);
     border-radius: 50%;
-    box-shadow: 0 1px 3px rgb(28 26 23 / 0.25);
+    box-shadow: 0 1px 3px rgb(17 26 34 / 0.25);
   }
 
   .timeline-bare::-moz-range-track {
@@ -631,6 +645,6 @@
     background: var(--color-white);
     border: 2px solid var(--color-glass);
     border-radius: 50%;
-    box-shadow: 0 1px 3px rgb(28 26 23 / 0.25);
+    box-shadow: 0 1px 3px rgb(17 26 34 / 0.25);
   }
 }

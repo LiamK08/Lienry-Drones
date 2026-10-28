@@ -13,8 +13,8 @@ const HEIGHT = MAP.rows * MAP.up * CH + (MAP.rows - 1) * ROW_GAP;
 const LETTERS = ["A", "B", "C", "D"];
 
 const COLOURS = {
-  pending: "#e4ded3",
-  washed: "#0f6a7c",
+  pending: "#dbe2e9",
+  washed: "#1f5d8c",
   amber: [224, 161, 58],
   rust: [180, 90, 28],
 } as const;
@@ -41,7 +41,7 @@ export const ArrayMap = memo(function ArrayMap({ cells, wash, debris, selected }
   return (
     <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-label={`Array map: rows A to D, two lines of ${MAP.cols} panels each, one cell per panel`} className="block h-auto w-full">
       {LETTERS.map((l, row) => (
-        <text key={l} x={0} y={rowTop(row) + CH + 2} fontSize={5.6} fill="#5e584f" fontWeight={600}>
+        <text key={l} x={0} y={rowTop(row) + CH + 2} fontSize={5.6} fill="#52606e" fontWeight={600}>
           {l}
         </text>
       ))}

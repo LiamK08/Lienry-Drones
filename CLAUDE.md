@@ -20,8 +20,12 @@ are part of the window, not imagery: each model's window brings its own (check 1
 
 Layout (since 20 October 2026, the owner's brief): the site follows refresh.tech's page
 templates, section order and interaction patterns, in Lienry's own words, fonts, colours and
-media. White ground, a warm paper band and a pale accent tint; Lienry's glass teal is the one
-accent; near-black for the dark band and the footer. Status tones are not accents: the debris amber marks
+media. Colour is Glass and sky (the owner's palette, 28 October 2026): cool slate neutrals, a white ground, a
+cool mist paper band and a pale glass-blue tint; Lienry's glass blue (`--color-accent` #1f5d8c) is the one
+accent, its lighter step (`--color-accent-on-night`) filling buttons on the dark bands; deep slate night
+(#111a22) for every dark band, the strip and the footer. Every colour comes from that palette: a token in
+`globals.css`, or, where a value has to be literal (scrims and shadows, SVG and 3D map colours), the palette's
+own value; nothing warm is left but the honest status tones and the 3D scene's daylight. Status tones are not accents: the debris amber marks
 debris, and with the fit check's soft red (`fit-*` tokens) a Partly or a No and the score's zones; never
 a second accent. Section heads may be centred.
 

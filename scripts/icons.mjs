@@ -6,8 +6,8 @@ import { readFileSync, writeFileSync } from "node:fs";
 import sharp from "sharp";
 
 const mark = readFileSync("public/brand/lienry-mark.svg", "utf8").match(/ d="([^"]+)"/)[1];
-const PLASTER = "#f3efe7";
-const INK = "#1c1a17";
+const PLASTER = "#f4f6f8";
+const INK = "#141e28";
 
 // The mark on a plaster square. Small sizes get a taller mark so the three blocks stay readable.
 function tile(size, markHeight) {

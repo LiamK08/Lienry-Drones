@@ -11,7 +11,7 @@ const scrims = (
   <>
     <div className="absolute inset-0 bg-ink/30" />
     <div className="absolute inset-x-0 top-0 h-[220px] bg-[linear-gradient(to_bottom,rgba(0,0,0,0.5)_0px,rgba(0,0,0,0.5)_56px,rgba(0,0,0,0.26)_140px,rgba(0,0,0,0)_220px)]" />
-    <div className="absolute inset-x-0 bottom-0 h-[70%] bg-[linear-gradient(to_top,rgba(18,17,16,0.85)_0%,rgba(18,17,16,0.45)_50%,transparent_100%)]" />
+    <div className="absolute inset-x-0 bottom-0 h-[70%] bg-[linear-gradient(to_top,rgba(17,26,34,0.85)_0%,rgba(17,26,34,0.45)_50%,transparent_100%)]" />
   </>
 );
 

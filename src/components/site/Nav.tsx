@@ -223,7 +223,7 @@ export function Nav() {
                           {links.map((l) => (
                             <li key={`${l.href}-${l.label}`}>
                               <Link href={l.href} onClick={() => setOpen(false)} className="flex items-center gap-3 rounded-[0.625rem] py-2 pr-2">
-                                <span aria-hidden="true" className={`flex size-9 shrink-0 items-center justify-center rounded-[0.5rem] ${l.tone === "sand" ? "bg-[#f4ecdd] text-[#8a5210]" : l.tone === "green" ? "bg-[#e3f0ea] text-[#187566]" : "bg-tint text-accent"}`}>
+                                <span aria-hidden="true" className={`flex size-9 shrink-0 items-center justify-center rounded-[0.5rem] ${l.tone === "sand" ? "bg-tint text-accent" : l.tone === "green" ? "bg-tint text-accent" : "bg-tint text-accent"}`}>
                                   <Icon name={l.icon} className="size-[1.125rem]" />
                                 </span>
                                 <span className="font-display text-[0.9375rem]">{l.label}</span>

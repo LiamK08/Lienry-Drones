@@ -17,9 +17,9 @@ const WIDTH = UNITS * CW;
 const HEIGHT = FLOORS * CH;
 
 const COLOURS = {
-  pending: "#e4ded3",
-  half: "#7fb0b9",
-  washed: "#0f6a7c",
+  pending: "#dbe2e9",
+  half: "#8db4d4",
+  washed: "#1f5d8c",
   amber: [224, 161, 58],
   rust: [180, 90, 28],
 } as const;

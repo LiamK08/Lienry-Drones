@@ -1,20 +1,20 @@
 import * as THREE from "three";
 
 export const PALETTE = {
-  plaster: "#f3efe7",
-  raised: "#fbf9f4",
-  sunken: "#e9e3d8",
-  ink: "#1c1a17",
-  inkRaised: "#26221d",
-  muted: "#5e584f",
-  glass: "#0f6a7c",
-  glassDeep: "#0d6072",
-  glassOnDark: "#8ed4e0",
-  water: "#187566",
+  plaster: "#f4f6f8",
+  raised: "#f9fafb",
+  sunken: "#e3e9ef",
+  ink: "#141e28",
+  inkRaised: "#1d2834",
+  muted: "#52606e",
+  glass: "#1f5d8c",
+  glassDeep: "#164569",
+  glassOnDark: "#9ccaee",
+  water: "#4a8fc0",
   debris: "#b9721c",
   debrisText: "#8a5210",
-  hairline: "#dcd5c8",
-  borderStrong: "#857d70",
+  hairline: "#d5dde5",
+  borderStrong: "#758291",
 };
 
 /**
@@ -173,7 +173,7 @@ export const surfaces = {
   lip: new THREE.MeshStandardMaterial({ color: PALETTE.glass, roughness: 0.4, metalness: 0.2 }),
   rubber: new THREE.MeshStandardMaterial({ color: "#1e1c19", roughness: 0.95, metalness: 0 }),
   sensor: new THREE.MeshPhysicalMaterial({ color: "#101418", roughness: 0.12, metalness: 0.4, clearcoat: 1, clearcoatRoughness: 0.1 }),
-  pad: new THREE.MeshStandardMaterial({ color: "#e4ded3", roughness: 1, metalness: 0 }),
+  pad: new THREE.MeshStandardMaterial({ color: "#dbe2e9", roughness: 1, metalness: 0 }),
   tether: new THREE.MeshStandardMaterial({ color: PALETTE.glassDeep, roughness: 0.6, metalness: 0.1 }),
   lightOn: new THREE.MeshBasicMaterial({ color: "#ffffff" }),
   /** A module's body under its glass: the anodised frame's sides and the backsheet. */

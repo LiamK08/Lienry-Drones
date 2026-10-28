@@ -32,7 +32,7 @@ const tones = {
   plaster: "bg-plaster text-ink",
   paper: "bg-paper text-ink",
   tint: "bg-tint text-ink",
-  mist: "bg-[#f3f2ef] text-ink",
+  mist: "bg-mist text-ink",
   ink: "on-dark bg-ink text-plaster",
   night: "on-dark bg-night text-plaster",
   raised: "bg-raised text-ink", // legacy, deleted at integration

@@ -12,15 +12,15 @@ const mark = (cls) => `<svg class="${cls}" viewBox="0 0 529 785" fill="currentCo
 const html = `<!doctype html><html><head><meta charset="utf-8"><style>
 @font-face{font-family:"Instrument Serif";src:url("${font("instrument-serif-latin-400-normal.woff2")}") format("woff2");font-weight:400}
 @font-face{font-family:"Inter";src:url("${font("inter-latin-opsz-normal.woff2")}") format("woff2-variations");font-weight:100 900}
-html,body{margin:0}body{width:1200px;height:630px;background:#f3efe7;color:#1c1a17;font-family:Inter,sans-serif;font-optical-sizing:auto;position:relative;overflow:hidden}
+html,body{margin:0}body{width:1200px;height:630px;background:#f4f6f8;color:#141e28;font-family:Inter,sans-serif;font-optical-sizing:auto;position:relative;overflow:hidden}
 .wm{position:absolute;left:72px;top:64px;display:flex;align-items:center;gap:14px;font-family:"Instrument Serif";font-size:30px;letter-spacing:-.02em}
 .wm span{font-family:Inter;font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:500;opacity:.7;margin-left:6px}
-.line{position:absolute;left:72px;right:72px;top:236px;height:1px;background:#dcd5c8}
-.label{position:absolute;left:72px;top:256px;font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#5e584f}
+.line{position:absolute;left:72px;right:72px;top:236px;height:1px;background:#d5dde5}
+.label{position:absolute;left:72px;top:256px;font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#52606e}
 h1{position:absolute;left:72px;top:286px;margin:0;font-family:"Instrument Serif";font-weight:400;font-size:100px;line-height:1.02;letter-spacing:-.02em;width:960px}
-p{position:absolute;left:72px;top:520px;margin:0;font-size:22px;color:#5e584f;width:820px;line-height:1.45}
+p{position:absolute;left:72px;top:520px;margin:0;font-size:22px;color:#52606e;width:820px;line-height:1.45}
 .mark{height:40px;width:auto;display:block}
-.big{position:absolute;right:56px;top:96px;height:560px;width:auto;color:#1c1a17;opacity:.06}
+.big{position:absolute;right:56px;top:96px;height:560px;width:auto;color:#141e28;opacity:.06}
 </style></head><body>
 ${mark("big")}
 <div class="wm">${mark("mark")}Lienry<span>Drones</span></div>

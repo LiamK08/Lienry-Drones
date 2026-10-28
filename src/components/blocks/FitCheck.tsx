@@ -200,7 +200,7 @@ export function FitCheck({ id = "fit", layout = "card", intro, badge }: FitCheck
   }
 
   return (
-    <div className="grid rounded-panel border border-white bg-white/60 shadow-[inset_0_1px_0_rgb(255_255_255/0.8),0_30px_80px_-30px_rgb(15_106_124/0.25)] lg:grid-cols-[minmax(0,1fr)_minmax(0,29.875rem)]">
+    <div className="grid rounded-panel border border-white bg-white/60 shadow-[inset_0_1px_0_rgb(255_255_255/0.8),0_30px_80px_-30px_rgb(31_93_140/0.25)] lg:grid-cols-[minmax(0,1fr)_minmax(0,29.875rem)]">
       <div className="p-6 md:p-10 lg:col-start-1 lg:row-start-1 lg:py-12 lg:pl-12 lg:pr-6">
         <h3 className="text-h3">{fitCheck.title}</h3>
         <p className="mt-2 text-small text-muted">{fitCheck.intro}</p>
@@ -575,7 +575,7 @@ function FitStrip({ pct, answered, done, count, zone: at, scoreRef }: { pct: num
     <div
       data-fit-strip=""
       aria-hidden={scoreOnScreen || undefined}
-      className={`sticky bottom-3 z-10 mt-4 flex items-center justify-between gap-4 rounded-card border border-line bg-white px-4 py-2.5 shadow-[0_6px_20px_rgb(15_106_124/0.12)] transition-[opacity] duration-200 motion-reduce:transition-none lg:hidden ${scoreOnScreen ? "pointer-events-none opacity-0" : "opacity-100"}`}
+      className={`sticky bottom-3 z-10 mt-4 flex items-center justify-between gap-4 rounded-card border border-line bg-white px-4 py-2.5 shadow-[0_6px_20px_rgb(31_93_140/0.12)] transition-[opacity] duration-200 motion-reduce:transition-none lg:hidden ${scoreOnScreen ? "pointer-events-none opacity-0" : "opacity-100"}`}
     >
       <span className="min-w-0">
         <span className="block text-caption leading-tight text-muted">{done ? zone : answered ? count : ""}</span>

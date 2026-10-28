@@ -99,7 +99,7 @@ export function StepTimer() {
                   <Picture id={s.image.id} alt={i === active ? s.image.alt : ""} position={s.image.position} fit="fill" rounded="none" sizes="(min-width: 1248px) 1200px, 100vw" className="absolute inset-0" />
                 </div>
               ))}
-              <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(to_top,rgba(18,17,16,0.75)_0%,transparent_55%)]" />
+              <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(to_top,rgba(17,26,34,0.75)_0%,transparent_55%)]" />
               <div className="absolute inset-x-6 bottom-6 text-white md:inset-x-8 md:bottom-8 lg:right-auto lg:max-w-[28rem]">
                 <p className="font-display text-[1.5rem] leading-tight">{how.steps[active].title}</p>
                 <p className="mt-1 text-small text-white/85">{how.steps[active].body}</p>

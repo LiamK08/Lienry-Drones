@@ -5,8 +5,8 @@ import { Icon } from "@/components/blocks/Icon";
 // The icon tiles' tones, one per group: Lienry's teal, a warm sand and a water green.
 const tones = {
   teal: "bg-tint text-accent",
-  sand: "bg-[#f4ecdd] text-[#8a5210]",
-  green: "bg-[#e3f0ea] text-[#187566]",
+  sand: "bg-tint text-accent",
+  green: "bg-tint text-accent",
 } as const;
 
 function Item({ href, label, note, icon, tone, onPick }: { href: string; label: string; note: string; icon: string; tone: MenuGroup["tone"]; onPick: () => void }) {

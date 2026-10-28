@@ -18,8 +18,8 @@ export function Strip() {
     </ul>
   );
   return (
-    <section aria-label={strip.label} data-band="strip" data-tone="ink" className="on-dark relative flex h-[4.625rem] items-center overflow-hidden bg-[#141a1c] text-white">
-      <p className="page-x relative z-10 flex h-full shrink-0 items-center bg-[#141a1c] pr-8 text-small text-white/70">{strip.label}</p>
+    <section aria-label={strip.label} data-band="strip" data-tone="ink" className="on-dark relative flex h-[4.625rem] items-center overflow-hidden bg-night text-white">
+      <p className="page-x relative z-10 flex h-full shrink-0 items-center bg-night pr-8 text-small text-white/70">{strip.label}</p>
       <div className="flex min-w-0 flex-1 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]">
         <div className="marquee flex w-max">
           {row(false)}

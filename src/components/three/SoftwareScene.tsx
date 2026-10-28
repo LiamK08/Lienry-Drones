@@ -63,7 +63,7 @@ const SCAN_SWEEP_MS = 4400;
 const skyMaterial = new THREE.ShaderMaterial({
   side: THREE.BackSide,
   depthWrite: false,
-  uniforms: { uTop: { value: new THREE.Color("#f6f8f8") }, uHorizon: { value: new THREE.Color("#e4e6e3") }, uGround: { value: new THREE.Color("#cbc4b6") } },
+  uniforms: { uTop: { value: new THREE.Color("#f6f8f8") }, uHorizon: { value: new THREE.Color("#e3e8ec") }, uGround: { value: new THREE.Color("#c6cdd4") } },
   vertexShader: `varying vec3 vPos; void main() { vPos = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
   fragmentShader: `
     uniform vec3 uTop; uniform vec3 uHorizon; uniform vec3 uGround; varying vec3 vPos;
@@ -311,16 +311,16 @@ export default function SoftwareScene({ model = "building", controlRef, onFirstF
         <Sky />
         <Lightformer form="rect" intensity={2.4} color="#fff7ec" position={[0, 80, 10]} scale={[160, 120, 1]} />
         <Lightformer form="rect" intensity={1.5} color="#dcedf0" position={[70, 30, 70]} scale={[90, 50, 1]} />
-        <Lightformer form="rect" intensity={0.9} color="#f3efe7" position={[-90, 25, 20]} scale={[70, 40, 1]} />
-        <Lightformer form="rect" intensity={0.7} color="#e9e3d8" position={[10, 12, -100]} scale={[120, 40, 1]} />
-        <Lightformer form="rect" intensity={0.5} color="#cfc8ba" position={[0, -40, 0]} scale={[160, 160, 1]} />
+        <Lightformer form="rect" intensity={0.9} color="#f4f6f8" position={[-90, 25, 20]} scale={[70, 40, 1]} />
+        <Lightformer form="rect" intensity={0.7} color="#e3e9ef" position={[10, 12, -100]} scale={[120, 40, 1]} />
+        <Lightformer form="rect" intensity={0.5} color="#c9d1d9" position={[0, -40, 0]} scale={[160, 160, 1]} />
       </Environment>
       <ambientLight intensity={0.22} />
       <directionalLight position={[45, 70, 35]} intensity={1.7} color="#fff3e2" />
       <directionalLight position={[-40, 25, -20]} intensity={0.45} color="#dcedf0" />
       <directionalLight position={[-25, 35, 70]} intensity={0.55} color="#ffffff" />
       <Content controlRef={controlRef} clockRef={clockRef} fadeRef={fadeRef} />
-      <ContactShadows {...shadows} resolution={1024} frames={1} color="#1c1a17" />
+      <ContactShadows {...shadows} resolution={1024} frames={1} color="#141e28" />
       <Rig model={model} controlRef={controlRef} clockRef={clockRef} flyingRef={flyingRef} />
       <Driver controlRef={controlRef} clockRef={clockRef} fadeRef={fadeRef} flyingRef={flyingRef} />
       {onFirstFrame ? <FirstFrame onFirstFrame={onFirstFrame} /> : null}

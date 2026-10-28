@@ -38,7 +38,7 @@ export function CenterHero({
   return (
     <Band id="hero" as="header" tone="plaster" pad="none" labelledBy="hero-heading" className="isolate overflow-hidden pt-[calc(var(--nav-h)+4rem)] pb-24">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 [mask-image:linear-gradient(to_bottom,black_55%,transparent)]">
-        <div className="absolute -left-24 -top-16 size-[26rem] rounded-pill bg-[#d9c7a8]/25 blur-3xl" />
+        <div className="absolute -left-24 -top-16 size-[26rem] rounded-pill bg-accent-on-dark/25 blur-3xl" />
         <div className="absolute -right-24 top-0 size-[24rem] rounded-pill bg-accent/10 blur-3xl" />
       </div>
       <Container className="max-md:px-2">

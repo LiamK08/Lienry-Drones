@@ -31,19 +31,19 @@ export function AccentPanel({
 }) {
   const inner = (
     <div
-      className={`on-dark relative isolate overflow-hidden text-white ${dark ? "bg-[#0a0a0a]" : "bg-accent"} ${
+      className={`on-dark relative isolate overflow-hidden text-white ${dark ? "bg-night" : "bg-accent"} ${
         bleed ? "py-24" : "mx-auto max-w-[83rem] rounded-card px-6 py-14 lg:flex lg:min-h-[25rem] lg:items-center lg:justify-center lg:py-0"
       }`}
     >
       {dark ? (
         <>
           <div aria-hidden="true" className="pointer-events-none absolute -left-10 top-1/2 -z-10 h-[30rem] w-[48rem] -translate-y-1/2 rounded-pill bg-accent/70 blur-[100px]" />
-          <div aria-hidden="true" className="pointer-events-none absolute -right-20 top-0 -z-10 h-80 w-[40rem] rounded-pill bg-[#1c4f5a]/80 blur-[90px]" />
+          <div aria-hidden="true" className="pointer-events-none absolute -right-20 top-0 -z-10 h-80 w-[40rem] rounded-pill bg-accent-hover/80 blur-[90px]" />
         </>
       ) : (
         <>
           <div aria-hidden="true" className="glow-drift pointer-events-none absolute -left-24 -top-24 -z-10 h-80 w-[36rem] -rotate-[20deg] rounded-pill bg-white/20 blur-[60px]" />
-          <div aria-hidden="true" className="glow-drift-alt pointer-events-none absolute -bottom-32 right-[-4rem] -z-10 h-96 w-[34rem] -rotate-[20deg] rounded-pill bg-[#8ed4e0]/30 blur-[60px]" />
+          <div aria-hidden="true" className="glow-drift-alt pointer-events-none absolute -bottom-32 right-[-4rem] -z-10 h-96 w-[34rem] -rotate-[20deg] rounded-pill bg-accent-on-dark/30 blur-[60px]" />
           <div aria-hidden="true" className="glow-drift pointer-events-none absolute left-1/3 top-1/2 -z-10 h-56 w-[28rem] -rotate-[20deg] rounded-pill bg-accent-hover/40 blur-[60px] [animation-delay:-7s]" />
         </>
       )}

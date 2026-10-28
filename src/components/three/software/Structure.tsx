@@ -5,7 +5,7 @@ import * as THREE from "three";
 import { BAYS_E, BAYS_N, BAY_E, BAY_N, D, FLOORS, FLOOR_H, H, LANTERN, MULLION_W, PARAPET_H, PARAPET_T, RECESS, REEL, ROOF_SLAB, ROOF_Y, SLAB_H, W } from "./layout";
 import { makeGroundMaterial, surfaces } from "./materials";
 
-const interior = new THREE.MeshStandardMaterial({ color: "#2b2925", roughness: 1, metalness: 0 });
+const interior = new THREE.MeshStandardMaterial({ color: "#262b30", roughness: 1, metalness: 0 });
 const box = new THREE.BoxGeometry(1, 1, 1);
 // BoxGeometry's faces in order: +x, -x, +y (the top), -y, +z, -z.
 const roofSlab = [surfaces.slab, surfaces.slab, surfaces.roof, surfaces.slab, surfaces.slab, surfaces.slab];

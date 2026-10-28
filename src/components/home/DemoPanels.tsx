@@ -73,7 +73,7 @@ function Shell({ label, title, sub, size, children }: { label: string; title: st
 
 function Bar({ to, tone = "accent" }: { to: number; tone?: "accent" | "debris" }) {
   return (
-    <span className="block h-1.5 overflow-hidden rounded-pill bg-[#f1eee8]">
+    <span className="block h-1.5 overflow-hidden rounded-pill bg-sunken">
       <span className={`block h-full rounded-pill transition-[width] duration-700 ease-instrument motion-reduce:transition-none ${tone === "accent" ? "bg-accent" : "bg-debris"}`} style={{ width: `${to}%` }} />
     </span>
   );

@@ -110,7 +110,7 @@ function Lead({ card: c }: { card: ExploreCard }) {
     <li className="md:col-span-2">
       <Link href={c.href} className="group relative flex h-[26.25rem] flex-col justify-end overflow-hidden rounded-card border border-white/10 md:h-[21.25rem] min-[75rem]:h-[26.25rem]">
         <Picture id={c.image.id} alt="" position={c.image.position} fit="fill" rounded="none" zoom sizes="(min-width: 1200px) 50vw, 100vw" className="absolute inset-0" />
-        <span aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(to_top,rgba(18,17,16,0.92)_0%,rgba(18,17,16,0.55)_35%,rgba(18,17,16,0.05)_70%)]" />
+        <span aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(to_top,rgba(17,26,34,0.92)_0%,rgba(17,26,34,0.55)_35%,rgba(17,26,34,0.05)_70%)]" />
         <span className="relative p-6 lg:p-8">
           <span className="block text-label uppercase tracking-[0.08em] text-white/75">{c.meta}</span>
           <span className="mt-3 block text-balance font-display text-[1.5625rem] leading-[1.2] text-white group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4 md:text-[1.75rem]">{c.title}</span>
@@ -147,7 +147,7 @@ function Tags({ kind, tag, className = "" }: { kind: string; tag: string; classN
   return (
     <span className={`flex flex-wrap gap-2.5 ${className}`}>
       <span className="rounded-hard bg-white px-2.5 py-1.5 text-[0.8125rem] font-medium leading-none text-ink">{kind}</span>
-      <span className="rounded-hard bg-[#d5e7ea] px-2.5 py-1.5 text-[0.8125rem] font-medium leading-none text-ink">{tag}</span>
+      <span className="rounded-hard bg-tag px-2.5 py-1.5 text-[0.8125rem] font-medium leading-none text-ink">{tag}</span>
     </span>
   );
 }

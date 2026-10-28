@@ -92,11 +92,11 @@ export function ExpandCards() {
                 sizes="(min-width: 1200px) 54vw, (min-width: 768px) 50vw, 100vw"
                 className="absolute inset-0 min-[75rem]:left-1/2 min-[75rem]:right-auto min-[75rem]:w-[calc((100cqw-1rem)*0.54)] min-[75rem]:-translate-x-1/2"
               />
-              <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(to_top,rgba(18,17,16,0.8)_0%,rgba(18,17,16,0.15)_45%,rgba(18,17,16,0.25)_100%)]" />
+              <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(to_top,rgba(17,26,34,0.8)_0%,rgba(17,26,34,0.15)_45%,rgba(17,26,34,0.25)_100%)]" />
               {/* From 1200 the open card's left side darkens to near-black under its text and panel. */}
               <div
                 aria-hidden="true"
-                className="absolute inset-0 hidden bg-[linear-gradient(90deg,var(--color-night)_0%,rgba(18,17,16,0.85)_14%,transparent_58%)] opacity-0 transition-opacity duration-[700ms] ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none min-[75rem]:block"
+                className="absolute inset-0 hidden bg-[linear-gradient(90deg,var(--color-night)_0%,rgba(17,26,34,0.85)_14%,transparent_58%)] opacity-0 transition-opacity duration-[700ms] ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none min-[75rem]:block"
               />
               <span className="absolute left-5 top-5 text-white">
                 <Icon name={c.icon} className="size-7" />
