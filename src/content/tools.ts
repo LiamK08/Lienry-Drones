@@ -31,15 +31,12 @@ export const fitCheckPage = {
 
 export const calculatorPage = {
   hero: {
-    eyebrow: "Cost calculator",
     headline: "Add up what outsourced cleaning costs you",
     emphasis: "costs you",
     lead: "Enter your building type, its facade area and what you pay each year. See it over five and ten years.",
-    image: { id: "f4-dock", alt: "Rain beading on the closed lid of the roof capsule", position: "50% 50%" },
   },
+  /** The results panel's heading; it also labels the band and the form. */
   head: {
-    eyebrow: "Your numbers",
     headline: "Your spend, over five and ten years",
-    intro: "It uses only the figures you enter. It is not a Lienry quote or estimate.",
   },
 };

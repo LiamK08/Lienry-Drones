@@ -4,24 +4,27 @@ import { Picture } from "@/components/ui/Picture";
 import { Headline } from "@/components/ui/SectionHead";
 import { holdLines } from "@/components/blocks/holdLines";
 
-// Where each round picture sits, on phones (three across the top, two under the text, the sixth
-// hidden) and from 1024 (six around the headline, tops fixed in a 900px hero), with its size at each.
+// Where each round picture sits. The text runs in the flow between two zones the pictures keep to, so
+// no picture ever lies under a line of it, whatever the headline wraps to: a top zone under the bar
+// (the hero's top padding) and a bottom zone (its bottom padding). Below 1024 the top zone holds three
+// across and the bottom zone two (the sixth is hidden); from 1024 each zone holds three. Every spot
+// keeps 12px or more clear of its zone's edge, beyond the drift's 10px.
+//   top zone:    below 768 from 56 to 240; from 768 to 1023 to 256; from 1024 to 280
+//   bottom zone: below 768 the last 216; from 768 the last 224; from 1024 the last 232
 const SPOTS = [
-  "-left-[29px] top-[82px] size-[130px] lg:left-[3%] lg:top-[150px] lg:size-[254px]",
-  "left-[33%] top-[57px] size-[140px] lg:left-[31.3%] lg:top-[123px] lg:size-[178px]",
-  "-right-[13px] top-[90px] size-[130px] lg:left-[62.2%] lg:right-auto lg:top-[98px] lg:size-[158px]",
-  "-left-[27px] bottom-[71px] size-[140px] lg:bottom-auto lg:left-[18.75%] lg:top-[420px] lg:size-[216px]",
-  "-right-[11px] bottom-[84px] size-[130px] lg:bottom-auto lg:right-[4.5%] lg:top-[181px] lg:size-[246px]",
-  "hidden lg:block lg:right-[19.1%] lg:top-[464px] lg:size-[232px]",
+  "-left-[28px] top-[74px] size-[128px] md:top-[72px] md:size-[150px] lg:-left-[1.5%] lg:top-[76px] lg:size-[184px]",
+  "left-[34%] top-[62px] size-[118px] md:left-[37%] md:top-[64px] md:size-[132px] lg:left-[27%] lg:top-[64px] lg:size-[132px]",
+  "-right-[16px] top-[88px] size-[124px] md:top-[84px] md:size-[148px] lg:right-[3%] lg:top-[80px] lg:size-[176px]",
+  "-left-[24px] bottom-[52px] size-[132px] md:left-[6%] md:bottom-[40px] md:size-[160px] lg:left-[12%] lg:bottom-[40px] lg:size-[168px]",
+  "-right-[14px] bottom-[62px] size-[124px] md:right-[8%] md:bottom-[48px] md:size-[150px] lg:right-[9%] lg:bottom-[24px] lg:size-[192px]",
+  "hidden lg:block lg:left-[52%] lg:bottom-[84px] lg:size-[116px]",
 ] as const;
 
 /**
- * The about page's first screen: an accent ground that holds to just under halfway, then fades to
- * white, a large centred headline with its italic line and a short paragraph, ringed by round
- * pictures. From 1024 it is 900 tall with the text centred in it, whatever the headline's line
- * count. The fade stays within 12% of the accent until 72% down, so the paragraph's last line keeps
- * 4.5:1 (about 4.9 at 1024, 5.1 at 1440 and on a 320 phone), then runs to white. On load the
- * pictures pop in one after another, then each drifts slowly about its spot on its own loop. Under
+ * The about page's first screen: the pale accent tint, fading to white two thirds of the way down, a
+ * large centred headline with its accent italic and a short muted paragraph, ringed by round pictures
+ * in the zones above and below the text (SPOTS). A soft sky glow sits behind the headline. On load
+ * the pictures pop in one after another, then each drifts slowly about its spot on its own loop. Under
  * reduced motion they simply appear and stay still.
  */
 export function BubbleHero({ headline, emphasis, lead, images, mobileLines }: { headline: string; emphasis: string; lead: string; images: readonly ImageRef[]; mobileLines?: number }) {
@@ -30,27 +33,28 @@ export function BubbleHero({ headline, emphasis, lead, images, mobileLines }: { 
     <header
       id="hero"
       data-band="hero"
-      data-tone="ink"
+      data-tone="tint"
       data-scatter=""
       aria-labelledby="hero-heading"
-      className="on-dark relative isolate min-h-[848px] overflow-hidden bg-[linear-gradient(to_bottom,var(--color-accent)_0%,var(--color-accent)_47%,color-mix(in_srgb,var(--color-accent)_88%,#ffffff)_72%,#ffffff_100%)] pb-20 pt-[300px] text-white lg:flex lg:min-h-[900px] lg:flex-col lg:justify-center lg:pb-0 lg:pt-0"
+      className="relative isolate overflow-hidden bg-[linear-gradient(to_bottom,var(--color-tint)_0%,var(--color-tint)_32%,var(--color-plaster)_76%)] pb-[13.5rem] pt-[15rem] text-ink md:pb-56 md:pt-64 lg:pb-[14.5rem] lg:pt-[17.5rem]"
     >
+      <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-[45%] -z-10 h-[22rem] w-[44rem] max-w-full -translate-x-1/2 -translate-y-1/2 rounded-pill bg-accent-on-dark/30 blur-3xl" />
       <ul aria-hidden="true" className="absolute inset-0">
         {images.slice(0, SPOTS.length).map((im, i) => (
           <li key={im.id} className={`absolute ${SPOTS[i]}`}>
             <div className="bubble-pop size-full" style={{ animationDelay: `${150 + i * 140}ms` } as CSSProperties}>
               <div className="bubble-drift size-full overflow-hidden rounded-pill" style={{ animationDuration: `${8 + (i % 3) * 2.5}s`, animationDelay: `${-i * 1.7}s` } as CSSProperties}>
-                <Picture id={im.id} alt="" position={im.position} aspect="1/1" rounded="none" sizes="(min-width: 1024px) 256px, 140px" />
+                <Picture id={im.id} alt="" position={im.position} aspect="1/1" rounded="none" sizes="(min-width: 1024px) 192px, 160px" />
               </div>
             </div>
           </li>
         ))}
       </ul>
       <div className="page-x relative mx-auto w-full max-w-[1048px] text-center">
-        <h1 id="hero-heading" className={`mx-auto max-w-none text-balance text-[2.5rem] leading-none tracking-[-0.03em] md:text-[4.5rem] lg:text-[5.5rem] ${hold.className}`} style={hold.style}>
+        <h1 id="hero-heading" className={`em-accent mx-auto max-w-none text-balance text-[2.5rem] leading-none tracking-[-0.03em] md:text-[4.5rem] lg:text-[5.5rem] ${hold.className}`} style={hold.style}>
           <Headline text={headline} emphasis={emphasis} breakBefore />
         </h1>
-        <p className="mx-auto mt-6 max-w-[520px] text-[1.125rem] leading-[1.55] text-white lg:mt-7">{lead}</p>
+        <p className="mx-auto mt-6 max-w-[34rem] text-balance text-lead leading-[1.55] text-fg-muted lg:mt-7">{lead}</p>
       </div>
     </header>
   );

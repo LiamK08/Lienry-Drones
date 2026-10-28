@@ -1,25 +1,28 @@
 "use client";
 
-import Link from "next/link";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ChangeEvent, type ReactNode } from "react";
 import { calculatorCopy as copy } from "@/content/calculator";
 import { LIMITS, formatAud, formatPerArea, formatWhole, inRange, parsePercent, parseWhole, perSquareMetre, totalOver } from "@/lib/calculator";
 import { propertyTypes } from "@/lib/enquiry-schema";
 import { Button } from "@/components/ui/Button";
-import { Field, PrefixInput, SelectField, describedBy, fieldControl } from "@/components/ui/Field";
+import { Field, SelectField, describedBy, fieldControl } from "@/components/ui/Field";
 
 export type PropertyType = (typeof propertyTypes)[number];
 
 export type CostCalculatorProps = {
-  /** The band heading's id: the form is labelled by it. */
+  /** The results heading's id: the form is labelled by it. */
   headingId: string;
+  /** The results heading's words. The listing layout shows it over the results; the split layout
+   *  leaves the heading to the band (render it there with `headingId`). */
+  heading?: string;
   /** The id of the note under the results ("Uses only the figures you enter..."): the form is described by it. */
   noteId: string;
   /** The building type chosen at load ("" for none). */
   defaultType?: PropertyType | "";
-  /** "split" (default, /commercial): the fields beside one results panel. "listing" (/calculator): a
-   *  200px sidebar of fields and building-type chips beside a grid of result cards, a note card and
-   *  the follow-on card. The ids, the arithmetic and the status line are the same in both. */
+  /** "split" (default): the fields beside one results panel, on the band's grid. "listing"
+   *  (/calculator): one panel, the building type as pill chips and the fields beside a summary of the
+   *  results, its note and the follow-on pill. The ids, the arithmetic and the status line are the
+   *  same in both. */
   layout?: "split" | "listing";
 };
 
@@ -31,44 +34,112 @@ const fill = (template: string, values: Record<string, string>) => template.repl
 /** A figure with a break opportunity after each thousands comma, so a long total wraps at a comma. */
 const breakable = (v: string): ReactNode[] => v.split(",").flatMap((part, i) => (i ? [",", <wbr key={i} />, part] : [part]));
 
-// The listing sidebar's building type: one radio chip per type (the native radio is sr-only inside its
-// label). The edge rests on border-control (WCAG 1.4.11) and darkens on hover; chosen is the accent
-// fill with a white label (6.41:1), which hovers darker; the label draws the focus ring.
+/** Thousands commas, three digits at a time from the right ("0012000" keeps its zeros: "0,012,000"). */
+const group = (digits: string) => digits.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+/**
+ * A whole number re-grouped with thousands commas as it is typed, so the area and the spend always
+ * read alike. The caret stays after the same digit. Deleting a comma deletes the digit beside it
+ * instead (the comma would only come back). Anything but digits, commas and spaces is left exactly as
+ * typed, for the blur to flag.
+ */
+function regroup(next: string, caret: number | null, prev: string, inputType: string | undefined): { value: string; caret: number | null } {
+  let value = next;
+  let at = caret;
+  const digitsOf = (s: string) => s.replace(/\D/g, "");
+  if (at !== null && value.length === prev.length - 1 && digitsOf(value) === digitsOf(prev) && digitsOf(value) !== "") {
+    if (inputType === "deleteContentForward") value = value.slice(0, at) + value.slice(at + 1);
+    else if (at > 0) {
+      value = value.slice(0, at - 1) + value.slice(at);
+      at -= 1;
+    }
+  }
+  if (!/^[\d,\s]*$/.test(value)) return { value, caret: at };
+  const before = at === null ? null : digitsOf(value.slice(0, at)).length;
+  const grouped = group(digitsOf(value));
+  if (before === null) return { value: grouped, caret: null };
+  // The caret goes after the same count of digits in the grouped text.
+  let pos = 0;
+  for (let seen = 0; pos < grouped.length && seen < before; pos++) if (/\d/.test(grouped[pos])) seen++;
+  return { value: grouped, caret: pos };
+}
+
+/** A whole-number field (the area, the spend) that keeps its thousands commas as it is typed, with an optional prefix ("$") drawn inside its left edge. */
+function WholeInput({ id, value, onValue, onBlur, invalid, describedBy: described, prefix }: { id: string; value: string; onValue: (v: string) => void; onBlur: () => void; invalid: boolean; describedBy?: string; prefix?: string }) {
+  const ref = useRef<HTMLInputElement>(null);
+  const caret = useRef<number | null>(null);
+  // After React writes the re-grouped value (which puts the caret at the end), put it back.
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (el && caret.current !== null && document.activeElement === el) el.setSelectionRange(caret.current, caret.current);
+    caret.current = null;
+  });
+  const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const r = regroup(e.target.value, e.target.selectionStart, value, (e.nativeEvent as InputEvent).inputType);
+    caret.current = r.caret;
+    onValue(r.value);
+  };
+  const input = (
+    <input
+      ref={ref}
+      id={id}
+      type="text"
+      inputMode="numeric"
+      autoComplete="off"
+      enterKeyHint="done"
+      value={value}
+      onChange={onChange}
+      onBlur={onBlur}
+      aria-invalid={invalid || undefined}
+      aria-describedby={described}
+      className={prefix ? `${fieldControl} pl-8` : fieldControl}
+    />
+  );
+  if (!prefix) return input;
+  return (
+    <div className="relative">
+      <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-body text-fg-muted">
+        {prefix}
+      </span>
+      {input}
+    </div>
+  );
+}
+
+// The listing's building type: one radio pill per type, as the fit check's answers are drawn (the
+// native radio is sr-only inside its label, and the label draws the focus ring). Chosen is the accent
+// tint with a 2px accent edge (the border and an inset ring, so the pill never changes size) and the
+// accent label, so the choice never rests on the colour of the text alone. The label text is the type's
+// name and nothing else: it is the radio's accessible name.
 const chip =
-  "flex min-h-[2.125rem] w-full cursor-pointer items-center rounded-hard border border-control bg-white px-4 py-1.5 text-[0.8125rem] leading-[1.2] text-fg-muted " +
-  "transition-[background-color,border-color,color] duration-200 ease-instrument motion-reduce:transition-none hover:border-fg " +
-  "has-[:checked]:border-accent has-[:checked]:bg-accent has-[:checked]:text-white has-[:checked]:hover:border-accent-hover has-[:checked]:hover:bg-accent-hover " +
-  // Forced colours drop the fill, so the chosen chip takes the system highlight instead.
+  "relative inline-flex h-9 cursor-pointer select-none items-center rounded-pill border px-4 text-small font-medium " +
+  "transition-[background-color,border-color,color,box-shadow] duration-200 ease-instrument motion-reduce:transition-none " +
+  "border-line bg-white text-fg-muted hover:border-ink hover:text-ink " +
+  "has-[:checked]:border-accent has-[:checked]:bg-tint has-[:checked]:text-accent has-[:checked]:shadow-[inset_0_0_0_1px_var(--color-accent)] has-[:checked]:hover:border-accent has-[:checked]:hover:text-accent " +
   "forced-colors:has-[:checked]:forced-color-adjust-none forced-colors:has-[:checked]:border-[Highlight] forced-colors:has-[:checked]:bg-[Highlight] forced-colors:has-[:checked]:text-[HighlightText] " +
   "has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-solid has-[:focus-visible]:outline-focus";
-
-/** A listing card's 250px white panel; its content sits at the bottom. */
-const cardPanel = "flex h-[15.625rem] flex-col justify-end rounded-card bg-white p-6";
-/** A listing card's title, line and meta under its panel. */
-const cardTitle = "mt-2.5 font-display text-[1.5rem] leading-[1.2] tracking-[-0.02em] text-fg";
-const cardLine = "mt-4 text-small leading-[1.2] text-fg";
-const cardMeta = "mt-1.5 text-small leading-[1.2] text-fg-muted";
 
 /**
  * The cost calculator: what outsourced exterior cleaning costs the visitor over 5 and 10 years, and
  * per square metre, from their own figures only. No Lienry price, saving, ROI or comparison, and
  * nothing leaves the browser (no fetch, no storage).
  *
- * The values update on every keystroke with no tween; errors show on blur only (a non-empty, invalid
- * field), and valid whole numbers are reformatted with thousands separators on blur, never while
- * focused. One polite status region reads the totals 600ms after the last change while the spend is
- * valid. The building type changes only the area label and the follow-on link. Neither the form nor
- * the panel ever reveals.
+ * The values update on every keystroke with no tween; until a value can be worked out, its place says
+ * what it still needs (the empty state). The area and the spend keep thousands commas as they are
+ * typed; errors show on blur only (a non-empty, invalid field). One polite status region reads the
+ * totals 600ms after the last change while the spend is valid. The building type changes only the
+ * area label and the follow-on link. Neither the form nor the panel ever reveals.
+ *
+ * Listing layout: one white panel. From 1024 the inputs take five of its twelve columns (the building
+ * type as pill chips, then the three fields) and the summary takes seven on paper: its heading, the
+ * three results as rows (the label and how it is worked out, the figure at the right), the note, then
+ * the follow-on pill. Below 1024 the summary follows the inputs, and from 768 to 1023 the three fields
+ * sit in one row. Below 768 each result row reads label, figure, then how it is worked out.
  *
  * Split layout: from 1024 the fields stack in columns 1-5 and the results panel takes 7-12; from 768
  * the fields are two by two above the panel; below 768 everything is one column.
- *
- * Listing layout: from 1024 a 200px sidebar (the three fields, then the building type as seven radio
- * chips) beside a three-column grid: the three results as cards (a 250px value panel, the label, a
- * line and a meta line), then the note card and the follow-on card, a whole-card link. From 768 the
- * sidebar's fields and chips sit side by side above the cards; below 768 everything is one column.
  */
-export function CostCalculator({ headingId, noteId, defaultType = "", layout = "split" }: CostCalculatorProps) {
+export function CostCalculator({ headingId, heading, noteId, defaultType = "", layout = "split" }: CostCalculatorProps) {
   const [type, setType] = useState<PropertyType | "">(defaultType);
   const [area, setArea] = useState("");
   const [spend, setSpend] = useState("");
@@ -122,54 +193,28 @@ export function CostCalculator({ headingId, noteId, defaultType = "", layout = "
 
   const error = (key: FieldKey) => (shown[key] ? copy.fields[key].error : undefined);
   const route = copy.routes[type];
+  const solar = type === "Solar farm";
+  // What each result still needs before it can be worked out.
+  const needsTotal = !spendOk ? copy.needs.spend : copy.needs.rise;
+  const needsRate = !spendOk && !areaOk ? copy.needs.both : !areaOk ? (solar ? copy.needs.areaSolar : copy.needs.area) : copy.needs.spend;
   const rows = [
-    { key: "five", id: "cost-five", label: copy.outputs.five, value: five, more: copy.listing.results.five },
-    { key: "ten", id: "cost-ten", label: copy.outputs.ten, value: ten, more: copy.listing.results.ten },
-    { key: "perArea", id: "cost-area-rate", label: copy.outputs.perArea, value: perArea, more: copy.listing.results.perArea },
+    { key: "five", id: "cost-five", label: copy.outputs.five, value: five, needs: needsTotal, line: copy.listing.results.five },
+    { key: "ten", id: "cost-ten", label: copy.outputs.ten, value: ten, needs: needsTotal, line: copy.listing.results.ten },
+    { key: "perArea", id: "cost-area-rate", label: copy.outputs.perArea, value: perArea, needs: needsRate, line: copy.listing.results.perArea },
   ];
 
-  /** An output's text: the figure, or the dash (with its sr-only words) before there is one. */
-  const readout = (value: string | null, wrapAtCommas = false) =>
-    value ? (
-      wrapAtCommas ? breakable(value) : value
-    ) : (
-      <>
-        <span aria-hidden="true" className="text-fg-muted">
-          {copy.outputs.empty}
-        </span>
-        <span className="sr-only">{copy.outputs.emptySr}</span>
-      </>
-    );
+  /** An output's text: the figure, or what it still needs, in the small muted text. */
+  const readout = (value: string | null, needs: string, wrapAtCommas = false) =>
+    value ? wrapAtCommas ? breakable(value) : value : <span className="text-small font-normal leading-[1.5] text-fg-muted">{needs}</span>;
 
   const areaField = (
-    <Field id="cost-area" label={type === "Solar farm" ? copy.fields.area.labelSolar : copy.fields.area.label} error={error("area")}>
-      <input
-        id="cost-area"
-        type="text"
-        inputMode="numeric"
-        autoComplete="off"
-        enterKeyHint="done"
-        value={area}
-        onChange={(e) => change("area", e.target.value)}
-        onBlur={() => blur("area")}
-        aria-invalid={shown.area || undefined}
-        aria-describedby={describedBy("cost-area", undefined, error("area"))}
-        className={fieldControl}
-      />
+    <Field id="cost-area" label={solar ? copy.fields.area.labelSolar : copy.fields.area.label} error={error("area")}>
+      <WholeInput id="cost-area" value={area} onValue={(v) => change("area", v)} onBlur={() => blur("area")} invalid={shown.area} describedBy={describedBy("cost-area", undefined, error("area"))} />
     </Field>
   );
   const spendField = (
     <Field id="cost-spend" label={copy.fields.spend.label} error={error("spend")}>
-      <PrefixInput
-        id="cost-spend"
-        prefix={copy.fields.spend.prefix}
-        inputMode="numeric"
-        value={spend}
-        onChange={(v) => change("spend", v)}
-        onBlur={() => blur("spend")}
-        invalid={shown.spend}
-        describedBy={describedBy("cost-spend", undefined, error("spend"))}
-      />
+      <WholeInput id="cost-spend" prefix={copy.fields.spend.prefix} value={spend} onValue={(v) => change("spend", v)} onBlur={() => blur("spend")} invalid={shown.spend} describedBy={describedBy("cost-spend", undefined, error("spend"))} />
     </Field>
   );
   const riseField = (
@@ -196,7 +241,6 @@ export function CostCalculator({ headingId, noteId, defaultType = "", layout = "
   );
 
   if (layout === "listing") {
-    const L = copy.listing;
     return (
       <form
         data-calculator=""
@@ -204,18 +248,12 @@ export function CostCalculator({ headingId, noteId, defaultType = "", layout = "
         aria-describedby={noteId}
         noValidate
         onSubmit={(e) => e.preventDefault()}
-        className="lg:grid lg:grid-cols-[200px_minmax(0,1fr)] lg:items-start lg:gap-x-[25px]"
+        className="overflow-hidden rounded-panel border border-line bg-white lg:grid lg:grid-cols-12"
       >
-        <div className="md:grid md:grid-cols-2 md:items-start md:gap-x-6 lg:mt-3 lg:block">
-          {/* 34px white fields at 14px from 768 (16px below it, so iOS does not zoom in on focus). */}
-          <div className="grid gap-4 [&_input]:h-[2.125rem] [&_input]:bg-white md:[&_input]:text-small md:[&_span]:text-small">
-            {areaField}
-            {spendField}
-            {riseField}
-          </div>
-          <fieldset id="cost-type" className="mt-6 min-w-0 md:mt-0 lg:mt-6">
+        <div className="p-5 md:p-8 lg:col-span-5 lg:p-10">
+          <fieldset id="cost-type" className="min-w-0">
             <legend className="text-small font-medium text-fg">{copy.fields.type.label}</legend>
-            <div className="mt-2 grid grid-cols-2 gap-[0.5625rem] lg:grid-cols-1">
+            <div className="mt-3 flex flex-wrap gap-2">
               {propertyTypes.map((t) => (
                 <label key={t} className={chip}>
                   <input type="radio" name="cost-type" value={t} checked={type === t} onChange={() => setType(t)} className="sr-only" />
@@ -224,65 +262,41 @@ export function CostCalculator({ headingId, noteId, defaultType = "", layout = "
               ))}
             </div>
           </fieldset>
+          {/* From 768 to 1023 the three fields sit in a row: each label holds two lines, set to its foot,
+              so the fields line up however the labels wrap. */}
+          <div className="mt-8 grid gap-6 md:grid-cols-3 md:[&>div>label]:flex md:[&>div>label]:min-h-[2.625rem] md:[&>div>label]:items-end lg:grid-cols-1 lg:[&>div>label]:block lg:[&>div>label]:min-h-0">
+            {areaField}
+            {spendField}
+            {riseField}
+          </div>
         </div>
-        <div className="mt-10 lg:mt-0">
-          <dl className="grid gap-4 md:grid-cols-3 md:gap-6 lg:gap-12">
+        <div className="border-t border-line bg-paper p-5 md:p-8 lg:col-span-7 lg:border-l lg:border-t-0 lg:p-10">
+          <h2 id={headingId} className="text-h3">
+            {heading}
+          </h2>
+          <dl className="mt-6 border-t border-line">
             {rows.map((r) => (
-              // The label comes first for a screen reader; the value panel shows first.
-              <div key={r.key} className="flex flex-col">
-                <dt className={`order-2 ${cardTitle}`}>{r.label}</dt>
-                <dd className={`order-1 ${cardPanel}`}>
-                  <span id={r.id} className="block min-w-0 font-light tabular-nums text-h2s text-fg [overflow-wrap:anywhere]">
-                    {readout(r.value, true)}
+              // The label comes first for a screen reader. On phones the figure follows it, then how it is
+              // worked out; from 768 the figure sits at the right of the row, beside both.
+              <div key={r.key} className="border-b border-line py-5 md:grid md:grid-cols-[minmax(0,1fr)_minmax(9rem,auto)] md:gap-x-6">
+                <dt className="text-body font-medium leading-[1.5] text-fg md:col-start-1 md:row-start-1">{r.label}</dt>
+                <dd className="mt-1 min-w-0 md:col-start-2 md:row-span-2 md:row-start-1 md:mt-0 md:self-center md:text-right">
+                  <span id={r.id} className="block min-w-0 font-sans text-[1.75rem] font-light leading-[1.2] tracking-[-0.02em] tabular-nums text-fg [overflow-wrap:anywhere] md:text-[2rem]">
+                    {readout(r.value, r.needs, true)}
                   </span>
                 </dd>
-                <dd className={`order-3 ${cardLine}`}>{r.more.line}</dd>
-                <dd className={`order-4 ${cardMeta}`}>{r.more.meta}</dd>
+                <dd className="mt-1 text-small leading-[1.5] text-fg-muted md:col-start-1 md:row-start-2">{r.line}</dd>
               </div>
             ))}
           </dl>
-          <div className="mt-4 grid gap-4 md:mt-6 md:grid-cols-2 md:gap-6 lg:mt-12 lg:grid-cols-3 lg:gap-12">
-            <div className="flex flex-col">
-              <div className={cardPanel}>
-                <p className="font-display text-h3 text-fg">{L.note.panel}</p>
-              </div>
-              <p className={cardTitle}>{L.note.title}</p>
-              <p id={noteId} className={cardLine}>
-                {copy.note}
-              </p>
-              <p className={cardMeta}>{L.note.meta}</p>
-            </div>
-            {/* The follow-on route: a whole-card link (the title's ::after covers the card). */}
-            <div className="group relative flex flex-col">
-              <div
-                aria-hidden="true"
-                className={`${cardPanel} transition-[background-color] duration-300 ease-settle motion-reduce:transition-none group-hover:bg-tint group-has-[:focus-visible]:bg-tint`}
-              >
-                <span className="flex size-14 items-center justify-center rounded-pill bg-accent text-white">
-                  <svg
-                    viewBox="0 0 16 16"
-                    className="size-5 transition-transform duration-300 ease-settle group-hover:translate-x-0.5 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M3 8h10M8.5 3.5 13 8l-4.5 4.5" />
-                  </svg>
-                </span>
-              </div>
-              <p className={cardTitle}>
-                <Link
-                  href={route.href}
-                  className="decoration-1 underline-offset-4 group-hover:underline after:absolute after:inset-0 after:rounded-card after:content-[''] focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-solid focus-visible:after:outline-focus"
-                >
-                  {route.label}
-                </Link>
-              </p>
-              <p className={cardLine}>{L.route.line}</p>
-              <p className={cardMeta}>{L.route.meta}</p>
-            </div>
+          <p id={noteId} className="mt-4 text-small leading-[1.5] text-fg-muted">
+            {copy.note}
+          </p>
+          <div className="mt-8 flex flex-col items-start gap-4 md:flex-row md:items-center md:gap-6">
+            <Button href={route.href} arrow>
+              {route.label}
+            </Button>
+            <p className="max-w-[22rem] text-small leading-[1.5] text-fg-muted">{copy.listing.route}</p>
           </div>
           {status}
         </div>
@@ -301,14 +315,14 @@ export function CostCalculator({ headingId, noteId, defaultType = "", layout = "
         {riseField}
       </div>
       <div className="mt-10 lg:col-span-6 lg:col-start-7 lg:mt-0">
-        <div className="surface-raised rounded-hard border border-rule p-6 lg:p-8">
+        <div className="rounded-card border border-line bg-white p-6 lg:p-8">
           <dl>
             {rows.map((r) => (
-              <div key={r.key} className="border-t border-rule py-6 first:border-t-0 first:pt-0 last:pb-0">
+              <div key={r.key} className="border-t border-line py-6 first:border-t-0 first:pt-0 last:pb-0">
                 <dt className="text-small text-fg-muted">{r.label}</dt>
                 <dd className="mt-2">
                   <span id={r.id} className="block min-w-0 font-light tabular-nums text-h2 text-fg [overflow-wrap:anywhere]">
-                    {readout(r.value)}
+                    {readout(r.value, r.needs)}
                   </span>
                 </dd>
               </div>
