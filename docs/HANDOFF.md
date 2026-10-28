@@ -1,4 +1,4 @@
-# Handoff, 26 October 2026
+# Handoff, 28 October 2026
 
 Read this first in a new session, then `CLAUDE.md`. Update this file at the end of each session.
 
@@ -195,6 +195,35 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
     routes; `npm run contrast` at 1440 and 390 (film frames and the white bound); `perf:vitals`
     (three runs each) on all 11 pages. After the pre-deploy fixes, layout, rules, a11y and perf pass
     again on /, /fit-check and /register-interest. PR screenshots: `docs/screenshots/refresh-home/`.
+- 28 October (owner's request: an opening animation like breakerindustries.com's, then into the hero film
+  playing, only when people first arrive, not when they are already within the site): a first-visit
+  intro on home (`src/components/home/Intro.tsx` and `Intro.module.css`, all CSS; the head script in
+  `src/lib/intro.ts`; CLAUDE.md "Intro"). On the paper with fine corner ticks, three drones fly in from
+  some 2000px out on faint guide curves, each traces one block of the mark in the accent while it
+  fills, the right-hand one leaving along the flight arc; the mark turns ink and fades as the paper
+  fades into the film, which starts again from its first frame (introReveal). About 4.2s.
+  - When: the head script sets `data-intro="play"` on <html> before the first paint only when a browser
+    session starts on / (sessionStorage `lienry:intro-seen`), the referrer is not this site, there is no
+    hash and motion is allowed. Any key, press, wheel, touch or scroll ends it; a press or tap before
+    the reveal has its click and its emulated hover swallowed (a tablet tap never opens a header menu);
+    from the reveal the overlay lets presses through. A 6s cap starts once the tab is visible.
+  - The page renders underneath as normal, so LCP is unchanged (the hero's support line, painted under
+    the overlay): home 1.9s median with the intro, CLS 0.065. TBT on home rose (0.6-0.75s before, 0.87-1.24s
+    since: some of the intro's animation runs on the main thread); it is not gated.
+  - Checks: `check:layout`, `check:rules`, the screenshot scripts (`screenshots.mjs`, `shots-set.mjs`)
+    and `perf:motion`/`perf-scroll` seed the seen key (pages as an in-session visitor sees them);
+    `perf:vitals` and `check:a11y` load home as a first visit; new check 45 in `check:rules` proves the
+    intro's rules in fresh sessions (plays, aria-hidden, nothing focusable, the hero under it, ends by
+    itself within 5s, Tab/tap/wheel end it, a tap never clicks the header control under it while the
+    same tap after does, never on a reload, a same-site referrer, /platform first, a hash or reduced
+    motion). `perf:vitals` notes when the intro was up.
+  - Not done: Breaker's typed headline after the reveal (the hero's own headline stays as it is). A
+    text-fragment link (`/#:~:text=`) starts the intro and its scroll ends it; headless Chromium does not
+    scroll to text fragments, so this is untested here.
+  - Gates on 28 October: typecheck, lint and build pass; `check:layout` all 12 routes at 1440, 1024, 768
+    and 390; `check:rules` all 12 routes (check 45 included); `check:a11y` all 12 routes; `perf:vitals`
+    all 11 pages; then rules, a11y and perf again on / with the final build. PR frames:
+    `docs/screenshots/intro/`.
 
 ## How the owner works
 
