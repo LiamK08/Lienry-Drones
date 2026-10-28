@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type FocusEvent } from "react";
 import { useReducedMotion } from "motion/react";
 import { how } from "@/content/home";
 import { Band, Container } from "@/components/ui/Band";
@@ -10,49 +10,92 @@ import { useOnScreen } from "@/lib/hooks";
 import { StagePanel, type StagePanelId } from "@/components/home/DemoPanels";
 
 const STEP_MS = 6000;
+/** How long "Clean complete" shows before the stage moves on, once the visitor has washed the map. */
+const DONE_MS = 2000;
 
 /**
- * How it works: five tabs over one large picture. Each tab carries a 3px rule that fills while its step
- * is shown, and each finished step's rule stays full until the clean starts again, so the row reads as
- * one progress bar; after six seconds the next step takes over, looping, while the band is on screen.
- * On phones the five tabs share one row, one word each. Picking a
- * tab shows it and restarts the timer from there. Under reduced motion nothing advances on its own.
- * The picture crossfades, with the step's title and line on a scrim at its foot. Beside it (from 1024
- * on the night stage the picture fades into on its right, below it on smaller screens) the step's coded
- * panel plays through in demo data, as the reference plays a short screen recording there: one demo
- * building followed through the five steps on the software's facade map.
+ * How it works: five tabs over one stage. Each tab shows its number and name over a 3px rule that fills
+ * while its step is shown, and each finished step's rule stays full until the clean starts again, so
+ * the row reads as one progress bar; a soft marker glides to the chosen tab. After six seconds the next
+ * step takes over, looping, while the band is on screen. Picking a tab shows it and restarts the timer
+ * from there. The timer holds while the pointer is on the stage or the keyboard is in the steps (WCAG
+ * 2.2.2), and under reduced motion nothing advances on its own.
+ *
+ * The stage: the step's picture with its title and line on a scrim at its foot, and beside it (from 1024,
+ * on the night the picture fades into; below the picture on smaller screens) the step's coded panel
+ * playing in demo data: one demo building followed through the five steps on the software's facade map.
+ * On step 03 the visitor can wash the map themselves; when they finish, the stage moves on to the check.
  */
 export function StepTimer() {
   const [active, setActive] = useState(0);
   const [cycle, setCycle] = useState(0);
   // The step fading out, so its panel keeps its map through the crossfade.
   const [previous, setPrevious] = useState<number | null>(null);
+  // The step whose panel the visitor finished (the clean), until another step is shown.
+  const [finished, setFinished] = useState<number | null>(null);
   const [shownStep, setShownStep] = useState(active);
   if (shownStep !== active) {
     setPrevious(shownStep);
     setShownStep(active);
+    setFinished(null);
   }
   const reduce = useReducedMotion();
   const [ref, inView] = useOnScreen<HTMLDivElement>();
   const running = inView && !reduce;
+  const [pointerIn, setPointerIn] = useState(false);
+  const [keyboardIn, setKeyboardIn] = useState(false);
+  const ticking = running && !pointerIn && !keyboardIn;
 
+  // The step's time left: a hold pauses it and the step carries on from there; leaving the screen,
+  // or a new step, starts it whole. (This reset runs before the timer below in the same commit.)
+  const left = useRef(STEP_MS);
   useEffect(() => {
-    if (!running) return;
-    const t = window.setTimeout(() => setActive((i) => (i + 1) % how.steps.length), STEP_MS);
+    left.current = STEP_MS;
+  }, [active, cycle, inView]);
+  useEffect(() => {
+    if (!ticking) return;
+    const start = performance.now();
+    const t = window.setTimeout(() => setActive((i) => (i + 1) % how.steps.length), left.current);
+    return () => {
+      window.clearTimeout(t);
+      left.current = Math.max(0, left.current - (performance.now() - start));
+    };
+  }, [ticking, active, cycle]);
+
+  // The visitor washed the whole map on step 03: the check follows, unless the keyboard is still in it.
+  useEffect(() => {
+    if (finished !== active || !running || keyboardIn) return;
+    const t = window.setTimeout(() => setActive((i) => (i + 1) % how.steps.length), DONE_MS);
     return () => window.clearTimeout(t);
-  }, [running, active, cycle]);
+  }, [finished, active, running, keyboardIn]);
 
   const pick = (i: number) => {
     setActive(i);
     setCycle((c) => c + 1);
   };
+  // The keyboard in the steps (focus there, and the last input a key) holds the timer; a click's focus does not.
+  const onFocus = (e: FocusEvent<HTMLDivElement>) => setKeyboardIn(e.target.matches(":focus-visible"));
+  const onBlur = (e: FocusEvent<HTMLDivElement>) => {
+    if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setKeyboardIn(false);
+  };
+  const keys = {
+    onFocus,
+    onBlur,
+    onKeyDown: () => setKeyboardIn(true),
+    onPointerDown: () => setKeyboardIn(false),
+  };
 
   return (
     <Band id="how" tone="plaster" labelledBy="how-heading">
       <Container>
-        <SectionHead id="how-heading" layout="center" eyebrow={how.eyebrow} headline={how.headline} emphasis={how.emphasis} intro={how.intro} />
-        <div ref={ref} className="mx-auto mt-(--head-gap) max-w-[75rem]">
-          <div role="tablist" aria-label={how.label} className="grid grid-cols-5 gap-1 md:gap-5">
+        <SectionHead id="how-heading" layout="center" headline={how.headline} intro={how.intro} />
+        <div ref={ref} {...keys} className="mt-(--head-gap)">
+          <div role="tablist" aria-label={how.label} className="relative grid grid-cols-5 gap-(--tab-gap) [--tab-gap:0.25rem] md:[--tab-gap:1.25rem]" style={{ "--i": active } as CSSProperties}>
+            {/* The chosen tab's marker: it glides to the next choice in 250ms (a jump under reduced motion). */}
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-y-0 left-0 w-[calc((100%-4*var(--tab-gap))/5)] translate-x-[calc(var(--i)*(100%+var(--tab-gap)))] rounded-[0.625rem] bg-paper transition-[translate] duration-[250ms] ease-settle motion-reduce:transition-none forced-colors:border-2 forced-colors:border-[Highlight] md:rounded-card"
+            />
             {how.steps.map((s, i) => {
               const on = i === active;
               return (
@@ -67,51 +110,66 @@ export function StepTimer() {
                   onClick={() => pick(i)}
                   onKeyDown={(e) => {
                     const last = how.steps.length - 1;
-                    const next = e.key === "ArrowRight" ? (i + 1) % how.steps.length : e.key === "ArrowLeft" ? (i + last) % how.steps.length : e.key === "Home" ? 0 : e.key === "End" ? last : -1;
-                    if (next < 0) return;
+                    const to = e.key === "ArrowRight" ? (i + 1) % how.steps.length : e.key === "ArrowLeft" ? (i + last) % how.steps.length : e.key === "Home" ? 0 : e.key === "End" ? last : -1;
+                    if (to < 0) return;
                     e.preventDefault();
-                    pick(next);
-                    document.getElementById(`how-tab-${how.steps[next].id}`)?.focus();
+                    pick(to);
+                    document.getElementById(`how-tab-${how.steps[to].id}`)?.focus();
                   }}
-                  className="group/tab min-w-0 text-left"
+                  className="group/tab relative min-w-0 rounded-[0.625rem] px-2 py-3 text-left md:rounded-card md:p-4"
                 >
                   <span aria-hidden="true" className="relative block h-[3px] overflow-hidden rounded-pill bg-line">
                     <span
                       key={i < active ? `${s.id}-done` : `${s.id}-${on ? cycle : "off"}-${on ? active : ""}`}
-                      className={`absolute inset-y-0 left-0 rounded-pill bg-accent ${i < active ? "w-full" : on ? (running ? "animate-[fill_6s_linear_forwards]" : "w-full") : "w-0"}`}
+                      className={`absolute inset-y-0 left-0 rounded-pill bg-accent ${i < active || (on && reduce) ? "w-full" : on && inView ? "animate-[fill_6s_linear_forwards]" : "w-0"}`}
+                      style={on && !reduce ? { animationPlayState: ticking ? "running" : "paused" } : undefined}
                     />
                   </span>
-                  {/* On phones the five tabs share one row: one word each, the full label kept for screen readers. */}
-                  <span className={`mt-2.5 block truncate text-label uppercase tracking-[0.06em] md:hidden ${on ? "text-ink" : "text-muted"}`}>{s.short}</span>
-                  <span className="sr-only md:not-sr-only md:mt-4 md:block md:text-label md:uppercase md:tracking-[0.08em] md:text-muted">
-                    {s.n} · {s.who}
+                  <span aria-hidden="true" className="mt-3 block text-caption leading-none tabular-nums text-muted md:mt-4 md:text-small md:leading-none">
+                    {s.n}
                   </span>
-                  <span className={`sr-only md:not-sr-only md:mt-1.5 md:block md:text-body md:transition-[background-color,border-color,color] md:duration-200 ${on ? "md:text-ink" : "md:text-muted md:group-hover/tab:text-ink"}`}>{s.tab}</span>
+                  {/* On phones the five tabs share one row: the short name shows, the full one is kept for screen readers. */}
+                  <span aria-hidden="true" className={`mt-1.5 block truncate text-small transition-colors duration-200 md:hidden ${on ? "font-medium text-ink" : "text-muted group-hover/tab:text-ink"}`}>
+                    {s.short}
+                  </span>
+                  <span className={`sr-only md:not-sr-only md:mt-2 md:block md:truncate md:text-body md:leading-tight md:transition-colors md:duration-200 ${on ? "md:font-medium md:text-ink" : "md:text-muted md:group-hover/tab:text-ink"}`}>{s.tab}</span>
                 </button>
               );
             })}
           </div>
-          <div id="how-panel" role="tabpanel" aria-labelledby={`how-tab-${how.steps[active].id}`} className="relative mt-6 overflow-hidden rounded-card bg-night md:mt-12 lg:h-[30.1875rem]">
-            {/* From 1024 the picture fades out to the night stage on its right, where the step's panel stands. */}
-            <div className="relative aspect-[16/10] lg:absolute lg:inset-0 lg:aspect-auto lg:[-webkit-mask-image:linear-gradient(90deg,#000_57%,transparent_94%)] lg:[mask-image:linear-gradient(90deg,#000_57%,transparent_94%)]">
+          <div
+            id="how-panel"
+            role="tabpanel"
+            aria-labelledby={`how-tab-${how.steps[active].id}`}
+            onPointerEnter={() => setPointerIn(true)}
+            onPointerLeave={() => setPointerIn(false)}
+            className="relative mt-4 overflow-hidden rounded-card bg-night md:mt-6 lg:grid lg:h-[30rem] lg:grid-cols-12 lg:gap-x-6 xl:h-[34rem]"
+          >
+            {/* From 1024 the picture takes seven columns and fades into the night, where the step's panel stands. */}
+            <div className="relative aspect-[16/10] lg:col-span-7 lg:aspect-auto lg:[-webkit-mask-image:linear-gradient(90deg,#000_70%,transparent)] lg:[mask-image:linear-gradient(90deg,#000_70%,transparent)]">
               {how.steps.map((s, i) => (
                 <div key={s.id} aria-hidden={i !== active} className={`absolute inset-0 transition-opacity duration-700 ease-instrument motion-reduce:transition-none ${i === active ? "opacity-100" : "opacity-0"}`}>
-                  <Picture id={s.image.id} alt={i === active ? s.image.alt : ""} position={s.image.position} fit="fill" rounded="none" sizes="(min-width: 1248px) 1200px, 100vw" className="absolute inset-0" />
+                  <Picture id={s.image.id} alt={i === active ? s.image.alt : ""} position={s.image.position} fit="fill" frameAspect={1.5} rounded="none" sizes="(min-width: 1440px) 820px, (min-width: 1024px) 58vw, 100vw" className="absolute inset-0" />
                 </div>
               ))}
-              <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(to_top,rgba(17,26,34,0.75)_0%,transparent_55%)]" />
-              <div className="absolute inset-x-6 bottom-6 text-white md:inset-x-8 md:bottom-8 lg:right-auto lg:max-w-[28rem]">
+              <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(to_top,color-mix(in_srgb,var(--color-night)_75%,transparent)_0%,transparent_55%)]" />
+              <div className="absolute inset-x-6 bottom-6 text-white md:inset-x-8 md:bottom-8 lg:right-auto lg:max-w-[26rem]">
                 <p className="font-display text-[1.5rem] leading-tight">{how.steps[active].title}</p>
-                <p className="mt-1 text-small text-white/85">{how.steps[active].body}</p>
+                <p className="mt-1 text-small leading-normal text-white/85">{how.steps[active].body}</p>
               </div>
             </div>
-            {/* Each step's coded panel (demo data), playing while its step is shown on screen. */}
-            <div aria-hidden="true" className="grid grid-cols-[minmax(0,1fr)] justify-items-center p-5 md:p-8 lg:absolute lg:right-[9.5%] lg:top-1/2 lg:w-[21.25rem] lg:-translate-y-1/2 lg:p-0">
-              {how.steps.map((s, i) => (
-                <div key={s.id} className={`flex w-full max-w-[21.25rem] justify-center transition-opacity duration-500 ease-instrument [grid-area:1/1] motion-reduce:transition-none ${i === active ? "opacity-100" : "opacity-0"}`}>
-                  <StagePanel id={s.id as StagePanelId} active={i === active && inView} map={i === active || i === previous} />
-                </div>
-              ))}
+            {/* Each step's coded panel (demo data), centred on the stage's solid night half, playing while
+                its step is shown on screen. The steps not shown are hidden and inert, so nothing in them
+                can be reached while they are faded out. */}
+            <div className="grid grid-cols-[minmax(0,1fr)] justify-items-center p-5 md:p-8 lg:col-span-5 lg:self-center lg:p-0">
+              {how.steps.map((s, i) => {
+                const on = i === active;
+                return (
+                  <div key={s.id} aria-hidden={!on} inert={!on} className={`flex w-full max-w-[21.25rem] justify-center transition-opacity duration-500 ease-instrument [grid-area:1/1] motion-reduce:transition-none md:max-w-[26rem] lg:max-w-[21.25rem] xl:max-w-[26rem] ${on ? "opacity-100" : "opacity-0"}`}>
+                    <StagePanel id={s.id as StagePanelId} active={on && inView} map={on || i === previous} onDone={s.id === "clean" ? () => setFinished(i) : undefined} />
+                  </div>
+                );
+              })}
             </div>
           </div>
           <p className="mt-3 max-w-none text-caption text-muted">{how.note}</p>

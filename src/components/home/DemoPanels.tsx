@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
-import { FacadeMap } from "@/components/software/FacadeMap";
+import { useEffect, useId, useState, type ReactNode } from "react";
+import { FACADE_MAP_SIZE, FACADE_PENDING_STRONG, FacadeMap } from "@/components/software/FacadeMap";
 import { CELLS } from "@/components/three/software/dims";
 import { project, solarZones, zones } from "@/content/software";
 import { usePrefersReducedMotion } from "@/lib/hooks";
+import { Button } from "@/components/ui/Button";
+import { useWash, WashSurface } from "@/components/home/WashMap";
 
 // Small coded product panels for the home page: the reason cards show one when a card opens, and the
 // step stage shows one beside each step, as the reference shows short screen recordings there. They
@@ -40,9 +42,11 @@ function useBeat(beats: number, active: boolean, ms: number) {
 const appear = "transition-[opacity] duration-500 ease-instrument motion-reduce:transition-none";
 const shown = (on: boolean) => (on ? "opacity-100" : "opacity-0");
 
-function Tick({ tone = "accent" }: { tone?: "accent" | "debris" }) {
+/** A row's mark: a tick (or the debris sign), or, while its step is still to come, an empty ring. */
+function Tick({ tone = "accent", waiting = false }: { tone?: "accent" | "debris"; waiting?: boolean }) {
+  const fill = waiting ? "border border-line bg-white text-transparent" : tone === "accent" ? "border border-transparent bg-tint text-accent" : "border border-transparent bg-fit-partly-soft text-debris-text";
   return (
-    <span aria-hidden="true" className={`flex size-5 shrink-0 items-center justify-center rounded-pill ${tone === "accent" ? "bg-tint text-accent" : "bg-fit-partly-soft text-debris-text"}`}>
+    <span aria-hidden="true" className={`flex size-5 shrink-0 items-center justify-center rounded-pill transition-[background-color,border-color,color] duration-500 motion-reduce:transition-none ${fill}`}>
       <svg viewBox="0 0 16 16" className="size-3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         {tone === "accent" ? <path d="m4 8.5 2.5 2.5L12 5.5" /> : <path d="M8 4.5v4.5M8 11.5v.01" />}
       </svg>
@@ -50,14 +54,17 @@ function Tick({ tone = "accent" }: { tone?: "accent" | "debris" }) {
   );
 }
 
-/** The panel's shell: a white card with a title, a muted line and the Demo data tag, then its body. */
-function Shell({ label, title, sub, size, children }: { label: string; title: string; sub?: string; size: "card" | "stage"; children: ReactNode }) {
+/**
+ * The panel's shell: a white card with a title, a muted line and the Demo data tag, then its body. A
+ * panel the visitor works (`interactive`) is a labelled group; the others are one image each.
+ */
+function Shell({ label, title, sub, size, interactive = false, children }: { label: string; title: string; sub?: string; size: "card" | "stage"; interactive?: boolean; children: ReactNode }) {
   return (
     <div
       data-ui=""
-      role="img"
+      role={interactive ? "group" : "img"}
       aria-label={`${label} Demo data.`}
-      className={`flex flex-col overflow-hidden rounded-card bg-white text-ink shadow-[0_24px_48px_-24px_rgb(0_0_0/0.45)] ${size === "stage" ? "aspect-square w-full max-w-[21.25rem] p-5" : "h-[13.5rem] w-full max-w-[17.5rem] p-4 lg:h-[15rem]"}`}
+      className={`group/wash flex flex-col overflow-hidden rounded-card bg-white text-ink ${size === "stage" ? "h-full w-full p-5" : "h-[13.5rem] w-full max-w-[17.5rem] p-4 shadow-[0_24px_48px_-24px_rgb(0_0_0/0.45)] lg:h-[15rem]"}`}
     >
       <div className="flex items-start justify-between gap-3">
         <span className="min-w-0">
@@ -79,16 +86,23 @@ function Bar({ to, tone = "accent" }: { to: number; tone?: "accent" | "debris" }
   );
 }
 
-function Rows({ items, beat, from = 1 }: { items: { text: string; note?: string; tone?: "accent" | "debris" }[]; beat: number; from?: number }) {
+/**
+ * A panel's checklist: each row arrives on its beat. On the step stage (`waiting`) every row is there
+ * from the first beat, muted with an empty ring, and ticks off on its beat, so no panel opens empty.
+ */
+function Rows({ items, beat, from = 1, waiting = false }: { items: { text: string; note?: string; tone?: "accent" | "debris" }[]; beat: number; from?: number; waiting?: boolean }) {
   return (
     <ul className="flex flex-col">
-      {items.map((r, i) => (
-        <li key={r.text} className={`flex items-center gap-2.5 border-b border-line py-2 text-caption leading-tight last:border-b-0 ${appear} ${shown(beat >= from + i)}`}>
-          <Tick tone={r.tone} />
-          <span className="min-w-0 flex-1">{r.text}</span>
-          {r.note ? <span className="shrink-0 text-muted">{r.note}</span> : null}
-        </li>
-      ))}
+      {items.map((r, i) => {
+        const on = beat >= from + i;
+        return (
+          <li key={r.text} className={`flex items-center gap-2.5 border-b border-line py-2 text-caption leading-tight last:border-b-0 ${waiting ? "" : `${appear} ${shown(on)}`}`}>
+            <Tick tone={r.tone} waiting={waiting && !on} />
+            <span className={`min-w-0 flex-1 ${waiting ? `transition-colors duration-500 motion-reduce:transition-none ${on ? "text-ink" : "text-muted"}` : ""}`}>{r.text}</span>
+            {r.note ? <span className="shrink-0 text-muted">{r.note}</span> : null}
+          </li>
+        );
+      })}
     </ul>
   );
 }
@@ -214,46 +228,34 @@ export function CardPanel({ id, active }: { id: CardPanelId; active: boolean }) 
 // The step stage's panels: one record, the software's demo building (src/content/software.ts), followed
 // through the five steps on the window's own facade map, each step opening where the last one ended.
 
-/** The wash route, in the order the window's clean runs it: each zone top down, then the next zone. */
-const ROUTE = (() => {
-  const order = new Map(zones.map((z) => [z.id, z.order]));
-  return CELLS.map((c, i) => ({ i, zone: order.get(c.zone) ?? 9, floor: c.floor, bay: c.bay }))
-    .sort((a, b) => a.zone - b.zone || b.floor - a.floor || a.bay - b.bay)
-    .map((c) => c.i);
-})();
+const NONE = new Float32Array(CELLS.length);
+const ALL = new Float32Array(CELLS.length).fill(1);
 
-/** The map's cells after `share` of the route has been washed: done in full behind the front, half at it. */
-function washed(share: number) {
-  const cells = new Float32Array(CELLS.length);
-  const front = Math.round(share * ROUTE.length);
-  const band = Math.round(ROUTE.length * 0.06);
-  ROUTE.forEach((cell, k) => {
-    cells[cell] = k < front - band ? 1 : k < front ? 0.5 : 0;
-  });
-  return cells;
-}
-/** The zone at the washing front once `share` of the route is done. */
-const zoneAt = (share: number) => {
-  const cell = CELLS[ROUTE[Math.min(ROUTE.length - 1, Math.max(0, Math.round(share * ROUTE.length) - 1))]];
-  return zones.find((z) => z.id === cell.zone) ?? zones[0];
-};
-const NONE = washed(0);
-const ALL = washed(1.2);
-
-/** The stage's shell: the step's title and the Demo data tag, the demo building and its status, then the map and the step's rows. */
-function Stage({ label, title, status, map, children }: { label: string; title: string; status: string; map: ReactNode; children: ReactNode }) {
+/**
+ * The stage's shell: the step's title and the Demo data tag, the demo building, the step's status
+ * (with a note beside it), then the map and the step's rows. The map's box keeps its size while the
+ * map itself is not mounted, so every panel is the same height whichever step is shown.
+ */
+function Stage({ label, title, status, aside, interactive, map, below, children }: { label: string; title: string; status: string; aside?: ReactNode; interactive?: boolean; map: ReactNode; below?: ReactNode; children: ReactNode }) {
   return (
-    <Shell size="stage" label={label} title={title} sub={project.name}>
-      <span className="-mt-2 mb-3 inline-flex self-start rounded-pill bg-tint px-2 py-0.5 text-[0.6875rem] font-medium leading-tight text-accent">{status}</span>
-      <span className="block">{map}</span>
+    <Shell size="stage" label={label} title={title} sub={project.name} interactive={interactive}>
+      <span className="-mt-2 mb-3 flex min-w-0 items-center justify-between gap-3">
+        <span className="inline-flex shrink-0 rounded-pill bg-tint px-2 py-0.5 text-[0.6875rem] font-medium leading-tight text-accent">{status}</span>
+        {aside ? <span className="min-w-0 truncate text-right text-caption leading-tight text-muted">{aside}</span> : null}
+      </span>
+      <span className="block" style={{ aspectRatio: `${FACADE_MAP_SIZE.width} / ${FACADE_MAP_SIZE.height}` }}>
+        {map}
+      </span>
+      {below}
       <span className="mt-auto block pt-3">{children}</span>
     </Shell>
   );
 }
 
 function Scan({ beat, map }: { beat: number; map: boolean }) {
-  // The scan maps the building floor by floor from the top: the floors not reached yet are clipped away.
-  const reached = Math.min(1, beat / 4);
+  // Every floor is drawn from the first beat, in outline: the scan maps the building floor by floor
+  // from the top, its line moving down as each floor fills in.
+  const reach = Math.min(1, beat / 4);
   return (
     <Stage
       label="The scan mapping the demo building floor by floor into a model."
@@ -261,13 +263,19 @@ function Scan({ beat, map }: { beat: number; map: boolean }) {
       status={beat >= 5 ? "Model ready" : "Scanning"}
       map={
         map ? (
-          <span className="block transition-[clip-path] duration-700 ease-instrument motion-reduce:transition-none" style={{ clipPath: `inset(0 0 ${Math.round((1 - reached) * 100)}% 0)` }}>
-            <FacadeMap cells={NONE} version={0} wash={false} debris={false} selected={null} />
+          <span className="relative block">
+            <FacadeMap cells={NONE} version={0} wash={false} debris={false} selected={null} reach={reach} ease strong />
+            <span aria-hidden="true" className="pointer-events-none absolute inset-0 [container-type:size]">
+              <span
+                className={`absolute inset-x-0 top-0 -mt-px h-0.5 rounded-pill bg-accent transition-[translate,opacity] duration-700 ease-instrument motion-reduce:transition-none ${reach >= 1 ? "opacity-0" : "opacity-100"}`}
+                style={{ translate: `0 calc(${reach} * 100cqh)` }}
+              />
+            </span>
           </span>
         ) : null
       }
     >
-      <Rows beat={beat} from={4} items={[{ text: "Structure and dimensions mapped" }, { text: "Model built from the scan" }]} />
+      <Rows waiting beat={beat} from={4} items={[{ text: "Structure and dimensions mapped" }, { text: "Model built from the scan" }]} />
     </Stage>
   );
 }
@@ -280,9 +288,9 @@ function Plan({ beat, map }: { beat: number; map: boolean }) {
       label="The wash plan: each zone of the demo building lit in turn with its surface, preset and pressure."
       title="Wash plan"
       status="Planned"
-      map={map ? <FacadeMap cells={NONE} version={0} wash={false} debris={false} selected={beat ? z.id : null} /> : null}
+      map={map ? <FacadeMap cells={NONE} version={0} wash={false} debris={false} selected={null} lit={z.id} ease strong /> : null}
     >
-      <span className={`flex items-center justify-between gap-3 rounded-[0.5rem] bg-paper px-3 py-2 text-caption leading-tight ${appear} ${shown(beat >= 1)}`}>
+      <span className="flex items-center justify-between gap-3 rounded-[0.5rem] bg-paper px-3 py-2 text-caption leading-tight">
         <span className="min-w-0">
           <span className="block font-medium">{z.name}</span>
           <span className="block text-muted">{z.surface}</span>
@@ -292,26 +300,76 @@ function Plan({ beat, map }: { beat: number; map: boolean }) {
           <span className="block text-muted">{z.pressure}</span>
         </span>
       </span>
-      <span className="mt-2 block text-right text-[0.6875rem] text-muted">Zone {z.order} of {zones.length}</span>
+      <span className="mt-2 block text-right text-[0.6875rem] text-muted">
+        Zone {z.order} of {zones.length}
+      </span>
     </Stage>
   );
 }
 
-function Clean({ beat, map }: { beat: number; map: boolean }) {
-  const share = beat / 5;
+/** The map's key on the hands-on clean: the cell states and the debris that takes a second pass. */
+const LEGEND = [
+  { label: "To wash", swatch: FACADE_PENDING_STRONG },
+  { label: "One pass", swatch: "var(--color-map-half)" },
+  { label: "Washed", swatch: "var(--color-glass)" },
+  { label: "Debris, two passes", swatch: "var(--color-debris)" },
+] as const;
+
+/**
+ * Step 03, hands-on: the drone runs the route itself while the step plays, and the visitor can take
+ * over at any moment and wash the map themselves (WashMap.tsx). The count is plain text that changes
+ * only with the visitor's input.
+ */
+function Clean({ active, map, onDone }: { active: boolean; map: boolean; onDone?: () => void }) {
+  const reduce = usePrefersReducedMotion();
+  const wash = useWash({ active, reduce, onDone });
+  const keys = useId();
+  const line = wash.engaged ? `${wash.washed} of ${wash.total} panels washed` : wash.running ? `Now washing ${wash.running}` : wash.finished ? "Every zone washed" : "Ready to wash";
   return (
     <Stage
-      label="The clean moving down the demo building zone by zone, two passes per floor, top down."
+      interactive
+      label="Wash the demo building yourself: drag across a floor or tap one, or use the arrow keys."
       title="Washing the building"
-      status="Washing"
-      map={map ? <FacadeMap cells={washed(share)} version={beat} wash debris={false} selected={null} /> : null}
+      status={wash.complete ? "Clean complete" : wash.engaged || wash.running ? "Washing" : "Ready"}
+      aside={
+        wash.engaged && wash.complete ? null : (
+          <>
+            <span className="group-has-[[role=slider]:focus-visible]/wash:hidden">Drag or tap a floor to wash it</span>
+            <span className="hidden group-has-[[role=slider]:focus-visible]/wash:inline">Arrow keys wash floor by floor</span>
+          </>
+        )
+      }
+      map={
+        map ? (
+          <>
+            <WashSurface wash={wash} label="Wash the demo facade" describedBy={keys} />
+            <span id={keys} className="sr-only">
+              Drag across a floor, or tap one, to wash it. Right arrow washes the next floor, left arrow steps back, Home starts again and End washes every floor. A panel with debris on it takes two passes.
+            </span>
+          </>
+        ) : null
+      }
+      below={
+        <span aria-hidden="true" className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[0.6875rem] leading-tight text-muted">
+          {LEGEND.map((k) => (
+            <span key={k.label} className="inline-flex items-center gap-1.5">
+              <span className="size-2" style={{ background: k.swatch }} />
+              {k.label}
+            </span>
+          ))}
+        </span>
+      }
     >
-      <span className="flex items-center justify-between gap-3 text-caption">
-        <span className="text-muted">Now washing</span>
-        <span className="truncate">{zoneAt(share).name}</span>
+      <span className="flex min-h-8 items-center justify-between gap-3 text-caption">
+        <span className="min-w-0 truncate">{line}</span>
+        {wash.engaged ? (
+          <Button variant="secondary" size="sm" onClick={wash.reset} className="shrink-0">
+            {wash.complete ? "Wash again" : "Reset"}
+          </Button>
+        ) : null}
       </span>
       <span className="mt-2 block">
-        <Bar to={Math.min(100, share * 100)} />
+        <Bar to={(wash.washed / wash.total) * 100} />
       </span>
     </Stage>
   );
@@ -323,9 +381,9 @@ function Check({ beat, map }: { beat: number; map: boolean }) {
       label="The re-scan shading the zones of the demo building where debris has built up."
       title="Re-scan"
       status={`Last scan ${project.scanAge} ago`}
-      map={map ? <FacadeMap cells={NONE} version={0} wash={false} debris={beat >= 2} selected={null} /> : null}
+      map={map ? <FacadeMap cells={NONE} version={0} wash={false} debris={beat >= 2} selected={null} ease strong /> : null}
     >
-      <Rows beat={beat} from={3} items={[{ text: `Debris on ${project.debrisZones} areas`, tone: "debris" }, { text: "Added to the next clean" }]} />
+      <Rows waiting beat={beat} from={3} items={[{ text: `Debris on ${project.debrisZones} areas`, tone: "debris" }, { text: "Added to the next clean" }]} />
     </Stage>
   );
 }
@@ -336,22 +394,27 @@ function Report({ beat, map }: { beat: number; map: boolean }) {
       label="The clean report: every zone of the demo building washed, the debris the re-scan found queued, and the next clean due."
       title="Clean report"
       status="On record"
-      map={map ? <FacadeMap cells={ALL} version={1} wash debris={false} selected={null} /> : null}
+      map={map ? <FacadeMap cells={ALL} version={1} wash debris={false} selected={null} strong /> : null}
     >
-      <Rows beat={beat} items={[{ text: `Washed: ${zones.length} zones` }, { text: `Debris on ${project.debrisZones} areas, queued`, tone: "debris" }, { text: "Next clean", note: project.nextClean }]} />
+      <Rows waiting beat={beat} items={[{ text: `Washed: ${zones.length} zones` }, { text: `Debris on ${project.debrisZones} areas, queued`, tone: "debris" }, { text: "Next clean", note: project.nextClean }]} />
     </Stage>
   );
 }
 
-const STAGE_PANELS = { scan: Scan, plan: Plan, clean: Clean, check: Check, report: Report } as const;
-export type StagePanelId = keyof typeof STAGE_PANELS;
+const BEAT_PANELS = { scan: Scan, plan: Plan, check: Check, report: Report } as const;
+export type StagePanelId = keyof typeof BEAT_PANELS | "clean";
+
+function BeatPanel({ id, active, map }: { id: keyof typeof BEAT_PANELS; active: boolean; map: boolean }) {
+  const beat = useBeat(5, active, 900);
+  const Panel = BEAT_PANELS[id];
+  return <Panel beat={beat} map={map} />;
+}
 
 /**
  * A step's panel on the stage, playing while its step is shown. `map` mounts the facade map (the shown
- * step and the one fading out), so the page does not keep five maps of 320 cells alive.
+ * step and the one fading out), so the page does not keep five maps of 320 cells alive. The clean's
+ * panel is the visitor's to work; `onDone` hears when they finish washing it.
  */
-export function StagePanel({ id, active, map }: { id: StagePanelId; active: boolean; map: boolean }) {
-  const beat = useBeat(5, active, 900);
-  const Panel = STAGE_PANELS[id];
-  return <Panel beat={beat} map={map} />;
+export function StagePanel({ id, active, map, onDone }: { id: StagePanelId; active: boolean; map: boolean; onDone?: () => void }) {
+  return id === "clean" ? <Clean active={active} map={map} onDone={onDone} /> : <BeatPanel id={id} active={active} map={map} />;
 }
