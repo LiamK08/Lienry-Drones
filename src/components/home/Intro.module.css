@@ -27,7 +27,10 @@
   overflow: hidden;
   contain: strict;
   color: var(--color-ink);
-  animation: introEnd 1ms 4150ms forwards;
+  /* From the reveal, presses go through to the page; at 4.15 it hides itself. */
+  animation:
+    letGo 1ms 3300ms forwards,
+    introEnd 1ms 4150ms forwards;
 }
 
 @media print {
@@ -339,6 +342,11 @@
 @keyframes introReveal {
   to {
     opacity: 0;
+  }
+}
+@keyframes letGo {
+  to {
+    pointer-events: none;
   }
 }
 @keyframes introEnd {

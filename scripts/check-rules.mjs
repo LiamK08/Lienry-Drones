@@ -98,9 +98,10 @@
 //     header and the skip link; the hero's h1 renders under it and neither <main> nor the header is
 //     inert or hidden; nothing runs past the screen's edge; it ends by itself within SPEC.introMaxMs of
 //     the navigation, leaving the overlay display:none; a reload in the same session has no intro. In
-//     fresh sessions, a key (Tab, which then lands visibly on the skip link), a press or tap, and a
-//     wheel each end it at once (within 200ms; a wheel within 500ms, as it reaches the page a few frames
-//     after it is sent), and the press's click does not land on the page; a session that starts on
+//     fresh sessions, a key (Tab, which then lands visibly on the skip link), a touch tap and a wheel
+//     each end it at once (within 200ms; a wheel within 500ms, as it reaches the page a few frames after
+//     it is sent), and the tap, aimed at a header link (the burger on a phone), neither follows it nor
+//     opens the menu, while the same tap after the intro does; a session that starts on
 //     /platform and goes home by the header's link, a new tab opened on / from another page of the site
 //     (a same-site referrer), one that opens /#faq, and one under reduced motion never see it.
 // 44  References never load: no request from any page this script opens goes to refresh.tech,
@@ -2656,42 +2657,48 @@ async function introPass(width) {
       }
       await context.close();
     }
-    // Any input ends it at once: a key (Tab, landing on the skip link), a press or a tap, a wheel.
+    // Any input ends it at once: a key (Tab, landing on the skip link), a tap, a wheel. The tap is a
+    // touch tap at every width (a mouse press's click goes to the common ancestor anyway), aimed at a
+    // header control under the paper whose click must not land: a link from 800 (not a menu button,
+    // which opens on hover), the burger on a phone. Once the intro is over, the same tap must work (the
+    // control), so the test cannot pass for want of a working target.
+    const target = (page) =>
+      page.evaluate((phone) => {
+        const el = [...document.querySelectorAll(phone ? "body > header button[aria-expanded]" : 'body > header a[href]:not([href="/"])')].find((e) => e.getBoundingClientRect().width > 0);
+        const r = el?.getBoundingClientRect();
+        return r ? { x: r.x + r.width / 2, y: r.y + r.height / 2, href: el.href ?? null } : null;
+      }, width < 800);
+    const landed = (page) => page.evaluate(([home, phone]) => ({ moved: location.href !== home, open: phone && !!document.querySelector('body > header [aria-expanded="true"]') }), [opts.base + "/", width < 800]);
     const inputs = [
-      ["Tab", (page) => page.keyboard.press("Tab")],
-      // Aimed at a control in the header under the paper, whose click must not land: a link at 1440
-      // (not a menu button: those open on hover once the paper is gone), the burger on a phone.
-      [
-        width < 800 ? "a tap" : "a press",
-        async (page) => {
-          const at = await page.evaluate((phone) => {
-            const el = [...document.querySelectorAll(phone ? "body > header button[aria-expanded]" : 'body > header a[href]:not([href="/"])')].find((e) => e.getBoundingClientRect().width > 0);
-            const r = el?.getBoundingClientRect();
-            return r ? { x: r.x + r.width / 2, y: r.y + r.height / 2 } : { x: innerWidth / 2, y: 300 };
-          }, width < 800);
-          if (width < 800) await page.touchscreen.tap(at.x, at.y);
-          else await page.mouse.click(at.x, at.y);
-        },
-      ],
-      ...(width < 800 ? [] : [["a wheel", async (page) => { await page.mouse.move(width / 2, 300); await page.mouse.wheel(0, 200); }]]),
+      ["Tab", {}, (page) => page.keyboard.press("Tab")],
+      ["a tap", { hasTouch: true }, async (page, at) => page.touchscreen.tap(at.x, at.y)],
+      ...(width < 800 ? [] : [["a wheel", {}, async (page) => { await page.mouse.move(width / 2, 300); await page.mouse.wheel(0, 200); }]]),
     ];
-    for (const [name, act] of inputs) {
-      const { context, page, go } = await open();
+    for (const [name, extra, act] of inputs) {
+      const { context, page, go } = await open(extra);
       const t0 = await go("/");
       const loaded = Date.now() - t0;
       const was = (await introState(page)).on;
       await page.waitForTimeout(700);
-      if (was === "play" && (await introState(page)).on === "play") {
-        await act(page);
-        // At once: a key, press or tap within a frame or two; a wheel reaches the page a few frames
-        // after it is sent (about 100ms headless), so it has 500ms.
+      const at = await target(page);
+      if (name === "a tap" && !at) add(`no header control to tap ${label}`);
+      else if (was === "play" && (await introState(page)).on === "play") {
+        await act(page, at);
+        // At once: a key or tap within a frame or two; a wheel reaches the page a few frames after it
+        // is sent (about 100ms headless), so it has 500ms.
         await page.waitForFunction(() => !document.documentElement.hasAttribute("data-intro"), null, { timeout: name === "a wheel" ? 500 : 200, polling: "raf" }).catch(() => {});
         const st = await introState(page);
         if (st.on || st.display !== "none") add(`${name} does not end the intro at once ${label}`, JSON.stringify(st));
-        if (name !== "Tab" && name !== "a wheel") {
+        if (name === "a tap") {
           await page.waitForTimeout(700);
-          const landed = await page.evaluate(([home, phone]) => ({ moved: location.href !== home, open: phone && !!document.querySelector('body > header [aria-expanded="true"]') }), [opts.base + "/", width < 800]);
-          if (landed.moved || landed.open) add(`${name} that ends the intro also clicks what was under it ${label}`, JSON.stringify(landed));
+          const l = await landed(page);
+          if (l.moved || l.open) add(`a tap that ends the intro also clicks what was under it ${label}`, JSON.stringify(l));
+          else {
+            await page.touchscreen.tap(at.x, at.y);
+            await page.waitForTimeout(700);
+            const c = await landed(page);
+            if (!c.moved && !c.open) add(`the control tap after the intro does nothing, so the click test proves nothing ${label}`, JSON.stringify(c));
+          }
         }
         if (name === "Tab") {
           const f = await page.evaluate(() => {

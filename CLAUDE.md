@@ -61,9 +61,10 @@ leaving along the flight arc; the mark turns ink and fades as the paper fades in
 starts again from its first frame. About four seconds, never past five, all CSS
 (`src/components/home/Intro.tsx`; the head script in `src/lib/intro.ts` sets `data-intro` before the
 first paint). Once per session (sessionStorage), never on another entry page, a reload, a visit from
-another page of the site (a home tab opened from inside it), a deep link, or under reduced motion. Any
-key, press, wheel, touch or scroll ends it at once, and the click of a press that ends it never lands on
-the page. It is aria-hidden with nothing focusable, and the page renders underneath as normal (never
+another page of the site (a home tab opened from inside it), an address with a hash, or under reduced
+motion. Any key, press, wheel, touch or scroll ends it at once (a text-fragment link scrolls the page, so
+it ends at once too), and a press that ends it while the paper still covers the page never clicks or
+hovers what was under it. It is aria-hidden with nothing focusable, and the page renders underneath as normal (never
 hidden or inert), so it never delays the LCP.
 
 Header contrast: `npm run contrast -- <frame>` proves the bar stays legible over the hero
