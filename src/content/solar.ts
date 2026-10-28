@@ -13,7 +13,6 @@ export const solarPage = {
   stats: {
     eyebrow: "Industry figures",
     headline: "What soiling costs",
-    emphasis: "costs",
     intro: "Three figures from peer-reviewed and international sources, each cited.",
     image: { id: "so1-solar-hero", alt: "The drone washing a row of ground-mounted solar panels in the morning mist, its tether running back to a reel on a concrete pad", position: "60% 55%" },
   },
@@ -45,5 +44,5 @@ export const solarPage = {
       image: { id: "p5-solar-farm", alt: "The drone passing low over a row of solar panels, its tether curving back along the row", position: "50% 60%" },
     },
   ],
-  close: { headline: "Rooftop or solar farm, tell us about it.", action: { label: "Register interest", href: "/register-interest" } },
+  close: { headline: "Rooftop or solar farm, tell us about it", action: { label: "Register interest", href: "/register-interest" } },
 };

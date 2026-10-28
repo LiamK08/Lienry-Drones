@@ -39,8 +39,7 @@ export const homesPage = {
   },
   safety: {
     eyebrow: "Safety by design",
-    headline: "No ladders, and nobody walking the roof.",
-    emphasis: "nobody walking the roof.",
+    headline: "No ladders, and nobody walking the roof",
     aside: "No ladders, no lifts, no crews to book",
     tags: ["Tether", "Camera", "Ground pod"],
     image: { id: "ho1-homes-hero", alt: "The Lienry ground pod beside a house at first light, the drone washing a window", position: "42% 55%" },
@@ -50,7 +49,7 @@ export const homesPage = {
       { icon: "doc", title: "Site permissions", text: "We do not claim any approvals. What each site will need is still being finalised." },
     ],
   },
-  close: { headline: "Tell us about your property. We reply personally.", action: { label: "Register interest", href: "/register-interest?type=homeowner" } },
+  close: { headline: "Tell us about your property and we will reply personally", action: { label: "Register interest", href: "/register-interest?type=homeowner" } },
 };
 
 /**
@@ -58,9 +57,9 @@ export const homesPage = {
  * The picture follows the demo: before a clean, each chosen area while the drone washes it, then after.
  */
 export const landlordStory = {
-  headline: "Your property. Wherever you are.",
+  headline: "Your property, wherever you are",
   intro: "You own a rental in Sydney and live overseas. It needs a clean before the next tenant.",
-  steps: ["Choose the areas to clean.", "Tap start, wherever you are.", "Watch each area clean in turn.", "See the house after the clean."],
+  steps: ["Choose the areas to clean", "Tap start, wherever you are", "Watch each area clean in turn", "See the house after the clean"],
   pictures: {
     before: { id: "y1-story-before", alt: "A rental house before its clean, the ground pod closed beside the garden tap", chip: "Before the clean" },
     driveway: { id: "y3-story-driveway", alt: "The drone washing the concrete driveway of the rental house", chip: "Washing the driveway" },

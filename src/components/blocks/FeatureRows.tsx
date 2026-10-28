@@ -12,7 +12,7 @@ export type FeatureRowItem = {
   title: string;
   paragraphs: readonly string[];
   checks?: readonly string[];
-  /** A tinted box under the text: a title and a short list. */
+  /** A white card under the text: a title and a short list. */
   callout?: { title: string; items: readonly string[] };
   /** A small muted line under the checks (the cited note beside cited figures). */
   note?: string;
@@ -25,77 +25,61 @@ export type FeatureRowItem = {
   /** The picture's frame from 1024. Default "4/3"; "16/9" is the wide, shorter frame. Ignored by the
    *  solutions variant, whose pictures are all 5:4. */
   aspect?: "4/3" | "16/9";
-  /** The row's pill: a small white one (default) or the accent one with its arrow badge. */
+  /** The row's pill: the white one (default) or the accent one, both with the arrow badge. */
   linkStyle?: "secondary" | "primary";
-  /** Solutions variant only: the media takes more of the row, 8 of 12 columns from 1024 and 7 of 12
-   *  from 1280, on the same rail and 40px gap (the /homes-and-rentals app demo). Default rows split 1:1. */
+  /** Solutions variant only: the media takes 8 of the 12 columns from 1024 and 7 from 1280, the text 4
+   *  (the /homes-and-rentals app demo). Default rows give the text 5 columns and the media 6. */
   wideMedia?: boolean;
 };
 
-function Check({ filled }: { filled: boolean }) {
-  if (filled) {
-    return (
-      <svg viewBox="0 0 18 18" aria-hidden="true" className="size-[1.125rem] shrink-0 text-accent" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="9" cy="9" r="8.375" className="fill-tint" />
-        <path d="m5.75 9.25 2.25 2.25 4.25-4.5" strokeWidth="1.5" />
-      </svg>
-    );
-  }
+function Check() {
   return (
-    <svg viewBox="0 0 16 16" aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-accent" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="8" cy="8" r="7" />
-      <path d="m5 8 2 2 4-4" />
+    <svg viewBox="0 0 18 18" aria-hidden="true" className="mt-[3px] size-[1.125rem] shrink-0 text-accent" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="9" cy="9" r="8.375" className="fill-tint" />
+      <path d="m5.75 9.25 2.25 2.25 4.25-4.5" strokeWidth="1.5" />
     </svg>
   );
 }
 
-// The two layouts. "default" is /platform's, unchanged. "solutions" is the solution pages' features
-// run: a 1328px rail, 40 between the columns and 80 between the rows from 1024 (64 below), 5:4 pictures with
-// the 8px image corners, near-black 14px copy at 1.2, and the picture before the text on phones.
+// Every row sits on the page's 12-column grid from 1024, inside the one rail (Container): the text in 5
+// columns and the media in 6, one column apart, the side alternating; a wide-media row gives the text 4
+// and the media 8 (7 from 1280). Both cells share row 1, so the DOM order (text first) stays the reading
+// and phone order whichever side the media takes. Below 1024 the text keeps the paragraphs' 30rem measure,
+// so a callout card or the check list never runs wider than the copy above it.
+const cells = (right: boolean, wide: boolean) => {
+  if (wide) {
+    return right
+      ? { text: "lg:col-span-4 lg:row-start-1", media: "lg:col-span-8 lg:col-start-5 lg:row-start-1 xl:col-span-7 xl:col-start-6" }
+      : { text: "lg:col-span-4 lg:col-start-9 lg:row-start-1", media: "lg:col-span-8 lg:col-start-1 lg:row-start-1 xl:col-span-7" };
+  }
+  return right
+    ? { text: "lg:col-span-5 lg:row-start-1", media: "lg:col-span-6 lg:col-start-7 lg:row-start-1" }
+    : { text: "lg:col-span-5 lg:col-start-8 lg:row-start-1", media: "lg:col-span-6 lg:col-start-1 lg:row-start-1" };
+};
+
+// The two layouts differ only in their band and their pictures: "default" (/platform, /fit-check) takes
+// the band's own pad and 4:3 or 16:9 pictures; "solutions" (/commercial, /homes-and-rentals, /solar) runs
+// on from the word strip above it and frames every picture 5:4. The type is the site's reading set:
+// the row title at the card step, body 16/1.6 in the muted ink, checks 16/1.5, notes 14/1.5.
 const layouts = {
-  default: {
-    rail: "",
-    rows: "flex flex-col gap-24 lg:gap-32",
-    grid: "grid items-center gap-10 lg:grid-cols-2 lg:gap-16",
-    text: (right: boolean) => (right ? "" : "lg:order-2"),
-    media: (right: boolean) => (right ? "" : "lg:order-1"),
-    paras: "mt-4 space-y-3",
-    para: "max-w-xl text-small text-fg-muted",
-    list: "mt-6 space-y-3",
-    item: "flex gap-3 text-small text-fg",
-    after: "mt-6",
-  },
-  solutions: {
-    rail: "mx-auto w-full max-w-[83rem]",
-    rows: "flex flex-col gap-16 lg:gap-20",
-    grid: "grid items-center gap-8 lg:grid-cols-2 lg:gap-10",
-    // Text, then picture, in the DOM and below 1024 (as on /platform), so on phones the first picture
-    // stays under the fold and the hero text remains the LCP element; from 1024 a left-hand picture
-    // moves before its text.
-    text: (right: boolean) => (right ? "" : "lg:order-2"),
-    media: (right: boolean) => (right ? "" : "lg:order-1"),
-    paras: "mt-4 space-y-2",
-    para: "max-w-none text-small leading-[1.2] text-fg",
-    list: "mt-8 space-y-[1.1875rem]",
-    item: "flex gap-2.5 text-small leading-[1.2] text-fg",
-    after: "mt-8",
-  },
+  default: { rows: "flex flex-col gap-24 lg:gap-32" },
+  solutions: { rows: "flex flex-col gap-16 lg:gap-24" },
 } as const;
 
-// A solutions row with `wideMedia`: text 4 : media 8 from 1024, 5 : 7 from 1280, the media on its side.
-const wideGrid = (right: boolean) =>
-  `grid items-center gap-8 lg:gap-10 ${right ? "lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] xl:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]" : "lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] xl:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]"}`;
+const sizes = {
+  half: "(min-width: 1440px) 684px, (min-width: 1024px) 47vw, (min-width: 768px) calc(100vw - 3rem), calc(100vw - 2.5rem)",
+  wide: "(min-width: 1440px) 802px, (min-width: 1280px) 56vw, (min-width: 1024px) 63vw, (min-width: 768px) calc(100vw - 3rem), calc(100vw - 2.5rem)",
+};
 
 /**
  * Feature rows: text beside a rounded picture, the side alternating row by row (the first row's
- * picture on the right). Text: the h2, paragraphs, a check list, a tinted callout,
- * a small note and a pill. A row may close with four short facts.
+ * picture on the right). Text: the row title, paragraphs, a check list, a white callout card, a small
+ * note and a pill with its arrow badge. A row may close with four short facts, each over a hairline.
  *
- * variant "default" (/platform): the band's own padding, the 1392px grid, 4:3 or 16:9 pictures, and
- * below 1024 the picture follows the text.
- * variant "solutions" (/commercial, /homes-and-rentals, /solar): 80 above the first row (0 on
- * phones, where the strip's own 80 does it), 96 under the last row (56 on phones), and below 1024 the text comes first, then its picture.
- * A solutions row may opt into `wideMedia`, which gives its media the larger share of the row from 1024.
+ * variant "default": the band's own pad; below 1024 the picture follows the text.
+ * variant "solutions": 80 above the first row from 768 (0 on phones, where the strip's own 80 does it),
+ * 96 under the last row (56 on phones), and below 1024 the text comes first, then its picture, so on a
+ * phone the first picture stays under the fold and the hero text remains the LCP element.
  */
 export function FeatureRows({
   id,
@@ -104,6 +88,7 @@ export function FeatureRows({
   startSide = "right",
   pad = "section",
   variant = "default",
+  label = "Features",
 }: {
   id: string;
   tone?: "plaster" | "paper" | "mist";
@@ -112,92 +97,81 @@ export function FeatureRows({
   /** "feature" is the platform's 88px row band. Ignored by the solutions variant. */
   pad?: "section" | "feature";
   variant?: keyof typeof layouts;
+  /** The band's accessible name. Default "Features". */
+  label?: string;
   /** @deprecated Ignored: the site has no eyebrows (owner, 21 October 2026). */
   eyebrow?: string;
 }) {
   const solutions = variant === "solutions";
-  const L = layouts[variant];
   const wide = (r: FeatureRowItem) => solutions && !!r.wideMedia;
-  // Phones ask for the picture's real width, inside the page margins.
-  const mediaOf = (r: FeatureRowItem, right: boolean) => (
-    <div className={L.media(right)}>
-      {r.media ??
-        (r.image ? (
-          solutions ? (
-            <Picture
-              id={r.image.id}
-              alt={r.image.alt}
-              position={r.image.position}
-              aspect="5/4"
-              aspectSm="5/4"
-              rounded="image"
-              sizes={wide(r) ? "(min-width: 1440px) 751px, (min-width: 1280px) 55vw, (min-width: 1024px) 62vw, (min-width: 768px) calc(100vw - 3rem), calc(100vw - 2.5rem)" : "(min-width: 1440px) 644px, (min-width: 1024px) 46vw, (min-width: 768px) calc(100vw - 3rem), calc(100vw - 2.5rem)"}
-            />
-          ) : (
-            <Picture id={r.image.id} alt={r.image.alt} position={r.image.position} aspect={r.aspect ?? "4/3"} aspectSm="4/3" rounded="card" sizes="(min-width: 1440px) 684px, (min-width: 1024px) 50vw, 100vw" />
-          )
-        ) : null)}
-    </div>
+  const picture = (r: FeatureRowItem, image: ImageRef) => (
+    <Picture
+      id={image.id}
+      alt={image.alt}
+      position={image.position}
+      aspect={solutions ? "5/4" : (r.aspect ?? "4/3")}
+      aspectSm={solutions ? "5/4" : "4/3"}
+      rounded="image"
+      sizes={wide(r) ? sizes.wide : sizes.half}
+    />
   );
   const rows = (
-    <div className={L.rows}>
+    <div className={layouts[variant].rows}>
       {items.map((r, i) => {
         const right = (i % 2 === 0) === (startSide === "right");
+        const at = cells(right, wide(r));
         return (
           <section key={r.id} id={r.id} aria-labelledby={`${r.id}-heading`} className="scroll-mt-24">
-            <div className={wide(r) ? wideGrid(right) : L.grid}>
-              <Reveal className={L.text(right)}>
+            <div className="grid items-center gap-y-10 lg:grid-12 lg:gap-y-0">
+              <Reveal className={`max-lg:max-w-[30rem] ${at.text}`}>
                 <h2 id={`${r.id}-heading`} className="text-h3">
                   {r.title}
                 </h2>
-                <div className={L.paras}>
+                <div className="mt-5 space-y-4">
                   {r.paragraphs.map((p) => (
-                    <p key={p} className={L.para}>
+                    <p key={p} className="text-body leading-[1.6] text-fg-muted">
                       {p}
                     </p>
                   ))}
                 </div>
                 {r.checks ? (
-                  <ul className={L.list}>
+                  <ul className="mt-7 space-y-3">
                     {r.checks.map((c) => (
-                      <li key={c} className={L.item}>
-                        <Check filled={solutions} />
+                      <li key={c} className="flex gap-3 text-body leading-[1.5] text-fg">
+                        <Check />
                         {c}
                       </li>
                     ))}
                   </ul>
                 ) : null}
                 {r.callout ? (
-                  <div className="mt-6 rounded-[0.625rem] border-l-[3px] border-accent bg-tint px-5 py-4">
-                    <p className="text-small font-medium text-ink">{r.callout.title}</p>
-                    <ul className="mt-2 list-disc space-y-1 pl-5 text-small text-ink/80">
+                  <div className="mt-7 rounded-card border border-line bg-white p-5 md:p-6">
+                    <p className="text-body font-medium leading-[1.5] text-fg">{r.callout.title}</p>
+                    <ul className="mt-3 space-y-2">
                       {r.callout.items.map((c) => (
-                        <li key={c}>{c}</li>
+                        <li key={c} className="flex gap-3 text-small leading-[1.5] text-fg-muted">
+                          <Check />
+                          {c}
+                        </li>
                       ))}
                     </ul>
                   </div>
                 ) : null}
-                {r.note ? <p className={`${L.after} max-w-[37.5rem] text-caption leading-[1.4] text-fg-muted`}>{r.note}</p> : null}
+                {r.note ? <p className="mt-6 text-small leading-[1.5] text-fg-muted">{r.note}</p> : null}
                 {r.link ? (
-                  r.linkStyle === "primary" ? (
-                    <Button href={r.link.href} arrow className={L.after}>
-                      {r.link.label}
-                    </Button>
-                  ) : (
-                    <Button href={r.link.href} variant="secondary" size="sm" className={L.after}>
-                      {r.link.label}
-                    </Button>
-                  )
+                  <Button href={r.link.href} variant={r.linkStyle === "primary" ? "primary" : "secondary"} arrow className="mt-8">
+                    {r.link.label}
+                  </Button>
                 ) : null}
               </Reveal>
-              {mediaOf(r, right)}
+              <div className={at.media}>{r.media ?? (r.image ? picture(r, r.image) : null)}</div>
             </div>
             {r.facts ? (
-              <ul className="mt-12 grid gap-8 pt-2 md:grid-cols-2 lg:grid-cols-4 lg:gap-0">
-                {r.facts.map((f, k) => (
-                  <li key={f.title} className={k ? "lg:border-l lg:border-line lg:pl-6" : "lg:pr-6"}>
-                    <p className="text-small font-medium text-fg">{f.title}</p>
-                    <p className="mt-2 text-small text-fg-muted">{f.text}</p>
+              <ul className="mt-14 grid gap-x-(--gutter) gap-y-8 md:grid-cols-2 lg:grid-12">
+                {r.facts.map((f) => (
+                  <li key={f.title} className="border-t border-line pt-5 lg:col-span-3">
+                    <p className="text-body font-medium leading-[1.5] text-fg">{f.title}</p>
+                    <p className="mt-1.5 text-small leading-[1.5] text-fg-muted">{f.text}</p>
                   </li>
                 ))}
               </ul>
@@ -210,15 +184,13 @@ export function FeatureRows({
 
   if (solutions) {
     return (
-      <Band id={id} tone={tone} pad="none" ariaLabel="Features" className="pt-0 pb-14 md:pt-20 lg:pb-24">
-        <div className={L.rail}>
-          {rows}
-        </div>
+      <Band id={id} tone={tone} pad="none" ariaLabel={label} className="pt-0 pb-14 md:pt-20 lg:pb-24">
+        <Container>{rows}</Container>
       </Band>
     );
   }
   return (
-    <Band id={id} tone={tone} pad={pad} ariaLabel="Features">
+    <Band id={id} tone={tone} pad={pad} ariaLabel={label}>
       <Container>{rows}</Container>
     </Band>
   );

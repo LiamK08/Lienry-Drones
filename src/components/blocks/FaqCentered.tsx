@@ -1,23 +1,19 @@
 import type { FaqItem } from "@/components/sections/Faq";
 import { FaqRows } from "@/components/blocks/FaqRows";
 import { Band, Container } from "@/components/ui/Band";
-import { Headline } from "@/components/ui/SectionHead";
 import { Reveal } from "@/components/ui/Reveal";
 
-// "section" is the band rhythm; "tight" runs into the band below (/platform); "page" is the solution
-// pages' 64 above and 80 below (48 on phones), kept compact at the owner's request.
-const spacings = {
-  section: "",
-  tight: "pb-6 pt-20 lg:pt-[7.5rem]",
-  page: "pt-16 pb-20 max-md:py-12",
-} as const;
+// "section" is the band rhythm; "page" is the solution pages' compact rhythm (the owner asked for it
+// to stay compact), Band's compact pad. "tight" is retired into "section".
+const pads = { section: "section", tight: "section", page: "compact" } as const;
 
 /**
- * The questions, centred: the eyebrow, "Frequently asked questions" with its accent italic, then the
- * rows. `narrow` holds the rows to 600px under the wider heading.
+ * The questions, centred: the heading at the inner section step (36, no italic: the accent italic is
+ * the page h1's alone), then the rows on the 12-column grid, 8 columns wide from 1024 (6 when `narrow`).
  */
 export function FaqCentered({
   id = "faq",
+  headline = "Frequently asked questions",
   items,
   tone = "plaster",
   tight = false,
@@ -25,25 +21,29 @@ export function FaqCentered({
   narrow = false,
 }: {
   id?: string;
+  /** Default "Frequently asked questions". */
+  headline?: string;
   items: readonly FaqItem[];
   tone?: "plaster" | "paper";
-  /** @deprecated Use spacing="tight". */
+  /** @deprecated Use spacing="section". */
   tight?: boolean;
-  spacing?: keyof typeof spacings;
+  spacing?: keyof typeof pads;
   narrow?: boolean;
 }) {
   const space = spacing ?? (tight ? "tight" : "section");
   return (
-    <Band id={id} tone={tone} pad={space === "section" ? "section" : "none"} labelledBy={`${id}-heading`} className={spacings[space]}>
+    <Band id={id} tone={tone} pad={pads[space]} labelledBy={`${id}-heading`}>
       <Container>
-        <div className="mx-auto max-w-2xl">
-          <Reveal animate y={10} className="flex flex-col items-center text-center">
-            <h2 id={`${id}-heading`} className="em-accent text-h1 max-md:text-h2s">
-              <Headline text="Frequently asked questions" emphasis="questions" />
-            </h2>
-          </Reveal>
-          <div className={`mx-auto ${space === "page" ? "mt-8" : "mt-10"} ${narrow ? "max-w-[37.5rem]" : ""}`}>
-            <FaqRows id={id} items={items} />
+        <div className="lg:grid-12">
+          <div className={narrow ? "lg:col-span-6 lg:col-start-4" : "lg:col-span-8 lg:col-start-3"}>
+            <Reveal animate y={10} className="flex flex-col items-center text-center">
+              <h2 id={`${id}-heading`} className="text-h2s">
+                {headline}
+              </h2>
+            </Reveal>
+            <div className="mt-10">
+              <FaqRows id={id} items={items} />
+            </div>
           </div>
         </div>
       </Container>

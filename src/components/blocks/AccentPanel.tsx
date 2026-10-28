@@ -7,10 +7,12 @@ import { Button } from "@/components/ui/Button";
 const bandPads = { section: "", close: "pt-0 pb-14 lg:pb-20" } as const;
 
 /**
- * The closing ask: a rounded accent panel (inset, 1328 by 400 from 1024), or a full-bleed band
- * (`bleed`), with a slow drifting light wash, a centred serif line and one glass pill. `dark` is the
- * platform's statement band: near-black with teal glows and a small white pill. `note` sits centred
- * below the panel.
+ * The closing ask, as one of two grounds:
+ * - inset (default): an accent panel on the rail with the panel corners (400px tall from 1024), one
+ *   still, soft light in its top-left corner, a centred serif line and one solid white pill with its
+ *   arrow badge. `note` sits centred below the panel.
+ * - `bleed` + `dark`: the platform's statement band, a full-bleed night band with one still accent glow,
+ *   the line and the same white pill.
  */
 export function AccentPanel({
   id,
@@ -29,47 +31,33 @@ export function AccentPanel({
   note?: string;
   band?: keyof typeof bandPads;
 }) {
-  const inner = (
-    <div
-      className={`on-dark relative isolate overflow-hidden text-white ${dark ? "bg-night" : "bg-accent"} ${
-        bleed ? "py-24" : "mx-auto max-w-[83rem] rounded-card px-6 py-14 lg:flex lg:min-h-[25rem] lg:items-center lg:justify-center lg:py-0"
-      }`}
-    >
-      {dark ? (
-        <>
-          <div aria-hidden="true" className="pointer-events-none absolute -left-10 top-1/2 -z-10 h-[30rem] w-[48rem] -translate-y-1/2 rounded-pill bg-accent/70 blur-[100px]" />
-          <div aria-hidden="true" className="pointer-events-none absolute -right-20 top-0 -z-10 h-80 w-[40rem] rounded-pill bg-accent-hover/80 blur-[90px]" />
-        </>
-      ) : (
-        <>
-          <div aria-hidden="true" className="glow-drift pointer-events-none absolute -left-24 -top-24 -z-10 h-80 w-[36rem] -rotate-[20deg] rounded-pill bg-white/20 blur-[60px]" />
-          <div aria-hidden="true" className="glow-drift-alt pointer-events-none absolute -bottom-32 right-[-4rem] -z-10 h-96 w-[34rem] -rotate-[20deg] rounded-pill bg-accent-on-dark/30 blur-[60px]" />
-          <div aria-hidden="true" className="glow-drift pointer-events-none absolute left-1/3 top-1/2 -z-10 h-56 w-[28rem] -rotate-[20deg] rounded-pill bg-accent-hover/40 blur-[60px] [animation-delay:-7s]" />
-        </>
-      )}
-      <div className={`mx-auto flex w-full flex-col items-center text-center ${bleed ? "max-w-3xl px-5 md:px-4" : ""}`}>
-        <h2 id={`${id}-heading`} className={`mx-auto text-h2s ${bleed ? "" : "max-w-[35rem]"}`}>
-          {headline}
-        </h2>
-        <Button href={action.href} variant={dark ? "secondary" : "glass"} size={dark ? "sm" : "md"} arrow={!dark} className={dark ? "mt-6" : "mt-8"}>
-          {action.label}
-        </Button>
-      </div>
+  const content = (
+    <div className="relative mx-auto flex w-full max-w-[40rem] flex-col items-center text-center">
+      <h2 id={`${id}-heading`} className="text-h2s text-white">
+        {headline}
+      </h2>
+      <Button href={action.href} variant="glass" arrow className="mt-8">
+        {action.label}
+      </Button>
     </div>
   );
+
   if (bleed) {
     return (
-      <section id={id} data-band={id} data-tone="ink" aria-labelledby={`${id}-heading`}>
-        {inner}
-        {note ? <p className="page-x mx-auto mt-6 max-w-none text-center text-[0.875rem] leading-[1.2] text-ink">{note}</p> : null}
-      </section>
+      <Band id={id} tone={dark ? "night" : "ink"} labelledBy={`${id}-heading`} className="isolate overflow-hidden">
+        <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[22rem] w-[min(56rem,90vw)] -translate-x-1/2 -translate-y-1/2 rounded-pill bg-accent/45 blur-[110px]" />
+        <Container>{content}</Container>
+      </Band>
     );
   }
   return (
     <Band id={id} tone="plaster" pad={band === "section" ? "section" : "none"} labelledBy={`${id}-heading`} className={bandPads[band]}>
       <Container>
-        {inner}
-        {note ? <p className="mx-auto mt-14 max-w-none text-center text-[0.875rem] leading-[1.2] text-ink lg:mt-20">{note}</p> : null}
+        <div className={`on-dark relative isolate overflow-hidden rounded-panel px-6 py-16 md:px-10 lg:flex lg:min-h-[25rem] lg:items-center lg:justify-center lg:py-0 ${dark ? "bg-night" : "bg-accent"}`}>
+          <div aria-hidden="true" className="pointer-events-none absolute -left-32 -top-40 -z-10 h-96 w-[40rem] rounded-pill bg-white/15 blur-[90px]" />
+          {content}
+        </div>
+        {note ? <p className="mx-auto mt-10 text-center text-small leading-[1.5] text-fg-muted lg:mt-12">{note}</p> : null}
       </Container>
     </Band>
   );

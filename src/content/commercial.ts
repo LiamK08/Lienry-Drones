@@ -43,8 +43,7 @@ export const commercialPage = {
   ],
   safety: {
     eyebrow: "Safety by design",
-    headline: "Safety designed in from the dock up.",
-    emphasis: "from the dock up.",
+    headline: "Safety designed in from the dock up",
     aside: "Designed in, not supervised in",
     tags: ["Tether", "Obstacle camera", "Surface checks"],
     image: { id: "f1-tether", alt: "The tether's metal coupling where it enters the underside of the drone", position: "43% 45%" },

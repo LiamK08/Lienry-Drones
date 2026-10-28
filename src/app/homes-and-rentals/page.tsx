@@ -47,9 +47,9 @@ export default function HomesPage() {
   ];
   return (
     <>
-      <CenterHero mobileLines={3} leadLines={{ phone: 5, wide: 2 }} eyebrow={hero.eyebrow} headline={hero.headline} emphasis={hero.emphasis} lead={hero.lead} primary={hero.primary} />
+      <CenterHero mobileLines={3} leadLines={{ phone: 5, wide: 3 }} headline={hero.headline} emphasis={hero.emphasis} lead={hero.lead} primary={hero.primary} />
       <WordStrip label={strip.label} items={strip.items} />
-      <FeatureRows id="features" variant="solutions" eyebrow="Features" items={items} />
+      <FeatureRows id="features" variant="solutions" items={items} />
       <SafetyBlock {...safety} />
       <FaqCentered items={faqFor("homes")} spacing="page" narrow />
       <AccentPanel id="closing" headline={close.headline} action={close.action} band="close" />
