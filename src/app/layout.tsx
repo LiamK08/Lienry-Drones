@@ -6,6 +6,7 @@ import { fontClassName } from "@/lib/fonts";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { OrganizationJsonLd } from "@/components/site/JsonLd";
+import { introScript } from "@/lib/intro";
 
 // The fallbacks under every page's own metadata (src/lib/site.ts pageMetadata). They carry no canonical
 // link and no og:url, so a page without its own, such as the 404 page, never claims the home page's address.
@@ -42,7 +43,13 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-AU" className={fontClassName}>
+    // The intro's head script sets data-intro on <html> before hydration, hence suppressHydrationWarning
+    // (it covers this element's own attributes only).
+    <html lang="en-AU" className={fontClassName} suppressHydrationWarning>
+      <head>
+        {/* Before the body is parsed, so a first visit to home opens on the intro, not a flash of the page. */}
+        <script dangerouslySetInnerHTML={{ __html: introScript }} />
+      </head>
       <body>
         <MotionConfig reducedMotion="user">
           <a

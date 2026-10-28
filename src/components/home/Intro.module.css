@@ -1,0 +1,324 @@
+/*
+ * The first-visit intro (Intro.tsx). Hidden unless the head script sets data-intro="play" on <html>.
+ * Timeline, in seconds from the first paint:
+ *   0.05  corner ticks and the three guide curves draw in
+ *   0.30  drones set off (0.30, 0.45, 0.60); they arrive at 1.30, 1.45, 1.60
+ *         and trace their blocks in the accent, the outline drawn under them
+ *   2.00  the centre and left blocks fill, their drones dock (fade); 2.45 the right block fills and
+ *         its drone leaves along the flight arc, drawing it, until 2.95
+ *   2.75  the mark turns ink; 3.30 the paper fades and the mark turns white, then fades by 4.15
+ *   4.15  the overlay hides itself (introEnd), and the head script clears data-intro
+ * Each drone moves along one path (approach, its block's outline, then a dock or an exit), keyed at the
+ * share of the path's length where each stage ends (measured in Chromium), so the outline is drawn
+ * exactly under the drone.
+ */
+
+.overlay {
+  display: none;
+}
+
+:global(html[data-intro="play"]) .overlay {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  overflow: hidden;
+  color: var(--color-ink);
+  animation: introEnd 1ms 4150ms forwards;
+}
+
+@media print {
+  :global(html[data-intro="play"]) .overlay {
+    display: none;
+  }
+}
+
+/* The paper, as its own layer so it can fade while the mark stays. */
+.overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--color-paper);
+  animation: fadeOut 650ms 3300ms var(--ease-instrument) forwards;
+}
+
+.tick {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: color-mix(in srgb, var(--color-ink) 28%, transparent);
+  opacity: 0;
+  animation:
+    fadeIn 300ms 50ms forwards,
+    fadeOut 500ms 3300ms forwards;
+}
+.tl {
+  left: 16px;
+  top: 16px;
+  border-left: 1px solid;
+  border-top: 1px solid;
+}
+.tr {
+  right: 16px;
+  top: 16px;
+  border-right: 1px solid;
+  border-top: 1px solid;
+}
+.bl {
+  left: 16px;
+  bottom: 16px;
+  border-left: 1px solid;
+  border-bottom: 1px solid;
+}
+.br {
+  right: 16px;
+  bottom: 16px;
+  border-right: 1px solid;
+  border-bottom: 1px solid;
+}
+
+/* The mark's own box, centred; three quarters of its size below 768. */
+.stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 86.26px;
+  height: 128px;
+  margin: -64px 0 0 -43.13px;
+  transform: scale(0.75);
+}
+@media (min-width: 48rem) {
+  .stage {
+    transform: none;
+  }
+}
+
+.lines,
+.mark {
+  position: absolute;
+  inset: 0;
+  width: 86.26px;
+  height: 128px;
+  overflow: visible;
+}
+
+.guide {
+  fill: none;
+  stroke: currentColor;
+  stroke-opacity: 0.16;
+  stroke-width: 1;
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+  animation:
+    draw 600ms var(--ease-instrument) forwards,
+    fadeOut 500ms 1400ms forwards;
+}
+.g1 {
+  animation-delay: 50ms, 1400ms;
+}
+.g2 {
+  animation-delay: 150ms, 1450ms;
+}
+.g3 {
+  animation-delay: 100ms, 1500ms;
+}
+
+.trail {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+  animation:
+    draw 500ms 2450ms cubic-bezier(0.45, 0.1, 0.8, 0.6) forwards,
+    fadeOut 300ms 2950ms forwards;
+}
+
+/* The mark: accent while it is built, ink once whole, white as the paper fades, then gone. */
+.mark {
+  color: var(--color-accent);
+  transform-origin: 50% 50%;
+  animation:
+    toInk 350ms 2750ms var(--ease-instrument) forwards,
+    toWhite 500ms 3300ms var(--ease-instrument) forwards,
+    markOut 400ms 3750ms var(--ease-instrument) forwards;
+}
+
+.fill {
+  fill: currentColor;
+  fill-opacity: 0;
+}
+.outline {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+}
+
+/* Each block: its outline drawn while its drone traces it, then the fill takes over from the line. */
+.blockC .outline {
+  animation:
+    draw 700ms 1300ms linear forwards,
+    fadeOut 300ms 2000ms forwards;
+}
+.blockC .fill {
+  animation: fillIn 300ms 2000ms var(--ease-instrument) forwards;
+}
+.blockR .outline {
+  animation:
+    draw 850ms 1600ms linear forwards,
+    fadeOut 300ms 2450ms forwards;
+}
+.blockR .fill {
+  animation: fillIn 300ms 2450ms var(--ease-instrument) forwards;
+}
+.blockL .outline {
+  animation:
+    draw 550ms 1450ms linear forwards,
+    fadeOut 300ms 2000ms forwards;
+}
+.blockL .fill {
+  animation: fillIn 300ms 2000ms var(--ease-instrument) forwards;
+}
+
+.drone {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 14px;
+  height: 14px;
+  color: var(--color-ink);
+  offset-anchor: center;
+  offset-rotate: 0deg;
+  offset-distance: 0%;
+}
+.glyph {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+@supports not (offset-path: path("M0 0")) {
+  .drone {
+    display: none;
+  }
+}
+
+/* The approaches ease in to the tracing speed (about 330px/s); the traces run at it. */
+.droneC {
+  offset-path: path("M520 -720 C420 -300 25.93 -260 25.93 14.84 L48.26 0 L63.92 10.92 L63.92 24.3 A145.92 145.92 0 0 1 25.93 97.67 L25.93 14.84");
+  animation: flyC 1950ms 300ms both;
+}
+@keyframes flyC {
+  0% {
+    offset-distance: 0%;
+    animation-timing-function: cubic-bezier(0.2, 0.45, 0.6, 0.86);
+  }
+  51.28% {
+    offset-distance: 80.1%;
+    animation-timing-function: linear;
+  }
+  87.18% {
+    offset-distance: 100%;
+    opacity: 1;
+    scale: 1;
+    animation-timing-function: ease-in;
+  }
+  100% {
+    offset-distance: 100%;
+    opacity: 0;
+    scale: 0.4;
+  }
+}
+
+.droneR {
+  offset-path: path("M900 330 C520 330 260 40.44 66.04 40.44 L86.26 54.79 L86.26 128 L3.03 128 A100.79 100.79 0 0 0 66.04 40.44 C69.73 -19.4 160 -120 760 -360");
+  animation: flyR 2350ms 600ms both;
+}
+@keyframes flyR {
+  0% {
+    offset-distance: 0%;
+    animation-timing-function: cubic-bezier(0.2, 0.45, 0.6, 0.86);
+  }
+  42.55% {
+    offset-distance: 44.51%;
+    animation-timing-function: linear;
+  }
+  78.72% {
+    offset-distance: 59.23%;
+    animation-timing-function: cubic-bezier(0.45, 0.1, 0.8, 0.6);
+  }
+  100% {
+    offset-distance: 100%;
+  }
+}
+
+.droneL {
+  offset-path: path("M-720 520 C-300 560 -160 60.33 0 60.33 L19.73 47.94 L19.73 104.03 A145.92 145.92 0 0 1 0 119.46 L0 60.33");
+  animation: flyL 1800ms 450ms both;
+}
+@keyframes flyL {
+  0% {
+    offset-distance: 0%;
+    animation-timing-function: cubic-bezier(0.2, 0.45, 0.6, 0.86);
+  }
+  55.56% {
+    offset-distance: 84.53%;
+    animation-timing-function: linear;
+  }
+  86.11% {
+    offset-distance: 100%;
+    opacity: 1;
+    scale: 1;
+    animation-timing-function: ease-in;
+  }
+  100% {
+    offset-distance: 100%;
+    opacity: 0;
+    scale: 0.4;
+  }
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes fillIn {
+  to {
+    fill-opacity: 1;
+  }
+}
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes toInk {
+  to {
+    color: var(--color-ink);
+  }
+}
+@keyframes toWhite {
+  to {
+    color: #fff;
+  }
+}
+@keyframes markOut {
+  to {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+@keyframes introEnd {
+  to {
+    visibility: hidden;
+  }
+}

@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
 import { hero } from "@/content/home";
+import { INTRO_END_EVENT } from "@/lib/intro";
 import { FilmLayer, useFilm } from "@/components/ui/FilmMedia";
 import { Headline } from "@/components/ui/SectionHead";
 
@@ -16,10 +18,21 @@ const scrims = (
 /**
  * The home hero: the film full screen, the centred headline low in the frame with its italic turn,
  * then the support line. Nothing else sits on the film, which has no pause control (the owner's call,
- * 21 October). Under reduced motion or Save-Data the poster stands alone.
+ * 21 October). Under reduced motion or Save-Data the poster stands alone. The film plays (and loads)
+ * under the first-visit intro and starts again from its first frame as the intro ends, so the paper
+ * fades into its opening.
  */
 export function Hero() {
   const film = useFilm({ videoId: hero.videoId, threshold: 0.1 });
+  const { videoRef } = film;
+  useEffect(() => {
+    const restart = () => {
+      const el = videoRef.current;
+      if (el && el.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) el.currentTime = 0;
+    };
+    window.addEventListener(INTRO_END_EVENT, restart);
+    return () => window.removeEventListener(INTRO_END_EVENT, restart);
+  }, [videoRef]);
   return (
     <section aria-labelledby="hero-heading" data-band="hero" data-tone="film" className="on-dark on-film relative isolate flex min-h-[100svh] flex-col justify-end text-white md:h-[45rem] md:min-h-0">
       <FilmLayer film={film} videoId={hero.videoId} posterId={hero.posterId} priority fadeIn overlays={scrims} />
