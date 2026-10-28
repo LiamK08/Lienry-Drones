@@ -8,6 +8,10 @@
 //
 // Routes: the eleven pages, plus /this-page-does-not-exist, which must answer 404 (check 43).
 //
+// Every page is judged as a visitor in a session that has already seen the first-visit intro sees it
+// (CLAUDE.md "Intro": its session key is seeded before the page's own scripts run), so the intro's
+// overlay never shows here; check:rules' check 45 judges the intro itself.
+//
 //  2  Dead space. For every block in <main> except the film bands and the composed heroes (below), the
 //     visible content boxes inside the block's content box (padding excluded) are projected onto the page's
 //     vertical axis: no horizontal stripe taller than the limit may hold none (112px from 1024, 88px below:
@@ -1391,6 +1395,17 @@ for (const route of opts.routes) {
     const limit = limitFor(width);
     const context = await browser.newContext({ viewport: { width: vp.width, height: vp.height }, deviceScaleFactor: 1, isMobile: vp.mobile, hasTouch: vp.mobile });
     await context.addInitScript(pageLib, cfg);
+    // The intro already seen (src/lib/intro.ts INTRO_SEEN_KEY), before --inject so a self-test can clear it.
+    await context.addInitScript(
+      (key) => {
+      try {
+        sessionStorage.setItem(key, "1");
+      } catch {
+        // No storage: the head script then never starts the intro either.
+      }
+    },
+      "lienry:intro-seen",
+    );
     if (opts.injectSource) await context.addInitScript({ content: opts.injectSource });
     const page = await context.newPage();
     const errors = [];

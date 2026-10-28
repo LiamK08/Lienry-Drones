@@ -44,12 +44,26 @@ Checks: `check:a11y`, `perf:vitals`, `check:layout` and `check:rules` gate every
 the token sizes, no eyebrows, centred heads centred where they sit,
 content inside the rail and the 20px phone margins, the band palette and Band's pads. Their
 honesty checks (11 claims, 12 captions, 22 titles, 24 enquiry labels, 44 no ReFresh or Legora)
-never relax. Change a check only together with the rule here that it encodes. Hero headings hold
+never relax. `check:layout`, `check:rules` and the motion and screenshot scripts judge each page as a
+visitor in a session that has seen the intro (its key seeded); `perf:vitals` and `check:a11y` load home as
+a first visit, intro and all; check 45 (in `check:rules`) proves the intro's own rules. Change a check only together with the rule here that it encodes. Hero headings hold
 their fallback-font line count on phones (`holdLines`), or the web font arriving shifts the page.
 
 Sticky: only the header, a column under it (a nav, or a block holding a heading, nav or form), and,
 below 1024, the fit check's score strip (`data-fit-strip`), which sticks to the bottom of the screen inside
-its card's question column (the owner's brief, 26 October 2026). Check 21 encodes it.
+its card's question column (the owner's brief, 26 October 2026). Check 21 encodes it. Nothing is fixed but
+the header, the skip link and, while it plays, the intro's overlay.
+
+Intro (the owner's brief, 28 October 2026): when a browser session starts on the home page, a first-visit
+intro plays over it, after breakerindustries.com's loader in Lienry's own mark, colours and code: on the
+paper, three drones fly in on guide curves and trace the mark's blocks in the accent while they fill, one
+leaving along the flight arc; the mark turns ink, then white as the paper fades into the hero film, which
+starts again from its first frame. About four seconds, never past five, all CSS
+(`src/components/home/Intro.tsx`; the head script in `src/lib/intro.ts` sets `data-intro` before the
+first paint). Once per session (sessionStorage), never on another entry page, a reload, a deep link with a
+hash, or under reduced motion. Any key, press, wheel or touch ends it at once. It is aria-hidden with
+nothing focusable, and the page renders underneath as normal (never hidden or inert), so it never delays
+the LCP.
 
 Header contrast: `npm run contrast -- <frame>` proves the bar stays legible over the hero
 film. Run it after touching the header, the hero scrim or the primary button.

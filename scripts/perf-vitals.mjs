@@ -194,7 +194,7 @@ function lighthouse(url, n) {
 
 // The applied-throttling load, for the report and check 42.
 function observers() {
-  window.__p7vitals = { lcp: [], shifts: [], longtasks: [] };
+  window.__p7vitals = { lcp: [], shifts: [], longtasks: [], intro: [] };
   const describe = (el) => {
     if (!el) return null;
     const media = el.currentSrc || el.getAttribute?.("src") || "";
@@ -202,6 +202,12 @@ function observers() {
     return `<${el.tagName.toLowerCase()}${el.id ? `#${el.id}` : ""}>${media ? ` ${media.split("/").pop()}` : ""}${!media && text ? ` "${text}"` : ""}`;
   };
   try {
+    // The first-visit intro (CLAUDE.md "Intro"): every load here is a fresh session, so on / it plays,
+    // as it does for a first visitor; the report says when it was up beside the LCP painted under it.
+    // The document itself is observed: <html> may not exist yet when this runs.
+    new MutationObserver((records) => {
+      for (const r of records) if (r.target === document.documentElement) window.__p7vitals.intro.push({ on: document.documentElement.getAttribute("data-intro"), at: performance.now() });
+    }).observe(document, { subtree: true, attributes: true, attributeFilter: ["data-intro"] });
     new PerformanceObserver((list) => {
       for (const e of list.getEntries()) window.__p7vitals.lcp.push({ startTime: e.startTime, size: e.size, url: e.url || "", element: describe(e.element) });
     }).observe({ type: "largest-contentful-paint", buffered: true });
@@ -237,6 +243,7 @@ async function appliedLoad(browser, route) {
       return {
         lcp,
         cls: v.shifts.reduce((s, e) => s + e.value, 0),
+        intro: v.intro,
         shifts: v.shifts.filter((s) => s.value > 0.001),
         longtasks: v.longtasks,
         resources,
@@ -300,6 +307,9 @@ for (const route of opts.routes) {
       const lcpRes = lcpUrl ? applied.resources.find((r) => r.name === lcpUrl) : null;
       notes.push(`applied load: LCP ${ms(lcp.startTime)} on ${lcp.element ?? "?"}${lcpRes ? ` (${kb(lcpRes.transfer)})` : ""}, CLS ${applied.cls.toFixed(3)}, ${applied.longtasks.length} long task${applied.longtasks.length === 1 ? "" : "s"} (${ms(applied.longtasks.reduce((s, t) => s + t.duration, 0))})`);
       if (EXPECTED_LCP[route]) notes.push(`expected LCP image (D4): ${EXPECTED_LCP[route]}`);
+      const up = applied.intro.find((e) => e.on === "play");
+      const down = applied.intro.find((e) => e.on === null && up && e.at >= up.at);
+      if (up) notes.push(`intro: up ${ms(up.at)} to ${down ? ms(down.at) : "past the load"}; the LCP above is painted under it`);
       if (opts.profile === "mobile" && lcpRes && lcpRes.transfer > LCP_IMAGE_KB * 1024) add(42, `the mobile LCP image transfers ${kb(lcpRes.transfer)}, over ${LCP_IMAGE_KB} KB`, lcpUrl.replace(opts.base, ""));
       const before = applied.resources.filter((r) => r.end <= lcp.startTime).sort((a, b) => a.end - b.end);
       const heavy = before.filter((r) => r.name !== lcpUrl && r.transfer > OTHER_KB * 1024);

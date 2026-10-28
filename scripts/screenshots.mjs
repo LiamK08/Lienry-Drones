@@ -241,6 +241,14 @@ const errors = [];
 for (const width of opts.widths) {
   const [w, h, mobile] = VIEWPORTS[width] ?? [width, width < 800 ? 844 : 900, width < 800];
   const context = await browser.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: 1, isMobile: mobile, hasTouch: mobile });
+  // Pages as a visitor in a session that has seen the first-visit intro sees them (CLAUDE.md "Intro").
+  await context.addInitScript((key) => {
+    try {
+      sessionStorage.setItem(key, "1");
+    } catch {
+      // No storage: the head script then never starts the intro either.
+    }
+  }, "lienry:intro-seen");
   const page = await context.newPage();
   page.on("console", (m) => m.type() === "error" && errors.push(`${width} console: ${m.text().slice(0, 200)}`));
   page.on("pageerror", (e) => errors.push(`${width} pageerror: ${String(e).slice(0, 200)}`));

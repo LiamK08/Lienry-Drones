@@ -73,6 +73,8 @@
 //     or is a nav": the home FAQ's sticky block is its enquiry card (FaqForm.tsx), which has no heading.
 //     Below 1024 the fit check's score strip ([data-fit-strip], FitCheck.tsx) may stick to the bottom of
 //     the screen inside its card's question column, as the reference's does (CLAUDE.md, 26 Oct 2026).
+//     Every pass sees a page as a visitor in a session that has already seen the first-visit intro
+//     (SPEC.introKey is seeded), so the intro's overlay never shows here; check 45 judges it.
 // 22  Titles and links: every route's <title> is its own, "What the page is | Lienry Drones", exactly as
 //     pageTitle in src/lib/site.ts builds it. Its one canonical link and its og:url are its own address;
 //     og:title and twitter:title are the title without the brand; og:description and
@@ -90,6 +92,15 @@
 // 41  Hover clips (with the motion passes): nothing requested at load; hovering a card plays its clip
 //     alone within 1.2s and leaving pauses it within 400ms; focusing its link plays it and pauses it by
 //     5.2s; the card keeps its height; at 390 (touch) and under reduced motion there is no clip at all.
+// 45  First-visit intro (with the motion passes, when / is checked; CLAUDE.md "Intro", 28 Oct 2026): a
+//     fresh session that opens / at each width shows the intro's overlay ([data-intro-overlay]) at once;
+//     it is aria-hidden, holds no text and nothing focusable, and is the one fixed layer beside the
+//     header and the skip link; the hero's h1 renders under it and neither <main> nor the header is
+//     inert or hidden; nothing runs past the screen's edge; it ends by itself within SPEC.introMaxMs of
+//     the navigation, leaving the overlay display:none; a reload in the same session has no intro. In
+//     fresh sessions, a key (Tab, which then lands visibly on the skip link), a press or tap, and a
+//     wheel each end it at once (within 200ms: a wheel reaches the page a frame after it is sent); a session that starts on /platform and goes home by the header's link,
+//     one that opens /#faq, and one under reduced motion never see it.
 // 44  References never load: no request from any page this script opens goes to refresh.tech,
 //     legora.com or a subdomain of either, and no address in the page (href, src, srcset, poster,
 //     action, data: a preconnect or a link makes no request) is on one; no text in the page (hidden
@@ -211,6 +222,12 @@ const SPEC = {
     "/solar": { windows: 1 },
     "/download": { windows: 1 },
   },
+  // Check 45 (CLAUDE.md "Intro"): the intro's session key (INTRO_SEEN_KEY in src/lib/intro.ts), its
+  // overlay, and how long after the navigation it may still be playing by itself (WCAG 2.2.2's five
+  // seconds; it is built to end at about 4.2s from the first paint).
+  introKey: "lienry:intro-seen",
+  introOverlay: "[data-intro-overlay]",
+  introMaxMs: 5000,
   // D2 check 33: words that would turn the visitor's own figures into a Lienry claim.
   calcClaims: /\b(sav(e|es|ing|ings)|ROI|payback|cheaper|less than|compared|with Lienry|Lienry('s)? (cost|price|fee))/i,
 };
@@ -235,21 +252,22 @@ const CHECKS = {
   33: "the calculator",
   41: "hover clips",
   44: "references never load",
+  45: "first-visit intro",
 };
 // Checks that run with the motion passes (--no-motion skips them).
-const MOTION_CHECKS = new Set(["21", "41"]);
+const MOTION_CHECKS = new Set(["21", "41", "45"]);
 
 function usage() {
   console.log(`Usage: node scripts/check-rules.mjs <baseUrl> [route ...] [options]
 
-Runs the rule checks (5-14, 21-24, 26, 29, 33, 41 and 44) against a served build.
+Runs the rule checks (5-14, 21-24, 26, 29, 33, 41, 44 and 45) against a served build.
 
   <baseUrl>          the served build, e.g. http://localhost:3000 (default)
   route              one or more routes (default: all eleven and ${NOT_FOUND}, the 404 page)
   --widths 1440,390  viewport widths (1440x900 and 390x844 by default; 1024 and 768 are known too)
   --json <file>      also write the full report as JSON
   --no-sweep         skip the tab and disclosure state sweeps
-  --no-motion        skip the motion passes (checks 21 and 41), which load every route again
+  --no-motion        skip the motion passes (checks 21, 41 and 45), which load every route again
   --inject <file.js> add the file's source as an init script, after the page library, on every page
                      the script opens (all passes): a self-test that breaks a rule on purpose`);
 }
@@ -1721,13 +1739,22 @@ async function settlePage(page, vh) {
   await R(page, "idle", 3000);
 }
 
-// Every page the checks open: the page library, the draw counter, then the --inject mutation. Its
-// requests to a reference site are kept for check 44 (refs).
-async function newPage(width, extra = {}) {
+// Every page the checks open: the page library, the draw counter, the intro already seen (a session
+// in which it has played; check 45 opens its own without), then the --inject mutation, last, so a
+// self-test can clear the key again. Its requests to a reference site are kept for check 44 (refs).
+async function newPage(width, extra = {}, { introSeen = true } = {}) {
   const vp = VIEWPORTS[width] ?? { width, height: width < 800 ? 844 : 900, mobile: width < 800 };
   const context = await browser.newContext({ viewport: { width: vp.width, height: vp.height }, deviceScaleFactor: 1, isMobile: vp.mobile, hasTouch: vp.mobile, ...extra });
   await context.addInitScript(pageLib);
   await context.addInitScript(drawCounter);
+  if (introSeen)
+    await context.addInitScript((key) => {
+      try {
+        sessionStorage.setItem(key, "1");
+      } catch {
+        // No storage: the head script then never starts the intro either.
+      }
+    }, SPEC.introKey);
   if (opts.inject) await context.addInitScript({ content: opts.inject.content });
   const refs = [];
   context.on("request", (req) => {
@@ -2541,8 +2568,153 @@ async function clipPass(route) {
   }
 }
 
+// Check 45: the first-visit intro, in fresh sessions (no key seeded) that open / at one width.
+const introState = (page) =>
+  page.evaluate((sel) => {
+    const o = document.querySelector(sel);
+    const cs = o ? getComputedStyle(o) : null;
+    return { on: document.documentElement.getAttribute("data-intro"), display: cs ? cs.display : "absent", visibility: cs ? cs.visibility : "" };
+  }, SPEC.introOverlay);
+
+async function introPass(width) {
+  const failures = [];
+  const notes = [];
+  const add = (kind, sample = "") => failures.push({ check: 45, kind, sample });
+  const refs = [];
+  const errors = [];
+  // A fresh session at this width; `go` opens a route and returns once the head script has run.
+  const open = async (extra = {}) => {
+    const { context, page, refs: seen } = await newPage(width, extra, { introSeen: false });
+    refs.push(seen);
+    page.on("pageerror", (e) => errors.push(String(e.message).split("\n")[0]));
+    const go = async (route) => {
+      const t0 = Date.now();
+      await page.goto(opts.base + route, { waitUntil: "domcontentloaded", timeout: 60000 });
+      return t0;
+    };
+    return { context, page, go };
+  };
+  const label = `at ${width}`;
+  try {
+    // Plays by itself, and is judged while it plays.
+    {
+      const { context, page, go } = await open();
+      const t0 = await go("/");
+      let st = await introState(page);
+      if (st.on !== "play" || st.display === "none") add(`a fresh session opening / shows no intro ${label}`, JSON.stringify(st));
+      else {
+        await page.waitForTimeout(900);
+        const probe = await page.evaluate((sel) => {
+          const o = document.querySelector(sel);
+          const focusable = o.querySelectorAll('a[href], button, input, select, textarea, summary, iframe, [tabindex]:not([tabindex="-1"]), [contenteditable]').length;
+          const header = document.querySelector("body > header, header");
+          const h1 = document.querySelector("main h1");
+          const r = h1?.getBoundingClientRect();
+          let hidden = false;
+          for (let e = h1; e; e = e.parentElement) {
+            const c = getComputedStyle(e);
+            if (c.display === "none" || c.visibility === "hidden" || parseFloat(c.opacity) === 0) hidden = true;
+          }
+          const veiled = [document.querySelector("main"), header].filter((e) => e && (e.inert || e.hidden || e.getAttribute("aria-hidden") === "true")).map((e) => e.tagName.toLowerCase());
+          const fixed = [];
+          for (const e of document.body.querySelectorAll("*")) {
+            if (getComputedStyle(e).position !== "fixed" || o.contains(e) || (header && header.contains(e)) || e.matches('a[href="#main"]')) continue;
+            const b = e.getBoundingClientRect();
+            if (b.width && b.height && getComputedStyle(e).visibility === "visible") fixed.push(`${e.tagName.toLowerCase()}${e.className && typeof e.className === "string" ? "." + e.className.split(" ")[0] : ""}`);
+          }
+          return {
+            ariaHidden: o.getAttribute("aria-hidden"),
+            text: o.textContent.trim().slice(0, 40),
+            focusable,
+            h1: !!h1 && !!r && r.width > 0 && r.height > 0 && !hidden,
+            veiled,
+            fixed,
+            overflow: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - innerWidth,
+          };
+        }, SPEC.introOverlay);
+        if (probe.ariaHidden !== "true") add(`the intro overlay is not aria-hidden ${label}`);
+        if (probe.text) add(`the intro overlay holds text ${label}`, probe.text);
+        if (probe.focusable) add(`the intro overlay holds something focusable ${label}`, `${probe.focusable}`);
+        if (!probe.h1) add(`the hero's h1 does not render under the intro ${label}`);
+        if (probe.veiled.length) add(`inert, hidden or aria-hidden under the intro ${label}`, probe.veiled.join(", "));
+        for (const f of probe.fixed) add(`a fixed element other than the header, the skip link and the intro ${label}`, f);
+        if (probe.overflow > 0) add(`the page runs ${probe.overflow}px past the screen's edge during the intro ${label}`);
+        const left = SPEC.introMaxMs - (Date.now() - t0);
+        const ended = await page
+          .waitForFunction(() => !document.documentElement.hasAttribute("data-intro"), null, { timeout: Math.max(1, left), polling: 50 })
+          .then(() => Date.now() - t0)
+          .catch(() => null);
+        if (ended === null) add(`the intro is still playing ${SPEC.introMaxMs}ms after the navigation ${label}`);
+        else notes.push(`45: the intro ended by itself ${ended}ms after the navigation ${label}`);
+        st = await introState(page);
+        if (ended !== null && st.display !== "none") add(`the intro overlay is not display:none once it ends ${label}`, JSON.stringify(st));
+        await go("/");
+        st = await introState(page);
+        if (st.on || st.display !== "none") add(`a reload of / in the same session shows the intro again ${label}`, JSON.stringify(st));
+      }
+      await context.close();
+    }
+    // Any input ends it at once: a key (Tab, landing on the skip link), a press or a tap, a wheel.
+    const inputs = [
+      ["Tab", (page) => page.keyboard.press("Tab")],
+      [width < 800 ? "a tap" : "a press", (page) => (width < 800 ? page.touchscreen.tap(width / 2, 300) : page.mouse.click(width / 2, 300))],
+      ...(width < 800 ? [] : [["a wheel", async (page) => { await page.mouse.move(width / 2, 300); await page.mouse.wheel(0, 200); }]]),
+    ];
+    for (const [name, act] of inputs) {
+      const { context, page, go } = await open();
+      await go("/");
+      const was = (await introState(page)).on;
+      await page.waitForTimeout(700);
+      if (was === "play" && (await introState(page)).on === "play") {
+        await act(page);
+        // At once: within a frame or two (a wheel reaches the page a frame after it is sent).
+        await page.waitForFunction(() => !document.documentElement.hasAttribute("data-intro"), null, { timeout: 200, polling: "raf" }).catch(() => {});
+        const st = await introState(page);
+        if (st.on || st.display !== "none") add(`${name} does not end the intro at once ${label}`, JSON.stringify(st));
+        if (name === "Tab") {
+          const f = await page.evaluate(() => {
+            const a = document.activeElement;
+            const r = a.getBoundingClientRect();
+            const top = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+            return { skip: a.matches('a[href="#main"]'), seen: !!top && (a === top || a.contains(top)) };
+          });
+          if (!f.skip || !f.seen) add(`Tab during the intro does not land visibly on the skip link ${label}`, JSON.stringify(f));
+        }
+      } else add(`no intro to end with ${name} ${label}`, String(was));
+      await context.close();
+    }
+    // Never: a session that starts elsewhere, a deep link, reduced motion.
+    {
+      const { context, page, go } = await open();
+      await go("/platform");
+      if ((await introState(page)).on) add(`a session that opens /platform starts the intro ${label}`);
+      await page.waitForLoadState("load");
+      await page.locator('body > header a[href="/"], header a[href="/"]').first().click();
+      await page.waitForURL(opts.base + "/");
+      await page.waitForTimeout(300);
+      const st = await introState(page);
+      if (st.on || st.display !== "none") add(`going home by the header's link shows the intro ${label}`, JSON.stringify(st));
+      await context.close();
+    }
+    for (const [name, extra, route] of [["/#faq", {}, "/#faq"], ["reduced motion", { reducedMotion: "reduce" }, "/"]]) {
+      const { context, page, go } = await open(extra);
+      await go(route);
+      const st = await introState(page);
+      if (st.on || st.display !== "none") add(`the intro plays with ${name} ${label}`, JSON.stringify(st));
+      await context.close();
+    }
+  } catch (err) {
+    add(`the intro pass could not finish ${label}`, String(err.message).split("\n")[0]);
+  } finally {
+    for (const e of new Set(errors)) add(`page error in an intro session ${label}`, e);
+    judgeRefs(refs.flat(), (check, where, kind, sample) => failures.push({ check, kind, sample }));
+    printPass(`/ first-visit intro at ${width}`, failures, notes);
+  }
+}
+
 if (calcRoutes.size) for (const route of calcRoutes) for (const width of [390, 768, 1440]) await calcPass(route, width);
 if (opts.motion) for (const route of clipRoutes) await clipPass(route);
+if (opts.motion && opts.routes.includes("/")) for (const width of opts.widths) await introPass(width);
 
 // Site-wide checks: served HTML and JS, the manifest, fonts, public folders and source.
 console.log("");

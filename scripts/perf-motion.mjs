@@ -14,6 +14,9 @@
 // animationstart events in the same places; and a wrapper on Element.prototype.animate that logs the
 // keyframe properties of every scripted animation.
 //
+// Every load is a fresh one in a session that has already seen the first-visit intro (CLAUDE.md "Intro":
+// its session key is seeded), so the intro's own animation is never charged to a scenario.
+//
 // Scenarios, per route: scroll (wheel 100px every 16ms; on mobile, touch scroll gestures through CDP),
 // on a fresh load so the reveals fire as a visitor would see them; then, on a second fresh load, every
 // reveal brought into view one at a time (with every image already loaded and the page off the top, so
@@ -239,6 +242,16 @@ async function open(route, { cores, gpu }) {
   const browser = await browserFor(gpu ? "gpu" : "swiftshader");
   const context = await browser.newContext({ ...profile });
   await context.addInitScript(instrument, { cores });
+  await context.addInitScript(
+    (key) => {
+      try {
+        sessionStorage.setItem(key, "1");
+      } catch {
+        // No storage: the head script then never starts the intro either.
+      }
+    },
+    "lienry:intro-seen",
+  );
   const page = await context.newPage();
   const cdp = await context.newCDPSession(page);
   await cdp.send("Performance.enable");

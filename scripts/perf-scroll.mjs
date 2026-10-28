@@ -10,6 +10,8 @@ const width = Number(process.argv[3] ?? 1440);
 const height = width < 600 ? 844 : 900;
 const browser = await chromium.launch({ args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"] });
 const page = await browser.newPage({ viewport: { width, height }, isMobile: width < 600, hasTouch: width < 600 });
+// A session that has already seen the first-visit intro (CLAUDE.md "Intro").
+await page.addInitScript(() => { try { sessionStorage.setItem("lienry:intro-seen", "1"); } catch { /* no storage, no intro */ } });
 await page.goto(base + "/", { waitUntil: "networkidle" });
 await page.waitForTimeout(1500);
 const cdp = await page.context().newCDPSession(page);
