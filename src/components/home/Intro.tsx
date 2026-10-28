@@ -1,3 +1,4 @@
+import { DroneGlyph } from "@/components/home/DroneGlyph";
 import s from "./Intro.module.css";
 
 // The stage is the mark at 128px tall (86.26 wide), its top-left at 0,0; every path below is in its
@@ -14,26 +15,17 @@ const GUIDES = ["M1112.88 -1601.81 C892.88 -677.81 25.93 -589.81 25.93 14.84", "
 // The right-hand drone leaves along the flight arc, out past the top right of any screen.
 const TRAIL = "M66.04 40.44 C75.63 -115.14 310.34 -376.7 1870.34 -1000.7";
 
-/** A quadcopter from above: four rotors on crossed arms around the body. */
+/** A quadcopter from above (the glyph the step stage's wash puck uses too), moved along its path in CSS. */
 function Drone({ className }: { className: string }) {
   return (
     <div className={`${s.drone} ${className}`}>
-      <svg viewBox="-7 -7 14 14" className={s.glyph}>
-        <g fill="none" stroke="currentColor" strokeWidth="1.1">
-          <path d="M-4 -4 4 4M-4 4 4 -4" />
-          <circle cx="-4" cy="-4" r="2.4" />
-          <circle cx="4" cy="-4" r="2.4" />
-          <circle cx="-4" cy="4" r="2.4" />
-          <circle cx="4" cy="4" r="2.4" />
-        </g>
-        <rect x="-1.6" y="-1.6" width="3.2" height="3.2" fill="currentColor" />
-      </svg>
+      <DroneGlyph className={s.glyph} />
     </div>
   );
 }
 
 /**
- * The first-visit intro, after the owner's brief of 28 October 2026: the warm paper with fine corner
+ * The first-visit intro, after the owner's brief of 28 October 2026: the paper with fine corner
  * ticks, three drones flying in on faint guide curves, each tracing one block of the mark in the accent
  * while the block fills, the right-hand one leaving along the flight arc; the mark turns ink and fades as
  * the paper fades into the hero film, which starts again from its first frame. About four seconds, all

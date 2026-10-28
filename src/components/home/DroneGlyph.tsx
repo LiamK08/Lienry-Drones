@@ -1,5 +1,5 @@
 /**
- * The intro's quadcopter from above (src/components/home/Intro.tsx draws the same glyph): four rotors
+ * The quadcopter from above that the intro flies and the step stage's wash puck carries: four rotors
  * on crossed arms around the body. Decorative; it takes the colour of its text.
  */
 export function DroneGlyph({ className = "" }: { className?: string }) {

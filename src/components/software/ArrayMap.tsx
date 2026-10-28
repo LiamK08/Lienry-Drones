@@ -13,8 +13,8 @@ const HEIGHT = MAP.rows * MAP.up * CH + (MAP.rows - 1) * ROW_GAP;
 const LETTERS = ["A", "B", "C", "D"];
 
 const COLOURS = {
-  pending: "#dbe2e9",
-  washed: "#1f5d8c",
+  pending: "var(--color-map-pending)",
+  washed: "var(--color-glass)",
   amber: [224, 161, 58],
   rust: [180, 90, 28],
 } as const;

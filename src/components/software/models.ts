@@ -100,9 +100,9 @@ const building: WindowModel = {
   mapAxis: { columns: FACADE_MAP_COLUMNS, labels: ["North", "", "East", "", "Roof"] },
   legend: [
     { colour: "var(--color-glass)", label: "Washed" },
-    { colour: "#8db4d4", label: "One pass" },
-    { colour: "#dbe2e9", label: "Pending" },
-    { colour: "#e0a13a", label: "Debris" },
+    { colour: "var(--color-map-half)", label: "One pass" },
+    { colour: "var(--color-map-pending)", label: "Pending" },
+    { colour: "var(--color-debris)", label: "Debris" },
   ],
   video: "software-view",
   recordingLabel: "Recording of the software view: the model of a 12-storey building being scanned and washed",
@@ -132,7 +132,7 @@ const solar: WindowModel = {
   mapAxis: null,
   legend: [
     { colour: "var(--color-glass)", label: "Washed" },
-    { colour: "#dbe2e9", label: "Pending" },
+    { colour: "var(--color-map-pending)", label: "Pending" },
     { colour: "#e0a13a", label: "Soiling" },
   ],
   video: "solar-view",

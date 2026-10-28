@@ -54,7 +54,8 @@ export function pagerKeys(e: KeyboardEvent<HTMLElement>, index: number, position
 
 /**
  * Under a track, centred: round previous and next buttons around a pager of dots, one per position,
- * each in a 24px target, the current one a wider accent pill. At the ends a button is unavailable.
+ * each in a 24px target, the current one a wider accent pill. The targets sit 4px apart, so a focus ring
+ * (2px out, 2px wide) ends at its neighbour's edge, clear of the pill. At the ends a button is unavailable.
  */
 export function Pager({ trackId, index, positions, count, go, noun, className = "" }: { trackId: string; index: number; positions: number; count: number; go: (to: number) => void; noun: string; className?: string }) {
   // Each dot names the items it brings into view: "Show reason 2 of 5", or two up, "Show reasons 3 and 4 of 5".
@@ -65,7 +66,7 @@ export function Pager({ trackId, index, positions, count, go, noun, className = 
       <IconButton round label={`Previous ${noun}`} aria-controls={trackId} unavailable={index <= 0} onClick={() => go(index - 1)}>
         <ArrowGlyph back />
       </IconButton>
-      <ul className="flex items-center">
+      <ul className="flex items-center gap-1">
         {Array.from({ length: positions }, (_, p) => (
           <li key={p}>
             <button

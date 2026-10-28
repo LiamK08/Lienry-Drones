@@ -36,7 +36,8 @@ section titles 48px (36), inner section titles 36px (36), card and row titles 32
 negative tracking. A section's h2 set at the page-title step drops to 36px on phones. No eyebrows: headings stand alone,
 with no label above them (the owner's call, 21 October 2026). The header carries no pills.
 
-Shape: buttons are pills (`rounded-pill`, optional round arrow badge); cards are `rounded-card`
+Shape: buttons are pills (`rounded-pill`, optional round arrow badge) in one system: `md` for a page's calls
+to action, `lg` only for form submits, `sm` only inside app UI; icon buttons are round. Cards are `rounded-card`
 (16px), panels `rounded-panel` (20px); feature and story images follow the reference's softer
 corners (`Picture rounded="image"`, 12px, 8px from 1024; `rounded="media"`, 10px); small tags and form
 fields keep `--radius-hard` (4px). The header bar is 56px (`--nav-h`).
@@ -50,7 +51,7 @@ content inside the rail and the 20px phone margins, the band palette and Band's 
 honesty checks (11 claims, 12 captions, 22 titles, 24 enquiry labels, 44 no ReFresh or Legora)
 never relax. `check:layout`, `check:rules` and the motion and screenshot scripts judge each page as a
 visitor in a session that has seen the intro (its key seeded); `perf:vitals` and `check:a11y` load home as
-a first visit, intro and all; check 45 (in `check:rules`) proves the intro's own rules. Change a check only together with the rule here that it encodes. Hero headings hold
+a first visit, intro and all; check 45 (in `check:rules`) proves the intro's own rules, and check 46 the page entrances. Change a check only together with the rule here that it encodes. Hero headings hold
 their fallback-font line count on phones (`holdLines`), or the web font arriving shifts the page.
 
 Sticky: only the header, a column under it (a nav, or a block holding a heading, nav or form), and,
@@ -69,10 +70,17 @@ another page of the site (a home tab opened from inside it), an address with a h
 motion. Any key, press, wheel, touch or scroll ends it at once (a text-fragment link scrolls the page, so
 it ends at once too), and a press that ends it while the paper still covers the page never clicks or
 hovers what was under it. It is aria-hidden with nothing focusable, and the page renders underneath as normal (never
-hidden or inert), so it never delays the LCP.
+hidden or inert), so it never delays the LCP. The header's and the footer's marks echo the build in miniature on
+hover and keyboard focus (CSS, about 700ms, none under reduced motion).
+
+Page entrances (28 October 2026): moving to another page of the site brings the new page in, a fade and an 8px
+rise on `<main>` over about a quarter of a second, never past 300ms (`src/components/site/PageTransition.tsx`),
+while the header holds still. Never on the first page of a visit, an anchor or a new query, never under reduced
+motion, and it never holds the navigation back (no View Transitions). Check 46 encodes it.
 
 Header contrast: `npm run contrast -- <frame>` proves the bar stays legible over the hero
-film. Run it after touching the header, the hero scrim or the primary button.
+film and over /company's accent hero (there the bar is clear, painted in the hero's own top colour). Run it
+after touching the header, the hero scrim or the primary button.
 
 Legora and refresh.tech are references for quality and structure only. No Legora or ReFresh
 code, text, imagery, icons, logos or assets enter this repository, and the site never loads

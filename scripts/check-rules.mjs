@@ -104,6 +104,10 @@
 //     opens the menu, while the same tap after the intro does; a session that starts on
 //     /platform and goes home by the header's link, a new tab opened on / from another page of the site
 //     (a same-site referrer), one that opens /#faq, and one under reduced motion never see it.
+// 46  Page entrances (with the motion passes; CLAUDE.md "Page entrances", 28 Oct 2026): at each width,
+//     the first page of a visit (the first checked route other than /) has no entrance on <main>; the
+//     header's link home then brings the new <main> in with exactly one animation of at most
+//     SPEC.pageEnterMaxMs, while the header's box never changes; under reduced motion there is none.
 // 44  References never load: no request from any page this script opens goes to refresh.tech,
 //     legora.com or a subdomain of either, and no address in the page (href, src, srcset, poster,
 //     action, data: a preconnect or a link makes no request) is on one; no text in the page (hidden
@@ -231,6 +235,8 @@ const SPEC = {
   introKey: "lienry:intro-seen",
   introOverlay: "[data-intro-overlay]",
   introMaxMs: 5000,
+  // Check 46 (CLAUDE.md "Page entrances"): the longest the new page's entrance may run.
+  pageEnterMaxMs: 300,
   // D2 check 33: words that would turn the visitor's own figures into a Lienry claim.
   calcClaims: /\b(sav(e|es|ing|ings)|ROI|payback|cheaper|less than|compared|with Lienry|Lienry('s)? (cost|price|fee))/i,
 };
@@ -256,9 +262,10 @@ const CHECKS = {
   41: "hover clips",
   44: "references never load",
   45: "first-visit intro",
+  46: "page entrances",
 };
 // Checks that run with the motion passes (--no-motion skips them).
-const MOTION_CHECKS = new Set(["21", "41", "45"]);
+const MOTION_CHECKS = new Set(["21", "41", "45", "46"]);
 
 function usage() {
   console.log(`Usage: node scripts/check-rules.mjs <baseUrl> [route ...] [options]
@@ -2748,9 +2755,78 @@ async function introPass(width) {
   }
 }
 
+// Check 46 (CLAUDE.md "Page entrances"): a move to another page of the site brings the new <main> in
+// with one short entrance while the header holds still; the first page of a visit never has one, nor
+// does any page under reduced motion. From a route other than home to home by the header's own link.
+async function pagePass(width) {
+  const failures = [];
+  const notes = [];
+  const add = (kind, sample = "") => failures.push({ check: 46, kind, sample });
+  const from = opts.routes.find((r) => r !== "/" && r !== NOT_FOUND) ?? "/platform";
+  const label = `from ${from} at ${width}`;
+  const refs = [];
+  try {
+    for (const reduce of [false, true]) {
+      const { context, page, refs: seen } = await newPage(width, reduce ? { reducedMotion: "reduce" } : {});
+      refs.push(seen);
+      await page.goto(opts.base + from, { waitUntil: "load", timeout: 60000 });
+      await page.waitForTimeout(400);
+      const first = await page.evaluate(() => {
+        const main = document.getElementById("main");
+        return { marked: !!main?.hasAttribute("data-page-enter"), running: document.getAnimations().filter((a) => a.effect?.target === main).length };
+      });
+      if (first.marked || first.running) add(`the first page of a visit has an entrance ${label}`, JSON.stringify(first));
+      // Every animation that starts on the new <main>, and the header's box each frame, from the click on.
+      await page.evaluate(() => {
+        const header = document.querySelector("body > header") ?? document.querySelector("header");
+        const box = () => {
+          const r = header.getBoundingClientRect();
+          return [r.x, r.y, r.width, r.height].map((v) => Math.round(v * 10) / 10).join(",");
+        };
+        const log = { starts: [], boxes: new Set([box()]) };
+        window.__entrance = log;
+        document.addEventListener(
+          "animationstart",
+          (e) => {
+            if (e.target.id !== "main") return;
+            const anim = e.target.getAnimations().find((a) => a.animationName === e.animationName);
+            log.starts.push({ name: e.animationName, ms: anim ? Number(anim.effect.getComputedTiming().duration) + Number(anim.effect.getComputedTiming().delay) : null });
+          },
+          true,
+        );
+        let n = 0;
+        const tick = () => {
+          log.boxes.add(box());
+          if (n++ < 45) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      });
+      await page.locator('body > header a[href="/"], header a[href="/"]').first().click();
+      await page.waitForURL(opts.base + "/", { timeout: 15000 });
+      await page.waitForTimeout(700);
+      const seenLog = await page.evaluate(() => ({ starts: window.__entrance.starts, boxes: [...window.__entrance.boxes], marked: !!document.getElementById("main")?.hasAttribute("data-page-enter") }));
+      if (reduce) {
+        if (seenLog.starts.length) add(`a page entrance plays under reduced motion ${label}`, JSON.stringify(seenLog.starts));
+      } else {
+        if (!seenLog.marked || seenLog.starts.length !== 1) add(`a move inside the site does not bring the new page in with one entrance ${label}`, JSON.stringify(seenLog));
+        for (const st of seenLog.starts) if (st.ms === null || st.ms > SPEC.pageEnterMaxMs) add(`the page entrance runs past ${SPEC.pageEnterMaxMs}ms ${label}`, JSON.stringify(st));
+        notes.push(`entrance ${label}: ${seenLog.starts.map((st) => `${st.name} ${st.ms}ms`).join(", ") || "none"}`);
+      }
+      if (seenLog.boxes.length > 1) add(`the header moves or resizes during a page change ${label}`, seenLog.boxes.join(" | "));
+      await context.close();
+    }
+  } catch (err) {
+    add(`the page entrance pass could not finish ${label}`, String(err.message).split("\n")[0]);
+  } finally {
+    judgeRefs(refs.flat(), (check, where, kind, sample) => failures.push({ check, kind, sample }));
+    printPass(`page entrances at ${width}`, failures, notes);
+  }
+}
+
 if (calcRoutes.size) for (const route of calcRoutes) for (const width of [390, 768, 1440]) await calcPass(route, width);
 if (opts.motion) for (const route of clipRoutes) await clipPass(route);
 if (opts.motion && opts.routes.includes("/")) for (const width of opts.widths) await introPass(width);
+if (opts.motion) for (const width of opts.widths) await pagePass(width);
 
 // Site-wide checks: served HTML and JS, the manifest, fonts, public folders and source.
 console.log("");
