@@ -3,19 +3,19 @@
 // are Action-compatible `{ label, href }`. Facts come from docs/SITE-PLAN.md only.
 
 /**
- * How a story row sits from 1024: "wide" (text then picture across 1328, the first row), "imageLeft"
- * (picture then text, two equal columns across 1200) or "textLeft" (a narrower text column, then a
- * wider picture, across 1200). Below 1024 every row is text, then picture.
+ * Which side a story row's text takes from 1024, on the page's 12 columns: "textLeft" (text in 1-5,
+ * the picture in 7-12) or "imageLeft" (the picture in 1-6, the text in 8-12). Below 1024 every row is
+ * text, then picture.
  */
-export type StoryRowLayout = "wide" | "imageLeft" | "textLeft";
+export type StoryRowLayout = "textLeft" | "imageLeft";
 
 /** A founder on /company. Only `published` entries render, and `photo` renders only when the owner supplies a real photograph. */
 export type FounderEntry = { name: string; title: string; bio: string; photo: null | { src: string; alt: string; width: number; height: number }; published: boolean };
 
 export const companyPage = {
   hero: {
-    headline: "Built in Sydney, for the buildings people own.",
-    emphasis: "for the buildings people own.",
+    headline: "Built in Sydney, for the buildings people own",
+    emphasis: "for the buildings people own",
     lead: "A small team designing a cleaning drone that stays on the property, so the exterior stays clean and nobody climbs up to do it.",
     images: [
       { id: "p1-tower", alt: "", position: "50% 40%" },
@@ -29,8 +29,8 @@ export const companyPage = {
   rows: [
     {
       id: "why",
-      layout: "wide" as StoryRowLayout,
-      title: "We think cleaning a building\u2019s exterior shouldn\u2019t need anyone at\u00a0height.",
+      layout: "textLeft" as StoryRowLayout,
+      title: "We think cleaning a building\u2019s exterior shouldn\u2019t need anyone at\u00a0height",
       paragraphs: ["Lienry Drones is a Sydney company at concept stage. We are building a resident cleaning drone that lives on a property and keeps its exterior clean with nobody on site. We start with the buildings people own: offices, apartments, homes and rentals."],
       image: { id: "co1-company", alt: "A harbour-side street of mid-rise buildings at dawn", position: "50% 50%" },
     },
@@ -77,5 +77,6 @@ export const companyPage = {
     ] satisfies FounderEntry[],
   },
   close: { headline: "Own a building that could use this? We would like to hear about it.", action: { label: "Register interest", href: "/register-interest" } },
+  /** Under the pre-seed round's action. */
   media: "For media enquiries, use the enquiry form and we will reply directly.",
 };

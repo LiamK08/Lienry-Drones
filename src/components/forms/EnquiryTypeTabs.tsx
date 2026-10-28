@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { createContext, Suspense, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, Suspense, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { enquiryTypes, type EnquiryType } from "@/lib/enquiry-schema";
 import { registerPage } from "@/content/register";
 import { TextLink } from "@/components/ui/TextLink";
@@ -44,13 +44,29 @@ const panelId = (t: EnquiryType) => `${ID}-panel-${t}`;
 
 /**
  * The tab row and its panels. Arrow keys move along the row (and wrap), Home and End jump to the
- * ends, and focus selects. The panels share one grid cell, so the row keeps the tallest panel's
- * height and a change cross-fades instead of jumping; a hidden panel is `invisible`, which also takes
- * it and its link out of the tab order and the accessibility tree.
+ * ends, and focus selects. The row is one line on a hairline that scrolls sideways where it does not
+ * fit (phones), its far edge fading out. Each tab draws its own underline, so the chosen one shows
+ * from the first paint; on a change the new underline glides over from the old one (250ms, none under
+ * reduced motion). The panels share one grid cell, so the row keeps the tallest panel's height and a
+ * change cross-fades instead of jumping; a hidden panel is `invisible`, which also takes it and its
+ * link out of the tab order and the accessibility tree.
  */
 function TabsView({ type, onSelect }: { type: EnquiryType; onSelect: (t: EnquiryType) => void }) {
   const t = registerPage.types;
   const n = enquiryTypes.length;
+  const rowRef = useRef<HTMLDivElement>(null);
+  const last = useRef<{ type: EnquiryType; left: number; width: number } | null>(null);
+
+  // The glide: the new underline starts where the old one was drawn and eases into its own place.
+  useLayoutEffect(() => {
+    const line = rowRef.current?.querySelector<HTMLElement>(`#${tabId(type)} [data-underline]`);
+    if (!line) return;
+    const r = line.getBoundingClientRect();
+    const prev = last.current;
+    last.current = { type, left: r.left, width: r.width };
+    if (!prev || prev.type === type || !r.width || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    line.animate([{ transform: `translateX(${prev.left - r.left}px) scaleX(${prev.width / r.width})` }, { transform: "none" }], { duration: 250, easing: "cubic-bezier(0.22, 1, 0.36, 1)" });
+  }, [type]);
 
   function onKeyDown(e: React.KeyboardEvent<HTMLButtonElement>, i: number) {
     const to = e.key === "ArrowRight" ? (i + 1) % n : e.key === "ArrowLeft" ? (i - 1 + n) % n : e.key === "Home" ? 0 : e.key === "End" ? n - 1 : -1;
@@ -63,7 +79,12 @@ function TabsView({ type, onSelect }: { type: EnquiryType; onSelect: (t: Enquiry
   // data-sweep="form": the tabs choose the form's fields, so the band's height follows them (check 3).
   return (
     <div data-sweep="form">
-      <div role="tablist" aria-label={t.label} className="grid grid-cols-2 justify-items-center gap-y-[11px] md:grid-cols-4">
+      <div
+        ref={rowRef}
+        role="tablist"
+        aria-label={t.label}
+        className="no-scrollbar -mx-5 flex gap-6 overflow-x-auto px-5 shadow-[inset_0_-1px_0_var(--color-line)] max-md:[mask-image:linear-gradient(to_right,black_calc(100%-2rem),transparent)] md:mx-0 md:px-0"
+      >
         {enquiryTypes.map((k, i) => {
           const on = k === type;
           return (
@@ -77,20 +98,21 @@ function TabsView({ type, onSelect }: { type: EnquiryType; onSelect: (t: Enquiry
               tabIndex={on ? 0 : -1}
               onClick={() => onSelect(k)}
               onKeyDown={(e) => onKeyDown(e, i)}
-              className={`relative inline-flex h-[26px] cursor-pointer items-center px-0.5 text-[0.875rem] font-medium leading-none transition-[background-color,border-color,color] duration-200 ease-instrument motion-reduce:transition-none ${
+              className={`relative inline-flex h-11 shrink-0 cursor-pointer items-center whitespace-nowrap text-small font-medium transition-[color] duration-200 ease-instrument motion-reduce:transition-none ${
                 on ? "text-fg" : "text-fg-muted hover:text-fg"
               }`}
             >
               {t.items[k].tab}
               <span
                 aria-hidden="true"
-                className={`absolute inset-x-0 bottom-0 h-0.5 origin-center bg-accent forced-colors:forced-color-adjust-none forced-colors:bg-[Highlight] transition-transform duration-300 ease-settle motion-reduce:transition-none ${on ? "scale-x-100" : "scale-x-0"}`}
+                data-underline=""
+                className={`absolute inset-x-0 bottom-0 h-0.5 origin-left bg-accent forced-colors:forced-color-adjust-none forced-colors:bg-[Highlight] ${on ? "" : "invisible"}`}
               />
             </button>
           );
         })}
       </div>
-      <div className="mt-4 grid">
+      <div className="mt-5 grid">
         {enquiryTypes.map((k) => {
           const on = k === type;
           return (
@@ -100,10 +122,10 @@ function TabsView({ type, onSelect }: { type: EnquiryType; onSelect: (t: Enquiry
               role="tabpanel"
               aria-labelledby={tabId(k)}
               tabIndex={on ? 0 : undefined}
-              className={`[grid-area:1/1] text-center transition-[opacity,visibility] duration-200 ease-instrument motion-reduce:transition-none ${on ? "visible opacity-100" : "invisible opacity-0"}`}
+              className={`[grid-area:1/1] transition-[opacity,visibility] duration-200 ease-instrument motion-reduce:transition-none ${on ? "visible opacity-100" : "invisible opacity-0"}`}
             >
-              <p className="mx-auto max-w-[36.5rem] font-display text-[1.0625rem] leading-[1.35] text-fg/80">{t.items[k].line}</p>
-              <p className="mx-auto mt-3 text-small">
+              <p className="max-w-[34rem] text-body leading-[1.6] text-fg-muted">{t.items[k].line}</p>
+              <p className="mt-3 text-small">
                 <TextLink href={t.items[k].link.href} className="inline-block py-1">{t.items[k].link.label}</TextLink>
               </p>
             </div>
