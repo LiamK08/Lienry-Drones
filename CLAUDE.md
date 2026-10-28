@@ -79,7 +79,7 @@ while the header holds still. Never on the first page of a visit, an anchor or a
 motion, and it never holds the navigation back (no View Transitions). Check 46 encodes it.
 
 Header contrast: `npm run contrast -- <frame>` proves the bar stays legible over the hero
-film and over /company's accent hero (there the bar is clear, painted in the hero's own top colour). Run it
+film (the one hero the bar is clear over; every other page opens light, under the white bar). Run it
 after touching the header, the hero scrim or the primary button.
 
 Legora and refresh.tech are references for quality and structure only. No Legora or ReFresh

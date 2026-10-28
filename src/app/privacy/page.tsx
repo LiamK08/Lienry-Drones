@@ -20,8 +20,9 @@ function slug(title: string) {
     .replace(/^-|-$/g, "");
 }
 
-/** Legal prose: 16px at 1.65, held to about 68 characters a line. */
-const prose = "max-w-[68ch] text-body leading-[1.65] text-fg-muted";
+/** Legal prose: 16px at 1.65, held to the site's measure of 68 characters a line or under (max-w-prose,
+ *  45ch of Inter's wide 0; globals.css), the lists included. */
+const prose = "max-w-prose text-body leading-[1.65] text-fg-muted";
 
 /** The section's text, with the first occurrence of its link label (if any) as an inline link. */
 function withLink(text: string, link: PrivacySection["link"]): ReactNode {

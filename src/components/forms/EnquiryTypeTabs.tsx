@@ -98,11 +98,14 @@ function TabsView({ type, onSelect }: { type: EnquiryType; onSelect: (t: Enquiry
   }
 
   // data-sweep="form": the tabs choose the form's fields, so the band's height follows them (check 3).
+  // The scroller clips what overflows it, so it keeps 4px round the row (taken back from its margins)
+  // for the tabs' focus ring; the hairline is drawn at the row's foot, under the gliding underline, and
+  // spans what it did before (the card's edges on phones, the column from 768).
   return (
     <div data-sweep="form">
       <div
         ref={scrollerRef}
-        className="no-scrollbar -mx-5 overflow-x-auto px-5 shadow-[inset_0_-1px_0_var(--color-line)] max-md:[mask-image:linear-gradient(to_right,black_calc(100%-2rem),transparent)] md:mx-0 md:px-0"
+        className="no-scrollbar -mx-5 -my-1 overflow-x-auto bg-[linear-gradient(var(--color-line),var(--color-line))] bg-[position:0_calc(100%-0.25rem)] bg-[size:100%_1px] bg-no-repeat px-5 py-1 max-md:[mask-image:linear-gradient(to_right,black_calc(100%-2rem),transparent)] md:-mx-1 md:bg-[position:0.25rem_calc(100%-0.25rem)] md:bg-[size:calc(100%-0.5rem)_1px] md:px-1"
       >
         <div ref={rowRef} role="tablist" aria-label={t.label} className="group/ind relative flex w-max gap-6">
           <span

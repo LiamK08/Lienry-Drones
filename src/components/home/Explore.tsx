@@ -81,8 +81,9 @@ export function Explore() {
           }
         />
         {/* A phone scrolls the row sideways from the page's edge, the far edge fading over the page margin
-            so a pill cut there reads as more to come; from 768 it is centred under the head. */}
-        <div className="no-scrollbar -mx-(--page-margin) mt-10 scroll-px-(--page-margin) overflow-x-auto px-(--page-margin) [mask-image:linear-gradient(to_right,black_calc(100%-var(--page-margin)),transparent)] md:mx-0 md:overflow-visible md:px-0 md:[mask-image:none]">
+            so a pill cut there reads as more to come; from 768 it is centred under the head. The 4px above
+            and below the pills (taken back from the margins) hold their focus ring, which the scroller clips. */}
+        <div className="no-scrollbar -mx-(--page-margin) mt-9 -mb-1 scroll-px-(--page-margin) overflow-x-auto px-(--page-margin) py-1 [mask-image:linear-gradient(to_right,black_calc(100%-var(--page-margin)),transparent)] md:mx-0 md:overflow-visible md:px-0 md:[mask-image:none]">
           <div ref={rowRef} role="group" aria-label="Filter" className="group/ind relative mx-auto flex w-max gap-2">
             <span
               aria-hidden="true"
@@ -103,9 +104,11 @@ export function Explore() {
                     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
                     e.currentTarget.scrollIntoView({ block: "nearest", inline: "nearest", behavior: reduce ? "auto" : "smooth" });
                   }}
-                  className={`relative flex h-9 shrink-0 items-center rounded-pill border px-4 text-small font-medium transition-[border-color,color,background-color] duration-200 motion-reduce:transition-none focus-visible:outline-accent-on-dark ${
+                  className={`relative flex h-9 shrink-0 items-center rounded-pill border px-4 text-small font-medium transition-[border-color,color,background-color] duration-200 motion-reduce:transition-none focus-visible:outline-accent-on-dark forced-colors:focus-visible:outline-[Highlight] ${
                     on
-                      ? "border-transparent bg-white text-ink group-data-[indicator-ready]/ind:bg-transparent forced-colors:text-[HighlightText]"
+                      ? // In forced colours the chosen label is HighlightText on the Highlight indicator (or its own
+                        // Highlight fill until that has measured), kept from the browser's Canvas backplate.
+                        "border-transparent bg-white text-ink group-data-[indicator-ready]/ind:bg-transparent forced-colors:forced-color-adjust-none forced-colors:bg-[Highlight] forced-colors:text-[HighlightText]"
                       : "border-white/15 text-white/75 hover:border-white/40 hover:text-white"
                   }`}
                 >

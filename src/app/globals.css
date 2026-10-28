@@ -31,8 +31,6 @@
   --color-glass-on-dark: #9ccaee;
   /* In progress in the software: a lighter step of the accent, not a new hue. */
   --color-water: #4a8fc0;
-  /* Subject tags on the dark Explore cards: ink 12.88:1. */
-  --color-tag: #d4e3f0;
   /* The software maps' cells: pending and one pass (washed is the glass). */
   --color-map-pending: #dbe2e9;
   --color-map-half: #8db4d4;
@@ -612,16 +610,23 @@
 }
 
 /* Page transitions (PageTransition.tsx): a page reached from inside the site fades in, rising 8px, over
-   220ms; the first page of a visit never does. The header sits outside <main>, so it holds still. Only
-   opacity and transform move (no fill mode, so nothing is left behind once it ends), so nothing shifts
-   in the layout and nothing waits on it. None under reduced motion. */
+   220ms; the first page of a visit never does, and one reached at an anchor only fades (its scroll to the
+   anchor is measured as it mounts, so a rise would carry the anchor 8px under the bar). The header sits
+   outside <main>, so it holds still. Only opacity and transform move (no fill mode, so nothing is left
+   behind once it ends), so nothing shifts in the layout and nothing waits on it. None under reduced motion. */
 @media (prefers-reduced-motion: no-preference) {
   main[data-page-enter] {
     animation: page-in 220ms var(--ease-settle);
   }
+  main[data-page-enter="fade"] {
+    animation-name: page-fade;
+  }
 }
 @keyframes page-in {
   from { opacity: 0; transform: translateY(8px); }
+}
+@keyframes page-fade {
+  from { opacity: 0; }
 }
 
 @layer components {

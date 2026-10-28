@@ -32,13 +32,15 @@ function Logo({ className = "" }: { className?: string }) {
   );
 }
 
-// At the top of a page that opens on a dark hero (the home film, the about page's accent ground) the bar
-// joins the hero, in white: clear over the film, and over a painted ground in that ground's own top
-// colour, so it is seamless and the focus ring is read against a solid colour. On the server the ground
-// comes from the address; in the browser from the page's first band (its data-tone and paint), so a hero
-// that changes ground takes the bar with it, and a light one sends the bar back to white. A new page
-// replaces <main> (PageTransition keys it by the path), which the observer sees before the next paint.
-const CLEAR_TOP: Readonly<Record<string, string>> = { "/": "transparent", "/company": "var(--color-accent)" };
+// At the top of a page that opens on a dark hero (today only the home film) the bar joins the hero, in
+// white: clear over the film, and over a painted ground in that ground's own top colour, so it is
+// seamless and the focus ring is read against a solid colour. On the server the ground comes from the
+// address, so only a route whose first band is dark belongs here (the about page's hero is the pale
+// tint, so its bar is the white veil from the first paint); in the browser it comes from the page's
+// first band (its data-tone and paint), so a hero that changes ground takes the bar with it, and a light
+// one sends the bar back to white. A new page replaces <main> (PageTransition keys it by the path),
+// which the observer sees before the next paint.
+const CLEAR_TOP: Readonly<Record<string, string>> = { "/": "transparent" };
 const DARK_TONES = new Set(["film", "ink", "night"]);
 function subscribeMain(onChange: () => void) {
   const observer = new MutationObserver(onChange);
@@ -60,8 +62,8 @@ function heroGround(): string {
  * The header: the logo left and the menus centred (Platform, Solutions and Resources open a panel of
  * links on hover or click; About is a plain link). It carries no action pills (the owner's call, 21
  * October): Lienry Desktop sits in Resources, and every page closes on its own Register interest.
- * Over the home film it is clear with white text, over the about page's accent ground the same in that
- * ground's colour; anywhere else, or once scrolled, it is a white bar with a hairline. The logo sits on
+ * Over the home film it is clear with white text; anywhere else it is a soft white veil at the top of
+ * the page and, once scrolled, a white bar with a hairline. The logo sits on
  * the page's rail (the Container's left edge: 20px on phones, 24px from 768, centred past 1440). Below
  * 1024 the bar holds the logo and the burger, which drops a short white sheet under the bar with the four
  * sections (each opens its links in place) over the dimmed page; a tap outside or Escape closes it. It
@@ -79,6 +81,16 @@ export function Nav() {
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const closeTimer = useRef<number | undefined>(undefined);
   const ground = useSyncExternalStore(subscribeMain, heroGround, () => CLEAR_TOP[pathname] ?? "");
+  // A new page closes every menu (a Back press with the phone sheet open included). Adjusted while
+  // rendering, as PageTransition marks its <main>, so it lands in the commit that brings the new <main>:
+  // the sheet is never left modal over a page it did not make inert.
+  const [shownPath, setShownPath] = useState(pathname);
+  if (pathname !== shownPath) {
+    setShownPath(pathname);
+    setOpen(false);
+    setMenu(null);
+    setSub(null);
+  }
   // The open panel as last committed, for the hover handler below.
   const menuNow = useRef<MenuId | null>(null);
   useEffect(() => {

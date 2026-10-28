@@ -47,8 +47,8 @@
 //     document order, then its ::after. A blurred glow is not a surface. (c) Light tones (plaster, paper,
 //     tint, mist) render a light surface, relative luminance 0.8 or more at every colour stop (white, warm
 //     paper, the pale accent tint); dark tones (ink, night) a near-black one, 0.02 or less at every stop. A
-//     composed hero's gradient wash is judged by its first stop: under 0.4 for a dark tone (the /company
-//     wash starts at the accent), 0.8 or more for a light one. A film band is not judged.
+//     composed hero's gradient wash is judged by its first stop: under 0.4 for a dark tone, 0.8 or more
+//     for a light one (the /company wash starts at the pale tint). A film band is not judged.
 //     (d) The footer's data-tone is ink or night and it renders near-black (0.02 or less), by the same model.
 // 19  Overflow. Nothing runs past the viewport's edge, with the phone menu open and closed. The page
 //     clips overflow-x on <html> and <body>, which hides overflow from documentElement.scrollWidth, so
@@ -1183,8 +1183,8 @@ const blockName = (b) => {
 const BAND_TONES = ["plaster", "paper", "tint", "mist", "ink", "night", "film"];
 const LIGHT_TONES = new Set(["plaster", "paper", "tint", "mist"]);
 const DARK_TONES = new Set(["ink", "night"]);
-// Relative luminance: a light surface is 0.8 or more, a near-black one 0.02 or less, and a composed
-// hero's wash ([data-scatter], the /company hero) starts under 0.4.
+// Relative luminance: a light surface is 0.8 or more, a near-black one 0.02 or less, and a dark composed
+// hero's wash ([data-scatter]) starts under 0.4 (the /company hero's is light: it starts at the pale tint).
 const LIGHT_MIN = 0.8;
 const NEAR_BLACK = 0.02;
 const DARK_STOP = 0.4;

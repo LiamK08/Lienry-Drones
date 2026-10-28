@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { companyPage } from "@/content/company";
 import { pageMetadata } from "@/lib/site";
 import { AccentPanel } from "@/components/blocks/AccentPanel";
@@ -11,6 +12,11 @@ export const metadata: Metadata = pageMetadata(
   "/company",
   "Lienry Drones is a Sydney company at concept stage, building a resident cleaning drone and raising a pre-seed round.",
 );
+
+/** Each hyphenated word ("pre-seed") kept whole on its line by markup, not a character, so copied text stays as written. */
+function keepWhole(text: string): ReactNode[] {
+  return text.split(/(\S+-\S+)/).map((part, i) => (i % 2 ? <span key={i} className="whitespace-nowrap">{part}</span> : part));
+}
 
 /**
  * /company: the tinted hero with round pictures around the headline; the story on the page's 12
@@ -70,11 +76,11 @@ export default function CompanyPage() {
             last four, set to the paragraph's foot. */}
         <Container className="grid gap-8 lg:grid-12 lg:items-end">
           <div className="lg:col-span-7">
-            {/* A word joiner after each hyphen keeps "pre-seed" and "co-founder" whole, so lines break between words. */}
+            {/* The heading keeps "pre-seed" whole, so it breaks between words; the paragraph may break at a hyphen. */}
             <h2 id="round-heading" className="text-h2s">
-              {founders.headline.replaceAll("-", "-\u2060")}
+              {keepWhole(founders.headline)}
             </h2>
-            <p className="mt-5 max-w-[38rem] text-body leading-[1.6] text-fg-muted">{founders.body.replaceAll("-", "-\u2060")}</p>
+            <p className="mt-5 max-w-[38rem] text-body leading-[1.6] text-fg-muted">{founders.body}</p>
           </div>
           <div className="lg:col-span-4 lg:col-start-9">
             <Button href={founders.action.href} arrow>

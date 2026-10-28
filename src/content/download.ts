@@ -33,7 +33,7 @@ export const downloadPage = {
     headline: "What the software does",
     intro: "Every clean is planned on a model of your own building.",
     items: [
-      { term: "3D building view", text: "A model of your building from the drone\u2019s scan, to turn and look over from every side." },
+      { term: "3D building view", text: "A model of your building from the drone's scan, to turn and look over from every side." },
       { term: "Zones and pressure", text: "Group surfaces into zones and set the pressure for each, gentle for skylights and standard for glass." },
       { term: "Live wash progress", text: "Watch the clean move across the building, panel by panel, with debris marked where it is found." },
     ],
