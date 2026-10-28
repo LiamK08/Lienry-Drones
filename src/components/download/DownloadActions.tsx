@@ -29,69 +29,77 @@ function InlineScript({ html }: { html: string }) {
 
 const name = (p: Platform) => `${copy.download} ${copy.platforms[p]}`;
 
-/** A download that is not live yet: its label, a separator and "Coming soon", named as one phrase. */
-function Soon({ platform }: { platform: Platform }) {
+/** The availability line: a small status dot and "Coming soon for Mac and Windows" in the muted text. */
+function Status({ text }: { text: string }) {
   return (
-    <>
-      {name(platform)}
-      <span aria-hidden="true">·</span>
-      <span className="font-normal">{copy.soon}</span>
-    </>
+    <p className="flex items-center gap-2 text-small leading-[1.5] text-fg-muted">
+      <span aria-hidden="true" className="size-1.5 shrink-0 rounded-pill bg-accent forced-colors:bg-[CanvasText]" />
+      {text}
+    </p>
   );
 }
 
 /**
- * One platform's set: its download button, then 8 below it the other platform's smaller link and,
- * beside that (below it on phones), Register interest while the download is not live, or the
- * version once it is.
+ * One platform's set once its download is live: the download pill, then the other platform's link
+ * (live, or its own "coming soon" line) and the version.
  */
 function Controls({ primary, other, className }: { primary: Platform; other: Platform; className: string }) {
-  const url = downloadUrl(primary);
+  const url = downloadUrl(primary)!;
   const otherUrl = downloadUrl(other);
-  const soonLabel = (p: Platform) => `${name(p)}, ${copy.soon.toLowerCase()}`;
   return (
     <div className={className}>
-      {url ? (
-        <Button href={url} size="lg" download="">
-          {name(primary)}
-        </Button>
-      ) : (
-        <Button size="lg" aria-disabled aria-label={soonLabel(primary)}>
-          <Soon platform={primary} />
-        </Button>
-      )}
-      <div data-actions="" className="mt-2 flex flex-col items-start md:flex-row md:items-center md:gap-6">
+      <Button href={url} download="">
+        {name(primary)}
+      </Button>
+      <div data-actions="" className="mt-3 flex flex-col gap-1 md:flex-row md:items-center md:gap-6">
         {otherUrl ? (
           <Button href={otherUrl} variant="tertiary" download="">
             {name(other)}
           </Button>
         ) : (
-          <Button variant="tertiary" aria-disabled aria-label={soonLabel(other)}>
-            <Soon platform={other} />
-          </Button>
+          <Status text={`${copy.platforms[other]}: ${copy.soon.toLowerCase()}`} />
         )}
-        {url ? (
-          desktopRelease.version ? <p className="text-caption text-fg-muted">{`${copy.version} ${desktopRelease.version}`}</p> : null
-        ) : (
-          <Button href={copy.register.href} variant="tertiary" arrow>
-            {copy.register.label}
-          </Button>
-        )}
+        {desktopRelease.version ? <p className="text-small leading-[1.5] text-fg-muted">{`${copy.version} ${desktopRelease.version}`}</p> : null}
       </div>
     </div>
   );
 }
 
 /**
- * The download buttons, matched to the visitor's platform: "Download for Mac" or "Download for
- * Windows", with the other platform's link underneath. Both sets are in the HTML and `data-os` shows
- * one, so the right set is on screen from the first paint, before any JavaScript loads.
+ * The hero's actions. Until a download is live (src/lib/download.ts) there is nothing to download, so
+ * the one action is Register interest, the primary pill, with the availability as a muted line under
+ * it ("Coming soon for Mac and Windows"), never a disabled pill.
  *
- * What is live comes from src/lib/download.ts. Until a download is live its control is shown as
- * "Coming soon": aria-disabled rather than disabled, so it stays focusable and announces its state.
+ * Once one is live, the download pill matches the visitor's platform: "Download for Mac" or "Download
+ * for Windows", with the other platform's link underneath. Both sets are in the HTML and `data-os`
+ * shows one, so the right set is on screen from the first paint, before any JavaScript loads.
  */
 export function DownloadActions({ className = "" }: { className?: string }) {
   const os = useSyncExternalStore<Platform>(noop, detect, () => "mac");
+  const live = Boolean(downloadUrl("mac") || downloadUrl("windows"));
+  if (!live) {
+    return (
+      <div className={className}>
+        <Button href={copy.register.href} arrow>
+          {copy.register.label}
+        </Button>
+        <div className="mt-4">
+          <Status text={copy.status} />
+        </div>
+      </div>
+    );
+  }
+  // A platform without its own download yet shows the other's set to everyone.
+  const macLive = Boolean(downloadUrl("mac"));
+  const winLive = Boolean(downloadUrl("windows"));
+  if (macLive !== winLive) {
+    const only: Platform = macLive ? "mac" : "windows";
+    return (
+      <div className={className}>
+        <Controls primary={only} other={only === "mac" ? "windows" : "mac"} className="" />
+      </div>
+    );
+  }
   return (
     <div data-os={os} suppressHydrationWarning className={`group ${className}`}>
       <Controls primary="mac" other="windows" className="group-data-[os=windows]:hidden" />

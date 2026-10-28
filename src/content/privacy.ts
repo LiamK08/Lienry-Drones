@@ -7,7 +7,7 @@ export type PrivacySection = {
   title: string;
   /** The opening paragraph; the lead-in line when a list follows. */
   body: string;
-  /** Optional items under the lead-in, rendered as lettered lines: (a), (b), (c). */
+  /** Optional items under the lead-in, rendered as a lettered list: a, b, c. */
   list?: readonly string[];
   /** Optional paragraph after the list. */
   close?: string;
@@ -18,13 +18,10 @@ export type PrivacySection = {
 export const privacyPage: {
   headline: string;
   updated: string;
-  /** The legal tab strip under the hero. Lienry has one legal page; later ones slot in here. */
-  legalPages: readonly { label: string; href: string }[];
   sections: readonly PrivacySection[];
 } = {
-  headline: "Privacy policy.",
+  headline: "Privacy policy",
   updated: "September 2026",
-  legalPages: [{ label: "Privacy policy", href: "/privacy" }],
   sections: [
     {
       title: "Who we are",

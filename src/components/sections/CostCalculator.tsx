@@ -108,13 +108,14 @@ function WholeInput({ id, value, onValue, onBlur, invalid, describedBy: describe
 
 // The listing's building type: one radio pill per type, as the fit check's answers are drawn (the
 // native radio is sr-only inside its label, and the label draws the focus ring). Chosen is the accent
-// tint with an accent edge and label in the heavier weight, so the choice never rests on colour alone;
-// the label's width is held at the heavier weight, so choosing never re-wraps the row.
+// tint with a 2px accent edge (the border and an inset ring, so the pill never changes size) and the
+// accent label, so the choice never rests on the colour of the text alone. The label text is the type's
+// name and nothing else: it is the radio's accessible name.
 const chip =
-  "relative inline-flex h-9 cursor-pointer select-none items-center rounded-pill border px-4 text-small " +
-  "transition-[background-color,border-color,color] duration-200 ease-instrument motion-reduce:transition-none " +
-  "border-line bg-white font-medium text-fg-muted hover:border-ink hover:text-ink " +
-  "has-[:checked]:border-accent has-[:checked]:bg-tint has-[:checked]:font-semibold has-[:checked]:text-accent has-[:checked]:hover:border-accent has-[:checked]:hover:text-accent " +
+  "relative inline-flex h-9 cursor-pointer select-none items-center rounded-pill border px-4 text-small font-medium " +
+  "transition-[background-color,border-color,color,box-shadow] duration-200 ease-instrument motion-reduce:transition-none " +
+  "border-line bg-white text-fg-muted hover:border-ink hover:text-ink " +
+  "has-[:checked]:border-accent has-[:checked]:bg-tint has-[:checked]:text-accent has-[:checked]:shadow-[inset_0_0_0_1px_var(--color-accent)] has-[:checked]:hover:border-accent has-[:checked]:hover:text-accent " +
   "forced-colors:has-[:checked]:forced-color-adjust-none forced-colors:has-[:checked]:border-[Highlight] forced-colors:has-[:checked]:bg-[Highlight] forced-colors:has-[:checked]:text-[HighlightText] " +
   "has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-solid has-[:focus-visible]:outline-focus";
 
@@ -132,8 +133,8 @@ const chip =
  * Listing layout: one white panel. From 1024 the inputs take five of its twelve columns (the building
  * type as pill chips, then the three fields) and the summary takes seven on paper: its heading, the
  * three results as rows (the label and how it is worked out, the figure at the right), the note, then
- * the follow-on pill. Below 1024 the summary follows the inputs, and from 768 the area and the spend
- * sit side by side.
+ * the follow-on pill. Below 1024 the summary follows the inputs, and from 768 to 1023 the three fields
+ * sit in one row. Below 768 each result row reads label, figure, then how it is worked out.
  *
  * Split layout: from 1024 the fields stack in columns 1-5 and the results panel takes 7-12; from 768
  * the fields are two by two above the panel; below 768 everything is one column.
@@ -256,20 +257,14 @@ export function CostCalculator({ headingId, heading, noteId, defaultType = "", l
               {propertyTypes.map((t) => (
                 <label key={t} className={chip}>
                   <input type="radio" name="cost-type" value={t} checked={type === t} onChange={() => setType(t)} className="sr-only" />
-                  {/* The heavier weight's width, held by an invisible copy in the same cell. */}
-                  <span className="grid">
-                    <span className="[grid-area:1/1]">{t}</span>
-                    <span aria-hidden="true" className="invisible [grid-area:1/1] font-semibold">
-                      {t}
-                    </span>
-                  </span>
+                  {t}
                 </label>
               ))}
             </div>
           </fieldset>
           {/* From 768 to 1023 the three fields sit in a row: each label holds two lines, set to its foot,
               so the fields line up however the labels wrap. */}
-          <div className="mt-8 grid gap-6 md:grid-cols-3 md:[&>div>label]:flex md:[&>div>label]:min-h-10 md:[&>div>label]:items-end lg:grid-cols-1 lg:[&>div>label]:block lg:[&>div>label]:min-h-0">
+          <div className="mt-8 grid gap-6 md:grid-cols-3 md:[&>div>label]:flex md:[&>div>label]:min-h-[2.625rem] md:[&>div>label]:items-end lg:grid-cols-1 lg:[&>div>label]:block lg:[&>div>label]:min-h-0">
             {areaField}
             {spendField}
             {riseField}
@@ -281,15 +276,16 @@ export function CostCalculator({ headingId, heading, noteId, defaultType = "", l
           </h2>
           <dl className="mt-6 border-t border-line">
             {rows.map((r) => (
-              // The label comes first for a screen reader; the figure sits at the right of the row.
-              <div key={r.key} className="grid grid-cols-[minmax(0,1fr)_minmax(9rem,auto)] gap-x-6 border-b border-line py-5">
-                <dt className="col-start-1 row-start-1 text-body font-medium leading-[1.5] text-fg">{r.label}</dt>
-                <dd className="col-start-2 row-span-2 row-start-1 self-center text-right">
-                  <span id={r.id} className="block min-w-0 font-sans text-[1.75rem] font-light leading-[1.1] tracking-[-0.02em] tabular-nums text-fg [overflow-wrap:anywhere] md:text-[2rem]">
+              // The label comes first for a screen reader. On phones the figure follows it, then how it is
+              // worked out; from 768 the figure sits at the right of the row, beside both.
+              <div key={r.key} className="border-b border-line py-5 md:grid md:grid-cols-[minmax(0,1fr)_minmax(9rem,auto)] md:gap-x-6">
+                <dt className="text-body font-medium leading-[1.5] text-fg md:col-start-1 md:row-start-1">{r.label}</dt>
+                <dd className="mt-1 min-w-0 md:col-start-2 md:row-span-2 md:row-start-1 md:mt-0 md:self-center md:text-right">
+                  <span id={r.id} className="block min-w-0 font-sans text-[1.75rem] font-light leading-[1.2] tracking-[-0.02em] tabular-nums text-fg [overflow-wrap:anywhere] md:text-[2rem]">
                     {readout(r.value, r.needs, true)}
                   </span>
                 </dd>
-                <dd className="col-start-1 row-start-2 mt-1 text-small leading-[1.5] text-fg-muted">{r.line}</dd>
+                <dd className="mt-1 text-small leading-[1.5] text-fg-muted md:col-start-1 md:row-start-2">{r.line}</dd>
               </div>
             ))}
           </dl>

@@ -23,7 +23,7 @@ const SPOTS = [
 /**
  * The about page's first screen: the pale accent tint, fading to white two thirds of the way down, a
  * large centred headline with its accent italic and a short muted paragraph, ringed by round pictures
- * in the zones above and below the text (SPOTS). A soft accent glow sits behind the headline. On load
+ * in the zones above and below the text (SPOTS). A soft sky glow sits behind the headline. On load
  * the pictures pop in one after another, then each drifts slowly about its spot on its own loop. Under
  * reduced motion they simply appear and stay still.
  */
@@ -38,7 +38,7 @@ export function BubbleHero({ headline, emphasis, lead, images, mobileLines }: { 
       aria-labelledby="hero-heading"
       className="relative isolate overflow-hidden bg-[linear-gradient(to_bottom,var(--color-tint)_0%,var(--color-tint)_32%,var(--color-plaster)_76%)] pb-[13.5rem] pt-[15rem] text-ink md:pb-56 md:pt-64 lg:pb-[14.5rem] lg:pt-[17.5rem]"
     >
-      <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-[45%] -z-10 h-[22rem] w-[44rem] max-w-full -translate-x-1/2 -translate-y-1/2 rounded-pill bg-accent/10 blur-3xl" />
+      <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-[45%] -z-10 h-[22rem] w-[44rem] max-w-full -translate-x-1/2 -translate-y-1/2 rounded-pill bg-accent-on-dark/30 blur-3xl" />
       <ul aria-hidden="true" className="absolute inset-0">
         {images.slice(0, SPOTS.length).map((im, i) => (
           <li key={im.id} className={`absolute ${SPOTS[i]}`}>
@@ -54,7 +54,7 @@ export function BubbleHero({ headline, emphasis, lead, images, mobileLines }: { 
         <h1 id="hero-heading" className={`em-accent mx-auto max-w-none text-balance text-[2.5rem] leading-none tracking-[-0.03em] md:text-[4.5rem] lg:text-[5.5rem] ${hold.className}`} style={hold.style}>
           <Headline text={headline} emphasis={emphasis} breakBefore />
         </h1>
-        <p className="mx-auto mt-6 max-w-[34rem] text-lead leading-[1.55] text-fg-muted lg:mt-7">{lead}</p>
+        <p className="mx-auto mt-6 max-w-[34rem] text-balance text-lead leading-[1.55] text-fg-muted lg:mt-7">{lead}</p>
       </div>
     </header>
   );

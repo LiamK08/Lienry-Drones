@@ -12,62 +12,75 @@ export const metadata: Metadata = pageMetadata(
   "Lienry Drones is a Sydney company at concept stage, building a resident cleaning drone and raising a pre-seed round.",
 );
 
-// Every story row sits on the page's 12 columns from 1024: the text in five, the picture in six at one
-// shared 3:2 frame, with a column between them; "imageLeft" rows swap the sides. Below 1024 each row
-// is its text, then its picture.
-const SIDES = {
-  textLeft: { text: "lg:col-span-5 lg:col-start-1", image: "lg:col-span-6 lg:col-start-7" },
-  imageLeft: { text: "lg:col-span-5 lg:col-start-8", image: "lg:col-span-6 lg:col-start-1" },
-} as const;
-
 /**
- * /company: the tinted hero with round pictures around the headline; the story as four rows of text
- * beside a picture, alternating sides on one grid; the pre-seed round on paper (its heading beside its
- * text and the investor action, with the media line under it); then the closing panel.
+ * /company: the tinted hero with round pictures around the headline; the story on the page's 12
+ * columns (why we exist in five beside its picture in six, then where we are, how we work and what we
+ * are exploring as one open row of three, each a picture over its title and paragraph); the pre-seed
+ * round on paper (its heading and paragraph, and beside them the investor action over the media
+ * line); then the closing panel. Below 768 the story reads straight down, each of the three its text then its picture;
+ * from 768 to 1023 each sets its picture beside its text.
  */
 export default function CompanyPage() {
-  const { hero, rows, founders, close, media } = companyPage;
+  const { hero, story, founders, close, media } = companyPage;
+  const { lead, items } = story;
   return (
     <>
       <BubbleHero mobileLines={3} headline={hero.headline} emphasis={hero.emphasis} lead={hero.lead} images={hero.images} />
-      <Band id="story" tone="plaster" ariaLabel="Our story">
+      <Band id="story" tone="plaster" labelledBy={`${lead.id}-heading`}>
         <Container>
-          <div className="flex flex-col gap-16 lg:gap-24">
-            {rows.map((r) => {
-              const side = SIDES[r.layout];
-              return (
-                <section key={r.id} aria-labelledby={`${r.id}-heading`} className="grid gap-6 lg:grid-12 lg:items-center">
-                  <div className={`lg:row-start-1 ${side.text}`}>
-                    <h2 id={`${r.id}-heading`} className="text-h2s">
-                      {r.title}
-                    </h2>
-                    {r.paragraphs.map((p) => (
-                      <p key={p} className="mt-4 max-w-[32rem] text-body leading-[1.6] text-fg-muted">
-                        {p}
-                      </p>
-                    ))}
-                  </div>
-                  <div className={`lg:row-start-1 ${side.image}`}>
-                    <Picture id={r.image.id} alt={r.image.alt} position={r.image.position} aspect="3/2" rounded="image" sizes="(min-width: 1440px) 684px, (min-width: 1024px) 48vw, 100vw" />
-                  </div>
-                </section>
-              );
-            })}
+          <div className="grid gap-8 lg:grid-12 lg:items-center">
+            <div className="lg:col-span-5">
+              <h2 id={`${lead.id}-heading`} className="text-h2s">
+                {lead.title}
+              </h2>
+              {lead.paragraphs.map((p) => (
+                <p key={p} className="mt-5 max-w-[34rem] text-lead leading-[1.55] text-fg-muted">
+                  {p}
+                </p>
+              ))}
+            </div>
+            <div className="lg:col-span-6 lg:col-start-7">
+              <Picture id={lead.image.id} alt={lead.image.alt} position={lead.image.position} aspect="3/2" rounded="image" sizes="(min-width: 1440px) 684px, (min-width: 1024px) 48vw, 100vw" />
+            </div>
           </div>
+          <ul className="mt-16 grid gap-12 md:gap-10 lg:mt-24 lg:grid-12 lg:gap-y-0">
+            {items.map((it) => (
+              // Below 768 the text comes first, so the lead's picture is never followed straight by another.
+              <li key={it.id} className="flex flex-col gap-6 md:grid md:grid-cols-2 md:items-center lg:col-span-4 lg:flex lg:items-stretch">
+                <div className="order-2 md:order-none">
+                  <Picture id={it.image.id} alt={it.image.alt} position={it.image.position} aspect="3/2" rounded="image" sizes="(min-width: 1440px) 443px, (min-width: 1024px) 31vw, (min-width: 768px) 46vw, 100vw" />
+                </div>
+                <div>
+                  <h3 id={`${it.id}-heading`} className="text-h3">
+                    {it.title}
+                  </h3>
+                  {it.paragraphs.map((p) => (
+                    <p key={p} className="mt-3 max-w-[30rem] text-body leading-[1.6] text-fg-muted">
+                      {p}
+                    </p>
+                  ))}
+                </div>
+              </li>
+            ))}
+          </ul>
         </Container>
       </Band>
       <Band id="round" tone="paper" labelledBy="round-heading">
-        <Container className="grid gap-6 lg:grid-12">
-          {/* A word joiner after each hyphen keeps "pre-seed" whole, so the 36px phone head breaks between words. */}
-          <h2 id="round-heading" className="text-h2s lg:col-span-5">
-            {founders.headline.replaceAll("-", "-⁠")}
-          </h2>
-          <div className="lg:col-span-6 lg:col-start-7">
-            <p className="max-w-[32rem] text-body leading-[1.6] text-fg-muted">{founders.body}</p>
-            <Button href={founders.action.href} arrow className="mt-8">
+        {/* The heading and its paragraph in seven columns; the investor action and the media line in the
+            last four, set to the paragraph's foot. */}
+        <Container className="grid gap-8 lg:grid-12 lg:items-end">
+          <div className="lg:col-span-7">
+            {/* A word joiner after each hyphen keeps "pre-seed" and "co-founder" whole, so lines break between words. */}
+            <h2 id="round-heading" className="text-h2s">
+              {founders.headline.replaceAll("-", "-\u2060")}
+            </h2>
+            <p className="mt-5 max-w-[38rem] text-body leading-[1.6] text-fg-muted">{founders.body.replaceAll("-", "-\u2060")}</p>
+          </div>
+          <div className="lg:col-span-4 lg:col-start-9">
+            <Button href={founders.action.href} arrow>
               {founders.action.label}
             </Button>
-            <p className="mt-6 max-w-[32rem] text-small leading-[1.5] text-fg-muted">{media}</p>
+            <p className="mt-4 max-w-[24rem] text-small leading-[1.5] text-fg-muted">{media}</p>
           </div>
         </Container>
       </Band>

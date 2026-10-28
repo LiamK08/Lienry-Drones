@@ -16,9 +16,8 @@ export const downloadPage = {
     },
   },
   hero: {
-    eyebrow: "Lienry Desktop",
-    headline: "Your building, on your desk.",
-    emphasis: "on your desk.",
+    headline: "Your building, on your desk",
+    emphasis: "on your desk",
     lead: "See the 3D scan of your building, set zones and pressure, and watch every wash live.",
   },
   actions: {
@@ -26,21 +25,21 @@ export const downloadPage = {
     download: "Download for",
     soon: "Coming soon",
     version: "Version",
+    /** The availability line under Register interest while neither download is live. */
+    status: "Coming soon for Mac and Windows",
     register: { label: "Register interest", href: "/register-interest" },
   },
   features: {
-    eyebrow: "What it does",
-    headline: "What the software does.",
+    headline: "What the software does",
     intro: "Every clean is planned on a model of your own building.",
     items: [
-      { term: "3D building view", text: "A model of your building from the drone's scan." },
-      { term: "Zones and pressure", text: "Group surfaces into zones and set each pressure." },
-      { term: "Live wash progress", text: "Watch the clean move across the building." },
+      { term: "3D building view", text: "A model of your building from the drone\u2019s scan, to turn and look over from every side." },
+      { term: "Zones and pressure", text: "Group surfaces into zones and set the pressure for each, gentle for skylights and standard for glass." },
+      { term: "Live wash progress", text: "Watch the clean move across the building, panel by panel, with debris marked where it is found." },
     ],
   },
   faq: {
-    eyebrow: "questions",
-    headline: "Before you download.",
+    headline: "Before you download",
     intro: "Including what is still being finalised.",
     link: { label: "Register interest", href: "/register-interest" },
     items: [

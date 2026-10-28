@@ -27,24 +27,25 @@ function Tick() {
  * accent italic, the lead and three ticks, then the enquirer card (tabs of the four enquirer types,
  * each with Lienry's own line and a link, tied to the form's "I am a" radios, then what happens next),
  * at its own height; the form takes columns 8-12 in its card beside them. Below 1024 the form follows
- * the ticks, and the enquirer card comes after it. The accent glow spills over the footer's top edge,
- * so the band sits above it and clips only sideways.
+ * the ticks, and the enquirer card comes after it. One soft sky glow sits behind the middle of the band.
  */
 export default function RegisterInterestPage() {
   const r = registerPage;
   const hold = holdLines(1);
   return (
-    <Band id="register" tone="plaster" pad="hero" labelledBy="register-heading" className="z-10 overflow-x-clip">
+    <Band id="register" tone="plaster" pad="hero" labelledBy="register-heading" className="overflow-hidden">
       <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-[18rem] size-[28rem] -translate-x-1/2 rounded-pill bg-accent-on-dark/20 blur-3xl" />
-      <div aria-hidden="true" className="pointer-events-none absolute -bottom-48 left-1/2 size-[24rem] -translate-x-1/2 rounded-pill bg-accent/10 blur-3xl" />
       <Container className="relative">
         <EnquiryTypeProvider>
-          <div className="grid gap-10 lg:grid-12 lg:grid-rows-[auto_1fr] lg:items-start lg:gap-y-10">
-            <div className="lg:col-span-6">
+          {/* grid-cols-1 (a minmax(0, 1fr) track) keeps the phone column to the page: the tab row inside the
+              enquirer card is one line that scrolls, and would otherwise widen an auto track to its own width. */}
+          <div className="grid grid-cols-1 gap-10 lg:grid-12 lg:grid-rows-[auto_1fr] lg:items-start lg:gap-y-10">
+            <div className="min-w-0 lg:col-span-6">
               <h1 id="register-heading" className={`em-accent text-h1 ${hold.className}`} style={hold.style}>
                 <Headline text={r.headline} emphasis={r.emphasis} />
               </h1>
-              <p className="mt-4 max-w-[36rem] text-lead leading-[1.55] text-fg-muted">{r.lead}</p>
+              {/* A word joiner after each hyphen keeps "pre-launch" whole. */}
+              <p className="mt-4 max-w-[36rem] text-pretty text-lead leading-[1.55] text-fg-muted">{r.lead.replaceAll("-", "-\u2060")}</p>
               <ul className="mt-8 space-y-3">
                 {r.checks.map((c) => (
                   <li key={c} className="flex items-start gap-2 text-body leading-[1.5] text-fg">
@@ -54,12 +55,12 @@ export default function RegisterInterestPage() {
                 ))}
               </ul>
             </div>
-            <div className="rounded-card border border-line bg-white p-5 md:p-8 lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-1">
+            <div className="min-w-0 rounded-card border border-line bg-white p-5 md:p-8 lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-1">
               <Suspense fallback={<div className="h-96" aria-hidden="true" />}>
                 <EnquiryForm />
               </Suspense>
             </div>
-            <div className="rounded-card border border-line bg-white p-5 md:p-8 lg:col-span-6 lg:row-start-2">
+            <div className="min-w-0 rounded-card border border-line bg-white p-5 md:p-8 lg:col-span-6 lg:row-start-2">
               <EnquiryTypeTabs />
               <div className="mt-8 border-t border-line pt-6">
                 <p className="text-small font-medium text-fg">{r.next.title}</p>

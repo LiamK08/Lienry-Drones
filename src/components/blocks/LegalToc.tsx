@@ -3,12 +3,13 @@
 import { useEffect, useState } from "react";
 
 /**
- * A legal page's contents: a vertical list on a rule, shown and sticky from 1024 (hidden on phones and
- * tablets, where the sections read straight through). The section in view is marked (aria-current, an
- * accent rule and ink text); above the first heading nothing is marked. Clicking a link uses native
- * fragment navigation, so focus moves to the section's heading.
+ * A legal page's contents: "On this page" over a vertical list on a hairline, shown and sticky from 1024
+ * (hidden on phones and tablets, where the sections read straight through). The section in view is
+ * marked (aria-current, an accent rule and ink text); above the first heading nothing is marked.
+ * Clicking a link uses native fragment navigation, so focus moves to the section's heading. `className`
+ * places it on its page's grid.
  */
-export function LegalToc({ items }: { items: readonly { id: string; title: string }[] }) {
+export function LegalToc({ items, className = "" }: { items: readonly { id: string; title: string }[]; className?: string }) {
   const [current, setCurrent] = useState<string | undefined>(undefined);
 
   useEffect(() => {
@@ -37,8 +38,11 @@ export function LegalToc({ items }: { items: readonly { id: string; title: strin
   }, [items]);
 
   return (
-    <nav aria-label="On this page" className="hidden lg:sticky lg:top-[calc(var(--nav-h)+2rem)] lg:block lg:self-start">
-      <ul className="border-l-2 border-border-strong/70">
+    <nav aria-labelledby="toc-heading" className={`hidden lg:sticky lg:top-[calc(var(--nav-h)+2rem)] lg:block lg:self-start ${className}`}>
+      <p id="toc-heading" className="text-small font-medium leading-[1.5] text-fg">
+        On this page
+      </p>
+      <ul className="mt-4 border-l border-line">
         {items.map((i) => {
           const on = i.id === current;
           return (
@@ -46,7 +50,7 @@ export function LegalToc({ items }: { items: readonly { id: string; title: strin
               <a
                 href={`#${i.id}`}
                 aria-current={on ? "location" : undefined}
-                className={`-ml-0.5 block border-l-2 py-2 pl-5 text-small leading-[1.2] transition-[background-color,border-color,color] duration-200 ${on ? "border-accent text-ink" : "border-transparent text-muted hover:text-ink"}`}
+                className={`-ml-px block border-l-2 py-1.5 pl-4 text-small leading-[1.5] transition-[border-color,color] duration-200 motion-reduce:transition-none ${on ? "border-accent text-fg" : "border-transparent text-fg-muted hover:text-fg"}`}
               >
                 {i.title}
               </a>
