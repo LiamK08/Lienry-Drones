@@ -133,7 +133,7 @@ const solar: WindowModel = {
   legend: [
     { colour: "var(--color-glass)", label: "Washed" },
     { colour: "var(--color-map-pending)", label: "Pending" },
-    { colour: "#e0a13a", label: "Soiling" },
+    { colour: "var(--color-debris)", label: "Soiling" },
   ],
   video: "solar-view",
   recordingLabel: "Recording of the software view: the model of a four-row solar array being scanned and washed",

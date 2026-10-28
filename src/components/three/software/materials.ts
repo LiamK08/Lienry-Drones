@@ -164,14 +164,13 @@ export function makeSolarMaterial(): THREE.MeshPhysicalMaterial {
 export const surfaces = {
   slab: new THREE.MeshStandardMaterial({ color: "#323b41", roughness: 0.34, metalness: 0.55, envMapIntensity: 1.2 }),
   mullion: new THREE.MeshStandardMaterial({ color: "#9aa0a4", roughness: 0.3, metalness: 0.85, envMapIntensity: 1.1 }),
-  reveal: new THREE.MeshStandardMaterial({ color: "#d7d0c3", roughness: 0.9, metalness: 0 }),
   parapet: new THREE.MeshStandardMaterial({ color: "#4a5257", roughness: 0.42, metalness: 0.6, envMapIntensity: 1.1 }),
-  roof: new THREE.MeshStandardMaterial({ color: "#a29f98", roughness: 0.95, metalness: 0 }),
-  plant: new THREE.MeshStandardMaterial({ color: "#bdbcb6", roughness: 0.5, metalness: 0.45 }),
-  charcoal: new THREE.MeshStandardMaterial({ color: "#2a2723", roughness: 0.55, metalness: 0.2 }),
-  shell: new THREE.MeshStandardMaterial({ color: "#f1ece2", roughness: 0.42, metalness: 0.05 }),
+  roof: new THREE.MeshStandardMaterial({ color: "#9fa5ab", roughness: 0.95, metalness: 0 }),
+  plant: new THREE.MeshStandardMaterial({ color: "#b8bdc2", roughness: 0.5, metalness: 0.45 }),
+  charcoal: new THREE.MeshStandardMaterial({ color: PALETTE.inkRaised, roughness: 0.55, metalness: 0.2 }),
+  shell: new THREE.MeshStandardMaterial({ color: "#eef1f4", roughness: 0.42, metalness: 0.05 }),
   lip: new THREE.MeshStandardMaterial({ color: PALETTE.glass, roughness: 0.4, metalness: 0.2 }),
-  rubber: new THREE.MeshStandardMaterial({ color: "#1e1c19", roughness: 0.95, metalness: 0 }),
+  rubber: new THREE.MeshStandardMaterial({ color: PALETTE.ink, roughness: 0.95, metalness: 0 }),
   sensor: new THREE.MeshPhysicalMaterial({ color: "#101418", roughness: 0.12, metalness: 0.4, clearcoat: 1, clearcoatRoughness: 0.1 }),
   pad: new THREE.MeshStandardMaterial({ color: "#dbe2e9", roughness: 1, metalness: 0 }),
   tether: new THREE.MeshStandardMaterial({ color: PALETTE.glassDeep, roughness: 0.6, metalness: 0.1 }),
@@ -181,13 +180,14 @@ export const surfaces = {
   /** Hot-dip galvanised posts and rails under the solar tables. */
   galvanised: new THREE.MeshStandardMaterial({ color: "#a9adaf", roughness: 0.45, metalness: 0.8, envMapIntensity: 1.1 }),
   /** The concrete pad the reel stands on. */
-  concrete: new THREE.MeshStandardMaterial({ color: "#d3cfc6", roughness: 0.95, metalness: 0 }),
+  concrete: new THREE.MeshStandardMaterial({ color: "#cfd5db", roughness: 0.95, metalness: 0 }),
 };
 
 /**
  * Debris overlay for one face: a heat map drawn as soft radial blobs on a canvas, shown at 60 %
- * opacity in amber to rust, and cleared wherever the wash has passed. `washMap` holds, per panel
- * cell, the progress at which the wash reaches that cell (two passes per floor, packed in r and g).
+ * opacity in the palette's debris tones (the debris amber, deepening to its text tone where it builds
+ * up), and cleared wherever the wash has passed. `washMap` holds, per panel cell, the progress at
+ * which the wash reaches that cell (two passes per floor, packed in r and g).
  */
 export function makeDebrisMaterial(heat: THREE.Texture, washMap: THREE.DataTexture): THREE.ShaderMaterial {
   return new THREE.ShaderMaterial({
@@ -198,19 +198,19 @@ export function makeDebrisMaterial(heat: THREE.Texture, washMap: THREE.DataTextu
       uWash: { value: washMap },
       uProgress: { value: 0 },
       uOpacity: { value: 0 },
-      uAmber: { value: new THREE.Color("#e0a13a") },
-      uRust: { value: new THREE.Color("#b45a1c") },
+      uAmber: { value: new THREE.Color(PALETTE.debris) },
+      uDeep: { value: new THREE.Color(PALETTE.debrisText) },
     },
     vertexShader: `varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
     fragmentShader: `
       uniform sampler2D uHeat; uniform sampler2D uWash; uniform float uProgress; uniform float uOpacity;
-      uniform vec3 uAmber; uniform vec3 uRust; varying vec2 vUv;
+      uniform vec3 uAmber; uniform vec3 uDeep; varying vec2 vUv;
       void main() {
         float heat = texture2D(uHeat, vUv).r;
         vec2 wash = texture2D(uWash, vUv).rg;
         float cleared = smoothstep(wash.r - 0.004, wash.r + 0.004, uProgress) * 0.5 + smoothstep(wash.g - 0.004, wash.g + 0.004, uProgress) * 0.5;
         float a = heat * (1.0 - cleared) * uOpacity * 0.6;
-        vec3 c = mix(uAmber, uRust, smoothstep(0.35, 1.0, heat));
+        vec3 c = mix(uAmber, uDeep, smoothstep(0.35, 1.0, heat));
         gl_FragColor = vec4(c, a);
         #include <colorspace_fragment>
       }`,

@@ -15,11 +15,8 @@ const LETTERS = ["A", "B", "C", "D"];
 const COLOURS = {
   pending: "var(--color-map-pending)",
   washed: "var(--color-glass)",
-  amber: [224, 161, 58],
-  rust: [180, 90, 28],
+  debris: "var(--color-debris)",
 } as const;
-
-const mix = (a: readonly number[], b: readonly number[], t: number) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
 
 /**
  * The map is drawn as the model is seen from the front (from the north, as the default camera looks):
@@ -33,8 +30,9 @@ const PLACES = CELLS.map((c) => ({
 
 /**
  * The solar plan as a map of the array: its four rows (row A at the bottom, as in the model), each two
- * panel lines of ten, with the row's letter beside it. Each cell is one panel: pending or washed, with the soiling still on it shaded
- * amber. A chosen row keeps its colour and the rest fade back. The same props as the facade map, so
+ * panel lines of ten, with the row's letter beside it. Each cell is one panel: pending or washed, with
+ * the soiling still on it shaded in the debris tone, deeper as it builds up, as the facade map shades
+ * debris. A chosen row keeps its colour and the rest fade back. The same props as the facade map, so
  * the window swaps one for the other.
  */
 export const ArrayMap = memo(function ArrayMap({ cells, wash, debris, selected }: { cells: ArrayLike<number>; version: number; wash: boolean; debris: boolean; selected: ZoneId | null }) {
@@ -49,11 +47,10 @@ export const ArrayMap = memo(function ArrayMap({ cells, wash, debris, selected }
         const { x, y } = PLACES[i];
         const done = wash ? cells[i] : 0;
         const residue = debris ? c.debris * (1 - done) : 0;
-        const [r, g, b] = residue > 0.12 ? mix(COLOURS.amber, COLOURS.rust, Math.min(1, Math.max(0, (residue - 0.35) / 0.65))) : [0, 0, 0];
         return (
           <g key={i} opacity={selected && c.zone !== selected ? 0.32 : 1}>
             <rect x={x} y={y} width={CW - INSET} height={CH - INSET} fill={done >= 0.999 ? COLOURS.washed : COLOURS.pending} />
-            {residue > 0.12 ? <rect x={x} y={y} width={CW - INSET} height={CH - INSET} fill={`rgb(${r} ${g} ${b})`} fillOpacity={Math.min(0.95, 0.25 + residue * 0.8)} /> : null}
+            {residue > 0.12 ? <rect x={x} y={y} width={CW - INSET} height={CH - INSET} fill={COLOURS.debris} fillOpacity={Math.min(0.95, 0.25 + residue * 0.8)} /> : null}
           </g>
         );
       })}

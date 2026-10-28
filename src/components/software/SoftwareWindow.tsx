@@ -98,7 +98,7 @@ function LayerKey({ id }: { id: LayerId }) {
       ) : id === "wash" ? (
         <rect x="0.5" y="0.5" width="9" height="9" fill="var(--color-glass)" />
       ) : id === "debris" ? (
-        <rect x="0.5" y="0.5" width="9" height="9" fill="#e0a13a" />
+        <rect x="0.5" y="0.5" width="9" height="9" fill="var(--color-debris)" />
       ) : (
         <rect x="1" y="1" width="8" height="8" fill="none" stroke="var(--color-glass)" strokeWidth="1.5" strokeDasharray="2 1.5" />
       )}
