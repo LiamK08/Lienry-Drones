@@ -92,6 +92,11 @@ type FacadeMapProps = {
   lit?: ZoneId | null;
   /** Cells ease between states (a hands-on map); otherwise they change at once, as the window draws them. */
   ease?: boolean;
+  /**
+   * With `ease`, on a map whose debris can show: the debris shading stays mounted, clear while it is
+   * hidden, on each cell with debris on it, so it fades in and out. Elsewhere it is drawn only while shown.
+   */
+  debrisLayer?: boolean;
   /** Inside a control that names it: the map itself is then hidden from assistive technology. */
   decorative?: boolean;
   /** Pending cells a step darker, for a map on a white card of its own (at least 1.5:1 on white). */
@@ -106,7 +111,7 @@ type FacadeMapProps = {
  * canvas: the window's only canvas is the live model. `cells` is read in place, so `version` (the
  * count of washed passes) is what tells the memo it has changed.
  */
-export const FacadeMap = memo(function FacadeMap({ cells, wash, debris, selected, reach, lit = null, ease = false, decorative = false, strong = false }: FacadeMapProps) {
+export const FacadeMap = memo(function FacadeMap({ cells, wash, debris, selected, reach, lit = null, ease = false, debrisLayer = false, decorative = false, strong = false }: FacadeMapProps) {
   const edge = reach === undefined ? FLOORS : reach * FLOORS;
   const motion = ease ? "transition-[fill,fill-opacity,stroke] duration-300 ease-instrument motion-reduce:transition-none" : "";
   return (
@@ -132,7 +137,7 @@ export const FacadeMap = memo(function FacadeMap({ cells, wash, debris, selected
               strokeWidth={stroked ? 1 : undefined}
               className={`${tone} ${motion}`}
             />
-            {residue > DEBRIS_SHOWN || ease ? (
+            {residue > DEBRIS_SHOWN || (ease && debrisLayer && c.debris > DEBRIS_SHOWN) ? (
               <rect x={x} y={y} width={CW - INSET} height={CH - INSET} fillOpacity={residue > DEBRIS_SHOWN ? Math.min(0.95, 0.25 + residue * 0.8) : 0} className={`${FILL.debris} ${motion}`} />
             ) : null}
           </g>
