@@ -276,7 +276,7 @@ Runs the rule checks (5-14, 21-24, 26, 29, 33, 41, 44 and 45) against a served b
   route              one or more routes (default: all eleven and ${NOT_FOUND}, the 404 page)
   --widths 1440,390  viewport widths (1440x900 and 390x844 by default; 1024 and 768 are known too)
   --json <file>      also write the full report as JSON
-  --no-sweep         skip the tab and disclosure state sweeps
+  --no-sweep         skip the tab, disclosure and filter state sweeps
   --no-motion        skip the motion passes (checks 21, 41 and 45), which load every route again
   --inject <file.js> add the file's source as an init script, after the page library, on every page
                      the script opens (all passes): a self-test that breaks a rule on purpose`);
@@ -665,9 +665,15 @@ function pageLib() {
     copy.querySelectorAll("[aria-hidden='true']").forEach((n) => n.remove());
     return clean(el.getAttribute("aria-label") || copy.textContent, 40);
   };
-  // The switchable states of a block: tab groups and h3 disclosure groups.
+  // The switchable states of a block: tab groups, h3 disclosure groups and single-choice filter groups
+  // (a labelled group of aria-pressed buttons with exactly one pressed, such as Explore's filters).
   function controlsOf(block) {
     const groups = [];
+    for (const group of block.querySelectorAll('[role="group"][aria-label]')) {
+      const pills = [...group.querySelectorAll("button[aria-pressed]")].filter(rendered);
+      const pressed = pills.filter((b) => b.getAttribute("aria-pressed") === "true");
+      if (pills.length >= 2 && pressed.length === 1) groups.push({ kind: "filter", els: pills, initial: pills.indexOf(pressed[0]) });
+    }
     for (const list of block.querySelectorAll('[role="tablist"]')) {
       const tabs = [...list.querySelectorAll('[role="tab"]')].filter(rendered);
       if (tabs.length >= 2) groups.push({ kind: "tab", els: tabs, initial: Math.max(0, tabs.findIndex((t) => t.getAttribute("aria-selected") === "true")) });
@@ -1926,7 +1932,7 @@ let totalFailures = 0;
 const byCheck = {};
 
 console.log(`check:rules  ${opts.base}`);
-console.log(`Checks 5-14, 21-24, 26, 29, 33, 41, 44 and 45 at ${opts.widths.join(" and ")}${opts.sweep ? ", sweeping tabs, stage parts and story beats" : ""}${opts.motion ? ", with the motion passes" : ""}`);
+console.log(`Checks 5-14, 21-24, 26, 29, 33, 41 and 44-46 at ${opts.widths.join(" and ")}${opts.sweep ? ", sweeping tabs, stage parts, story beats and filters" : ""}${opts.motion ? ", with the motion passes" : ""}`);
 if (content.error) console.log(`  note: ${content.error}; the checks that compare against content report it.`);
 if (opts.inject) console.log(`  note: injecting ${path.relative(process.cwd(), opts.inject.file) || opts.inject.file} on every page`);
 for (const e of content.loadErrors ?? []) console.log(`  note: could not load ${e}`);
@@ -2043,7 +2049,7 @@ for (const route of opts.routes) {
     dupes(await R(page, "mediaFrames"), "");
     for (const id of await R(page, "mediaInDom")) idsSeen.add(id);
 
-    // Sweeps: audit each block again in every tab and disclosure state.
+    // Sweeps: audit each block again in every tab, disclosure and filter state.
     const blockList = await R(page, "blockList");
     const swept = [];
     // What the default state already reported: a state or the open menu only adds what is new.
