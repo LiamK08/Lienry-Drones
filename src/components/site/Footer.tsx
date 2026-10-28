@@ -34,17 +34,21 @@ function Circles({ hidden }: { hidden?: boolean }) {
   );
 }
 
+// Small grey heads over the link groups and the Ask AI row.
+const head = "text-caption font-medium leading-[1.2] text-muted-on-dark";
+
 /**
- * The footer, on near-black: a row of round pictures drifting slowly across the top over a soft
- * teal glow, then the logo set large with the tagline in Inter italic and, at the right, one row of
- * "Ask AI about Lienry" pills, four link columns under small grey headings, a hairline, and the
- * copyright line with the legal links. Under reduced motion the
- * row stands still. Condensed on 23 October at the owner's request: smaller pictures, logo and gaps.
+ * The footer, on near-black: a row of round pictures drifting slowly across the top over a faint
+ * accent glow, then, on the page's rail, the logo (the link home, whose mark builds on hover or focus as
+ * in the intro) with the tagline in Inter italic and, at the right, one row of "Ask AI about Lienry"
+ * pills, four link columns under small grey headings (two by two on phones), a hairline, and the
+ * copyright line with the legal links. Under reduced motion the row stands still. Condensed on 23
+ * October at the owner's request: smaller pictures, logo and gaps.
  */
 export function Footer() {
   return (
     <footer data-tone="ink" className="on-dark relative isolate overflow-hidden bg-night pb-16 text-white md:pb-8">
-      <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-12 -z-10 size-[26rem] -translate-x-1/2 rounded-pill bg-accent/25 blur-[110px] md:top-16 md:size-[38rem]" />
+      <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-12 -z-10 size-[26rem] -translate-x-1/2 rounded-pill bg-accent/[0.12] blur-[110px] md:top-16 md:size-[38rem]" />
       <div aria-hidden="true" className="flex overflow-hidden pt-16 md:pt-[4.5rem]">
         <div className="marquee flex w-max [animation-duration:30s] md:[animation-duration:60s]">
           <Circles />
@@ -52,71 +56,75 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="mx-auto mt-10 w-full max-w-[75rem] px-5 md:mt-12 xl:px-0">
-        <div className="grid gap-y-8 md:grid-cols-4 md:items-end md:gap-x-6">
-          <div className="md:col-span-2">
-            <div className="flex items-center gap-3 md:gap-4">
-              <Mark className="h-11 w-auto md:h-16" />
-              <p aria-hidden="true" className="max-w-none font-display text-[3rem] leading-none tracking-[-0.02em] md:text-[4.25rem]">
-                {brand.name.split(" ")[0]}
-              </p>
+      {/* The rail: the Container's 87rem inside the page margin, the left edge of every band above. */}
+      <div className="page-x mt-10 md:mt-12">
+        <div className="mx-auto w-full max-w-grid">
+          <div className="grid gap-y-8 lg:grid-cols-4 lg:items-end lg:gap-x-6">
+            <div className="lg:col-span-2">
+              <Link href="/" aria-label="Lienry Drones home" data-mark-host="" className="flex w-fit items-center gap-3 rounded-hard">
+                {/* The trace in the mark's own units: about 1.4px at 36px tall, 1.6px at 44. */}
+                <Mark className="h-9 w-auto [--mark-stroke:30px] md:h-11" build />
+                <span aria-hidden="true" className="font-display text-[2.5rem] leading-none tracking-[-0.02em] md:text-[3rem]">
+                  {brand.name.split(" ")[0]}
+                </span>
+              </Link>
+              <p className="mt-3 max-w-none font-[family-name:var(--font-inter-italic)] text-[1.0625rem] italic tracking-[-0.01em] md:text-[1.125rem]">{footer.tagline}</p>
             </div>
-            <p className="mt-3 max-w-none font-[family-name:var(--font-inter-italic)] text-[1.125rem] italic tracking-[-0.02em] md:text-[1.375rem]">{footer.tagline}</p>
-          </div>
-          {/* Ask an AI assistant about Lienry: text pills, on one row at the right, each opening its assistant with the question filled in. */}
-          <div className="md:col-span-2 md:justify-self-end">
-            <p id="footer-ask-ai" className="text-[0.8125rem] font-medium leading-[1.2] text-muted-on-dark">
-              {footer.askAi.label}
-            </p>
-            <ul aria-labelledby="footer-ask-ai" className="mt-3 flex flex-wrap gap-2">
-              {footer.askAi.links.map((l) => (
-                <li key={l.label}>
-                  <a
-                    href={l.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`Ask ${l.label} about Lienry (opens in a new tab)`}
-                    className="flex h-8 items-center rounded-pill border border-white/10 bg-white/[0.05] px-3 text-[0.75rem] text-white/85 transition-[background-color,border-color,color] duration-200 hover:border-white/30 hover:bg-white/[0.1] hover:text-white"
-                  >
-                    {l.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        <nav aria-label="Footer" className="mt-8 grid gap-y-10 md:mt-10 md:grid-cols-4 md:gap-x-6">
-          {footer.groups.map((g) => (
-            <div key={g.id}>
-              <p id={`footer-${g.id}`} className="text-[0.8125rem] font-medium leading-[1.2] text-muted-on-dark">
-                {g.heading}
+            {/* Ask an AI assistant about Lienry: text pills, on one row at the right, each opening its assistant with the question filled in. */}
+            <div className="lg:col-span-2 lg:justify-self-end">
+              <p id="footer-ask-ai" className={head}>
+                {footer.askAi.label}
               </p>
-              <ul aria-labelledby={`footer-${g.id}`} className="mt-[0.6875rem] flex flex-col gap-[0.8125rem]">
-                {g.links.map((l) => (
-                  <li key={l.href} className="leading-[1.125rem]">
-                    <Link href={l.href} className="text-[0.9375rem] leading-[1.125rem] text-white transition-[color] duration-200 hover:text-white/70">
+              <ul aria-labelledby="footer-ask-ai" className="mt-3 flex flex-wrap gap-2">
+                {footer.askAi.links.map((l) => (
+                  <li key={l.label}>
+                    <a
+                      href={l.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Ask ${l.label} about Lienry (opens in a new tab)`}
+                      className="flex h-8 items-center rounded-pill border border-white/10 bg-white/[0.05] px-3 text-[0.75rem] text-white/85 transition-[background-color,border-color,color] duration-200 hover:border-white/30 hover:bg-white/[0.1] hover:text-white"
+                    >
                       {l.label}
-                    </Link>
+                    </a>
                   </li>
                 ))}
               </ul>
             </div>
-          ))}
-        </nav>
+          </div>
 
-        <div className="mt-10 flex flex-col gap-3 border-t border-white/[0.08] pt-6 md:flex-row md:items-center md:justify-between">
-          <p className="text-small text-white/55">{footer.legal}</p>
-          <ul className="flex flex-col gap-2 md:flex-row md:items-center md:gap-0">
-            {footer.legalLinks.map((l, i) => (
-              <li key={l.href} className="flex items-center">
-                {i ? <span aria-hidden="true" className="mx-[1.125rem] hidden h-5 w-px bg-white/15 md:block" /> : null}
-                <Link href={l.href} className="text-small text-white/55 transition-[color] duration-200 hover:text-white">
-                  {l.label}
-                </Link>
-              </li>
+          <nav aria-label="Footer" className="mt-10 grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-4">
+            {footer.groups.map((g) => (
+              <div key={g.id}>
+                <p id={`footer-${g.id}`} className={head}>
+                  {g.heading}
+                </p>
+                <ul aria-labelledby={`footer-${g.id}`} className="mt-3 flex flex-col gap-3">
+                  {g.links.map((l) => (
+                    <li key={l.href} className="leading-[1.3]">
+                      <Link href={l.href} className="text-[0.9375rem] leading-[1.3] text-white transition-[color] duration-200 hover:text-white/70">
+                        {l.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
-          </ul>
+          </nav>
+
+          <div className="mt-10 flex flex-col gap-3 border-t border-white/[0.08] pt-6 md:flex-row md:items-center md:justify-between">
+            <p className="text-small text-muted-on-dark">{footer.legal}</p>
+            <ul className="flex flex-col gap-2 md:flex-row md:items-center md:gap-0">
+              {footer.legalLinks.map((l, i) => (
+                <li key={l.href} className="flex items-center">
+                  {i ? <span aria-hidden="true" className="mx-[1.125rem] hidden h-5 w-px bg-white/15 md:block" /> : null}
+                  <Link href={l.href} className="text-small text-muted-on-dark transition-[color] duration-200 hover:text-white">
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
     </footer>

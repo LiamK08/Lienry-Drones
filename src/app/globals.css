@@ -76,20 +76,23 @@
   --text-h1--letter-spacing: -0.03em;
   --text-h2: clamp(2.25rem, 1.971rem + 1.143vw, 3rem);
   --text-h2--line-height: 1.1;
-  --text-h2--letter-spacing: -0.05em;
+  /* -0.03em: tight like the h1, and the 48px serif's letters never touch. */
+  --text-h2--letter-spacing: -0.03em;
   --text-h2s: 2.25rem;
   --text-h2s--line-height: 1.1;
   --text-h2s--letter-spacing: -0.02em;
   --text-h3: clamp(1.875rem, 1.8286rem + 0.19vw, 2rem);
   --text-h3--line-height: 1.1;
   --text-h3--letter-spacing: -0.01em;
+  /* Running text, three steps with open leading (1.2 is for one-line titles only): lead 1.55, body 1.6,
+     small 1.5. */
   --text-lead: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
-  --text-lead--line-height: 1.45;
+  --text-lead--line-height: 1.55;
   --text-body: 1rem;
-  --text-body--line-height: 1.55;
+  --text-body--line-height: 1.6;
   --text-body--letter-spacing: -0.01em;
   --text-small: 0.875rem;
-  --text-small--line-height: 1.45;
+  --text-small--line-height: 1.5;
   --text-small--letter-spacing: -0.02em;
   --text-caption: 0.8125rem;
   --text-caption--line-height: 1.5;
@@ -562,6 +565,63 @@
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
+  /* The mark builds (Wordmark.tsx, build): hovering or focusing the header's or the footer's home link
+     replays the intro in miniature. Each block's outline traces in the surface's accent while its fill
+     drops to a ghost, in the intro's order (centre, left, right), then the fill comes back and the line
+     fades: about 700ms, after a 60ms hover intent so a pointer passing over never sets it off. The
+     stroke is in the mark's own units (529 x 785): 40 is about 1.2px at the header's 24px. */
+  .mark-trace {
+    fill: none;
+    stroke: var(--s-accent);
+    stroke-width: var(--mark-stroke, 40px);
+    stroke-linejoin: round;
+    stroke-dasharray: 1 1;
+    stroke-dashoffset: 1;
+    opacity: 0;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    :is([data-mark-host]:hover, [data-mark-host]:focus-visible) .mark-build :is(.mark-fill, .mark-trace) {
+      animation: 540ms var(--mark-delay, 0ms) var(--ease-instrument) both;
+    }
+    :is([data-mark-host]:hover, [data-mark-host]:focus-visible) .mark-build .mark-fill {
+      animation-name: mark-fill;
+    }
+    :is([data-mark-host]:hover, [data-mark-host]:focus-visible) .mark-build .mark-trace {
+      animation-name: mark-trace;
+      animation-timing-function: linear;
+    }
+    .mark-build .mark-c { --mark-delay: 60ms; }
+    .mark-build .mark-l { --mark-delay: 110ms; }
+    .mark-build .mark-r { --mark-delay: 160ms; }
+  }
+  @keyframes mark-fill {
+    0% { fill-opacity: 1; }
+    16%, 52% { fill-opacity: 0.14; }
+    84%, 100% { fill-opacity: 1; }
+  }
+  @keyframes mark-trace {
+    0% { opacity: 1; stroke-dashoffset: 1; }
+    56% { opacity: 1; stroke-dashoffset: 0; }
+    76% { opacity: 1; }
+    100% { opacity: 0; stroke-dashoffset: 0; }
+  }
+  @media (forced-colors: active) {
+    .mark-trace { display: none; }
+  }
+}
+
+/* Page transitions (PageTransition.tsx): a page reached from inside the site fades in, rising 8px, over
+   220ms; the first page of a visit never does. The header sits outside <main>, so it holds still. Only
+   opacity and transform move (no fill mode, so nothing is left behind once it ends), so nothing shifts
+   in the layout and nothing waits on it. None under reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  main[data-page-enter] {
+    animation: page-in 220ms var(--ease-settle);
+  }
+}
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(8px); }
 }
 
 @layer components {

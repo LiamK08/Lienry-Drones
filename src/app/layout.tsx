@@ -5,6 +5,7 @@ import { brand, openGraphBase, siteUrl } from "@/lib/site";
 import { fontClassName } from "@/lib/fonts";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
+import { PageTransition } from "@/components/site/PageTransition";
 import { OrganizationJsonLd } from "@/components/site/JsonLd";
 import { introScript } from "@/lib/intro";
 
@@ -59,7 +60,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             Skip to content
           </a>
           <Nav />
-          <main id="main">{children}</main>
+          {/* <main id="main">, keyed by the path: a page reached from inside the site fades and rises in; the header holds still. */}
+          <PageTransition>{children}</PageTransition>
           <Footer />
         </MotionConfig>
         <OrganizationJsonLd />
