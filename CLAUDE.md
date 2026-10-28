@@ -75,7 +75,7 @@ hover and keyboard focus (CSS, about 700ms, none under reduced motion).
 
 Page entrances (28 October 2026): moving to another page of the site brings the new page in, a fade and an 8px
 rise on `<main>` over about a quarter of a second, never past 300ms (`src/components/site/PageTransition.tsx`),
-while the header holds still. Never on the first page of a visit, an anchor or a new query, never under reduced
+while the header holds still; a page reached at an anchor only fades, so the anchor lands where a hard load puts it. Never on the first page of a visit, an anchor or a new query, never under reduced
 motion, and it never holds the navigation back (no View Transitions). Check 46 encodes it.
 
 Header contrast: `npm run contrast -- <frame>` proves the bar stays legible over the hero

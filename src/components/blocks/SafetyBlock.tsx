@@ -142,7 +142,7 @@ export function FiguresBlock({ id, headline, aside, image, items, note }: Figure
           </li>
         ))}
       </ul>
-      <p className="mt-10 text-small leading-[1.5] text-fg-muted md:max-w-[68ch]">{note}</p>
+      <p className="mt-10 text-small leading-[1.5] text-fg-muted md:max-w-prose">{note}</p>
     </PaperBand>
   );
 }

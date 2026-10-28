@@ -1,22 +1,17 @@
 import type { Metadata } from "next";
-import type { ReactNode } from "react";
 import { companyPage } from "@/content/company";
 import { pageMetadata } from "@/lib/site";
 import { AccentPanel } from "@/components/blocks/AccentPanel";
 import { BubbleHero } from "@/components/blocks/BubbleHero";
 import { Band, Container } from "@/components/ui/Band";
 import { Button } from "@/components/ui/Button";
+import { keepWhole } from "@/components/ui/keepWhole";
 import { Picture } from "@/components/ui/Picture";
 
 export const metadata: Metadata = pageMetadata(
   "/company",
   "Lienry Drones is a Sydney company at concept stage, building a resident cleaning drone and raising a pre-seed round.",
 );
-
-/** Each hyphenated word ("pre-seed") kept whole on its line by markup, not a character, so copied text stays as written. */
-function keepWhole(text: string): ReactNode[] {
-  return text.split(/(\S+-\S+)/).map((part, i) => (i % 2 ? <span key={i} className="whitespace-nowrap">{part}</span> : part));
-}
 
 /**
  * /company: the tinted hero with round pictures around the headline; the story on the page's 12

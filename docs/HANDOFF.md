@@ -236,7 +236,7 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
   - **Polish** (two audits of every page, then five builders, each in its own files): one button system
     (md page calls to action, lg form submits, sm app UI; secondary pills carry an accent arrow badge;
     `glass` is a solid white pill), round icon buttons, the header logo and the footer on the rail,
-    Inter menus with one tile tone, a scrim under the phone sheet, the bar clear over /company's hero;
+    Inter menus with one tile tone, a scrim under the phone sheet (it closes on any page change);
     running text at lead 18/1.55, body 16/1.6, small 14/1.5, h2 tracking -0.03em; every band on the one
     rail; the italic accent only in each page's h1; no full stops on section heads. Home: the fit check as
     one card with "0 of 7 answered", the booking card without its header slab, Explore's pill filters with
@@ -250,13 +250,24 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
   - **Features:** a gliding selection indicator (`src/components/home/useIndicator.ts`) on Explore's
     filters, /platform's part tabs and /register-interest's tabs (the step stage's tabs glide in CSS);
     "wash the facade yourself" on the home step stage's Clean step (`WashMap.tsx`: drag across a floor,
-    tap a floor, or the arrow keys on the map, a role=slider; debris needs two passes; Demo data kept);
+    tap a floor, or the arrow keys on the map, a role=slider; every floor takes two passes, as the
+    software's own model does; once the visitor washes, the stage holds on step 03 until they finish,
+    pick a step or scroll away; keyboard focus on the map pauses the drone's own run; Demo data kept);
     page entrances (`PageTransition.tsx`: the new page fades and rises 8px over 220ms after a move
     inside the site, never on a first page or under reduced motion; CLAUDE.md "Page entrances", check
-    46); the logo mark builds on hover and focus in the header and footer, like the intro.
+    46; a page reached at an anchor only fades, so the anchor lands where a hard load puts it); the logo
+    mark builds on hover and focus in the header and footer, like the intro.
   - **Checks:** check 46 (page entrances) in `check:rules`; `npm run contrast` now models the current
-    header (rail logo, centred menus or the burger, the 30% veil and 56px scrim) and gates /company's
-    clear bar; the pager's dots sit 4px apart so a focus ring clears the active pill.
+    header (rail logo, centred menus or the burger, the 30% veil and 56px scrim); /company's hero is now
+    the pale tint, so the home film is the one hero the bar is clear over; the pager's dots sit 4px apart
+    so a focus ring clears the active pill; the rules sweep now opens every Explore filter too.
+  - **Review:** six lenses (React correctness, accessibility, rules and honesty, copy, performance, layout)
+    over everything since the last deploy, each finding checked by an independent verifier: 33 confirmed,
+    all fixed and proved before and after (among them: a phone scroll that started on the wash map froze
+    the demo, "Wash again" was overridden by the move-on, /company's header painted blue before
+    hydration, Back with the phone menu open left the page un-inert, anchors after a page entrance landed
+    8px under the bar, the debris tones and the 3D drone and dock finishes were still warm; the window's
+    recordings were re-recorded from the cooled model).
 
 ## How the owner works
 

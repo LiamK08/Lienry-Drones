@@ -6,6 +6,7 @@ import { holdLines } from "@/components/blocks/holdLines";
 import { EnquiryForm } from "@/components/forms/EnquiryForm";
 import { EnquiryTypeProvider, EnquiryTypeTabs } from "@/components/forms/EnquiryTypeTabs";
 import { Band, Container } from "@/components/ui/Band";
+import { keepWhole } from "@/components/ui/keepWhole";
 import { Headline } from "@/components/ui/SectionHead";
 
 export const metadata: Metadata = pageMetadata(
@@ -45,7 +46,7 @@ export default function RegisterInterestPage() {
                 <Headline text={r.headline} emphasis={r.emphasis} />
               </h1>
               {/* A word joiner after each hyphen keeps "pre-launch" whole. */}
-              <p className="mt-4 max-w-[36rem] text-pretty text-lead leading-[1.55] text-fg-muted">{r.lead.replaceAll("-", "-\u2060")}</p>
+              <p className="mt-4 max-w-[36rem] text-pretty text-lead leading-[1.55] text-fg-muted">{keepWhole(r.lead)}</p>
               <ul className="mt-8 space-y-3">
                 {r.checks.map((c) => (
                   <li key={c} className="flex items-start gap-2 text-body leading-[1.5] text-fg">
