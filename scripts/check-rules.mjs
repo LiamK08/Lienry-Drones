@@ -2815,6 +2815,8 @@ async function pagePass(width) {
       });
       await page.locator('body > header a[href="/"], header a[href="/"]').first().click();
       await page.waitForURL(opts.base + "/", { timeout: 15000 });
+      // Under load the new page can hold the main thread a while: wait for the entrance, not a fixed time.
+      if (!reduce) await page.waitForFunction(() => window.__entrance.starts.length > 0, null, { timeout: 5000 }).catch(() => {});
       await page.waitForTimeout(700);
       const seenLog = await page.evaluate(() => ({ starts: window.__entrance.starts, boxes: [...window.__entrance.boxes], marked: !!document.getElementById("main")?.hasAttribute("data-page-enter") }));
       if (reduce) {
@@ -2841,17 +2843,34 @@ async function pagePass(width) {
           true,
         );
       });
+      // The scroll position once it has held still for 400ms (the page's own anchor sync included).
+      const settled = (pg) =>
+        pg.evaluate(
+          () =>
+            new Promise((done) => {
+              let y = window.scrollY;
+              let still = performance.now();
+              const t0 = still;
+              const tick = () => {
+                if (window.scrollY !== y) [y, still] = [window.scrollY, performance.now()];
+                if (performance.now() - still > 400 || performance.now() - t0 > 6000) done(Math.round(y));
+                else requestAnimationFrame(tick);
+              };
+              requestAnimationFrame(tick);
+            }),
+        );
       await page.locator(`footer a[href="${anchor}"]`).first().click();
       await page.waitForURL(opts.base + anchor, { timeout: 15000 });
-      await page.waitForTimeout(900);
-      const soft = await page.evaluate(() => ({ starts: window.__anchor.starts, y: Math.round(window.scrollY) }));
+      if (!reduce) await page.waitForFunction(() => window.__anchor.starts.length > 0, null, { timeout: 5000 }).catch(() => {});
+      await page.waitForTimeout(500);
+      const soft = { starts: await page.evaluate(() => window.__anchor.starts), y: await settled(page) };
       if (reduce) {
         if (soft.starts.length) add(`a page entrance plays under reduced motion at an anchor ${label}`, JSON.stringify(soft.starts));
       } else if (soft.starts.length !== 1 || soft.starts[0].moves) add(`a page reached at an anchor does not only fade in ${label}`, JSON.stringify(soft.starts));
       const hard = await context.newPage();
       await hard.goto(opts.base + anchor, { waitUntil: "load", timeout: 60000 });
-      await hard.waitForTimeout(900);
-      const hardY = await hard.evaluate(() => Math.round(window.scrollY));
+      await hard.waitForTimeout(500);
+      const hardY = await settled(hard);
       if (Math.abs(hardY - soft.y) > 2) add(`a page reached at an anchor lands away from where a hard load puts it ${label}`, `${anchor}: scrollY ${soft.y} against ${hardY}`);
       await context.close();
     }
