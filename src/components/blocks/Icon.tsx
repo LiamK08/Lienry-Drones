@@ -5,7 +5,8 @@ const paths: Record<string, string> = {
   sliders: "M4 7h10M18 7h2M4 17h4M12 17h8M16 5v4M10 15v4",
   phone: "M8 3h8a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Zm3 15h2",
   record: "M7 3h7l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Zm2 9h6M9 16h4",
-  tether: "M12 3v4m0 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm0 4c0 5-6 5-6 10",
+  // A small drone (two rotors over its body) on a cable that curves down to its dock.
+  tether: "M9 4h4m4 0h4M11 4v2m8-2v2m-8 0h8l-1.5 2.5h-5L11 6Zm4 2.5c0 4-8 3.5-8 7.5M3 16h8v5H3v-5Z",
   camera: "M4 8h3l2-3h6l2 3h3v11H4V8Zm8 9a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z",
   check: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm-4-9 3 3 5-6",
   dock: "M3 20h18M5 20V10l7-5 7 5v10M9 20v-5h6v5",
