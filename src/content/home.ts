@@ -157,23 +157,21 @@ export const benefits = {
 
 /**
  * How a clean runs: five timed steps over one large picture, each with a coded panel that follows the
- * software's one demo building (src/content/software.ts) through the step. `short` is the tab's one word
- * on phones, where the five tabs share one row.
+ * software's one demo building (src/content/software.ts) through the step. Each tab shows its number
+ * and name; `short` is the name on phones, where the five tabs share one row.
  */
 export const how = {
-  eyebrow: "How it works",
-  headline: "From scan to report, on its own.",
-  emphasis: "on its own.",
+  headline: "From scan to report, on its own",
   intro: "Every clean follows the same five steps, planned on a model of your building.",
   // Under the stage: its panels are coded previews of the software's demo building.
   note: "Demo data. The building is illustrative; the software will model each property from its scan.",
   label: "Steps of a clean",
   steps: [
-    { id: "scan", n: "01", short: "Scan", who: "The drone", tab: "Scans it", title: "Maps the building first.", body: "Structure and dimensions, before the first clean.", image: { id: "s4-scan", alt: "The drone holding off the corner of a glass building to scan it", position: "50% 40%" } },
-    { id: "plan", n: "02", short: "Plan", who: "The software", tab: "Plans it", title: "Every zone gets a plan.", body: "Surface, pressure and route for each part of the building.", image: { id: "s5-software", alt: "A laptop showing the desktop software's shaded 3D building", position: "50% 50%" } },
-    { id: "clean", n: "03", short: "Clean", who: "The drone", tab: "Cleans it", title: "Washes with nobody on site.", body: "Water through the tether, two passes per floor.", image: { id: "m1-drone-master", alt: "The Lienry drone washing a glass wall, its spray bar on the pane", position: "50% 50%" } },
-    { id: "check", n: "04", short: "Check", who: "The scan", tab: "Checks it", title: "Looks again.", body: "A re-scan shades where debris has built up.", image: { id: "f2-camera", alt: "The drone's sensor strip and scanning sensor, close up", position: "50% 45%" } },
-    { id: "report", n: "05", short: "Report", who: "The software", tab: "Reports it", title: "Back to the dock, on record.", body: "What was cleaned, and when the next clean is due.", image: { id: "s6-automation", alt: "The roof capsule open at dawn, the drone above its cradle", position: "50% 40%" } },
+    { id: "scan", n: "01", short: "Scan", tab: "Scans it", title: "Maps the building first.", body: "Structure and dimensions, before the first clean.", image: { id: "s4-scan", alt: "The drone holding off the corner of a glass building to scan it", position: "50% 40%" } },
+    { id: "plan", n: "02", short: "Plan", tab: "Plans it", title: "Every zone gets a plan.", body: "Surface, pressure and route for each part of the building.", image: { id: "s5-software", alt: "A laptop showing the desktop software's shaded 3D building", position: "50% 50%" } },
+    { id: "clean", n: "03", short: "Clean", tab: "Cleans it", title: "Washes with nobody on site.", body: "Water through the tether, two passes per floor.", image: { id: "m1-drone-master", alt: "The Lienry drone washing a glass wall, its spray bar on the pane", position: "50% 50%" } },
+    { id: "check", n: "04", short: "Check", tab: "Checks it", title: "Looks again.", body: "A re-scan shades where debris has built up.", image: { id: "f2-camera", alt: "The drone's sensor strip and scanning sensor, close up", position: "50% 45%" } },
+    { id: "report", n: "05", short: "Report", tab: "Reports it", title: "Back to the dock, on record.", body: "What was cleaned, and when the next clean is due.", image: { id: "s6-automation", alt: "The roof capsule open at dawn, the drone above its cradle", position: "50% 40%" } },
   ],
 };
 
