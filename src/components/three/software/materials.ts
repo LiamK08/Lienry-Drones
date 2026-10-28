@@ -256,7 +256,7 @@ export function makePointsMaterial(dpr: number, axis: "x" | "y" = "y"): THREE.Sh
  * (0 for the building's paving) mottles it, at the scale of `size` metres across, like dry ground
  * under an array.
  */
-export function makeGroundMaterial(outer = "#e3ddd1", inner = "#ebe6db", grain = 0, size = 180): THREE.ShaderMaterial {
+export function makeGroundMaterial(outer = "#dde3e9", inner = "#e7ecf0", grain = 0, size = 180): THREE.ShaderMaterial {
   return new THREE.ShaderMaterial({
     transparent: true,
     depthWrite: false,

@@ -182,7 +182,7 @@ export function SolarField({ controlRef, clockRef, fadeRef }: { controlRef: RefO
   const lines = useRef<Partial<Record<SolarZoneId, LineRef | null>>>({});
   const hovered = useRef(-1);
   const material = useMemo(() => makeSolarMaterial(), []);
-  const ground = useMemo(() => makeGroundMaterial("#d9d4c3", "#e2dccb", 0.14, 180), []);
+  const ground = useMemo(() => makeGroundMaterial("#d6dbd8", "#e0e4e2", 0.14, 180), []);
   const state = useMemo(() => {
     const a = new THREE.InstancedBufferAttribute(new Float32Array(PANELS.length * 4), 4);
     a.setUsage(THREE.DynamicDrawUsage);
