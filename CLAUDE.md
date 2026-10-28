@@ -57,13 +57,14 @@ the header, the skip link and, while it plays, the intro's overlay.
 Intro (the owner's brief, 28 October 2026): when a browser session starts on the home page, a first-visit
 intro plays over it, after breakerindustries.com's loader in Lienry's own mark, colours and code: on the
 paper, three drones fly in on guide curves and trace the mark's blocks in the accent while they fill, one
-leaving along the flight arc; the mark turns ink, then white as the paper fades into the hero film, which
+leaving along the flight arc; the mark turns ink and fades as the paper fades into the hero film, which
 starts again from its first frame. About four seconds, never past five, all CSS
 (`src/components/home/Intro.tsx`; the head script in `src/lib/intro.ts` sets `data-intro` before the
-first paint). Once per session (sessionStorage), never on another entry page, a reload, a deep link with a
-hash, or under reduced motion. Any key, press, wheel or touch ends it at once. It is aria-hidden with
-nothing focusable, and the page renders underneath as normal (never hidden or inert), so it never delays
-the LCP.
+first paint). Once per session (sessionStorage), never on another entry page, a reload, a visit from
+another page of the site (a home tab opened from inside it), a deep link, or under reduced motion. Any
+key, press, wheel, touch or scroll ends it at once, and the click of a press that ends it never lands on
+the page. It is aria-hidden with nothing focusable, and the page renders underneath as normal (never
+hidden or inert), so it never delays the LCP.
 
 Header contrast: `npm run contrast -- <frame>` proves the bar stays legible over the hero
 film. Run it after touching the header, the hero scrim or the primary button.

@@ -14,6 +14,14 @@ const jpg = (name, extra = {}) => ({ path: path.join(out, `${name}.jpg`), type: 
 const browser = await chromium.launch({ args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"] });
 for (const [vname, width, height, mobile] of [["1440", 1440, 900, false], ["390", 390, 844, true]]) {
   const ctx = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: 1, isMobile: mobile, hasTouch: mobile });
+  // Pages as a visitor in a session that has seen the first-visit intro sees them (CLAUDE.md "Intro").
+  await ctx.addInitScript((key) => {
+    try {
+      sessionStorage.setItem(key, "1");
+    } catch {
+      // No storage: the head script then never starts the intro either.
+    }
+  }, "lienry:intro-seen");
   const page = await ctx.newPage();
   for (const [name, route] of routes) {
     await page.goto(base + route, { waitUntil: "networkidle" });

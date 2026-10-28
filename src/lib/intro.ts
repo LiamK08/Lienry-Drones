@@ -1,16 +1,22 @@
 // The first-visit intro (src/components/home/Intro.tsx): when a browser session starts on the home page,
 // three drones fly in and build the mark, then the paper fades into the hero film. Once per session,
-// only on a home entry, never under reduced motion or on a deep link (a hash), and any key, press,
-// wheel or touch ends it at once.
+// only on a home entry from outside the site, never under reduced motion or on a deep link (a hash), and
+// any key, press, wheel, touch or scroll ends it at once.
 
 /** sessionStorage key: set on the first page of a session, whichever it is. */
 export const INTRO_SEEN_KEY = "lienry:intro-seen";
-/** Dispatched on window when the intro ends, played through or skipped (the hero film restarts on it). */
+/** Dispatched on window as the paper starts to fade (the hero film starts again from its first frame). */
+export const INTRO_REVEAL_EVENT = "lienry:intro-reveal";
+/** Dispatched on window when the intro ends, played through or cut short. */
 export const INTRO_END_EVENT = "lienry:intro-end";
 
 /**
  * Runs in the head before the body is parsed, so the overlay is up before the first paint. It sets
- * `data-intro="play"` on <html> (the overlay's only switch, in CSS) and clears it when the overlay's
- * last animation ends, on the first key, press, wheel or touch, or after 6 seconds at most.
+ * `data-intro="play"` on <html> (the overlay's only switch, in CSS) unless the session has already had a
+ * page, the visit comes from another page of the site (a home tab opened from inside it), the page is not
+ * home, the address has a hash, or motion is reduced. It clears it when the overlay's last animation ends,
+ * on the first key, press, wheel, touch or scroll (a text-fragment link scrolls the page too), or 6
+ * seconds after the tab is first visible. A press or tap that ends it also has its click swallowed, so
+ * it never lands on what was under the paper.
  */
-export const introScript = `(function(){var d=document.documentElement,k=${JSON.stringify(INTRO_SEEN_KEY)},s;try{s=sessionStorage.getItem(k);sessionStorage.setItem(k,"1")}catch(e){return}if(s||location.pathname!=="/"||location.hash||!window.matchMedia||matchMedia("(prefers-reduced-motion: reduce)").matches)return;d.setAttribute("data-intro","play");var t=["keydown","pointerdown","wheel","touchstart"],o={capture:true,passive:true};function end(){if(d.getAttribute("data-intro")!=="play")return;d.removeAttribute("data-intro");t.forEach(function(n){removeEventListener(n,end,o)});removeEventListener("animationend",done,true);clearTimeout(c);dispatchEvent(new Event(${JSON.stringify(INTRO_END_EVENT)}))}function done(e){if(String(e.animationName).indexOf("introEnd")>-1)end()}t.forEach(function(n){addEventListener(n,end,o)});addEventListener("animationend",done,true);var c=setTimeout(end,6000)})();`;
+export const introScript = `(function(){var d=document.documentElement,k=${JSON.stringify(INTRO_SEEN_KEY)},s,r=document.referrer,same=false;try{s=sessionStorage.getItem(k);sessionStorage.setItem(k,"1")}catch(e){return}try{same=!!r&&new URL(r).origin===location.origin}catch(e){}if(s||same||location.pathname!=="/"||location.hash||!window.matchMedia||matchMedia("(prefers-reduced-motion: reduce)").matches)return;d.setAttribute("data-intro","play");var t=["keydown","pointerdown","wheel","touchstart"],o={capture:true,passive:true},c,w=0;function end(e){if(d.getAttribute("data-intro")!=="play")return;d.removeAttribute("data-intro");t.forEach(function(n){removeEventListener(n,end,o)});removeEventListener("scroll",end);removeEventListener("animationstart",go,true);removeEventListener("animationend",done,true);document.removeEventListener("visibilitychange",arm);clearTimeout(c);if(e&&(e.type==="pointerdown"||e.type==="touchstart")){var x=function(v){v.preventDefault();v.stopPropagation();removeEventListener("click",x,true)};addEventListener("click",x,true);setTimeout(function(){removeEventListener("click",x,true)},600)}dispatchEvent(new Event(${JSON.stringify(INTRO_END_EVENT)}))}function go(e){if(String(e.animationName).indexOf("introReveal")>-1)dispatchEvent(new Event(${JSON.stringify(INTRO_REVEAL_EVENT)}))}function done(e){if(String(e.animationName).indexOf("introEnd")>-1)end()}function arm(){if(document.visibilityState==="visible"&&!w){w=1;c=setTimeout(end,6000)}}t.forEach(function(n){addEventListener(n,end,o)});addEventListener("scroll",end,{passive:true});addEventListener("animationstart",go,true);addEventListener("animationend",done,true);document.addEventListener("visibilitychange",arm);arm()})();`;

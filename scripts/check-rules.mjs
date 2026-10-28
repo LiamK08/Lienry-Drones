@@ -100,8 +100,9 @@
 //     the navigation, leaving the overlay display:none; a reload in the same session has no intro. In
 //     fresh sessions, a key (Tab, which then lands visibly on the skip link), a press or tap, and a
 //     wheel each end it at once (within 200ms; a wheel within 500ms, as it reaches the page a few frames
-//     after it is sent); a session that starts on /platform and goes home by the header's link,
-//     one that opens /#faq, and one under reduced motion never see it.
+//     after it is sent), and the press's click does not land on the page; a session that starts on
+//     /platform and goes home by the header's link, a new tab opened on / from another page of the site
+//     (a same-site referrer), one that opens /#faq, and one under reduced motion never see it.
 // 44  References never load: no request from any page this script opens goes to refresh.tech,
 //     legora.com or a subdomain of either, and no address in the page (href, src, srcset, poster,
 //     action, data: a preconnect or a link makes no request) is on one; no text in the page (hidden
@@ -1917,7 +1918,7 @@ let totalFailures = 0;
 const byCheck = {};
 
 console.log(`check:rules  ${opts.base}`);
-console.log(`Checks 5-14, 21-24, 26, 29, 33, 41 and 44 at ${opts.widths.join(" and ")}${opts.sweep ? ", sweeping tabs, stage parts and story beats" : ""}${opts.motion ? ", with the motion passes" : ""}`);
+console.log(`Checks 5-14, 21-24, 26, 29, 33, 41, 44 and 45 at ${opts.widths.join(" and ")}${opts.sweep ? ", sweeping tabs, stage parts and story beats" : ""}${opts.motion ? ", with the motion passes" : ""}`);
 if (content.error) console.log(`  note: ${content.error}; the checks that compare against content report it.`);
 if (opts.inject) console.log(`  note: injecting ${path.relative(process.cwd(), opts.inject.file) || opts.inject.file} on every page`);
 for (const e of content.loadErrors ?? []) console.log(`  note: could not load ${e}`);
@@ -2658,7 +2659,20 @@ async function introPass(width) {
     // Any input ends it at once: a key (Tab, landing on the skip link), a press or a tap, a wheel.
     const inputs = [
       ["Tab", (page) => page.keyboard.press("Tab")],
-      [width < 800 ? "a tap" : "a press", (page) => (width < 800 ? page.touchscreen.tap(width / 2, 300) : page.mouse.click(width / 2, 300))],
+      // Aimed at a control in the header under the paper, whose click must not land: a link at 1440
+      // (not a menu button: those open on hover once the paper is gone), the burger on a phone.
+      [
+        width < 800 ? "a tap" : "a press",
+        async (page) => {
+          const at = await page.evaluate((phone) => {
+            const el = [...document.querySelectorAll(phone ? "body > header button[aria-expanded]" : 'body > header a[href]:not([href="/"])')].find((e) => e.getBoundingClientRect().width > 0);
+            const r = el?.getBoundingClientRect();
+            return r ? { x: r.x + r.width / 2, y: r.y + r.height / 2 } : { x: innerWidth / 2, y: 300 };
+          }, width < 800);
+          if (width < 800) await page.touchscreen.tap(at.x, at.y);
+          else await page.mouse.click(at.x, at.y);
+        },
+      ],
       ...(width < 800 ? [] : [["a wheel", async (page) => { await page.mouse.move(width / 2, 300); await page.mouse.wheel(0, 200); }]]),
     ];
     for (const [name, act] of inputs) {
@@ -2674,6 +2688,11 @@ async function introPass(width) {
         await page.waitForFunction(() => !document.documentElement.hasAttribute("data-intro"), null, { timeout: name === "a wheel" ? 500 : 200, polling: "raf" }).catch(() => {});
         const st = await introState(page);
         if (st.on || st.display !== "none") add(`${name} does not end the intro at once ${label}`, JSON.stringify(st));
+        if (name !== "Tab" && name !== "a wheel") {
+          await page.waitForTimeout(700);
+          const landed = await page.evaluate(([home, phone]) => ({ moved: location.href !== home, open: phone && !!document.querySelector('body > header [aria-expanded="true"]') }), [opts.base + "/", width < 800]);
+          if (landed.moved || landed.open) add(`${name} that ends the intro also clicks what was under it ${label}`, JSON.stringify(landed));
+        }
         if (name === "Tab") {
           const f = await page.evaluate(() => {
             const a = document.activeElement;
@@ -2697,6 +2716,13 @@ async function introPass(width) {
       await page.waitForTimeout(300);
       const st = await introState(page);
       if (st.on || st.display !== "none") add(`going home by the header's link shows the intro ${label}`, JSON.stringify(st));
+      await context.close();
+    }
+    {
+      const { context, page } = await open();
+      await page.goto(opts.base + "/", { waitUntil: "domcontentloaded", timeout: 60000, referer: opts.base + "/platform" });
+      const st = await introState(page);
+      if (st.on || st.display !== "none") add(`a new tab opened on / from another page of the site shows the intro ${label}`, JSON.stringify(st));
       await context.close();
     }
     for (const [name, extra, route] of [["/#faq", {}, "/#faq"], ["reduced motion", { reducedMotion: "reduce" }, "/"]]) {
@@ -2923,6 +2949,10 @@ for (const [check, name] of Object.entries(CHECKS).sort(([a], [b]) => parseInt(a
     continue;
   }
   const ran = check === "33" ? (calcRoutes.size ? "" : " (no route has a calculator)") : check === "41" ? (clipRoutes.size ? "" : " (no route has hover clips)") : "";
+  if (check === "45" && !opts.routes.includes("/")) {
+    console.log(`  [${check}] ${name}: not run (/ is not among the routes)`);
+    continue;
+  }
   console.log(`  [${check}] ${name}: ${byCheck[check] ? `${byCheck[check]} failing` : `pass${ran}`}`);
 }
 if (opts.json) {

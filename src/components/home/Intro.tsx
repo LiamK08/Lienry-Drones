@@ -8,10 +8,11 @@ const BLOCKS = {
   R: "M66.04 40.44 L86.26 54.79 L86.26 128 L3.03 128 A100.79 100.79 0 0 0 66.04 40.44 Z",
   L: "M0 60.33 L19.73 47.94 L19.73 104.03 A145.92 145.92 0 0 1 0 119.46 Z",
 } as const;
-// The approaches, from off screen at 1440 and at 390: from the top right, the right and the bottom left.
-const GUIDES = ["M520 -720 C420 -300 25.93 -260 25.93 14.84", "M900 330 C520 330 260 40.44 66.04 40.44", "M-720 520 C-300 560 -160 60.33 0 60.33"];
-// The right-hand drone leaves along the flight arc, out to the top right.
-const TRAIL = "M66.04 40.44 C69.73 -19.4 160 -120 760 -360";
+// The approaches, from the top right, the right and the bottom left, each starting some 2000px out so
+// it begins past the edge of any screen (the drones' own paths in Intro.module.css begin the same way).
+const GUIDES = ["M1112.88 -1601.81 C892.88 -677.81 25.93 -589.81 25.93 14.84", "M1900.75 677.47 C1064.75 677.47 492.75 40.44 66.04 40.44", "M-1584 1071.6 C-660 1159.6 -352 60.33 0 60.33"];
+// The right-hand drone leaves along the flight arc, out past the top right of any screen.
+const TRAIL = "M66.04 40.44 C75.63 -115.14 310.34 -376.7 1870.34 -1000.7";
 
 /** A quadcopter from above: four rotors on crossed arms around the body. */
 function Drone({ className }: { className: string }) {
@@ -34,13 +35,14 @@ function Drone({ className }: { className: string }) {
 /**
  * The first-visit intro, after the owner's brief of 28 October 2026: the warm paper with fine corner
  * ticks, three drones flying in on faint guide curves, each tracing one block of the mark in the accent
- * while the block fills, the right-hand one leaving along the flight arc; the mark turns ink, then white
- * as the paper fades into the hero film. About four seconds, all CSS.
+ * while the block fills, the right-hand one leaving along the flight arc; the mark turns ink and fades as
+ * the paper fades into the hero film, which starts again from its first frame. About four seconds, all
+ * CSS.
  *
  * It is server-rendered on the home page and hidden until the head script (src/lib/intro.ts) sets
- * `data-intro="play"` on <html>, which it does only when a browser session starts here, motion is
- * allowed and the address has no hash. The page renders underneath as normal. Decorative: aria-hidden,
- * nothing focusable, and any key, press, wheel or touch ends it at once.
+ * `data-intro="play"` on <html>, which it does only when a browser session starts here from outside the
+ * site, motion is allowed and the address has no hash. The page renders underneath as normal.
+ * Decorative: aria-hidden, nothing focusable, and any key, press, wheel, touch or scroll ends it at once.
  */
 export function Intro() {
   return (
