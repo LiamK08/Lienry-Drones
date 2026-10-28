@@ -99,7 +99,8 @@
 //     inert or hidden; nothing runs past the screen's edge; it ends by itself within SPEC.introMaxMs of
 //     the navigation, leaving the overlay display:none; a reload in the same session has no intro. In
 //     fresh sessions, a key (Tab, which then lands visibly on the skip link), a press or tap, and a
-//     wheel each end it at once (within 200ms: a wheel reaches the page a frame after it is sent); a session that starts on /platform and goes home by the header's link,
+//     wheel each end it at once (within 200ms; a wheel within 500ms, as it reaches the page a few frames
+//     after it is sent); a session that starts on /platform and goes home by the header's link,
 //     one that opens /#faq, and one under reduced motion never see it.
 // 44  References never load: no request from any page this script opens goes to refresh.tech,
 //     legora.com or a subdomain of either, and no address in the page (href, src, srcset, poster,
@@ -2662,13 +2663,15 @@ async function introPass(width) {
     ];
     for (const [name, act] of inputs) {
       const { context, page, go } = await open();
-      await go("/");
+      const t0 = await go("/");
+      const loaded = Date.now() - t0;
       const was = (await introState(page)).on;
       await page.waitForTimeout(700);
       if (was === "play" && (await introState(page)).on === "play") {
         await act(page);
-        // At once: within a frame or two (a wheel reaches the page a frame after it is sent).
-        await page.waitForFunction(() => !document.documentElement.hasAttribute("data-intro"), null, { timeout: 200, polling: "raf" }).catch(() => {});
+        // At once: a key, press or tap within a frame or two; a wheel reaches the page a few frames
+        // after it is sent (about 100ms headless), so it has 500ms.
+        await page.waitForFunction(() => !document.documentElement.hasAttribute("data-intro"), null, { timeout: name === "a wheel" ? 500 : 200, polling: "raf" }).catch(() => {});
         const st = await introState(page);
         if (st.on || st.display !== "none") add(`${name} does not end the intro at once ${label}`, JSON.stringify(st));
         if (name === "Tab") {
@@ -2680,7 +2683,7 @@ async function introPass(width) {
           });
           if (!f.skip || !f.seen) add(`Tab during the intro does not land visibly on the skip link ${label}`, JSON.stringify(f));
         }
-      } else add(`no intro to end with ${name} ${label}`, String(was));
+      } else add(`no intro to end with ${name} ${label}`, `${was} (domcontentloaded at ${loaded}ms, seen key ${await page.evaluate((k) => sessionStorage.getItem(k), SPEC.introKey)})`);
       await context.close();
     }
     // Never: a session that starts elsewhere, a deep link, reduced motion.
