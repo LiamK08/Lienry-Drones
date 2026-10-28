@@ -76,7 +76,14 @@ function WholeInput({ id, value, onValue, onBlur, invalid, describedBy: describe
   });
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     const r = regroup(e.target.value, e.target.selectionStart, value, (e.nativeEvent as InputEvent).inputType);
-    caret.current = r.caret;
+    if (r.value !== value) caret.current = r.caret;
+    else if (r.caret !== null) {
+      // Re-grouped to the same text (a comma or space typed mid-number): nothing renders, so the effect
+      // above never runs, but React still writes the value back, caret at the end. Put it back after that.
+      const el = e.target;
+      const at = r.caret;
+      queueMicrotask(() => document.activeElement === el && el.setSelectionRange(at, at));
+    }
     onValue(r.value);
   };
   const input = (
@@ -109,13 +116,14 @@ function WholeInput({ id, value, onValue, onBlur, invalid, describedBy: describe
 // The listing's building type: one radio pill per type, as the fit check's answers are drawn (the
 // native radio is sr-only inside its label, and the label draws the focus ring). Chosen is the accent
 // tint with a 2px accent edge (the border and an inset ring, so the pill never changes size) and the
-// accent label, so the choice never rests on the colour of the text alone. The label text is the type's
-// name and nothing else: it is the radio's accessible name.
+// accent label, so the choice never rests on the colour of the text alone; in forced colours it is
+// HighlightText on Highlight, hovered or not. The label text is the type's name and nothing else: it is
+// the radio's accessible name.
 const chip =
   "relative inline-flex h-9 cursor-pointer select-none items-center rounded-pill border px-4 text-small font-medium " +
   "transition-[background-color,border-color,color,box-shadow] duration-200 ease-instrument motion-reduce:transition-none " +
   "border-line bg-white text-fg-muted hover:border-ink hover:text-ink " +
-  "has-[:checked]:border-accent has-[:checked]:bg-tint has-[:checked]:text-accent has-[:checked]:shadow-[inset_0_0_0_1px_var(--color-accent)] has-[:checked]:hover:border-accent has-[:checked]:hover:text-accent " +
+  "has-[:checked]:border-accent has-[:checked]:bg-tint has-[:checked]:text-accent has-[:checked]:shadow-[inset_0_0_0_1px_var(--color-accent)] not-forced-colors:has-[:checked]:hover:border-accent not-forced-colors:has-[:checked]:hover:text-accent " +
   "forced-colors:has-[:checked]:forced-color-adjust-none forced-colors:has-[:checked]:border-[Highlight] forced-colors:has-[:checked]:bg-[Highlight] forced-colors:has-[:checked]:text-[HighlightText] " +
   "has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-solid has-[:focus-visible]:outline-focus";
 
@@ -200,7 +208,7 @@ export function CostCalculator({ headingId, heading, noteId, defaultType = "", l
   const rows = [
     { key: "five", id: "cost-five", label: copy.outputs.five, value: five, needs: needsTotal, line: copy.listing.results.five },
     { key: "ten", id: "cost-ten", label: copy.outputs.ten, value: ten, needs: needsTotal, line: copy.listing.results.ten },
-    { key: "perArea", id: "cost-area-rate", label: copy.outputs.perArea, value: perArea, needs: needsRate, line: copy.listing.results.perArea },
+    { key: "perArea", id: "cost-area-rate", label: copy.outputs.perArea, value: perArea, needs: needsRate, line: solar ? copy.listing.results.perAreaSolar : copy.listing.results.perArea },
   ];
 
   /** An output's text: the figure, or what it still needs, in the small muted text. */

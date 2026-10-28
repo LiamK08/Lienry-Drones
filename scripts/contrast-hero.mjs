@@ -1,4 +1,5 @@
-// Prove the header stays legible over the hero film, and over /company's accent hero.
+// Prove the header stays legible over the hero film, the one hero the bar is clear over (every other
+// page opens light, under the white bar, /company's pale tint hero included).
 //
 // The hero stacks three layers under the bar (src/components/home/Hero.tsx):
 //   1. the film frame, object-cover over the viewport
@@ -21,13 +22,10 @@ const frameFile = process.argv[2];
 const VW = Number(process.argv[3] ?? 1440);
 const VH = Number(process.argv[4] ?? 900);
 
-// The Glass and sky palette (src/app/globals.css): ink, the white ground, muted, the accent and its
-// light step on dark (the focus ring there).
+// The Glass and sky palette (src/app/globals.css): ink, the white ground and muted.
 const INK = [0x14, 0x1e, 0x28];
 const PLASTER = [0xff, 0xff, 0xff];
 const MUTED = [0x52, 0x60, 0x6e];
-const ACCENT = [0x1f, 0x5d, 0x8c];
-const ACCENT_ON_DARK = [0x9c, 0xca, 0xee];
 const VEIL = 0.3;
 const scrimAt = (y) =>
   y <= 56 ? 0.5 : y <= 140 ? 0.5 + (0.26 - 0.5) * ((y - 56) / 84) : y <= 220 ? 0.26 * (1 - (y - 140) / 80) : 0;
@@ -116,15 +114,6 @@ console.table([
   { pair: "ink link on white", ratio: `${ratio(INK, PLASTER).toFixed(2)}:1`, target: "4.5:1", result: ratio(INK, PLASTER) >= 4.5 ? "PASS" : "FAIL" },
   { pair: "muted text on white", ratio: `${ratio(MUTED, PLASTER).toFixed(2)}:1`, target: "4.5:1", result: ratio(MUTED, PLASTER) >= 4.5 ? "PASS" : "FAIL" },
 ]);
-
-// Gate 4: on /company the bar is clear over the accent hero, painted in the hero's own top colour.
-const company = [
-  { pair: "white text on the accent", fg: [255, 255, 255], need: 4.5 },
-  { pair: "focus ring (accent on dark) on the accent", fg: ACCENT_ON_DARK, need: 3 },
-];
-console.log("\nGate 4: the clear bar over /company's accent hero:");
-console.table(company.map((c) => ({ pair: c.pair, ratio: `${ratio(c.fg, ACCENT).toFixed(2)}:1`, target: `${c.need}:1`, result: ratio(c.fg, ACCENT) >= c.need ? "PASS" : "FAIL" })));
-for (const c of company) if (ratio(c.fg, ACCENT) < c.need) failed++;
 
 // Gate 3: the header switches its surface and ink together. Any interpolation can
 // pass through a low-contrast frame, even when both resting states pass.

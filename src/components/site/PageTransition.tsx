@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 
 /**
@@ -14,22 +14,32 @@ import { usePathname } from "next/navigation";
  * Nothing waits on it: the new page is in the DOM, laid out and taking input from the first frame (an
  * opacity and transform animation moves nothing in the layout). None under reduced motion.
  *
+ * A page reached at an anchor (/platform#parts) only fades. The anchor is scrolled to as the new <main>
+ * mounts, by Next and by the page itself (PillarTabs brings its band in), and a scroll measured while the
+ * rise still holds <main> 8px down would leave the anchor 8px under the bar once it ends.
+ *
  * Why not the View Transitions API (React's <ViewTransition>): it holds the new page back until the old
  * one is captured, a frame or two on a fast machine but 330 to 540ms on the checks' headless runs (against
  * 20 to 35ms without it), which fails check 45's tap and would make a slow phone feel slower.
  */
 export function PageTransition({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const mainRef = useRef<HTMLElement>(null);
   // The page this visit opened on, until the first navigation inside the site; adjusted while rendering
-  // (React's pattern for state that follows a prop), so the new <main> is marked in the same commit.
+  // (React's pattern for state that follows a prop), so the new <main> is known to be a move in its commit.
   const [shown, setShown] = useState(pathname);
   const [moved, setMoved] = useState(false);
   if (pathname !== shown) {
     setShown(pathname);
     setMoved(true);
   }
+  // Marked in that commit, before the new page paints, once the address is the new one (Next writes it
+  // first), so the mark can tell an anchor; and after Next's own scroll to it (inside <main>, so earlier).
+  useLayoutEffect(() => {
+    if (moved) mainRef.current?.setAttribute("data-page-enter", window.location.hash ? "fade" : "");
+  }, [moved, pathname]);
   return (
-    <main id="main" key={pathname} data-page-enter={moved ? "" : undefined}>
+    <main ref={mainRef} id="main" key={pathname}>
       {children}
     </main>
   );

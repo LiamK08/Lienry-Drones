@@ -32,6 +32,7 @@ export const calculatorCopy = {
       five: "Five years of what you pay now, rising by your yearly increase.",
       ten: "The same sum, carried on to ten years.",
       perArea: "One year of your spend, spread over your facade area.",
+      perAreaSolar: "One year of your spend, spread over your panel area.",
     },
     route: "Lienry is pre-launch. Tell us about your property and we reply ourselves.",
   },
