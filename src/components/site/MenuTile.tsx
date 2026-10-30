@@ -5,8 +5,8 @@ import { MENU_GLYPHS, type MenuGlyphName } from "@/components/site/menuGlyphs";
  * header's panels at 40px, the phone menu at 36px). Decorative beside the link's label. Its colours
  * hold in forced colours, so the white glyph never lands on a light Canvas.
  */
-export function MenuTile({ name, size = "panel" }: { name: string; size?: "panel" | "phone" }) {
-  const glyph = MENU_GLYPHS[name as MenuGlyphName] ?? MENU_GLYPHS.grid;
+export function MenuTile({ name, size = "panel" }: { name: MenuGlyphName; size?: "panel" | "phone" }) {
+  const glyph = MENU_GLYPHS[name];
   const box = size === "panel" ? "size-10 rounded-[0.625rem]" : "size-9 rounded-[0.5rem]";
   return (
     <span aria-hidden="true" className={`flex shrink-0 items-center justify-center bg-night text-white forced-color-adjust-none ${box}`}>

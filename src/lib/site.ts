@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { MenuGlyphName } from "@/components/site/menuGlyphs";
 
 export const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.lienrydrones.com").replace(/\/$/, "");
 
@@ -65,11 +66,10 @@ export function pageMetadata(route: Route, description: string): Metadata {
   };
 }
 
-/** One entry in a header menu: a title and a one-line description. */
-/** One link in a header panel: its icon (src/components/blocks/Icon.tsx), title and one-line note. */
-export type MenuLink = { href: string; label: string; note: string; icon: string };
+/** One link in a header panel: its icon (a glyph of src/components/site/menuGlyphs.ts, drawn by MenuTile), title and one-line note. */
+export type MenuLink = { href: string; label: string; note: string; icon: MenuGlyphName };
 
-/** A column of a header panel: a heading, the tile tone for its icons, and its links (in 1 or 2 columns). */
+/** A column of a header panel: a heading, a tone (no longer read: every tile is the one night tile), and its links (in 1 or 2 columns). */
 export type MenuGroup = { heading: string; tone: "teal" | "sand" | "green"; cols?: 1 | 2; muted?: boolean; links: readonly MenuLink[] };
 
 /** The dark card that opens the Resources panel: an eyebrow, a title, three links with tags, and a pill. */
