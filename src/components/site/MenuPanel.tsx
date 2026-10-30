@@ -3,7 +3,7 @@ import type { MenuFeature, MenuGroup, MenuLink } from "@/lib/site";
 import { MenuTile } from "@/components/site/MenuTile";
 import { Button } from "@/components/ui/Button";
 
-// One tile for every group: a night tile with a white glyph and one water-blue detail (MenuTile). A
+// One tile for every group: a night tile with a white and water-blue glyph (MenuTile). A
 // group's `tone` in src/lib/site.ts is not read: three hues read as a rainbow, and amber is a status tone.
 
 function Item({ href, label, note, icon, onPick }: MenuLink & { onPick: () => void }) {

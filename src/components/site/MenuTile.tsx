@@ -1,9 +1,9 @@
 import { MENU_GLYPHS, type MenuGlyphName } from "@/components/site/menuGlyphs";
 
 /**
- * A menu link's icon: a night tile holding a solid white glyph with one water-blue detail (the
- * header's panels at 40px, the phone menu at 36px). Decorative beside the link's label. Its colours
- * hold in forced colours, so the white glyph never lands on a light Canvas.
+ * A menu link's icon: a night tile holding a solid two-part glyph, white and water blue (the header's
+ * panels at 40px, the phone menu at 36px). Decorative beside the link's label. Its colours hold in
+ * forced colours, so the white never lands on a light Canvas.
  */
 export function MenuTile({ name, size = "panel" }: { name: MenuGlyphName; size?: "panel" | "phone" }) {
   const glyph = MENU_GLYPHS[name];
