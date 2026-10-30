@@ -277,6 +277,16 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
     alone, three runs each, all 11 pages (median LCP 1.87s home, 2.42s /platform and /download, the
     rest 1.9-2.0s; CLS at most 0.065). TBT on home is 1.4s (not gated; the intro and the 3D window).
     PR frames: `docs/screenshots/glass-and-sky/`.
+- 30 October (owner's request: refresh.tech's new menu icons, "lets fix our to match the new vibrance of
+  theres but of course relevant to our website"): every link in the header's panels and the phone menu now
+  has a night tile (40px, 36px on phones) with a solid two-part glyph in white and the water blue
+  (`src/components/site/MenuTile.tsx`, glyphs in `menuGlyphs.ts`, 24-unit grid, evenodd). The style follows
+  refresh's new tiles (dark tile, chunky solid glyph, the accent carrying the main shape; about 62% of each
+  glyph is water, against refresh's 66%); every glyph is Lienry's own and none is traced from theirs. Two
+  designers drew a set each, two judges picked per glyph, a review then found the accent too small and four
+  glyphs misread (dock, tether, solar, key), and a redraw fixed both. `MenuLink.icon` is typed to the glyph
+  names, so a wrong name fails typecheck; the line icons (`blocks/Icon.tsx`) stay for the pages' cards and
+  strips. PR frames: `docs/screenshots/menu-icons/`.
 
 ## How the owner works
 
