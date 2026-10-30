@@ -286,7 +286,8 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
   designers drew a set each, two judges picked per glyph, a review then found the accent too small and four
   glyphs misread (dock, tether, solar, key), and a redraw fixed both. `MenuLink.icon` is typed to the glyph
   names, so a wrong name fails typecheck; the line icons (`blocks/Icon.tsx`) stay for the pages' cards and
-  strips. PR frames: `docs/screenshots/menu-icons/`.
+  strips. PR frames: `docs/screenshots/menu-icons/`. Gates: typecheck, lint, build; `check:layout`, `check:rules`
+  (motion) and `check:a11y` on all 12 routes; `perf:vitals` alone on all 11 pages (/platform the closest, 2.47s).
 
 ## How the owner works
 
