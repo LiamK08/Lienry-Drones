@@ -8,7 +8,7 @@ import { menus, navAbout } from "@/lib/site";
 import { useScrolledPast } from "@/lib/hooks";
 import { Mark } from "@/components/ui/Wordmark";
 import { MenuPanel } from "@/components/site/MenuPanel";
-import { Icon } from "@/components/blocks/Icon";
+import { MenuTile } from "@/components/site/MenuTile";
 
 type MenuId = string;
 
@@ -291,9 +291,7 @@ export function Nav() {
                           {links.map((l) => (
                             <li key={`${l.href}-${l.label}`}>
                               <Link href={l.href} onClick={() => setOpen(false)} className="flex items-center gap-3 rounded-[0.625rem] py-2 pr-2">
-                                <span aria-hidden="true" className="flex size-9 shrink-0 items-center justify-center rounded-[0.5rem] bg-tint text-accent">
-                                  <Icon name={l.icon} className="size-[1.125rem]" />
-                                </span>
+                                <MenuTile name={l.icon} size="phone" />
                                 <span className="text-small text-ink">{l.label}</span>
                               </Link>
                             </li>

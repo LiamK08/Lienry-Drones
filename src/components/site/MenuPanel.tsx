@@ -1,19 +1,16 @@
 import Link from "next/link";
 import type { MenuFeature, MenuGroup } from "@/lib/site";
-import { Icon } from "@/components/blocks/Icon";
+import { MenuTile } from "@/components/site/MenuTile";
 import { Button } from "@/components/ui/Button";
 
-// One tile tone for every group: the accent on its pale tint (a group's `tone` in src/lib/site.ts is no
-// longer read: three hues read as a rainbow, and amber is a status tone, never a second accent).
-const tile = "bg-tint text-accent";
+// One tile for every group: a night tile with a white glyph and one water-blue detail (MenuTile). A
+// group's `tone` in src/lib/site.ts is not read: three hues read as a rainbow, and amber is a status tone.
 
 function Item({ href, label, note, icon, onPick }: { href: string; label: string; note: string; icon: string; onPick: () => void }) {
   return (
     <li>
       <Link href={href} onClick={onPick} className="group/item flex gap-3 rounded-[0.625rem] p-2 transition-[background-color] duration-200 hover:bg-paper">
-        <span aria-hidden="true" className={`flex size-10 shrink-0 items-center justify-center rounded-[0.625rem] ${tile}`}>
-          <Icon name={icon} className="size-5" />
-        </span>
+        <MenuTile name={icon} />
         <span className="min-w-0">
           <span className="block text-small font-medium text-ink group-hover/item:underline group-hover/item:decoration-1 group-hover/item:underline-offset-4">{label}</span>
           <span className="mt-0.5 block text-caption leading-[1.45] text-muted">{note}</span>
