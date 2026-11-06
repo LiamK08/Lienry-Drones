@@ -56,8 +56,9 @@ const focusOnMount = (el: HTMLElement | null) => el?.focus();
  * and for the chosen call method; fields are white with the control edge. Times are Sydney time;
  * where the visitor's clock reads them differently, each also reads in theirs, with their own day when it
  * falls on another (a Monday evening in London for a Tuesday morning in Sydney). On a phone, picking a
- * day swaps the calendar for that day's times under "All days". The steps share one grid cell; the
- * details step leaves the flow while another step shows (on a phone it also mounts only once first
+ * day swaps the calendar for that day's times under "All days" (the calendar leaves the flow meanwhile,
+ * so the card ends under the times). The steps share one grid cell; the details step leaves the flow
+ * while another step shows (on a phone it also mounts only once first
  * reached), so the calendar is never left over a tall blank, the card grows only when the visitor opens
  * the details, and what was typed survives a change of time.
  *
@@ -130,8 +131,9 @@ export function BookingCard() {
     // White fields inside the card (the surface's field fill), and the form's chosen call method in the
     // card's one selection state: the accent edge on the tint, as the picked day.
     <div className="@container grid [--s-field:var(--color-white)] [&_label:has(input[type=radio]:checked)]:border-accent [&_label:has(input[type=radio]:checked)]:bg-tint [&_input[type=radio]]:accent-accent">
-      {/* The calendar, with the picked day's times under it (on a phone, their own step). */}
-      <Step on={step === "calendar"}>
+      {/* The calendar, with the picked day's times under it (on a phone, their own step, and while they
+          show the calendar leaves the flow, so the card ends under the six times). */}
+      <Step on={step === "calendar"} collapse={phone && step === "times"}>
         <Facts elsewhere={elsewhere} zone={zone} />
         {rejected ? (
           <p ref={rejectedRef} tabIndex={-1} className="mt-5 text-small font-medium text-error focus-visible:outline-none">
@@ -140,9 +142,10 @@ export function BookingCard() {
         ) : null}
         <Calendar today={today} day={day} onPick={pickDay} monthRef={monthRef} />
         {phone ? null : (
-          // Before a day is picked the times show muted (inert) under "Pick a day", so the card keeps its
-          // height with nothing blank in it.
+          // Before a day is picked the times show muted (inert and hidden from assistive technology, which
+          // hears one line instead) under "Pick a day", so the card keeps its height with nothing blank in it.
           <div className="mt-6">
+            {day ? null : <p className="sr-only">{booking.previewNote}</p>}
             <Times day={day} local={local} onPick={pickTime} preview={!day} />
           </div>
         )}
@@ -287,8 +290,9 @@ function Facts({ elsewhere, zone }: { elsewhere: boolean; zone: string }) {
 const dayCell = "relative mx-auto flex aspect-square w-full max-w-11 items-center justify-center rounded-pill text-small";
 
 /**
- * The five weeks from this week's Monday, with the open days as buttons: a hairline ring at rest, the
- * accent edge on the tint once picked. Where a month turns after the first cell, a short row over that
+ * The five weeks from this week's Monday, with the open days as buttons: a filled paper circle with an
+ * ink numeral at rest (its edge turning ink on hover), the accent edge on the tint once picked; closed
+ * days are plain muted numerals. Where a month turns after the first cell, a short row over that
  * week names the new month, in muted text over its first day's column.
  */
 function Calendar({ today, day, onPick, monthRef }: { today: DayKey; day: DayKey | null; onPick: (d: DayKey) => void; monthRef: RefObject<HTMLParagraphElement | null> }) {
@@ -342,7 +346,7 @@ function Calendar({ today, day, onPick, monthRef }: { today: DayKey; day: DayKey
                     aria-label={longDay(d)}
                     onClick={() => onPick(d)}
                     className={`${dayCell} border transition-[background-color,border-color,color] duration-200 motion-reduce:transition-none forced-colors:border-[ButtonBorder] ${
-                      on ? "border-accent bg-tint font-semibold text-accent ring-1 ring-inset ring-accent forced-colors:border-[Highlight] forced-colors:ring-0" : "border-line bg-white font-medium text-ink hover:border-accent hover:text-accent"
+                      on ? "border-accent bg-tint font-semibold text-accent ring-1 ring-inset ring-accent forced-colors:border-[Highlight] forced-colors:ring-0" : "border-transparent bg-paper font-medium text-ink hover:border-ink"
                     }`}
                   >
                     {partsOf(d)[2]}

@@ -72,17 +72,35 @@ export type MenuLink = { href: string; label: string; note: string; icon: MenuGl
 /** A column of a header panel: a heading, a tone (no longer read: every tile is the one night tile), and its links (in 1 or 2 columns). */
 export type MenuGroup = { heading: string; tone: "teal" | "sand" | "green"; cols?: 1 | 2; muted?: boolean; links: readonly MenuLink[] };
 
-/** The dark card that opens the Resources panel: an eyebrow, a title, three links with tags, and a pill. */
-export type MenuFeature = { eyebrow: string; title: string; items: readonly { href: string; tag: string; label: string }[]; action: { href: string; label: string } };
+/**
+ * The card that opens a header panel (src/components/site/MenuPanel.tsx), one of three kinds:
+ * - list: the dark card of the Resources panel, a title, three links each with its subject, and a pill;
+ * - accent: the Platform panel's accent card, a title, one line and a text link, over a coded map of the
+ *   demo building (Demo data) cut off by its foot;
+ * - tint: the Solutions panel's pale card, a title, one line and a text link into a tool.
+ * `link` is also where the phone menu's section ends (Nav.tsx).
+ */
+export type MenuFeature =
+  | { kind: "list"; title: string; items: readonly { href: string; tag: string; label: string }[]; action: { href: string; label: string } }
+  | { kind: "accent" | "tint"; title: string; body: string; link: { href: string; label: string } };
+
+/** Where a panel's feature leads: the phone menu ends its section on this link. */
+export const featureLink = (f: MenuFeature) => (f.kind === "list" ? f.action : f.link);
 
 /**
- * The header's menus. Platform, Solutions and Resources open wide panels of grouped links; About is a
- * plain link. Every enquiry label is the one label that route has everywhere.
+ * The header's menus. Platform, Solutions and Resources open wide panels, each a feature card beside its
+ * groups of links; About is a plain link. Every enquiry label is the one label that route has everywhere.
  */
-export const menus: readonly { id: string; label: string; groups: readonly MenuGroup[]; feature?: MenuFeature }[] = [
+export const menus: readonly { id: string; label: string; groups: readonly MenuGroup[]; feature: MenuFeature }[] = [
   {
     id: "platform",
     label: "Platform",
+    feature: {
+      kind: "accent",
+      title: "The Lienry platform",
+      body: "Six parts and two systems, run from one screen.",
+      link: { href: "/platform", label: "See the platform" },
+    },
     groups: [
       {
         heading: "Hardware",
@@ -102,25 +120,21 @@ export const menus: readonly { id: string; label: string; groups: readonly MenuG
           { href: "/platform#automation", label: "Automation", note: "Start a clean from anywhere, or let the re-scan decide.", icon: "repeat" },
         ],
       },
-      {
-        heading: "Get started",
-        tone: "green",
-        links: [
-          { href: "/platform", label: "Platform overview", note: "How the six parts work as one.", icon: "grid" },
-          { href: "/download", label: "Lienry Desktop", note: "The desktop software for Mac and Windows.", icon: "download" },
-          { href: "/fit-check", label: "Fit check", note: "Seven questions on whether your building suits it.", icon: "check" },
-        ],
-      },
     ],
   },
   {
     id: "solutions",
     label: "Solutions",
+    feature: {
+      kind: "tint",
+      title: "Will it suit your building?",
+      body: "Answer seven questions from the design brief and see a score out of 100 as you go.",
+      link: { href: "/fit-check", label: "Check your building" },
+    },
     groups: [
       {
         heading: "By property",
         tone: "teal",
-        cols: 2,
         muted: true,
         links: [
           { href: "/commercial", label: "Office buildings", note: "Glass and render under 70 metres", icon: "building" },
@@ -133,7 +147,6 @@ export const menus: readonly { id: string; label: string; groups: readonly MenuG
       {
         heading: "By role",
         tone: "green",
-        cols: 2,
         muted: true,
         links: [
           { href: "/commercial", label: "Facility managers", note: "One system for the whole building", icon: "person" },
@@ -148,7 +161,7 @@ export const menus: readonly { id: string; label: string; groups: readonly MenuG
     id: "resources",
     label: "Resources",
     feature: {
-      eyebrow: "Inside Lienry",
+      kind: "list",
       title: "Where the platform is up to",
       items: [
         { href: "/company", tag: "Company", label: "Concept stage, raising pre-seed, with a pilot next" },
@@ -165,6 +178,7 @@ export const menus: readonly { id: string; label: string; groups: readonly MenuG
         links: [
           { href: "/fit-check", label: "Fit check", note: "Seven questions from the design brief, scored as you go.", icon: "check" },
           { href: "/calculator", label: "Cost calculator", note: "What outsourced cleaning adds up to over 5 and 10 years.", icon: "calculator" },
+          { href: "/download", label: "Lienry Desktop", note: "The desktop software for Mac and Windows.", icon: "download" },
         ],
       },
       {

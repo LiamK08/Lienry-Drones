@@ -6,7 +6,7 @@ import { useReducedMotion } from "motion/react";
 import { systems } from "@/content/home";
 import { australiaStats, solarStats } from "@/content/stats";
 import { Band, Container } from "@/components/ui/Band";
-import { Button } from "@/components/ui/Button";
+import { Button, ButtonFace } from "@/components/ui/Button";
 import { Pager, pagerKeys, stepTrack, usePager } from "@/components/ui/Pager";
 import { SectionHead } from "@/components/ui/SectionHead";
 import { Icon } from "@/components/blocks/Icon";
@@ -18,11 +18,11 @@ const TRACK = "(min-width: 48rem) and (max-width: 74.99rem)";
 
 /**
  * The three settings on the accent tint, in the shape of the reference's story cards (Lienry has no
- * customers, so nothing here is one): a centred head with one pill, then three even white cards with a
- * hairline edge across the rail. Each holds one icon (the setting's, in a disc) beside its name, a meta
- * line, the statement in the serif (Lienry's design intent, never a customer's words), the part that
- * does the work, then, ruled off, three figures in light Inter with short labels, a link that covers the
- * whole card and, at the foot, the figures' note. Commercial and home figures are design intent
+ * customers, so nothing here is one): a centred head with one pill, then three even white cards across
+ * the rail, read by tone on the tint (no edge). Each holds one icon (the setting's, in a disc) beside its
+ * name, a meta line, the statement in the serif (Lienry's design intent, never a customer's words), the
+ * part that does the work, then, ruled off, three figures in light Inter with short labels, a
+ * full-width outline pill whose link covers the whole card and, at the foot, the figures' note. Commercial and home figures are design intent
  * (commercial.ts designFacts, so check 11 can read them); solar's are cited, each with its source link
  * under it, beside the cited note. From 1200 the three cards share one subgrid of rows, so their
  * statements, parts, figure rows and links line up without reserved heights; any slack falls at the
@@ -70,7 +70,7 @@ export function SystemCards() {
               return (
                 <li
                   key={c.id}
-                  className="group relative flex flex-col rounded-card border border-line bg-white p-6 md:w-[calc((100%-1rem)/2)] md:shrink-0 md:snap-start md:p-8 min-[75rem]:row-span-6 min-[75rem]:grid min-[75rem]:w-auto min-[75rem]:grid-rows-subgrid min-[75rem]:gap-0"
+                  className="group relative flex flex-col rounded-card bg-white p-6 md:w-[calc((100%-1rem)/2)] md:shrink-0 md:snap-start md:p-8 min-[75rem]:row-span-6 min-[75rem]:grid min-[75rem]:w-auto min-[75rem]:grid-rows-subgrid min-[75rem]:gap-0"
                 >
                   <div>
                     <div className="flex items-center gap-3">
@@ -107,13 +107,16 @@ export function SystemCards() {
                       </div>
                     ))}
                   </dl>
-                  <div className="mt-5">
+                  <div className="mt-6">
+                    {/* The card's one link, as a full-width outline pill: its ::after covers the card (the
+                        card is not a nested link) and carries the focus ring; the pill's edge turns ink as
+                        the card is hovered. */}
                     <Link
                       href={c.link.href}
                       data-card-link=""
-                      className="inline-flex min-h-6 items-center gap-1 text-small font-medium text-accent after:absolute after:inset-0 after:rounded-card after:content-[''] focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-solid focus-visible:after:outline-focus group-hover:underline group-hover:underline-offset-4"
+                      className="block after:absolute after:inset-0 after:rounded-card after:content-[''] focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-solid focus-visible:after:outline-focus"
                     >
-                      {c.link.label} <span aria-hidden="true">→</span>
+                      <ButtonFace className="w-full group-hover:border-ink">{c.link.label}</ButtonFace>
                     </Link>
                   </div>
                   <p className="mt-3 text-caption leading-[1.5] text-muted">{c.note}</p>

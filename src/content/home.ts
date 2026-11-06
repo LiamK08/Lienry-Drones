@@ -238,11 +238,13 @@ export const systems = {
 };
 
 /**
- * The dark band of link cards into the rest of the site, filtered by kind. Each card carries one chip,
- * `tag`, its subject (the filter already says its kind). Every card links to a page or an
- * anchor that exists, and each picture appears nowhere else on the home page (check 14), with no open
- * ground pod beside the closed ones (the pod pairing rule). `all` is the six that "All" shows, one of
- * each kind at least; a filter shows its own, six at most.
+ * The dark band of link cards into the rest of the site, filtered by kind. Each card's foot carries the
+ * action its kind leads to (`actions`, or the card's own `action` where the kind's would not fit) and its
+ * subject, `tag`, on the right: the honest stand-in for the reference's dates (the filter already says
+ * its kind; no date is invented). Every card links to a page or an anchor that exists, and each picture
+ * appears nowhere else on the home page (check 14), with no open ground pod beside the closed ones (the
+ * pod pairing rule). `all` is the six that "All" shows, one of each kind at least; a filter shows its
+ * own, six at most.
  */
 export const explore = {
   headline: "Inside the platform",
@@ -254,13 +256,15 @@ export const explore = {
     { id: "tools", label: "Tools" },
     { id: "company", label: "Company" },
   ],
+  // What a card of each kind leads to, said on its pill.
+  actions: { Solutions: "See the system", Platform: "Open the part", Tools: "Try the tool", Company: "Read our story" } as Record<string, string>,
   all: ["commercial", "homes", "platform", "fit-check", "solar", "company"],
   cards: [
     { id: "commercial", kind: "Solutions", tag: "Commercial", title: "A capsule on the roof, and nobody on a rope", href: "/commercial", image: { id: "c1-commercial-hero", alt: "The roof capsule on a plant deck at dawn", position: "75% 50%" } },
     { id: "homes", kind: "Solutions", tag: "Homes", title: "Homes and rentals, cleaned from your phone", href: "/homes-and-rentals", image: { id: "ho1-homes-hero", alt: "The ground pod beside a house, the drone washing a window", position: "45% 50%" } },
     { id: "solar", kind: "Solutions", tag: "Solar", title: "Solar panels at the right pressure", href: "/solar", image: { id: "so2-solar-closeup", alt: "Water beading on a clean solar panel", position: "50% 50%" } },
-    { id: "soiling", kind: "Solutions", tag: "Soiling", title: "What dust costs a solar array", href: "/solar#soiling", image: { id: "so1-solar-hero", alt: "The drone washing a row of ground-mounted solar panels in the morning mist", position: "60% 55%" } },
-    { id: "platform", kind: "Platform", tag: "Six parts", title: "Six parts of one platform", href: "/platform", image: { id: "m2-capsule-master", alt: "The roof capsule open, the drone on its cradle", position: "50% 50%" } },
+    { id: "soiling", kind: "Solutions", tag: "Soiling", action: "See the figures", title: "What dust costs a solar array", href: "/solar#soiling", image: { id: "so1-solar-hero", alt: "The drone washing a row of ground-mounted solar panels in the morning mist", position: "60% 55%" } },
+    { id: "platform", kind: "Platform", tag: "Six parts", action: "See the platform", title: "Six parts of one platform", href: "/platform", image: { id: "m2-capsule-master", alt: "The roof capsule open, the drone on its cradle", position: "50% 50%" } },
     { id: "dock", kind: "Platform", tag: "Dock", title: "A home on the property", href: "/platform#dock", image: { id: "s1-dock", alt: "The roof capsule's lid closing over the drone on a wet roof", position: "50% 55%" } },
     { id: "tether", kind: "Platform", tag: "Tether", title: "Water and power, always connected", href: "/platform#tether", image: { id: "s2-tether", alt: "The drone's tether rising from its fitting past a wet glass facade", position: "50% 60%" } },
     { id: "drone", kind: "Platform", tag: "Drone", title: "Built to wash, not to fly far", href: "/platform#drone", image: { id: "f3-surface", alt: "The drone's spray bar, pad and roller on a pane of glass", position: "50% 50%" } },
@@ -306,6 +310,8 @@ export const booking = {
     { icon: "globe", text: "Sydney time" },
   ],
   pick: "Pick a day",
+  // Read by assistive technology in place of the muted time placeholders, before a day is picked.
+  previewNote: "Pick a day to see its times",
   allDays: "All days",
   times: ["9:30 am", "10:30 am", "11:30 am", "1:30 pm", "2:30 pm", "3:30 pm"],
   // Weekdays from tomorrow, up to four weeks out.
