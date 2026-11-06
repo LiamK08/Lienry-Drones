@@ -318,7 +318,12 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
     at once. /platform's phone LCP went from about 2.5s to 2.3s.
   - A link to an FAQ row opens it (`FaqHashOpen`: a pre-paint script on a full load, a hashchange and click
     listener after). Two-sentence headlines keep both stops; one-sentence closes and FAQ heads drop theirs.
-GATES_DETAIL_PLACEHOLDER
+  - Gates on 6 November: typecheck, lint and build pass; `check:layout` all 12 routes at 1440, 1024, 768
+    and 390 (two warnings, /register-interest's unmarked form columns, as before); `check:rules` with
+    motion all 12 routes; `check:a11y` all 12 routes (warnings: the header and footer target sizes, as
+    before); `npm run contrast` at 1440 and 390 (6.53:1 at worst); `perf:vitals` alone on all 11 pages,
+    mobile median LCP 1.93-2.01s, /download 2.28s and /platform 2.35s (the window's poster), CLS at
+    most 0.065. PR frames: `docs/screenshots/refresh-nov/`.
 ## How the owner works
 
 - They want results fast. Prefer to build, check, commit and push over long plans or multi-agent
