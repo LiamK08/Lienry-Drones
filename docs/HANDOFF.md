@@ -306,7 +306,19 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
   round as three facts. Solution pages: every feature row is its own tint or white band with a coded
   Demo-data `RowPanel` card over its picture (this supersedes the 20 October "one white features run"),
   heroes and closes with a second path to the fit check, and safety and figures as night panels.
-GATES_PLACEHOLDER
+  - Integration and review: the five builds merged cleanly; three review rounds (5 lenses, then 2, then 2,
+    each finding verified by a skeptic) confirmed 16, 8 and 5 small defects, all fixed, and a fourth round
+    found one (dev only), fixed. The one deep fix: the software window's drei `Environment` was rebuilt on
+    every render of the window (its children were inline JSX), six cube passes per readout tick; it is now
+    one constant element, the scene is memoised, stays mounted once started (drawing nothing off screen,
+    the canvas re-measuring on resize only), and plays only while a fifth of its view shows. That was what
+    starved the page under the checks' software WebGL (the intermittent /platform tab failure in check 34).
+  - The window's posters are WebP (`-poster.webp`, the JPEG kept as fallback; the recorder writes both and
+    check 14 accepts both); the phone poster of a first-screen window is preloaded from the head and decoded
+    at once. /platform's phone LCP went from about 2.5s to 2.3s.
+  - A link to an FAQ row opens it (`FaqHashOpen`: a pre-paint script on a full load, a hashchange and click
+    listener after). Two-sentence headlines keep both stops; one-sentence closes and FAQ heads drop theirs.
+GATES_DETAIL_PLACEHOLDER
 ## How the owner works
 
 - They want results fast. Prefer to build, check, commit and push over long plans or multi-agent
