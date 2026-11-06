@@ -209,7 +209,8 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare", model
   }
 
   // The scene mounts when the window first comes within 600px of the screen and then stays mounted:
-  // off screen it draws nothing (control.visible), and rebuilding it on every return would compile its
+  // off screen it draws nothing (control.visible; the canvas re-measures on resize only), and rebuilding
+  // it on every return would compile its
   // shaders again, a hitch on a phone and seconds of a blocked page under a software renderer. The
   // poster covers it until its first frame.
   const nextPaint: Paint = !live ? "off" : paint === "off" ? (near ? "starting" : "off") : paint;

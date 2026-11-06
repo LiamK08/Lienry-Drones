@@ -2,11 +2,6 @@ import Link from "next/link";
 import type { FaqItem } from "@/components/sections/Faq";
 import { FaqHashOpen } from "@/components/blocks/FaqHashOpen";
 
-// On a full load at a row's address, open that row before first paint, so the answer is open when the
-// page scrolls to it and nothing below it moves afterwards. A stray "%" keeps the raw fragment.
-const OPEN_FROM_HASH =
-  'try{var s=document.currentScript,p=s&&s.parentNode,h=location.hash.slice(1);if(h&&p){try{h=decodeURIComponent(h)}catch(e){}var d=document.getElementById(h);if(d&&d.tagName==="DETAILS"&&p.contains(d))d.open=true}}catch(e){}';
-
 /**
  * The site's one FAQ treatment: hairline rows, no cards. Each question is a display line (PT Serif, 20px,
  * 18 below 768) with a 16px chevron at its right that turns over as the row opens; a hairline runs above
@@ -14,12 +9,12 @@ const OPEN_FROM_HASH =
  * Native `details`, so it works without JavaScript and find-in-page reaches closed answers; where the
  * browser can, the answer's height animates open (globals.css, off under reduced motion). The answer is
  * body copy (16/1.6, muted) at the prose measure: it opens with a line, may list labelled points and close
- * with a line, and ends with its link when it has one. An address that names a row opens it (FaqHashOpen).
+ * with a line, and ends with its link when it has one. An address that names a row opens it (FaqHashOpen,
+ * after the rows).
  */
 export function FaqRows({ id, items }: { id: string; items: readonly FaqItem[] }) {
   return (
     <div data-accordion="">
-      <FaqHashOpen />
       {items.map((item, i) => (
         <details
           key={item.id}
@@ -47,9 +42,7 @@ export function FaqRows({ id, items }: { id: string; items: readonly FaqItem[] }
           <FaqAnswer item={item} className="pb-6 pr-10 text-body leading-[1.6] text-fg-muted" />
         </details>
       ))}
-      {/* Server-rendered only: React never runs a script it renders on the client (FaqHashOpen covers soft
-          navigations). */}
-      <script suppressHydrationWarning dangerouslySetInnerHTML={{ __html: OPEN_FROM_HASH }} />
+      <FaqHashOpen />
     </div>
   );
 }

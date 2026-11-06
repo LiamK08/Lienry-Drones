@@ -35,7 +35,12 @@ export function useOnScreen<T extends HTMLElement>(margin = "0px", minRatio = 0)
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const io = new IntersectionObserver(([entry]) => setOn(entry.isIntersecting && entry.intersectionRatio >= minRatio * 0.99), {
+    // One callback can carry several queued entries (two thresholds crossed between deliveries): the
+    // last is the current one.
+    const io = new IntersectionObserver((entries) => {
+      const entry = entries[entries.length - 1];
+      setOn(entry.isIntersecting && entry.intersectionRatio >= minRatio * 0.99);
+    }, {
       rootMargin: margin,
       threshold: minRatio ? [0.01, minRatio] : 0.01,
     });

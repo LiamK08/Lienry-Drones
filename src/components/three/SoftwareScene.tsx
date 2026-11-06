@@ -2,7 +2,7 @@
 
 import { ContactShadows, Environment, Lightformer } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { memo, useEffect, useRef, type RefObject } from "react";
+import { memo, useEffect, useRef, useState, type RefObject } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { isCapture, now, runTicks, setManualTime } from "@/lib/clock";
@@ -312,26 +312,33 @@ const SoftwareScene = memo(function SoftwareScene({ model = "building", controlR
   const clockRef = useRef<Clock>({ t: 0, dt: 0 });
   const fadeRef = useRef<Fade>({ scan: 0, wash: 1, debris: 1, zones: 0 });
   const flyingRef = useRef(false);
+  // Bumped when a lost WebGL context comes back: the one-frame light capture and ground shadow are
+  // mounted again so they redraw into the rebuilt targets.
+  const [epoch, setEpoch] = useState(0);
   return (
     <Canvas
       frameloop="demand"
+      // Measured on resize only: re-measuring on scroll would set the size, and so draw a frame, after
+      // every pause in scrolling, wherever the window is.
+      resize={{ scroll: false }}
       dpr={[1, 2]}
       camera={{ fov: 35, near: 1, far: 600, position: [60, 40, 60] }}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance", stencil: false }}
       onCreated={({ gl }) => {
+        gl.domElement.addEventListener("webglcontextrestored", () => setEpoch((e) => e + 1));
         gl.toneMapping = THREE.ACESFilmicToneMapping;
         gl.toneMappingExposure = 1.05;
         gl.outputColorSpace = THREE.SRGBColorSpace;
       }}
       style={{ background: "transparent" }}
     >
-      {ENVIRONMENT}
+      <group key={epoch}>{ENVIRONMENT}</group>
       <ambientLight intensity={0.22} />
       <directionalLight position={[45, 70, 35]} intensity={1.7} color="#fff3e2" />
       <directionalLight position={[-40, 25, -20]} intensity={0.45} color="#dcedf0" />
       <directionalLight position={[-25, 35, 70]} intensity={0.55} color="#ffffff" />
       <Content controlRef={controlRef} clockRef={clockRef} fadeRef={fadeRef} />
-      <ContactShadows {...shadows} resolution={1024} frames={1} color="#141e28" />
+      <ContactShadows key={epoch} {...shadows} resolution={1024} frames={1} color="#141e28" />
       <Rig model={model} controlRef={controlRef} clockRef={clockRef} flyingRef={flyingRef} />
       <Driver controlRef={controlRef} clockRef={clockRef} fadeRef={fadeRef} flyingRef={flyingRef} />
       {onFirstFrame ? <FirstFrame onFirstFrame={onFirstFrame} /> : null}
