@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
-import { menus, navAbout } from "@/lib/site";
+import { featureLink, menus, navAbout } from "@/lib/site";
 import { useScrolledPast } from "@/lib/hooks";
 import { Mark } from "@/components/ui/Wordmark";
 import { MenuPanel } from "@/components/site/MenuPanel";
@@ -64,9 +64,11 @@ function heroGround(): string {
  * October): Lienry Desktop sits in Resources, and every page closes on its own Register interest.
  * Over the home film it is clear with white text; anywhere else it is a soft white veil at the top of
  * the page and, once scrolled, a white bar with a hairline. The logo sits on
- * the page's rail (the Container's left edge: 20px on phones, 24px from 768, centred past 1440). Below
- * 1024 the bar holds the logo and the burger, which drops a short white sheet under the bar with the four
- * sections (each opens its links in place) over the dimmed page; a tap outside or Escape closes it. It
+ * the page's rail (the Container's left edge: 20px on phones, 24px from 768, centred past 1440). An open
+ * panel dims the page under it. Below 1024 the bar holds the logo and the burger, which drops a
+ * short white sheet under the bar with the four sections as 56px rows on hairlines (each opens in place on
+ * the tint: its groups under their heads, then its panel's feature as a text link) over the dimmed page;
+ * a tap outside or Escape closes it. It
  * sits outside <main>, so it holds still while a new page fades in under it (PageTransition.tsx).
  */
 export function Nav() {
@@ -150,9 +152,13 @@ export function Nav() {
     };
   }, [open]);
 
+  // The desktop scrim under an open panel, from its opening until it has faded out: meanwhile the bar
+  // keeps off the veil, whose backdrop filter would make the header the scrim's containing block.
+  const [dimmed, setDimmed] = useState(false);
+  if (menu && !dimmed) setDimmed(true);
   const overHero = pathname in CLEAR_TOP && ground !== "" && !scrolled && !open && !menu;
   // Elsewhere, at the top of the page the bar is a soft white veil with no rule; once scrolled, solid.
-  const atTop = !scrolled && !open && !menu;
+  const atTop = !scrolled && !open && !menu && !dimmed;
   // A panel the pointer has just opened stays open when its button is then clicked (the click that
   // usually follows the hover, however soon); otherwise a click toggles the panel.
   const hoverOpened = useRef<{ id: MenuId; at: number } | null>(null);
@@ -184,6 +190,27 @@ export function Nav() {
         overHero ? "on-dark border-transparent text-white" : atTop ? "border-transparent bg-white/70 text-ink backdrop-blur-md" : "border-line bg-white text-ink"
       }`}
     >
+      {/* From 1024, while a panel is open, the page under the bar dims, so the panel reads as the one layer
+          (opacity only: in over 180ms, out over 140ms, at once under reduced motion). No blur: over the
+          playing film a backdrop blur halved the frame rate in the software renderer. It exists
+          only with a panel open, so the intro and the film are untouched. A press on it closes the panel
+          (the document's listener leaves presses inside the header alone); the pointer moving onto it
+          leaves the nav, whose hover close still applies. Painted before the nav, so the panel is over it. */}
+      <AnimatePresence onExitComplete={() => setDimmed(false)}>
+        {active ? (
+          <motion.div
+            key="dim"
+            aria-hidden="true"
+            data-menu-scrim=""
+            onPointerDown={() => setMenu(null)}
+            className="fixed inset-x-0 bottom-0 top-[var(--nav-h)] hidden bg-night/20 lg:block"
+            initial={reduce ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, pointerEvents: "none", transition: { duration: reduce ? 0 : 0.14, ease: [0.4, 0, 1, 1] } }}
+            transition={{ duration: 0.18, ease: [0.4, 0, 0.2, 1] }}
+          />
+        ) : null}
+      </AnimatePresence>
       {/* The rail: the Container's 87rem inside the page margin, so the logo starts where the page's content does. */}
       <nav aria-label="Primary" className="relative mx-auto flex h-full max-w-[calc(var(--container-grid)+2*var(--page-margin))] items-center px-(--page-margin)" onMouseLeave={hoverClose}>
         <Logo />
@@ -264,45 +291,61 @@ export function Nav() {
             <motion.div
               key="sheet"
               id={panelId}
-              className="absolute inset-x-0 top-[var(--nav-h)] z-40 max-h-[calc(100svh-var(--nav-h))] overflow-y-auto border-b border-line bg-white px-(--page-margin) pb-6 pt-2 text-ink shadow-[0_24px_40px_-24px_rgb(17_26_34/0.25)] lg:hidden"
+              className="absolute inset-x-0 top-[var(--nav-h)] z-40 max-h-[calc(100svh-var(--nav-h))] overflow-y-auto border-b border-line bg-white px-(--page-margin) pb-3 text-ink shadow-[0_24px_40px_-24px_rgb(17_26_34/0.25)] lg:hidden"
               initial={reduce ? false : { opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8, transition: { duration: 0.16, ease: [0.4, 0, 1, 1] } }}
               transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
             >
+              {/* Each section a 56px row on a hairline that runs edge to edge. The open one sits on the
+                  tint with its groups under their heads, as the desktop panel has them, and ends on the
+                  panel's feature as a text link. No pills. */}
               <ul>
                 {menus.map((m) => {
                   const expanded = sub === m.id;
-                  const links = m.groups.flatMap((g) => g.links).filter((l, i, all) => all.findIndex((x) => x.href === l.href) === i);
+                  const end = featureLink(m.feature);
                   return (
-                    <li key={m.id}>
+                    <li key={m.id} className={`-mx-(--page-margin) border-b border-line px-(--page-margin) transition-[background-color] duration-200 motion-reduce:transition-none ${expanded ? "bg-tint" : ""}`}>
                       <button
                         type="button"
                         aria-expanded={expanded}
                         aria-controls={`m-${m.id}`}
                         onClick={() => setSub((v) => (v === m.id ? null : m.id))}
-                        className={`flex h-12 w-full items-center justify-between text-[0.9375rem] font-medium transition-[color] duration-200 ${expanded ? "text-muted" : "text-ink"}`}
+                        className="flex h-14 w-full items-center justify-between text-[1.0625rem] font-medium text-ink"
                       >
                         {m.label}
                         <Chevron open={expanded} />
                       </button>
                       {expanded ? (
-                        <ul id={`m-${m.id}`} className="pb-2">
-                          {links.map((l) => (
-                            <li key={`${l.href}-${l.label}`}>
-                              <Link href={l.href} onClick={() => setOpen(false)} className="flex items-center gap-3 rounded-[0.625rem] py-2 pr-2">
-                                <MenuTile name={l.icon} size="phone" />
-                                <span className="text-small text-ink">{l.label}</span>
-                              </Link>
-                            </li>
+                        <div id={`m-${m.id}`} className="pb-3">
+                          {m.groups.map((g) => (
+                            <div key={g.heading} className="mt-2 first:mt-0">
+                              <p className="py-1 text-caption font-medium text-muted">{g.heading}</p>
+                              <ul>
+                                {g.links.map((l) => (
+                                  <li key={`${l.href}-${l.label}`}>
+                                    <Link href={l.href} onClick={() => setOpen(false)} className="flex h-13 items-center gap-3 rounded-[0.625rem] pr-2">
+                                      <MenuTile name={l.icon} size="phone" />
+                                      <span className="text-[0.9375rem] text-ink">{l.label}</span>
+                                    </Link>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
                           ))}
-                        </ul>
+                          <Link href={end.href} onClick={() => setOpen(false)} className="group/end mt-2 inline-flex min-h-11 items-center gap-1.5 text-[0.9375rem] font-medium text-accent">
+                            {end.label}
+                            <svg viewBox="0 0 16 16" aria-hidden="true" className="size-3.5 transition-transform duration-200 ease-instrument group-hover/end:translate-x-0.5 motion-reduce:transition-none" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M3 8h10M8.5 3.5 13 8l-4.5 4.5" />
+                            </svg>
+                          </Link>
+                        </div>
                       ) : null}
                     </li>
                   );
                 })}
                 <li>
-                  <Link href={navAbout.href} onClick={() => setOpen(false)} aria-current={pathname === navAbout.href ? "page" : undefined} className="flex h-12 items-center text-[0.9375rem] font-medium">
+                  <Link href={navAbout.href} onClick={() => setOpen(false)} aria-current={pathname === navAbout.href ? "page" : undefined} className="flex h-14 items-center text-[1.0625rem] font-medium">
                     {navAbout.label}
                   </Link>
                 </li>
