@@ -3,11 +3,11 @@ import { downloadPage } from "@/content/download";
 import { desktopRelease } from "@/lib/download";
 import { pageMetadata } from "@/lib/site";
 import { DownloadActions } from "@/components/download/DownloadActions";
+import { AccentPanel } from "@/components/blocks/AccentPanel";
 import { FaqCentered } from "@/components/blocks/FaqCentered";
 import { Icon } from "@/components/blocks/Icon";
-import { SoftwareWindow } from "@/components/software/SoftwareWindow";
+import { ProductHero } from "@/components/blocks/ProductHero";
 import { Band, Container } from "@/components/ui/Band";
-import { Headline } from "@/components/ui/SectionHead";
 
 const d = downloadPage;
 const description = desktopRelease.available ? d.meta.description.live : d.meta.description.soon;
@@ -17,30 +17,24 @@ export const metadata: Metadata = pageMetadata("/download", description);
 const ICONS = ["dock", "sliders", "repeat"] as const;
 
 /**
- * /download: a centred hero (the h1, the lead, Register interest with the availability line under it
- * while the downloads are not live) over the working window in its frame; then on paper what the
+ * /download: the product hero (the h1, the lead, Register interest with the availability line under it
+ * while the downloads are not live, over the working window in its glass frame); then on paper what the
  * software does, its head on the grid and the three features as one open row of three (an icon, the
- * title and two lines, on a hairline); then the questions.
+ * title and two lines, on a hairline); then the questions, and the closing panel with its two steps.
  */
 export default function DownloadPage() {
-  const { hero, features, faq } = d;
+  const { hero, features, faq, close } = d;
   return (
     <>
-      <Band id="hero" as="header" tone="plaster" pad="hero" labelledBy="download-heading" className="overflow-hidden">
-        <div aria-hidden="true" className="pointer-events-none absolute -top-48 left-1/2 h-[32rem] w-[56rem] max-w-full -translate-x-1/2 rounded-pill bg-accent-on-dark/30 blur-3xl" />
-        <Container className="relative">
-          <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
-            <h1 id="download-heading" className="em-accent text-h1">
-              <Headline text={hero.headline} emphasis={hero.emphasis} />
-            </h1>
-            <p className="mt-4 max-w-xl text-pretty text-lead leading-[1.55] text-fg-muted">{hero.lead}</p>
-            <DownloadActions className="mt-8 flex flex-col items-center" />
-          </div>
-          <div className="mx-auto mt-14 max-w-5xl overflow-hidden rounded-card border border-line bg-white p-2">
-            <SoftwareWindow priority frame="inset" />
-          </div>
-        </Container>
-      </Band>
+      {/* Measured from 360 to 412 in both fonts: the lead holds three lines below 384 and two from there;
+          the h1 holds none, as before (one line from 370, two in the web font below it). */}
+      <ProductHero
+        leadLines={{ narrow: 3, phone: 2, wide: 2 }}
+        headline={hero.headline}
+        emphasis={hero.emphasis}
+        lead={hero.lead}
+        actions={<DownloadActions className="flex flex-col items-center" />}
+      />
       <Band id="features" tone="paper" labelledBy="features-heading">
         <Container>
           {/* The intro takes the third feature's columns, so the head and the row share their edges. */}
@@ -64,6 +58,7 @@ export default function DownloadPage() {
         </Container>
       </Band>
       <FaqCentered items={faq.items} />
+      <AccentPanel id="closing" band="close" headline={close.headline} action={close.action} secondary={close.secondary} />
     </>
   );
 }
