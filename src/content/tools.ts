@@ -1,12 +1,14 @@
-// The two tool pages: /fit-check and /calculator. Conventions as in every content module.
+// The two tool pages: /fit-check and /calculator. Conventions as in every content module. Each page
+// closes on the accent panel (`close`), its main ask and a lighter step on to the other tool; a link to
+// /register-interest carries the one label of its ?type= (check 24).
 
 export const fitCheckPage = {
   hero: {
-    eyebrow: "Free fit check",
     headline: "See whether your building suits a resident drone",
     emphasis: "a resident drone",
-    /** Under the h1, over the check: what to answer for and what the result is. */
-    lead: "Answer for one building. It takes about a minute, and nothing is sent unless you ask for your result.",
+    /** Under the h1, over the check (the card has no title of its own): where the questions come from,
+     *  how long they take, and that nothing leaves the page unless asked. */
+    lead: "Seven questions from the design brief, for one building. It takes a minute, and nothing is sent unless you ask.",
   },
   /** What the check covers and what it is not: a feature row under the check, beside the scan picture. */
   about: {
@@ -19,6 +21,11 @@ export const fitCheckPage = {
     image: { id: "s4-scan", alt: "The drone holding off the corner of a glass building to scan it", position: "50% 40%" },
   },
   faq: { headline: "Questions about the fit check" },
+  close: {
+    headline: "Talk your building through with us",
+    action: { label: "Book a pilot conversation", href: "/register-interest?type=commercial" },
+    secondary: { label: "Add up what you spend now", href: "/calculator" },
+  },
 };
 
 export const calculatorPage = {
@@ -30,5 +37,11 @@ export const calculatorPage = {
   /** The results panel's heading; it also labels the band and the form. */
   head: {
     headline: "Your spend, over five and ten years",
+  },
+  faq: { headline: "Questions about the calculator" },
+  close: {
+    headline: "Next, see whether your building is a fit",
+    action: { label: "Check your building", href: "/fit-check" },
+    secondary: { label: "Register interest", href: "/register-interest" },
   },
 };

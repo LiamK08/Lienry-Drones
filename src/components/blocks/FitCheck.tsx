@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type ReactNode, type RefObject } from "react";
+import { useEffect, useId, useRef, useState, type RefObject } from "react";
 import { fitCheck } from "@/content/home";
 import { enquirySchema, enquiryTypeLabels, enquiryTypes } from "@/lib/enquiry-schema";
 import { Button } from "@/components/ui/Button";
@@ -67,17 +67,18 @@ const zoneTone: Record<Zone, { track: string; fill: string; text: string }> = {
 };
 
 export type FitCheckProps = {
-  /** Prefixes the radio names and label ids. Column: the group headings are `${id}-g0`, `${id}-g1`. */
+  /** Prefixes the radio names and label ids. */
   id?: string;
-  /** "card" (default, the home page): questions beside the scoring panel. "column": one centred column
-   *  on the 12-column grid under a seven-segment progress bar, with the result and the buttons after the
-   *  questions. */
-  layout?: "card" | "column";
-  /** Column only: the opening paragraphs, over the first group. */
-  intro?: ReactNode;
-  /** Column only: a small tag at the end of the button row. */
-  badge?: string;
+  /** "inline" (default, the home card): the h3 and its intro head the question column, beside the
+   *  result. "progress" (/fit-check, where the page's h1 is the one title): no h3; a seven-segment bar
+   *  of the questions answered opens the question column, level with the result's "Your fit" row. */
+  head?: "inline" | "progress";
+  /** Below 1024, the result follows the questions (/fit-check) instead of leading them (the home card). */
+  resultAfter?: boolean;
 };
+
+/** The card's raised shadow, mixed from the palette's night (the calculator's panel takes it too). */
+export const raisedShadow = "shadow-[0_30px_80px_-30px_color-mix(in_srgb,var(--color-night)_22%,transparent)]";
 
 /**
  * The fit check: seven questions in two groups, each answered Yes, Partly or No with a row of small
@@ -88,17 +89,20 @@ export type FitCheckProps = {
  * it, the verdict's lead line and up to three points the answers raise (the Nos first, then the
  * Partlys), or a clear line when there are none. Indicative only.
  *
- * The home card is one white card: the questions beside a paper result column from 1024, where the
- * chosen tone glides between a row's pills; on smaller screens the result comes first, and once a
- * question is answered a strip at the foot of the questions keeps the score in view (sticky to the
- * bottom of the screen while the result's score is off it) with a button back to the result. The result
- * holds one height in every state, its room shown before the first answer as the rows the points will
- * fill. Its actions keep their roles: "Book a pilot conversation" is the primary, and "Send me my
- * result" (a secondary, unavailable until a question is answered) opens a short form in the column
- * (name and email) that sends the answers with the score through the enquiry route, to be answered by a
- * person; "Start again" clears every answer. The column layout links on instead.
+ * One raised card on its band (translucent white on a soft shadow, no hairline): the questions beside
+ * the result from 1024, where the chosen tone glides between a row's pills. The result is its own inset
+ * white card. The home card (`head="inline"`) opens its question column on its h3 and intro, and the
+ * result starts level with the top of the card, spanning the head and the questions; below 1024 it runs
+ * head, result, questions. /fit-check (`head="progress"`, `resultAfter`) opens the questions on the bar
+ * and, below 1024, runs bar, questions, result. Below 1024, once a question is answered, a strip at the
+ * foot of the questions keeps the score in view (sticky to the bottom of the screen while the result's
+ * score is off it) with a button to the result. The result holds one height in every state, its room
+ * shown before the first answer as the rows the points will fill. Its actions keep their roles: "Book a
+ * pilot conversation" is the primary, and "Send me my result" (a secondary, unavailable until a question
+ * is answered) opens a short form in the result (name and email) that sends the answers with the score
+ * through the enquiry route, to be answered by a person; "Start again" clears every answer.
  */
-export function FitCheck({ id = "fit", layout = "card", intro, badge }: FitCheckProps) {
+export function FitCheck({ id = "fit", head = "inline", resultAfter = false }: FitCheckProps) {
   const [answers, setAnswers] = useState<Record<string, Answer>>({});
   const answered = Object.keys(answers).length;
   const pct = scoreFor(answers);
@@ -113,109 +117,21 @@ export function FitCheck({ id = "fit", layout = "card", intro, badge }: FitCheck
     setAnswers({});
     firstRef.current?.focus();
   };
-
-  if (layout === "column") {
-    return (
-      <div className="lg:grid-12">
-        <div className="lg:col-span-8 lg:col-start-3 xl:col-span-6 xl:col-start-4">
-          <div
-            role="progressbar"
-            aria-label="Questions answered"
-            aria-valuemin={0}
-            aria-valuemax={all.length}
-            aria-valuenow={answered}
-            aria-valuetext={count}
-            className="flex gap-2"
-          >
-            {all.map((q, i) => (
-              <span
-                key={q.id}
-                className={`h-1 flex-1 rounded-pill transition-[background-color] duration-200 motion-reduce:transition-none forced-colors:forced-color-adjust-none ${i < answered ? "bg-accent forced-colors:bg-[Highlight]" : "bg-line forced-colors:bg-[GrayText]"}`}
-              />
-            ))}
-          </div>
-
-          {intro ? <div className="mt-8 space-y-4 text-body leading-[1.6] text-ink">{intro}</div> : null}
-
-          {fitCheck.groups.map((g, gi) => (
-            <div key={g.label} role="group" aria-labelledby={`${id}-g${gi}`} className={gi ? "mt-12" : "mt-10"}>
-              <h2 id={`${id}-g${gi}`} className="text-[1.875rem] leading-[1.2] tracking-[-0.02em] text-ink">
-                {g.label}
-              </h2>
-              <ol className="mt-6 space-y-7">
-                {g.questions.map((q) => {
-                  const n = all.findIndex((x) => x.id === q.id) + 1;
-                  return (
-                    <li key={q.id} className="flex flex-col gap-3">
-                      <p id={`${id}-${q.id}`} className="max-w-none text-[1.125rem] font-semibold leading-[1.4] tracking-[-0.01em] text-pretty text-ink">
-                        <span aria-hidden="true" className="mr-2 font-normal text-muted">
-                          {n}.
-                        </span>
-                        {q.text}
-                      </p>
-                      <span role="radiogroup" aria-labelledby={`${id}-${q.id}`} className="flex flex-wrap gap-2">
-                        {fitCheck.answers.map((a) => {
-                          const on = answers[q.id] === a.id;
-                          return (
-                            <label
-                              key={a.id}
-                              className={`relative flex h-10 min-w-16 cursor-pointer items-center justify-center rounded-pill border px-4 text-small transition-[background-color,border-color,color] duration-200 motion-reduce:transition-none has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus ${
-                                on ? `${chosen(a.id)} ${forced}` : "border-line bg-white font-medium text-ink hover:border-ink"
-                              }`}
-                            >
-                              <input type="radio" name={`${id}-${q.id}`} value={a.id} checked={on} onChange={() => pick(q.id, a.id)} className="sr-only" />
-                              {a.label}
-                            </label>
-                          );
-                        })}
-                      </span>
-                    </li>
-                  );
-                })}
-              </ol>
-            </div>
-          ))}
-
-          <div className="mt-12 rounded-card border border-line bg-white p-6 md:p-8">
-            <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-              <p className="text-small font-medium text-ink">{fitCheck.panel.label}</p>
-              <p className="text-caption text-muted">{count}</p>
-            </div>
-            <Score pct={pct} answered={answered} className="mt-4" size="sm" />
-            <ZoneBar pct={pct} zone={answered ? verdict.zone : null} done={done} className="mt-5" />
-            <div aria-live="polite" className="mt-6">
-              <Result answered={answered} done={done} verdict={verdict} gaps={gaps} answers={answers} place="column" />
-            </div>
-          </div>
-
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
-            <div className="flex flex-wrap gap-3">
-              <Button href={fitCheck.panel.primary.href} arrow>
-                {fitCheck.panel.primary.label}
-              </Button>
-              <Button href={fitCheck.panel.secondary.href} variant="secondary">
-                {fitCheck.panel.secondary.label}
-              </Button>
-            </div>
-            {badge ? <p className="rounded-hard border border-line bg-white px-2.5 py-1 text-caption text-muted">{badge}</p> : null}
-          </div>
-          <p className="mt-4 text-caption text-muted">{fitCheck.panel.note}</p>
-        </div>
-      </div>
-    );
-  }
+  const progress = head === "progress";
 
   return (
-    <div className="grid rounded-panel border border-line bg-white lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
-      {/* The card's head across both columns; below 1024 the result follows it, then the questions. */}
-      <div className="order-first border-b border-line px-5 pb-6 pt-6 md:px-10 md:pb-8 md:pt-9 lg:col-span-2 lg:row-start-1 lg:px-12">
-
-        <h3 className="text-h3">{fitCheck.title}</h3>
-        <p className="mt-2 max-w-none text-body leading-[1.6] text-muted">{fitCheck.intro}</p>
-      </div>
-      <div className="px-5 pb-5 pt-2 md:px-10 md:pb-10 lg:col-start-1 lg:row-start-2 lg:px-12 lg:pb-12 lg:pt-4">
+    <div className={`grid rounded-panel bg-white/60 ${raisedShadow} lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] ${progress ? "" : "lg:grid-rows-[auto_1fr]"}`}>
+      {progress ? null : (
+        // The head of the question column; below 1024 the result follows it, then the questions.
+        <div className="order-first px-5 pb-5 pt-6 md:px-10 md:pb-6 md:pt-9 lg:col-start-1 lg:row-start-1 lg:px-12 lg:pb-0 lg:pt-12">
+          <h3 className="text-h3">{fitCheck.title}</h3>
+          <p className="mt-2 max-w-none text-body leading-[1.6] text-muted">{fitCheck.intro}</p>
+        </div>
+      )}
+      <div className={`px-5 pb-5 md:px-10 md:pb-10 lg:col-start-1 lg:px-12 lg:pb-12 ${progress ? "pt-6 lg:row-start-1 lg:pt-[3.75rem]" : "pt-2 lg:row-start-2 lg:pt-2"}`}>
+        {progress ? <AnsweredBar answered={answered} count={count} /> : null}
         {fitCheck.groups.map((g, gi) => (
-          <fieldset key={g.label} className="mt-6 md:mt-8">
+          <fieldset key={g.label} className={progress && gi === 0 ? "mt-4" : "mt-6 md:mt-8"}>
             <legend className="text-small font-medium text-ink">{g.label}</legend>
             <ol className="mt-2 border-t border-line">
               {g.questions.map((q, qi) => {
@@ -239,16 +155,50 @@ export function FitCheck({ id = "fit", layout = "card", intro, badge }: FitCheck
         {answered ? <FitStrip pct={pct} answered={answered} done={done} count={count} zone={verdict.zone} scoreRef={scoreRef} /> : null}
       </div>
 
-      <ResultPanel pct={pct} answered={answered} done={done} verdict={verdict} gaps={gaps} answers={answers} count={count} scoreRef={scoreRef} onRestart={restart} />
+      <ResultPanel
+        pct={pct}
+        answered={answered}
+        done={done}
+        verdict={verdict}
+        gaps={gaps}
+        answers={answers}
+        count={count}
+        scoreRef={scoreRef}
+        onRestart={restart}
+        place={resultAfter ? "after" : "beside"}
+        className={`${resultAfter ? "" : "order-first"} ${progress ? "lg:row-start-1" : "lg:row-span-2 lg:row-start-1"}`}
+      />
     </div>
   );
 }
 
 /**
- * A question's three pills on the home card. The chosen pill's tone is painted by one marker under the
- * row that glides to the next choice (useIndicator) and takes that answer's tone as it goes; until the
- * marker is in place (the first paint, the first answer) the chosen pill paints its own. The chosen pill
- * keeps its tone's text and the heavier weight, so the choice never rests on colour alone.
+ * /fit-check's progress: seven segments, one per question, each turning from the hairline to the accent
+ * as a question is answered (200ms, none under reduced motion). It sits in a box one small line tall, so
+ * from 1024 it lines up with the result's "Your fit" row beside it.
+ */
+function AnsweredBar({ answered, count }: { answered: number; count: string }) {
+  return (
+    <div className="flex h-[1lh] items-center text-small">
+      <div role="progressbar" aria-label="Questions answered" aria-valuemin={0} aria-valuemax={all.length} aria-valuenow={answered} aria-valuetext={count} className="flex w-full gap-2">
+        {all.map((q, i) => (
+          <span
+            key={q.id}
+            className={`h-1 flex-1 rounded-pill transition-[background-color] duration-200 motion-reduce:transition-none forced-colors:forced-color-adjust-none ${i < answered ? "bg-accent forced-colors:bg-[Highlight]" : "bg-line forced-colors:bg-[GrayText]"}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * A question's three pills. At rest they are quiet: borderless paper with a muted label that turns ink
+ * on hover (a transparent edge, which forced colours draw). The chosen pill's tone is painted by one
+ * marker that glides to the next choice (useIndicator) and takes that answer's tone and solid edge as it
+ * goes; it passes over the resting pills' fill, under their labels. Until the marker is in place (the
+ * first paint, the first answer) the chosen pill paints its own. The chosen pill keeps its tone's text
+ * and the heavier weight, so the choice never rests on colour alone.
  */
 function AnswerRow({ id, q, value, onPick, firstRef }: { id: string; q: Question; value?: Answer; onPick: (q: string, a: Answer) => void; firstRef?: RefObject<HTMLInputElement | null> }) {
   const rowRef = useRef<HTMLSpanElement>(null);
@@ -258,7 +208,7 @@ function AnswerRow({ id, q, value, onPick, firstRef }: { id: string; q: Question
     <span ref={rowRef} role="radiogroup" aria-labelledby={`${id}-${q.id}`} className="group/ind relative flex shrink-0 gap-1.5 pl-7 sm:pl-0">
       <span
         aria-hidden="true"
-        className={`pointer-events-none absolute left-0 top-0 h-(--ih) w-(--iw) translate-x-(--ix) translate-y-(--iy) rounded-pill border opacity-0 group-data-[indicator-ready]/ind:opacity-100 group-data-[indicator-ready]/ind:transition-[translate,width,background-color,border-color] group-data-[indicator-ready]/ind:duration-[250ms] group-data-[indicator-ready]/ind:ease-instrument motion-reduce:transition-none! forced-colors:forced-color-adjust-none forced-colors:border-[Highlight] forced-colors:bg-[Highlight] ${value ? `${tone[value].edge} ${tone[value].fill}` : "border-transparent"}`}
+        className={`pointer-events-none absolute left-0 top-0 z-[1] h-(--ih) w-(--iw) translate-x-(--ix) translate-y-(--iy) rounded-pill border opacity-0 group-data-[indicator-ready]/ind:opacity-100 group-data-[indicator-ready]/ind:transition-[translate,width,background-color,border-color] group-data-[indicator-ready]/ind:duration-[250ms] group-data-[indicator-ready]/ind:ease-instrument motion-reduce:transition-none! forced-colors:forced-color-adjust-none forced-colors:border-[Highlight] forced-colors:bg-[Highlight] ${value ? `${tone[value].edge} ${tone[value].fill}` : "border-transparent"}`}
       />
       {fitCheck.answers.map((a) => {
         const on = value === a.id;
@@ -267,11 +217,12 @@ function AnswerRow({ id, q, value, onPick, firstRef }: { id: string; q: Question
             key={a.id}
             data-indicator-item=""
             className={`relative flex h-9 min-w-12 cursor-pointer items-center justify-center rounded-pill border px-3.5 text-small transition-[border-color,color,background-color] duration-200 motion-reduce:transition-none has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus sm:h-8 sm:px-3 ${
-              on ? `${chosen(a.id)} ${forced} group-data-[indicator-ready]/ind:border-transparent group-data-[indicator-ready]/ind:bg-transparent` : "border-line font-medium text-muted hover:border-ink hover:text-ink"
+              on ? `${chosen(a.id)} ${forced} group-data-[indicator-ready]/ind:border-transparent group-data-[indicator-ready]/ind:bg-transparent` : "border-transparent bg-paper font-medium text-muted hover:text-ink"
             }`}
           >
             <input ref={a.id === fitCheck.answers[0].id ? firstRef : undefined} type="radio" name={`${id}-${q.id}`} value={a.id} checked={on} onChange={() => onPick(q.id, a.id)} className="sr-only" />
-            {a.label}
+            {/* Over the marker, which paints over the pills' own fill. */}
+            <span className="relative z-[2]">{a.label}</span>
           </label>
         );
       })}
@@ -280,8 +231,9 @@ function AnswerRow({ id, q, value, onPick, firstRef }: { id: string; q: Question
 }
 
 type ResultProps = {
-  /** Where the questions sit from the result: beside it, or below it on a phone ("card"), or above it ("column"). */
-  place?: "card" | "column";
+  /** Where the questions sit from the result below 1024: under it ("beside", the home card) or above it
+   *  ("after", /fit-check). From 1024 they sit beside it, on its left, either way. */
+  place?: "beside" | "after";
   answered: number;
   done: boolean;
   verdict: (typeof verdicts)[number];
@@ -294,10 +246,10 @@ type ResultProps = {
  * The big score in light Inter, then "/ 100": a muted dash until the first answer, so an empty check
  * never reads as a score of nought. The live line beside it reads it out.
  */
-function Score({ pct, answered, size = "lg", className = "" }: { pct: number; answered: number; size?: "lg" | "sm"; className?: string }) {
+function Score({ pct, answered, className = "" }: { pct: number; answered: number; className?: string }) {
   return (
     <p className={`flex items-baseline gap-2 text-ink ${className}`}>
-      <span className={`${size === "lg" ? "text-[4.5rem] md:text-[5rem]" : "text-[3.5rem]"} font-light leading-none tracking-[-0.04em] tabular-nums ${answered ? "" : "text-muted"}`}>
+      <span className={`text-[4.5rem] font-light md:text-[5rem] leading-none tracking-[-0.04em] tabular-nums ${answered ? "" : "text-muted"}`}>
         {answered ? (
           pct
         ) : (
@@ -360,38 +312,36 @@ function ZoneBar({ pct, zone: at, done, className = "" }: { pct: number; zone: Z
 }
 
 /** What the answers mean so far: a prompt before the first (with the rows the points will fill), then the lead line and up to three points to talk through. */
-function Result({ answered, done, verdict, gaps, answers, place = "card", className = "" }: ResultProps) {
+function Result({ answered, done, verdict, gaps, answers, place = "beside", className = "" }: ResultProps) {
   if (!answered) {
+    const after = place === "after";
     return (
       <div className={className}>
         <div className="flex items-start gap-3">
-          <svg
-            aria-hidden="true"
-            viewBox="0 0 16 16"
-            className={`mt-1 size-4 shrink-0 text-accent motion-reduce:animate-none ${place === "column" ? "rotate-90" : "-rotate-90 animate-[nudge-y_1.4s_ease-in-out_infinite] lg:rotate-0 lg:animate-[nudge-x_1.4s_ease-in-out_infinite]"}`}
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.75"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M13 8H3m4.5-4.5L3 8l4.5 4.5" />
-          </svg>
+          {/* The arrow points at the questions and nudges toward them: left from 1024, and below it down
+              (the home card) or up (/fit-check), the up arrow drawn as the down one turned over by its frame. */}
+          <span aria-hidden="true" className={`mt-1 flex shrink-0 ${after ? "-scale-y-100 lg:scale-y-100" : ""}`}>
+            <svg
+              viewBox="0 0 16 16"
+              className="size-4 -rotate-90 animate-[nudge-y_1.4s_ease-in-out_infinite] text-accent motion-reduce:animate-none lg:rotate-0 lg:animate-[nudge-x_1.4s_ease-in-out_infinite]"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M13 8H3m4.5-4.5L3 8l4.5 4.5" />
+            </svg>
+          </span>
           <span>
             <span className="block text-body font-medium leading-[1.4] text-balance text-ink">
-              {place === "column" ? (
-                fitCheck.panel.prompt.title.above
-              ) : (
-                <>
-                  <span className="lg:hidden">{fitCheck.panel.prompt.title.narrow}</span>
-                  <span className="hidden lg:inline">{fitCheck.panel.prompt.title.wide}</span>
-                </>
-              )}
+              <span className="lg:hidden">{after ? fitCheck.panel.prompt.title.above : fitCheck.panel.prompt.title.narrow}</span>
+              <span className="hidden lg:inline">{fitCheck.panel.prompt.title.wide}</span>
             </span>
             <span className="mt-1 block text-small leading-[1.5] text-pretty text-muted">{fitCheck.panel.prompt.body}</span>
           </span>
         </div>
-        {place === "card" ? <GhostRows /> : null}
+        <GhostRows />
       </div>
     );
   }
@@ -450,13 +400,14 @@ const longestLine = [...verdicts.flatMap((v) => [v.lead, v.body])].sort((a, b) =
 const longestGaps = [...all].sort((a, b) => b.gap.length - a.gap.length).slice(0, 3);
 
 /**
- * The home card's result column, on paper inside the one card: "Your fit" with the count, the score,
- * the bar, the result, then the two actions in fixed roles ("Book a pilot conversation" the primary,
- * "Send me my result" the secondary), the note and, once anything is answered, "Start again". "Send me
- * my result" swaps the result and actions for a two-field form that sends the answers with the score;
- * the reply comes from a person. Everything that changes is announced politely.
+ * The result, an inset white card in the card (no edge: the white is its edge): "Your fit" with the
+ * count, the score, the bar, the result, then the two actions in fixed roles ("Book a pilot
+ * conversation" the primary, "Send me my result" the secondary), the note and, once anything is
+ * answered, "Start again". "Send me my result" swaps the result and actions for a two-field form that
+ * sends the answers with the score; the reply comes from a person. Everything that changes is announced
+ * politely. `className` places it on the card's grid.
  */
-function ResultPanel({ pct, count, scoreRef, onRestart, ...result }: ResultProps & { pct: number; count: string; scoreRef: RefObject<HTMLDivElement | null>; onRestart: () => void }) {
+function ResultPanel({ pct, count, scoreRef, onRestart, className = "", ...result }: ResultProps & { pct: number; count: string; scoreRef: RefObject<HTMLDivElement | null>; onRestart: () => void }) {
   const { send } = fitCheck.panel;
   const [mode, setMode] = useState<"result" | "form" | "sending" | "sent" | "failed">("result");
   const [errors, setErrors] = useState<Partial<Record<"name" | "email", string>>>({});
@@ -506,7 +457,7 @@ function ResultPanel({ pct, count, scoreRef, onRestart, ...result }: ResultProps
   );
 
   return (
-    <div className="order-first flex flex-col border-b border-line bg-paper p-5 md:p-10 lg:col-start-2 lg:row-start-2 lg:rounded-br-panel lg:border-b-0 lg:border-l lg:p-12">
+    <div className={`m-2 flex flex-col rounded-card bg-white p-5 md:m-3 md:p-8 lg:col-start-2 lg:m-6 lg:p-9 ${className}`}>
       <div ref={scoreRef} tabIndex={-1} className="focus-visible:outline-none">
         <div className="flex items-baseline justify-between gap-4">
           <p className="text-small font-medium text-ink">{fitCheck.panel.label}</p>
@@ -604,10 +555,10 @@ function ResultPanel({ pct, count, scoreRef, onRestart, ...result }: ResultProps
 }
 
 /**
- * Below 1024: the strip at the foot of the card once a question is answered. It sticks 12px above the
- * bottom of the screen while the result panel's score is off screen, and stops at the card's foot. It
+ * Below 1024: the strip at the foot of the questions once a question is answered. It sticks 12px above
+ * the bottom of the screen while the result's score is off screen, and stops at the questions' foot. It
  * shows the count (the zone once all seven are answered) over the score, and a button that brings the
- * result back into view under the bar and moves the focus to it (at once under reduced motion).
+ * result into view under the bar, up or down, and moves the focus to it (at once under reduced motion).
  */
 function FitStrip({ pct, answered, done, count, zone: at, scoreRef }: { pct: number; answered: number; done: boolean; count: string; zone: Zone; scoreRef: RefObject<HTMLDivElement | null> }) {
   const [scoreOnScreen, setScoreOnScreen] = useState(true);
@@ -623,7 +574,10 @@ function FitStrip({ pct, answered, done, count, zone: at, scoreRef }: { pct: num
     const el = scoreRef.current;
     if (!el) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const nav = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--nav-h")) || 56;
+    // --nav-h is in rem (3.5rem): read it in pixels, so the score lands 24px under the bar, not under it.
+    const root = getComputedStyle(document.documentElement);
+    const navH = root.getPropertyValue("--nav-h").trim();
+    const nav = (navH.endsWith("rem") ? parseFloat(navH) * parseFloat(root.fontSize) : parseFloat(navH)) || 56;
     window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - nav - 24, behavior: reduce ? "auto" : "smooth" });
     el.focus({ preventScroll: true });
   };

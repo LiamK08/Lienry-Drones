@@ -6,6 +6,7 @@ import { pageMetadata } from "@/lib/site";
 import { LegalToc } from "@/components/blocks/LegalToc";
 import { holdLines } from "@/components/blocks/holdLines";
 import { Band, Container } from "@/components/ui/Band";
+import { Button } from "@/components/ui/Button";
 
 export const metadata: Metadata = {
   ...pageMetadata("/privacy", "How Lienry Drones handles the details you share through this website."),
@@ -40,10 +41,42 @@ function withLink(text: string, link: PrivacySection["link"]): ReactNode {
 }
 
 /**
+ * "In short": the policy in four plain lines (privacy.ts `summary`), on a paper card, then the enquiry
+ * link. From 1024 it takes columns 10-12 beside the header and sticks under the bar as the contents do;
+ * below 1024 it sits 32 under the updated line, before the first section, not sticky. Outside the prose,
+ * left-aligned.
+ */
+function InShort({ lines }: { lines: readonly string[] }) {
+  return (
+    <aside
+      aria-labelledby="in-short-heading"
+      className="mt-8 rounded-card bg-paper p-6 lg:sticky lg:top-[calc(var(--nav-h)+2rem)] lg:col-span-3 lg:col-start-10 lg:row-span-2 lg:row-start-1 lg:mt-0 lg:self-start"
+    >
+      {/* A heading (the serif's smallest step, as the sections' are), so the sticky block holds one. */}
+      <h2 id="in-short-heading" className="text-[1.25rem] leading-[1.3]">
+        In short
+      </h2>
+      <ul className="mt-3 border-t border-line">
+        {lines.map((line) => (
+          <li key={line} className="border-b border-line py-3 text-small leading-[1.5] text-fg-muted">
+            {line}
+          </li>
+        ))}
+      </ul>
+      {/* Check 24: a link to /register-interest reads exactly "Register interest". */}
+      <Button href="/register-interest" variant="tertiary" arrow className="mt-2">
+        Register interest
+      </Button>
+    </aside>
+  );
+}
+
+/**
  * /privacy: one white band on the page's 12 columns. From 1024 the contents take columns 1-3, sticky
- * under the bar, and the policy takes 4-10: the h1 and the updated line, left-aligned over the text,
- * then the sections, each a heading and its paragraphs, with any list lettered (a, b, c). Below 1024
- * the contents are hidden and the policy reads straight down.
+ * under the bar, the policy takes 4-9: the h1 and the updated line, left-aligned over the text, then the
+ * sections, each a heading and its paragraphs, with any list lettered (a, b, c); and "In short" takes
+ * 10-12 beside the header, sticky too. Below 1024 the contents are hidden, "In short" follows the header
+ * and the policy reads straight down.
  */
 export default function PrivacyPage() {
   const p = privacyPage;
@@ -53,13 +86,14 @@ export default function PrivacyPage() {
     <Band id="policy" tone="plaster" pad="hero" labelledBy="privacy-heading">
       <Container className="lg:grid-12">
         <LegalToc items={sections.map(({ id, title }) => ({ id, title }))} className="lg:col-span-3 lg:row-span-2 lg:row-start-1" />
-        <header className="lg:col-span-7 lg:col-start-4 lg:row-start-1">
+        <header className="lg:col-span-6 lg:col-start-4 lg:row-start-1">
           <h1 id="privacy-heading" className={`text-h1 ${hold.className}`} style={hold.style}>
             {p.headline}
           </h1>
           <p className="mt-3 text-small leading-[1.5] text-fg-muted">Last updated {p.updated}</p>
         </header>
-        <div data-prose="" className="mt-12 min-w-0 lg:col-span-7 lg:col-start-4 lg:row-start-2 lg:mt-14">
+        <InShort lines={p.summary} />
+        <div data-prose="" className="mt-12 min-w-0 lg:col-span-6 lg:col-start-4 lg:row-start-2 lg:mt-14">
           {sections.map((s) => (
             <section key={s.id} aria-labelledby={s.id} className="mt-10 first:mt-0">
               {/* tabIndex -1: fragment navigation focuses the heading it scrolls to. */}
