@@ -4,6 +4,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type ChangeEvent, type Re
 import { calculatorCopy as copy } from "@/content/calculator";
 import { LIMITS, formatAud, formatPerArea, formatWhole, inRange, parsePercent, parseWhole, perSquareMetre, totalOver } from "@/lib/calculator";
 import { propertyTypes } from "@/lib/enquiry-schema";
+import { raisedShadow } from "@/components/blocks/FitCheck";
 import { Button } from "@/components/ui/Button";
 import { Field, SelectField, describedBy, fieldControl } from "@/components/ui/Field";
 
@@ -140,11 +141,14 @@ const chip =
  * totals 600ms after the last change while the spend is valid. The building type changes only the
  * area label and the follow-on link. Neither the form nor the panel ever reveals.
  *
- * Listing layout: one white panel. From 1024 the inputs take five of its twelve columns (the building
- * type as pill chips, then the three fields) and the summary takes seven on paper: its heading, the
- * three results as rows (the label and how it is worked out, the figure at the right), the note, then
- * the follow-on pill. Below 1024 the summary follows the inputs, and from 768 to 1023 the three fields
- * sit in one row. Below 768 each result row reads label, figure, then how it is worked out.
+ * Listing layout: one raised white panel (the fit check's shadow, no hairline) on the tool hero's tint.
+ * From 1024 the inputs take five of its twelve columns (the building type as pill chips, then the three
+ * fields) and the summary takes seven on paper: its heading, the three results as rows (the label and
+ * how it is worked out, the figure at the right), the note, then the follow-on pill. Below 1024 the
+ * summary follows the inputs, and from 768 to 1023 the three fields sit in one row. Below 768 each
+ * result row reads label, figure, then how it is worked out, and under the spend field one line repeats
+ * the two totals (a dash for each until it exists; aria-hidden, as the status line already reads them),
+ * over a link down to the summary, so a phone visitor sees the sum while typing. Nothing there is sticky.
  *
  * Split layout: from 1024 the fields stack in columns 1-5 and the results panel takes 7-12; from 768
  * the fields are two by two above the panel; below 768 everything is one column.
@@ -258,18 +262,26 @@ export function CostCalculator({ headingId, heading, noteId, defaultType = "", l
         aria-describedby={noteId}
         noValidate
         onSubmit={(e) => e.preventDefault()}
-        className="overflow-hidden rounded-panel border border-line bg-white lg:grid lg:grid-cols-12"
+        className={`overflow-hidden rounded-panel bg-white ${raisedShadow} lg:grid lg:grid-cols-12`}
       >
         <div className="p-5 md:p-8 lg:col-span-5 lg:p-10">
           <fieldset id="cost-type" className="min-w-0">
             <legend className="text-small font-medium text-fg">{copy.fields.type.label}</legend>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {propertyTypes.map((t) => (
-                <label key={t} className={chip}>
-                  <input type="radio" name="cost-type" value={t} checked={type === t} onChange={() => setType(t)} className="sr-only" />
-                  {t}
-                </label>
-              ))}
+            {/* Below 768 the chips sit two to a row, so the web font and its fallback wrap them alike and
+                the fields under them never move as the font arrives; from 768 they wrap as they fit. */}
+            <div className="mt-3 flex flex-col gap-2 md:flex-row md:flex-wrap">
+              {propertyTypes
+                .filter((_, i) => i % 2 === 0)
+                .map((first, i) => (
+                  <div key={first} className="flex flex-wrap gap-2 md:contents">
+                    {propertyTypes.slice(i * 2, i * 2 + 2).map((t) => (
+                      <label key={t} className={chip}>
+                        <input type="radio" name="cost-type" value={t} checked={type === t} onChange={() => setType(t)} className="sr-only" />
+                        {t}
+                      </label>
+                    ))}
+                  </div>
+                ))}
             </div>
           </fieldset>
           {/* From 768 to 1023 the three fields sit in a row: each label holds two lines, set to its foot,
@@ -277,11 +289,24 @@ export function CostCalculator({ headingId, heading, noteId, defaultType = "", l
           <div className="mt-8 grid gap-6 md:grid-cols-3 md:[&>div>label]:flex md:[&>div>label]:min-h-[2.625rem] md:[&>div>label]:items-end lg:grid-cols-1 lg:[&>div>label]:block lg:[&>div>label]:min-h-0">
             {areaField}
             {spendField}
+            {/* Below 768 only: the two totals in one held line under the spend field, a muted dash in each
+                place until it can be worked out (as the fit check's score), so nothing moves as they
+                appear; then the link down to the summary. */}
+            <div className="-mt-3 flex flex-col items-start md:hidden">
+              <p aria-hidden="true" className="min-h-[1lh] text-small leading-[1.5] text-fg-muted tabular-nums">
+                {copy.listing.phone.five} <span className={five ? "font-medium text-fg" : ""}>{five ?? "—"}</span>
+                <span className="px-1.5">·</span>
+                {copy.listing.phone.ten} <span className={ten ? "font-medium text-fg" : ""}>{ten ?? "—"}</span>
+              </p>
+              <Button href={`#${headingId}`} variant="tertiary" arrow>
+                {copy.listing.phone.see}
+              </Button>
+            </div>
             {riseField}
           </div>
         </div>
         <div className="border-t border-line bg-paper p-5 md:p-8 lg:col-span-7 lg:border-l lg:border-t-0 lg:p-10">
-          <h2 id={headingId} className="text-h3">
+          <h2 id={headingId} className="scroll-mt-6 text-h3">
             {heading}
           </h2>
           <dl className="mt-6 border-t border-line">

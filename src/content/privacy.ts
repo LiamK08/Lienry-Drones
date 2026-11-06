@@ -18,10 +18,18 @@ export type PrivacySection = {
 export const privacyPage: {
   headline: string;
   updated: string;
+  /** "In short" beside the policy: four plain lines, each restating a section below and nothing more. */
+  summary: readonly string[];
   sections: readonly PrivacySection[];
 } = {
   headline: "Privacy policy",
   updated: "September 2026",
+  summary: [
+    "We collect the details you give us when you register interest.",
+    "We use them to reply to you and to keep you informed about the pilot program and the product.",
+    "We do not sell your details or share them with advertisers, and the site sets no advertising cookies.",
+    "You can ask us what we hold about you, and ask us to correct or delete it.",
+  ],
   sections: [
     {
       title: "Who we are",

@@ -6,7 +6,7 @@
 import type { Action } from "@/lib/types";
 import type { FaqPoint } from "@/components/sections/Faq";
 
-export type FaqId = "surfaces" | "height" | "safety" | "weather" | "water" | "roof" | "approvals" | "app" | "pilot" | "cost";
+export type FaqId = "surfaces" | "height" | "safety" | "weather" | "water" | "roof" | "approvals" | "app" | "pilot" | "cost" | "score" | "result" | "calc-how" | "calc-data";
 
 export type FaqEntry = { id: FaqId; q: string; a: string; points?: readonly FaqPoint[]; after?: string; link?: Action };
 
@@ -81,6 +81,41 @@ export const faqItems: readonly FaqEntry[] = [
     a: "Pricing is still being finalised. We are not publishing prices before the pilot program.",
     link: { label: "Add up what outsourced cleaning costs you now", href: "/calculator" },
   },
+  // The two tools explain themselves. Each answer restates the tool's own logic (FitCheck.tsx's weights
+  // and capOf; src/lib/calculator.ts) or its own copy, and nothing more.
+  {
+    id: "score",
+    q: "How is the score worked out?",
+    a: "Your seven answers make a score out of 100, weighted as the design brief is:",
+    points: [
+      { label: "The building", text: "height, a dock, and water and power count 20 each" },
+      { label: "The clean", text: "the other four questions count 10 each" },
+      { label: "Yes and Partly", text: "a Yes counts in full and a Partly counts half" },
+      { label: "A No on the building", text: "keeps the score under 40, and a Partly there keeps it under 75, because the design needs all three" },
+    ],
+    after: "It is indicative, from the design brief, and not a site survey.",
+  },
+  {
+    id: "result",
+    q: "What happens if I ask for my result?",
+    a: "Nothing is sent until you ask. Then your answers and your score come to us with your name and email, and we read every one and reply personally with your result and what a pilot would need.",
+  },
+  {
+    id: "calc-how",
+    q: "How are the totals worked out?",
+    a: "Only from the figures you enter, rounded to whole dollars:",
+    points: [
+      { label: "Year one", text: "what you pay now" },
+      { label: "Each later year", text: "the year before, raised by your yearly increase" },
+      { label: "Over 5 and 10 years", text: "those years added up" },
+      { label: "Per m² each year", text: "one year of your spend over your facade or panel area" },
+    ],
+  },
+  {
+    id: "calc-data",
+    q: "Does anything I type leave this page?",
+    a: "No. The calculator works in your browser, and it does not send or store your figures.",
+  },
 ];
 
 /** The questions each page shows, in display order. */
@@ -90,11 +125,19 @@ export const faqSets = {
   commercial: ["roof", "safety", "weather", "water", "approvals", "pilot", "cost"],
   homes: ["app", "safety", "weather", "water", "approvals", "cost"],
   solar: ["surfaces", "weather", "water", "approvals"],
-  fitCheck: ["height", "roof", "surfaces", "pilot"],
-} as const satisfies Record<"home" | "platform" | "commercial" | "homes" | "solar" | "fitCheck", readonly FaqId[]>;
+  fitCheck: ["score", "result", "height", "roof", "surfaces", "pilot"],
+  calculator: ["calc-how", "calc-data", "cost", "pilot"],
+} as const satisfies Record<"home" | "platform" | "commercial" | "homes" | "solar" | "fitCheck" | "calculator", readonly FaqId[]>;
 
-/** A page's questions from the bank, in its set's order. */
-export const faqFor = (set: keyof typeof faqSets): FaqEntry[] => faqSets[set].map((id) => faqItems.find((i) => i.id === id)!);
+/**
+ * A page's questions from the bank, in its set's order. Given the page's own path (`here`), an answer
+ * drops a link to that page (the cost answer's link on /calculator), so no answer links to where it is.
+ */
+export const faqFor = (set: keyof typeof faqSets, here?: string): FaqEntry[] =>
+  faqSets[set].map((id) => {
+    const item = faqItems.find((i) => i.id === id)!;
+    return here && item.link?.href === here ? { ...item, link: undefined } : item;
+  });
 
 /** The home FAQ's link to the full set on /platform. */
 export const homeFaqLink = { label: "All questions", href: "/platform#faq" };

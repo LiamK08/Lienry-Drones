@@ -35,5 +35,7 @@ export const calculatorCopy = {
       perAreaSolar: "One year of your spend, spread over your panel area.",
     },
     route: "Lienry is pre-launch. Tell us about your property and we reply ourselves.",
+    /** Below 768: the two totals in one line under the spend field, and the link down to the summary. */
+    phone: { five: "5 years", ten: "10 years", see: "See the breakdown" },
   },
 } as const;
