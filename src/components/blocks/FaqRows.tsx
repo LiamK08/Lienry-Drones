@@ -2,6 +2,11 @@ import Link from "next/link";
 import type { FaqItem } from "@/components/sections/Faq";
 import { FaqHashOpen } from "@/components/blocks/FaqHashOpen";
 
+// On a full load at a row's address, open that row before first paint, so the answer is open when the
+// page scrolls to it and nothing below it moves afterwards. A stray "%" keeps the raw fragment.
+const OPEN_FROM_HASH =
+  'try{var s=document.currentScript,p=s&&s.parentNode,h=location.hash.slice(1);if(h&&p){try{h=decodeURIComponent(h)}catch(e){}var d=document.getElementById(h);if(d&&d.tagName==="DETAILS"&&p.contains(d))d.open=true}}catch(e){}';
+
 /**
  * The site's one FAQ treatment: hairline rows, no cards. Each question is a display line (PT Serif, 20px,
  * 18 below 768) with a 16px chevron at its right that turns over as the row opens; a hairline runs above
@@ -19,6 +24,7 @@ export function FaqRows({ id, items }: { id: string; items: readonly FaqItem[] }
         <details
           key={item.id}
           id={`${id}-${item.id}`}
+          suppressHydrationWarning
           className={`group border-b border-line transition-[border-color] duration-200 ease-instrument [@media(hover:hover)]:has-[>summary:hover]:border-b-border-strong motion-reduce:transition-none ${i === 0 ? "border-t" : ""}`}
         >
           <summary className="group/q flex cursor-pointer list-none items-center justify-between gap-6 py-[1.375rem] [&::-webkit-details-marker]:hidden">
@@ -41,6 +47,9 @@ export function FaqRows({ id, items }: { id: string; items: readonly FaqItem[] }
           <FaqAnswer item={item} className="pb-6 pr-10 text-body leading-[1.6] text-fg-muted" />
         </details>
       ))}
+      {/* Server-rendered only: React never runs a script it renders on the client (FaqHashOpen covers soft
+          navigations). */}
+      <script suppressHydrationWarning dangerouslySetInnerHTML={{ __html: OPEN_FROM_HASH }} />
     </div>
   );
 }

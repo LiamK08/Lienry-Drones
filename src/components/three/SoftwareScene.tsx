@@ -2,7 +2,7 @@
 
 import { ContactShadows, Environment, Lightformer } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useRef, type RefObject } from "react";
+import { memo, useEffect, useRef, type RefObject } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { isCapture, now, runTicks, setManualTime } from "@/lib/clock";
@@ -289,7 +289,25 @@ function FirstFrame({ onFirstFrame }: { onFirstFrame: () => void }) {
   return null;
 }
 
-export default function SoftwareScene({ model = "building", controlRef, onFirstFrame }: { model?: ModelId; controlRef: RefObject<SceneControl>; onFirstFrame?: () => void }) {
+// The image-based light, made once. Environment re-renders its six-sided capture whenever its children
+// change identity, so built inline it ran again on every render of the scene (each readout tick of the
+// window above it): six extra passes per update, and seconds of a blocked page under a software
+// renderer. As one constant element React skips it on every later render.
+const ENVIRONMENT = (
+  <Environment resolution={256} frames={1}>
+    <Sky />
+    <Lightformer form="rect" intensity={2.4} color="#fff7ec" position={[0, 80, 10]} scale={[160, 120, 1]} />
+    <Lightformer form="rect" intensity={1.5} color="#dcedf0" position={[70, 30, 70]} scale={[90, 50, 1]} />
+    <Lightformer form="rect" intensity={0.9} color="#f4f6f8" position={[-90, 25, 20]} scale={[70, 40, 1]} />
+    <Lightformer form="rect" intensity={0.7} color="#e3e9ef" position={[10, 12, -100]} scale={[120, 40, 1]} />
+    <Lightformer form="rect" intensity={0.5} color="#c9d1d9" position={[0, -40, 0]} scale={[160, 160, 1]} />
+  </Environment>
+);
+
+/** The window's scene. Memoised: its props are stable (the model, a ref and a memoised callback), so the
+ *  window's own state updates never re-render the canvas tree (ContactShadows also redraws its one frame
+ *  on every render). */
+const SoftwareScene = memo(function SoftwareScene({ model = "building", controlRef, onFirstFrame }: { model?: ModelId; controlRef: RefObject<SceneControl>; onFirstFrame?: () => void }) {
   const { Content, shadows } = SCENES[model];
   const clockRef = useRef<Clock>({ t: 0, dt: 0 });
   const fadeRef = useRef<Fade>({ scan: 0, wash: 1, debris: 1, zones: 0 });
@@ -307,14 +325,7 @@ export default function SoftwareScene({ model = "building", controlRef, onFirstF
       }}
       style={{ background: "transparent" }}
     >
-      <Environment resolution={256} frames={1}>
-        <Sky />
-        <Lightformer form="rect" intensity={2.4} color="#fff7ec" position={[0, 80, 10]} scale={[160, 120, 1]} />
-        <Lightformer form="rect" intensity={1.5} color="#dcedf0" position={[70, 30, 70]} scale={[90, 50, 1]} />
-        <Lightformer form="rect" intensity={0.9} color="#f4f6f8" position={[-90, 25, 20]} scale={[70, 40, 1]} />
-        <Lightformer form="rect" intensity={0.7} color="#e3e9ef" position={[10, 12, -100]} scale={[120, 40, 1]} />
-        <Lightformer form="rect" intensity={0.5} color="#c9d1d9" position={[0, -40, 0]} scale={[160, 160, 1]} />
-      </Environment>
+      {ENVIRONMENT}
       <ambientLight intensity={0.22} />
       <directionalLight position={[45, 70, 35]} intensity={1.7} color="#fff3e2" />
       <directionalLight position={[-40, 25, -20]} intensity={0.45} color="#dcedf0" />
@@ -326,4 +337,6 @@ export default function SoftwareScene({ model = "building", controlRef, onFirstF
       {onFirstFrame ? <FirstFrame onFirstFrame={onFirstFrame} /> : null}
     </Canvas>
   );
-}
+});
+
+export default SoftwareScene;

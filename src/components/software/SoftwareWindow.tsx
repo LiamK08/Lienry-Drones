@@ -208,10 +208,11 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare", model
     }
   }
 
-  // The scene mounts when the window comes within 600px of the screen and unmounts when it is far
-  // away again, but never before its first frame: R3F creates the canvas asynchronously and throws
-  // if it is unmounted mid-creation (a fast scroll past the window). The poster covers it meanwhile.
-  const nextPaint: Paint = !live ? "off" : near ? (paint === "off" ? "starting" : paint) : paint === "starting" ? "starting" : "off";
+  // The scene mounts when the window first comes within 600px of the screen and then stays mounted:
+  // off screen it draws nothing (control.visible), and rebuilding it on every return would compile its
+  // shaders again, a hitch on a phone and seconds of a blocked page under a software renderer. The
+  // poster covers it until its first frame.
+  const nextPaint: Paint = !live ? "off" : paint === "off" ? (near ? "starting" : "off") : paint;
   if (nextPaint !== paint) setPaint(nextPaint);
 
   // Write the preset into the scene. The first one applied skips the flight: the camera already
