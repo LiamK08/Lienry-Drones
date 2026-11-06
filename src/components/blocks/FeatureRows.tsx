@@ -30,6 +30,9 @@ export type FeatureRowItem = {
   /** Solutions variant only: the media takes 8 of the 12 columns from 1024 and 7 from 1280, the text 4
    *  (the /homes-and-rentals app demo). Default rows give the text 5 columns and the media 6. */
   wideMedia?: boolean;
+  /** A static, coded Demo-data card over the row's picture (RowPanel), on the `corner` side away from
+   *  the subject. Never on a software-window or app row. */
+  panel?: { id: "between-cleans" | "more-often" | "ground-pod" | "right-pressure" | "row-schedule"; corner?: "start" | "end" };
 };
 
 function Check() {

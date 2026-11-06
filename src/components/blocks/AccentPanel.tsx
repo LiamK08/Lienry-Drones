@@ -10,7 +10,8 @@ const bandPads = { section: "", close: "pt-0 pb-14 lg:pb-20" } as const;
  * The closing ask, as one of two grounds:
  * - inset (default): an accent panel on the rail with the panel corners (400px tall from 1024), one
  *   still, soft light in its top-left corner, a centred serif line and one solid white pill with its
- *   arrow badge. `note` sits centred below the panel.
+ *   arrow badge, then the lighter `secondary` step as a text link when given. `note` sits centred below
+ *   the panel.
  * - `bleed` + `dark`: the platform's statement band, a full-bleed night band with one still accent glow,
  *   the line and the same white pill.
  */
@@ -20,12 +21,15 @@ export function AccentPanel({
   action,
   bleed = false,
   dark = false,
+  secondary,
   note,
   band = "section",
 }: {
   id: string;
   headline: string;
   action: Action;
+  /** The lighter second step beside the main ask (usually "Check your building"), as a text link. */
+  secondary?: Action;
   bleed?: boolean;
   dark?: boolean;
   note?: string;
@@ -36,9 +40,16 @@ export function AccentPanel({
       <h2 id={`${id}-heading`} className="text-h2s text-white">
         {headline}
       </h2>
-      <Button href={action.href} variant="glass" arrow className="mt-8">
-        {action.label}
-      </Button>
+      <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-6">
+        <Button href={action.href} variant="glass" arrow>
+          {action.label}
+        </Button>
+        {secondary ? (
+          <Button href={secondary.href} variant="tertiary" arrow>
+            {secondary.label}
+          </Button>
+        ) : null}
+      </div>
     </div>
   );
 

@@ -1,6 +1,8 @@
 import type { FaqItem } from "@/components/sections/Faq";
+import type { Action } from "@/lib/types";
 import { FaqRows } from "@/components/blocks/FaqRows";
 import { Band, Container } from "@/components/ui/Band";
+import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/ui/Reveal";
 
 // "section" is the band rhythm; "page" is the solution pages' compact rhythm (the owner asked for it
@@ -18,7 +20,8 @@ export function FaqCentered({
   tone = "plaster",
   tight = false,
   spacing,
-  narrow = false,
+  intro,
+  link,
 }: {
   id?: string;
   /** Default "Frequently asked questions". */
@@ -28,18 +31,29 @@ export function FaqCentered({
   /** @deprecated Use spacing="section". */
   tight?: boolean;
   spacing?: keyof typeof pads;
+  /** @deprecated Ignored. */
   narrow?: boolean;
+  /** A short line under the heading. */
+  intro?: string;
+  /** A link under the heading (or its line), e.g. to the page that answers more. */
+  link?: Action;
 }) {
   const space = spacing ?? (tight ? "tight" : "section");
   return (
     <Band id={id} tone={tone} pad={pads[space]} labelledBy={`${id}-heading`}>
       <Container>
         <div className="lg:grid-12">
-          <div className={narrow ? "lg:col-span-6 lg:col-start-4" : "lg:col-span-8 lg:col-start-3"}>
+          <div className="lg:col-span-8 lg:col-start-3">
             <Reveal animate y={10} className="flex flex-col items-center text-center">
               <h2 id={`${id}-heading`} className="text-h2s">
                 {headline}
               </h2>
+              {intro ? <p className="mt-4 text-body leading-[1.6] text-fg-muted">{intro}</p> : null}
+              {link ? (
+                <Button href={link.href} variant="tertiary" arrow className="mt-4">
+                  {link.label}
+                </Button>
+              ) : null}
             </Reveal>
             <div className="mt-10">
               <FaqRows id={id} items={items} />

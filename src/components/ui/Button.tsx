@@ -92,6 +92,23 @@ function Arrow() {
   );
 }
 
+/**
+ * A pill's face without its element: Button's look, sizes, badge and label roll on a `<span>`, for a card
+ * whose whole surface is the link (so no interactive element is nested). The card drives its states
+ * through `className` (e.g. `group-hover/card:border-ink`). Carries `data-button={variant}` for the checks.
+ */
+export function ButtonFace({ variant = "secondary", size = "md", arrow = false, className = "", children }: { variant?: ButtonVariant; size?: ButtonSize; arrow?: boolean; className?: string; children: ReactNode }) {
+  const badge = arrow && variant !== "tertiary";
+  const cls = `${base} ${variant === "tertiary" ? "" : `${sizes[size]} ${pad[badge ? "badge" : "plain"][size]}`} ${variants[variant]} ${className}`;
+  return (
+    <span className={cls} data-button={variant}>
+      {badge ? <Badge variant={variant} size={size} /> : null}
+      {variant === "tertiary" ? children : <span>{children}</span>}
+      {arrow && variant === "tertiary" ? <Arrow /> : null}
+    </span>
+  );
+}
+
 type CommonProps = {
   /** Default "primary". Each band has one primary. */
   variant?: ButtonVariant;
