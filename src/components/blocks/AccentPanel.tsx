@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/Button";
 // that already ends with its own space.
 const bandPads = { section: "", close: "pt-0 pb-14 lg:pb-20" } as const;
 
-/** The close's line is a statement without a closing full stop (a question keeps its mark). */
-const noStop = (s: string) => s.replace(/\.\s*$/, "");
+/** A one-sentence line has no closing full stop (a question keeps its mark); a line of two sentences keeps
+ *  both stops, so its punctuation stays even. */
+const noStop = (s: string) => (/[.?!]\s/.test(s) ? s : s.replace(/\.\s*$/, ""));
 
 /**
  * The closing ask, as one of two grounds:

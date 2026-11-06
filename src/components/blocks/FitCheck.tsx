@@ -457,7 +457,7 @@ function ResultPanel({ pct, count, scoreRef, onRestart, className = "", ...resul
   );
 
   return (
-    <div className={`m-2 flex flex-col rounded-card bg-white p-5 md:m-3 md:p-8 lg:col-start-2 lg:m-6 lg:p-9 ${className}`}>
+    <div className={`m-2 flex flex-col rounded-card bg-white p-5 md:m-3 md:p-8 lg:col-start-2 lg:m-4 lg:p-7 xl:m-6 xl:p-9 ${className}`}>
       <div ref={scoreRef} tabIndex={-1} className="focus-visible:outline-none">
         <div className="flex items-baseline justify-between gap-4">
           <p className="text-small font-medium text-ink">{fitCheck.panel.label}</p>

@@ -31,7 +31,8 @@ a second accent. Section heads may be centred.
 
 Type: two families only, both open-licensed and self-hosted: PT Serif (regular and italic) for
 headings, display lines and the footer logo, and Inter for everything else (its italic only in the
-footer tagline, loaded on demand). Sizes follow the reference: page titles 40px (30 on phones), home
+footer tagline, loaded on demand). FAQ questions are display lines: PT Serif at 20px (18 on
+phones) on hairline rows. Sizes follow the reference: page titles 40px (30 on phones), home
 section titles 48px (36), inner section titles 36px (36), card and row titles 32px (30), with tight
 negative tracking. A section's h2 set at the page-title step drops to 36px on phones. No eyebrows: headings stand alone,
 with no label above them (the owner's call, 21 October 2026). The header carries no pills.
@@ -40,7 +41,8 @@ Shape: buttons are pills (`rounded-pill`, optional round arrow badge) in one sys
 to action, `lg` only for form submits, `sm` only inside app UI; icon buttons are round. Cards are `rounded-card`
 (16px), panels `rounded-panel` (20px); feature and story images follow the reference's softer
 corners (`Picture rounded="image"`, 12px, 8px from 1024; `rounded="media"`, 10px); small tags and form
-fields keep `--radius-hard` (4px). The header bar is 56px (`--nav-h`).
+fields keep `--radius-hard` (4px). The closing ask is a compact accent panel (about 1000px on the rail)
+with one white pill and a white text link; the footer is a night sheet with the panel radius on its top corners. The header bar is 56px (`--nav-h`).
 Soft blurred accent glows are allowed behind heroes and accent panels. No text shadows or
 gradient text.
 
@@ -57,7 +59,7 @@ their fallback-font line count on phones (`holdLines`), or the web font arriving
 Sticky: only the header, a column under it (a nav, or a block holding a heading, nav or form), and,
 below 1024, the fit check's score strip (`data-fit-strip`), which sticks to the bottom of the screen inside
 its card's question column (the owner's brief, 26 October 2026). Check 21 encodes it. Nothing is fixed but
-the header, the skip link and, while it plays, the intro's overlay.
+the header (with its dim page scrim while a desktop menu is open), the skip link and, while it plays, the intro's overlay.
 
 Intro (the owner's brief, 28 October 2026): when a browser session starts on the home page, a first-visit
 intro plays over it, after breakerindustries.com's loader in Lienry's own mark, colours and code: on the

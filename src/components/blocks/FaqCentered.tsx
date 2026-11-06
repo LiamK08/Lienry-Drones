@@ -9,8 +9,8 @@ import { Reveal } from "@/components/ui/Reveal";
 // to stay compact), Band's compact pad. "tight" is retired into "section".
 const pads = { section: "section", tight: "section", page: "compact" } as const;
 
-/** A heading is a statement without a closing full stop (a question keeps its mark). */
-const noStop = (s: string) => s.replace(/\.\s*$/, "");
+/** A one-sentence heading has no closing full stop (a question keeps its mark); two sentences keep both. */
+const noStop = (s: string) => (/[.?!]\s/.test(s) ? s : s.replace(/\.\s*$/, ""));
 
 /**
  * The questions, split: from 1024 the head holds columns 1 to 4 and stays in view under the bar while

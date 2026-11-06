@@ -1,4 +1,4 @@
-# Handoff, 28 October 2026
+# Handoff, 6 November 2026
 
 Read this first in a new session, then `CLAUDE.md`. Update this file at the end of each session.
 
@@ -288,7 +288,25 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
   names, so a wrong name fails typecheck; the line icons (`blocks/Icon.tsx`) stay for the pages' cards and
   strips. PR frames: `docs/screenshots/menu-icons/`. Gates: typecheck, lint, build; `check:layout`, `check:rules`
   (motion) and `check:a11y` on all 12 routes; `perf:vitals` alone on all 11 pages (/platform the closest, 2.47s).
-
+- 6 November (owner's request: review refresh.tech's new changes and Lienry's site, then "make the professional
+  changes"): the review is `docs/reviews/2026-11-06-refresh-and-lienry.md`; five builders made its chosen
+  changes in parallel worktrees, each owning its own files. Shared: the compact accent close (about 1000px, a
+  white pill and a white text link on the `.on-accent` surface), the FAQ split (heading in its own sticky
+  column from 1024, serif questions on hairline rows), and the footer as a night sheet with 20px top corners
+  (a 20px `data-foot-ground` strip takes the last band's colour so the corners never notch). Home: the how
+  stage framed as one instrument with its tabs under it, Explore as one even grid of card links (`ButtonFace`
+  pills, the kind on the right), outline pills on the system cards, the booking card shorter on phones.
+  Menus: each panel has a feature card (Platform accent with a Demo-data facade map, Solutions tint with the
+  fit check's opening state), a dim scrim under an open desktop panel (no blur: it halved the film's frame
+  rate), and the phone menu as 56px rows. Tools: `ToolHero` for /fit-check and /calculator, the raised fit
+  check card with its result inset, a progress head on /fit-check, tool FAQs and closes, and an "In short"
+  aside on /privacy. Product: `ProductHero` puts the software window in /platform's and /download's first
+  screen; `PanelPair` (what it needs, how it is kept safe) replaces the platform statement band. Company: the
+  story as one tint panel with `PictureFan` and `PlanTimeline` (five stages, no dates or amounts), and the
+  round as three facts. Solution pages: every feature row is its own tint or white band with a coded
+  Demo-data `RowPanel` card over its picture (this supersedes the 20 October "one white features run"),
+  heroes and closes with a second path to the fit check, and safety and figures as night panels.
+GATES_PLACEHOLDER
 ## How the owner works
 
 - They want results fast. Prefer to build, check, commit and push over long plans or multi-agent
@@ -360,15 +378,21 @@ NODE_USE_ENV_PROXY=1 node scripts/perf-vitals.mjs http://localhost:3000 [routes]
 
 ## Building blocks
 
-- **Pattern blocks** (`src/components/blocks`): `SplitHero` (platform, fit check, calculator),
-  `CenterHero` (solution pages), `BubbleHero` (company), `WordStrip`, `FeatureRows` (alternating rows
-  with checks, callout, fact strip, or a node such as the software window), `PillarTabs` (the six
-  parts; each panel id is the footer anchor), `SafetyBlock`, `AccentPanel` (inset or full bleed),
-  `FaqCentered` and `FaqRows`, `LegalToc`, `FitCheck`, `Icon`,
-  `holdLines`; from the second pass `TitleHero` (/calculator; it takes children under its lead),
-  `FiguresPanel` (cited figures in the solutions paper band), `SplitHero variant="compact"`,
-  `FeatureRows variant="solutions"`, `FitCheck layout="column"`, `CostCalculator layout="listing"`,
-  `EnquiryTypeTabs` (with `EnquiryTypeProvider`).
+- **Pattern blocks** (`src/components/blocks`): `ProductHero` (/platform and /download: centred head, then
+  the software window in a framed glass tray), `ToolHero` (/fit-check and /calculator: tint hero, the tool
+  under the lead), `CenterHero` (solution pages, with a `secondary` path), `BubbleHero` (company),
+  `WordStrip`, `FeatureRows` (alternating rows with checks, callout, fact strip, a node such as the software
+  window, or a coded Demo-data `RowPanel` card over the picture; the solutions variant gives every row its
+  own tint or white band), `PillarTabs` (the six parts; each panel id is the footer anchor), `PanelPair`
+  (/platform's what-it-needs and safety cards), `SafetyBlock` (a night panel of four tiles), `AccentPanel`
+  (the compact inset close with an optional white `secondary` link on its `.on-accent` surface, or the full
+  bleed band), `FaqCentered` (the heading in its own sticky column from 1024, with `intro` and `link`) and
+  `FaqRows` (serif questions on hairline rows), `LegalToc`, `FitCheck` (`head="progress"` and `resultAfter`
+  on /fit-check), `Icon`, `holdLines`, `FiguresPanel`, `CostCalculator layout="listing"`, `EnquiryTypeTabs`
+  (with `EnquiryTypeProvider`). `ui/Button` exports `ButtonFace`, the pill drawn inside a card link that
+  names itself `group/card`.
+- **Company** (`src/components/company`): `PictureFan` (three framed stills) and `PlanTimeline` (the five
+  plan stages as tabs on a ruler, no dates or amounts).
 - **Home** (`src/components/home`): `Hero`, `Strip` (marquee), `WhyFit`, `ExpandCards`, `StepTimer`,
   `SystemCards`, `Explore`, `SafetyPanel`, `FaqForm`; `DemoPanels` (the coded panels in the reason
   cards and the step stage); `WashMap` (the Clean step's hands-on map), `DroneGlyph` (the intro's
