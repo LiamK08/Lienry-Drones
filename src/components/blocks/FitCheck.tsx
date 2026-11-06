@@ -128,7 +128,7 @@ export function FitCheck({ id = "fit", head = "inline", resultAfter = false }: F
           <p className="mt-2 max-w-none text-body leading-[1.6] text-muted">{fitCheck.intro}</p>
         </div>
       )}
-      <div className={`px-5 pb-5 md:px-10 md:pb-10 lg:col-start-1 lg:px-12 lg:pb-12 ${progress ? "pt-6 lg:row-start-1 lg:pt-[3.75rem]" : "pt-2 lg:row-start-2 lg:pt-2"}`}>
+      <div className={`px-5 pb-5 md:px-10 md:pb-10 lg:col-start-1 lg:px-12 lg:pb-12 ${progress ? "pt-6 lg:row-start-1 lg:pt-11 xl:pt-[3.75rem]" : "pt-2 lg:row-start-2 lg:pt-2"}`}>
         {progress ? <AnsweredBar answered={answered} count={count} /> : null}
         {fitCheck.groups.map((g, gi) => (
           <fieldset key={g.label} className={progress && gi === 0 ? "mt-4" : "mt-6 md:mt-8"}>
@@ -300,7 +300,7 @@ function ZoneBar({ pct, zone: at, done, className = "" }: { pct: number; zone: Z
             <span
               key={z.id}
               style={{ flexBasis: `${to - z.from}%` }}
-              className={`min-w-0 grow whitespace-nowrap text-[0.75rem] leading-[1.3] transition-[color] duration-300 motion-reduce:transition-none sm:text-caption ${align} ${at === z.id ? zoneTone[z.id].text : "text-muted"} ${at === z.id && done ? "font-semibold" : ""}`}
+              className={`min-w-0 grow whitespace-nowrap max-[359px]:whitespace-normal text-[0.75rem] leading-[1.3] transition-[color] duration-300 motion-reduce:transition-none sm:text-caption ${align} ${at === z.id ? zoneTone[z.id].text : "text-muted"} ${at === z.id && done ? "font-semibold" : ""}`}
             >
               {z.label}
             </span>

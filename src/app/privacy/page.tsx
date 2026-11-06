@@ -52,8 +52,8 @@ function InShort({ lines }: { lines: readonly string[] }) {
       aria-labelledby="in-short-heading"
       className="mt-8 rounded-card bg-paper p-6 lg:sticky lg:top-[calc(var(--nav-h)+2rem)] lg:col-span-3 lg:col-start-10 lg:row-span-2 lg:row-start-1 lg:mt-0 lg:self-start"
     >
-      {/* A heading (the serif's smallest step, as the sections' are), so the sticky block holds one. */}
-      <h2 id="in-short-heading" className="text-[1.25rem] leading-[1.3]">
+      {/* A heading at the policy sections' own step, so the sticky block holds one. */}
+      <h2 id="in-short-heading" className="text-[1.375rem] leading-[1.25] lg:text-[1.5rem]">
         In short
       </h2>
       <ul className="mt-3 border-t border-line">

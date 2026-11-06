@@ -262,7 +262,7 @@ export const explore = {
   cards: [
     { id: "commercial", kind: "Solutions", tag: "Commercial", title: "A capsule on the roof, and nobody on a rope", href: "/commercial", image: { id: "c1-commercial-hero", alt: "The roof capsule on a plant deck at dawn", position: "75% 50%" } },
     { id: "homes", kind: "Solutions", tag: "Homes", title: "Homes and rentals, cleaned from your phone", href: "/homes-and-rentals", image: { id: "ho1-homes-hero", alt: "The ground pod beside a house, the drone washing a window", position: "45% 50%" } },
-    { id: "solar", kind: "Solutions", tag: "Solar", title: "Solar panels at the right pressure", href: "/solar", image: { id: "so2-solar-closeup", alt: "Water beading on a clean solar panel", position: "50% 50%" } },
+    { id: "solar", kind: "Solutions", tag: "Solar", action: "See solar", title: "Solar panels at the right pressure", href: "/solar", image: { id: "so2-solar-closeup", alt: "Water beading on a clean solar panel", position: "50% 50%" } },
     { id: "soiling", kind: "Solutions", tag: "Soiling", action: "See the figures", title: "What dust costs a solar array", href: "/solar#soiling", image: { id: "so1-solar-hero", alt: "The drone washing a row of ground-mounted solar panels in the morning mist", position: "60% 55%" } },
     { id: "platform", kind: "Platform", tag: "Six parts", action: "See the platform", title: "Six parts of one platform", href: "/platform", image: { id: "m2-capsule-master", alt: "The roof capsule open, the drone on its cradle", position: "50% 50%" } },
     { id: "dock", kind: "Platform", tag: "Dock", title: "A home on the property", href: "/platform#dock", image: { id: "s1-dock", alt: "The roof capsule's lid closing over the drone on a wet roof", position: "50% 55%" } },
@@ -271,7 +271,7 @@ export const explore = {
     { id: "fit-check", kind: "Tools", tag: "Fit check", title: "Seven questions: is your building a fit?", href: "/fit-check", image: { id: "p5-solar-farm", alt: "The drone low over a solar farm row", position: "50% 60%" } },
     { id: "calculator", kind: "Tools", tag: "Calculator", title: "What outsourced cleaning adds up to", href: "/calculator", image: { id: "f4-dock", alt: "Rain beading on the closed lid of the roof capsule", position: "50% 50%" } },
     { id: "company", kind: "Company", tag: "Our story", title: "Why we are building Lienry", href: "/company", image: { id: "co1-company", alt: "A harbour-side street of mid-rise buildings at dawn", position: "50% 50%" } },
-    { id: "round", kind: "Company", tag: "Pre-seed", title: "Concept stage, raising pre-seed, with a pilot next", href: "/company#round", image: { id: "f1-tether", alt: "The tether's metal coupling where it enters the underside of the drone", position: "43% 45%" } },
+    { id: "round", kind: "Company", tag: "Pre-seed", action: "See the round", title: "Concept stage, raising pre-seed, with a pilot next", href: "/company#round", image: { id: "f1-tether", alt: "The tether's metal coupling where it enters the underside of the drone", position: "43% 45%" } },
   ],
 };
 

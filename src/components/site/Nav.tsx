@@ -291,7 +291,7 @@ export function Nav() {
             <motion.div
               key="sheet"
               id={panelId}
-              className="absolute inset-x-0 top-[var(--nav-h)] z-40 max-h-[calc(100svh-var(--nav-h))] overflow-y-auto border-b border-line bg-white px-(--page-margin) pb-3 text-ink shadow-[0_24px_40px_-24px_rgb(17_26_34/0.25)] lg:hidden"
+              className="absolute inset-x-0 top-[var(--nav-h)] z-40 max-h-[calc(100svh-var(--nav-h))] overflow-y-auto border-b border-line bg-white px-(--page-margin) pb-3 pt-1 text-ink shadow-[0_24px_40px_-24px_rgb(17_26_34/0.25)] lg:hidden"
               initial={reduce ? false : { opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8, transition: { duration: 0.16, ease: [0.4, 0, 1, 1] } }}

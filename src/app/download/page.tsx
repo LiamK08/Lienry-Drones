@@ -27,8 +27,9 @@ export default function DownloadPage() {
   return (
     <>
       {/* Measured from 360 to 412 in both fonts: the lead holds three lines below 384 and two from there;
-          the h1 holds none, as before (one line from 370, two in the web font below it). */}
+          the h1 is one line from 370 and holds two below it, where the web font wraps it. */}
       <ProductHero
+        narrowLines={2}
         leadLines={{ narrow: 3, phone: 2, wide: 2 }}
         headline={hero.headline}
         emphasis={hero.emphasis}

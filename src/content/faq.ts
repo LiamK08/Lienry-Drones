@@ -139,5 +139,5 @@ export const faqFor = (set: keyof typeof faqSets, here?: string): FaqEntry[] =>
     return here && item.link?.href === here ? { ...item, link: undefined } : item;
   });
 
-/** The home FAQ's link to the full set on /platform. */
-export const homeFaqLink = { label: "All questions", href: "/platform#faq" };
+/** The tool pages' link on to the platform's own set of questions. */
+export const homeFaqLink = { label: "More questions", href: "/platform#faq" };

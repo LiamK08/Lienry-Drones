@@ -146,7 +146,7 @@ export function StepTimer() {
             </div>
             {/* The tabs under the stage, inside the frame. Below 360 the frame's inset and the tabs' own pad
                 narrow, so the five short names keep their row. */}
-            <div className="px-3 pb-3 pt-4 max-[359px]:px-1.5 md:px-6 md:pb-4 md:pt-5">
+            <div className="px-3 pb-3 pt-4 max-[374px]:px-1.5 md:px-6 md:pb-4 md:pt-5">
               <div role="tablist" aria-label={how.label} className="relative grid grid-cols-5 gap-(--tab-gap) [--tab-gap:0.25rem] md:[--tab-gap:1.25rem]" style={{ "--i": active } as CSSProperties}>
                 {/* The chosen tab's marker, a white tile on the paper frame: it glides to the next choice in
                     250ms (a jump under reduced motion). */}

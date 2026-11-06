@@ -7,8 +7,8 @@ import { Picture } from "@/components/ui/Picture";
 // and 3 degrees at 11rem, so only the last overlaps there.
 const cards = [
   { width: "w-44 md:w-[15rem] lg:w-[18rem] xl:w-[22rem]", rest: "-4deg", fan: "-5.5deg", sm: "", phone: false, overlap: "" },
-  { width: "w-44 md:w-[14rem] lg:w-[16.5rem] xl:w-[20rem]", rest: "1deg", fan: "2.5deg", sm: "-3deg", phone: true, overlap: "md:-ml-10" },
-  { width: "w-44 md:w-[15rem] lg:w-[18rem] xl:w-[22rem]", rest: "4deg", fan: "5.5deg", sm: "3deg", phone: true, overlap: "-ml-10" },
+  { width: "w-44 max-[374px]:w-36 md:w-[14rem] lg:w-[16.5rem] xl:w-[20rem]", rest: "1deg", fan: "2.5deg", sm: "-3deg", phone: true, overlap: "md:-ml-10" },
+  { width: "w-44 max-[374px]:w-36 md:w-[15rem] lg:w-[18rem] xl:w-[22rem]", rest: "4deg", fan: "5.5deg", sm: "3deg", phone: true, overlap: "-ml-10" },
 ] as const;
 
 /**

@@ -13,6 +13,9 @@ export type ProductHeroProps = {
   lead: string;
   /** Lines the h1 holds on phones (its fallback-font wrap, the larger of the two from 360 to 412). */
   mobileLines?: number;
+  /** Lines the h1 holds below 370 only, where the web font wraps it one line more than the fallback
+   *  (Lienry Desktop's one-line headline). */
+  narrowLines?: number;
   /** Lines the lead holds below 384 (`narrow`, default `phone`), from 384 to 767 (`phone`) and from 768
    *  (`wide`): Inter and its fallback wrap it differently, so the larger count of the two in each range. */
   leadLines?: { narrow?: number; phone: number; wide: number };
@@ -32,8 +35,11 @@ export type ProductHeroProps = {
  * The window's poster is the page's LCP image (`priority`). The h1 and the lead hold their fallback-font
  * line counts, so the web fonts arriving never move the window.
  */
-export function ProductHero({ headingId = "hero-heading", headline, emphasis, lead, mobileLines, leadLines, actions }: ProductHeroProps) {
-  const hold = holdLines(mobileLines);
+export function ProductHero({ headingId = "hero-heading", headline, emphasis, lead, mobileLines, narrowLines, leadLines, actions }: ProductHeroProps) {
+  const base = holdLines(mobileLines);
+  const hold = narrowLines
+    ? { className: `${base.className} max-[370px]:min-h-[calc(var(--h1-narrow)*1lh)]`, style: { ...base.style, "--h1-narrow": narrowLines } as CSSProperties }
+    : base;
   const leadHold = leadLines
     ? {
         className: "max-[23.99rem]:min-h-[calc(var(--lead-narrow)*1lh)] min-[24rem]:max-md:min-h-[calc(var(--lead-phone)*1lh)] md:min-h-[calc(var(--lead-wide)*1lh)]",

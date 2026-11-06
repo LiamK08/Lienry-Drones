@@ -61,8 +61,6 @@ export const platformPage = {
       linkStyle: "primary" as const,
       aspect: "16/9" as const,
       image: { id: "m3-pod-master", alt: "The Lienry ground pod open beside a garden tap, the home drone inside", position: "35% 50%" },
-      // A Demo-data card over the lawn, away from the pod: the re-scan finding where to clean.
-      panel: { id: "more-often", corner: "end" } as const,
     },
   ],
   // The honest stand-in for the reference's integrations and security pair: what the site supplies, and

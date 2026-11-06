@@ -53,7 +53,10 @@ export function PlanTimeline({ id, label, stages }: { id: string; label: string;
     const stem = document.getElementById(`${id}-tab-${stages[active].id}`);
     if (!el || !stem || el.scrollWidth <= el.clientWidth) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    el.scrollTo({ left: stem.offsetLeft + stem.offsetWidth / 2 - el.clientWidth / 2, behavior: reduce ? "auto" : "smooth" });
+    // Rects include the stem's centring transform and the track's padding.
+    const r = stem.getBoundingClientRect();
+    const b = el.getBoundingClientRect();
+    el.scrollTo({ left: el.scrollLeft + (r.left + r.width / 2) - (b.left + b.width / 2), behavior: reduce ? "auto" : "smooth" });
   }, [active, id, stages]);
 
   const select = (i: number, focus = false) => {
@@ -69,7 +72,7 @@ export function PlanTimeline({ id, label, stages }: { id: string; label: string;
           from 768. */}
       <div ref={scrollRef} className="no-scrollbar -mx-6 overflow-x-auto px-6 py-1 md:order-2 md:mx-0 md:mt-8 md:overflow-visible md:px-0 md:py-0">
         <div role="tablist" aria-label={label} className="relative h-[13.5rem] w-[37.5rem] md:w-full">
-          <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-10 h-7">
+          <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-10 h-7 forced-colors:border-b forced-colors:border-[CanvasText]">
             <div className="absolute inset-y-0 left-0" style={{ width: `${nowAt}%`, ...ticks(INK_30) }} />
             <div className="absolute inset-y-0" style={{ left: `${nowAt}%`, width: `${lineEnd - nowAt}%`, ...ticks(ACCENT_40) }} />
             {offLine ? <div className="absolute bottom-3.5 right-0 border-t border-dashed border-accent/50" style={{ left: `${lineEnd}%` }} /> : null}
@@ -91,6 +94,10 @@ export function PlanTimeline({ id, label, stages }: { id: string; label: string;
                 onClick={() => select(i)}
                 onPointerEnter={(e) => {
                   if (e.pointerType !== "mouse" || on) return;
+                  // Not on the sideways ruler: it scrolls itself to the pick, which would slide the next
+                  // stem under a still pointer and pick that one too.
+                  const track = scrollRef.current;
+                  if (track && track.scrollWidth > track.clientWidth) return;
                   window.clearTimeout(timer.current);
                   timer.current = window.setTimeout(() => select(i), INTENT_MS);
                 }}
@@ -113,14 +120,14 @@ export function PlanTimeline({ id, label, stages }: { id: string; label: string;
                   </span>
                   <span
                     className={`mt-2 rounded-pill transition-[width,height,background-color] duration-[250ms] ease-instrument motion-reduce:transition-none ${
-                      on ? "size-2.5 bg-accent ring-2 ring-white" : `size-1.5 ${tone} group-hover/stem:bg-ink`
+                      on ? "size-2.5 bg-accent ring-2 ring-white forced-colors:bg-[Highlight]" : `size-1.5 ${tone} group-hover/stem:bg-ink forced-colors:bg-[CanvasText]`
                     }`}
                   />
                   <span
                     className={`transition-[height,background-color,border-color] duration-[250ms] ease-instrument motion-reduce:transition-none ${on ? (dashed ? "h-[7.125rem]" : "h-32") : dashed ? "h-[5.125rem]" : "h-24"} ${
                       dashed
-                        ? `w-0 border-l-2 border-dashed ${on ? "border-accent" : "border-accent/50 group-hover/stem:border-ink"}`
-                        : `w-0.5 ${on ? "bg-accent" : `${tone} group-hover/stem:bg-ink`}`
+                        ? `w-0 border-l-2 border-dashed ${on ? "border-accent forced-colors:border-[Highlight]" : "border-accent/50 group-hover/stem:border-ink"}`
+                        : `w-0.5 ${on ? "bg-accent forced-colors:bg-[Highlight]" : `${tone} group-hover/stem:bg-ink forced-colors:bg-[CanvasText]`}`
                     }`}
                   />
                 </span>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { FaqItem } from "@/components/sections/Faq";
+import { FaqHashOpen } from "@/components/blocks/FaqHashOpen";
 
 /**
  * The site's one FAQ treatment: hairline rows, no cards. Each question is a display line (PT Serif, 20px,
@@ -8,16 +9,17 @@ import type { FaqItem } from "@/components/sections/Faq";
  * Native `details`, so it works without JavaScript and find-in-page reaches closed answers; where the
  * browser can, the answer's height animates open (globals.css, off under reduced motion). The answer is
  * body copy (16/1.6, muted) at the prose measure: it opens with a line, may list labelled points and close
- * with a line, and ends with its link when it has one.
+ * with a line, and ends with its link when it has one. An address that names a row opens it (FaqHashOpen).
  */
 export function FaqRows({ id, items }: { id: string; items: readonly FaqItem[] }) {
   return (
     <div data-accordion="">
+      <FaqHashOpen />
       {items.map((item, i) => (
         <details
           key={item.id}
           id={`${id}-${item.id}`}
-          className={`group border-b border-line transition-[border-color] duration-200 ease-instrument has-[>summary:hover]:border-b-border-strong motion-reduce:transition-none ${i === 0 ? "border-t" : ""}`}
+          className={`group border-b border-line transition-[border-color] duration-200 ease-instrument [@media(hover:hover)]:has-[>summary:hover]:border-b-border-strong motion-reduce:transition-none ${i === 0 ? "border-t" : ""}`}
         >
           <summary className="group/q flex cursor-pointer list-none items-center justify-between gap-6 py-[1.375rem] [&::-webkit-details-marker]:hidden">
             <span className="font-display text-[1.125rem] leading-[1.3] tracking-[-0.01em] text-ink underline decoration-transparent decoration-1 underline-offset-4 transition-[text-decoration-color] duration-200 group-hover/q:decoration-current motion-reduce:transition-none md:text-[1.25rem]">
