@@ -9,9 +9,15 @@ import { Reveal } from "@/components/ui/Reveal";
 // to stay compact), Band's compact pad. "tight" is retired into "section".
 const pads = { section: "section", tight: "section", page: "compact" } as const;
 
+/** A heading is a statement without a closing full stop (a question keeps its mark). */
+const noStop = (s: string) => s.replace(/\.\s*$/, "");
+
 /**
- * The questions, centred: the heading at the inner section step (36, no italic: the accent italic is
- * the page h1's alone), then the rows on the 12-column grid, 8 columns wide from 1024 (6 when `narrow`).
+ * The questions, split: from 1024 the head holds columns 1 to 4 and stays in view under the bar while
+ * the rows scroll past in columns 6 to 12; below 1024 the head sits above the rows, 32px over them, and
+ * never beside them. The head is the heading at the inner section step (36, left-aligned, no italic: the
+ * accent italic is the page h1's alone), then the optional `intro` line and `link`. Nothing is centred.
+ * The name keeps its history: the questions were once a centred column.
  */
 export function FaqCentered({
   id = "faq",
@@ -31,7 +37,7 @@ export function FaqCentered({
   /** @deprecated Use spacing="section". */
   tight?: boolean;
   spacing?: keyof typeof pads;
-  /** @deprecated Ignored. */
+  /** @deprecated Ignored: every FAQ is the split. */
   narrow?: boolean;
   /** A short line under the heading. */
   intro?: string;
@@ -43,21 +49,23 @@ export function FaqCentered({
     <Band id={id} tone={tone} pad={pads[space]} labelledBy={`${id}-heading`}>
       <Container>
         <div className="lg:grid-12">
-          <div className="lg:col-span-8 lg:col-start-3">
-            <Reveal animate y={10} className="flex flex-col items-center text-center">
+          <div className="lg:sticky lg:top-[calc(var(--nav-h)+2rem)] lg:col-span-4 lg:self-start">
+            <Reveal animate y={10}>
               <h2 id={`${id}-heading`} className="text-h2s">
-                {headline}
+                {noStop(headline)}
               </h2>
               {intro ? <p className="mt-4 text-body leading-[1.6] text-fg-muted">{intro}</p> : null}
               {link ? (
-                <Button href={link.href} variant="tertiary" arrow className="mt-4">
-                  {link.label}
-                </Button>
+                <div className="mt-6">
+                  <Button href={link.href} variant="tertiary" arrow>
+                    {link.label}
+                  </Button>
+                </div>
               ) : null}
             </Reveal>
-            <div className="mt-10">
-              <FaqRows id={id} items={items} />
-            </div>
+          </div>
+          <div className="mt-8 lg:col-span-7 lg:col-start-6 lg:mt-0">
+            <FaqRows id={id} items={items} />
           </div>
         </div>
       </Container>

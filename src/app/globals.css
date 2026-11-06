@@ -233,6 +233,15 @@
     --s-action-edge: transparent; /* composites to rgb(198,198,197): 3.51:1 on the brightest frame, 10.16:1 on ink */
   }
 
+  /* On the accent fill (the closing panel, with .on-dark): a text link is white, 6.99:1, and only its
+     underline answers the hover (1px to 2px), so it never turns the pale on-dark link colour; the focus
+     ring is white too. Must follow .on-dark. */
+  .on-accent {
+    --s-link: var(--color-white);
+    --s-link-hover: var(--color-white);
+    --s-focus: var(--color-white);
+  }
+
   /* The UA centres button text. Button labels centre by flex instead, so no text is centred
      anywhere outside the home hero. */
   button {
@@ -440,6 +449,18 @@
       }
     }
   }
+
+  /* The footer is a sheet with the panel's corners on top (Footer.tsx). Behind them, its ground strip
+     takes the tone of the band the page ends on, so a corner never shows a white notch against a
+     coloured last band; white (plaster) unless that band says otherwise. */
+  [data-foot-ground] {
+    background-color: var(--color-plaster);
+  }
+  #main:has(> :last-child[data-tone="paper"]) ~ [data-foot-ground] { background-color: var(--color-paper); }
+  #main:has(> :last-child[data-tone="mist"]) ~ [data-foot-ground] { background-color: var(--color-mist); }
+  #main:has(> :last-child[data-tone="tint"]) ~ [data-foot-ground] { background-color: var(--color-tint); }
+  #main:has(> :last-child[data-tone="ink"]) ~ [data-foot-ground] { background-color: var(--color-ink); }
+  #main:has(> :last-child[data-tone="night"]) ~ [data-foot-ground] { background-color: var(--color-night); }
 
   /* The step timer's rule: fills left to right over one step. */
   @keyframes fill {

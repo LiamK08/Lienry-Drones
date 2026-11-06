@@ -2,28 +2,41 @@ import Link from "next/link";
 import type { FaqItem } from "@/components/sections/Faq";
 
 /**
- * The site's one FAQ treatment: each question a white card (the card corners and a 1px hairline edge,
- * so it reads on white and on paper alike, no shadow) with a plus in a round disc that turns to a cross
- * as the row opens (the disc fills). Native `details`, so it works without JavaScript and find-in-page
- * reaches closed answers; where the browser can, the answer's height animates open (globals.css, off
- * under reduced motion). The question is 16px medium; the answer body copy (16/1.6, muted) opens with a
- * line, may list labelled points and close with a line, and ends with its link when it has one.
+ * The site's one FAQ treatment: hairline rows, no cards. Each question is a display line (PT Serif, 20px,
+ * 18 below 768) with a 16px chevron at its right that turns over as the row opens; a hairline runs above
+ * the first row and under every row, and darkens to the strong border while its question is hovered.
+ * Native `details`, so it works without JavaScript and find-in-page reaches closed answers; where the
+ * browser can, the answer's height animates open (globals.css, off under reduced motion). The answer is
+ * body copy (16/1.6, muted) at the prose measure: it opens with a line, may list labelled points and close
+ * with a line, and ends with its link when it has one.
  */
 export function FaqRows({ id, items }: { id: string; items: readonly FaqItem[] }) {
   return (
-    <div data-accordion="" className="flex flex-col gap-3">
-      {items.map((item) => (
-        <details key={item.id} id={`${id}-${item.id}`} className="group rounded-card border border-line bg-white">
-          <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-6 py-3 pl-5 pr-3 text-body font-medium leading-[1.4] text-ink [&::-webkit-details-marker]:hidden">
-            <span className="underline decoration-transparent decoration-1 underline-offset-4 transition-[text-decoration-color] duration-200 group-hover:decoration-current motion-reduce:transition-none">{item.q}</span>
-            <span aria-hidden="true" className="flex size-8 shrink-0 items-center justify-center rounded-pill bg-paper transition-[background-color] duration-200 group-open:bg-tint motion-reduce:transition-none">
-              <span className="relative size-3.5 text-ink transition-[rotate] duration-200 ease-instrument group-open:rotate-45 motion-reduce:transition-none">
-                <span className="absolute left-0 top-1/2 h-[1.5px] w-3.5 -translate-y-1/2 bg-current" />
-                <span className="absolute left-1/2 top-0 h-3.5 w-[1.5px] -translate-x-1/2 bg-current" />
-              </span>
+    <div data-accordion="">
+      {items.map((item, i) => (
+        <details
+          key={item.id}
+          id={`${id}-${item.id}`}
+          className={`group border-b border-line transition-[border-color] duration-200 ease-instrument has-[>summary:hover]:border-b-border-strong motion-reduce:transition-none ${i === 0 ? "border-t" : ""}`}
+        >
+          <summary className="group/q flex cursor-pointer list-none items-center justify-between gap-6 py-[1.375rem] [&::-webkit-details-marker]:hidden">
+            <span className="font-display text-[1.125rem] leading-[1.3] tracking-[-0.01em] text-ink underline decoration-transparent decoration-1 underline-offset-4 transition-[text-decoration-color] duration-200 group-hover/q:decoration-current motion-reduce:transition-none md:text-[1.25rem]">
+              {item.q}
             </span>
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 16 16"
+              className="size-4 shrink-0 text-ink transition-[rotate] duration-200 ease-instrument group-open:rotate-180 motion-reduce:transition-none"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M3.5 6 8 10.5 12.5 6" />
+            </svg>
           </summary>
-          <FaqAnswer item={item} className="px-5 pb-5 pr-14 text-body leading-[1.6] text-fg-muted" />
+          <FaqAnswer item={item} className="pb-6 pr-10 text-body leading-[1.6] text-fg-muted" />
         </details>
       ))}
     </div>

@@ -38,16 +38,28 @@ function Circles({ hidden }: { hidden?: boolean }) {
 const head = "text-caption font-medium leading-[1.2] text-muted-on-dark";
 
 /**
- * The footer, on near-black: a row of round pictures drifting slowly across the top over a faint
- * accent glow, then, on the page's rail, the logo (the link home, whose mark builds on hover or focus as
- * in the intro) with the tagline in Inter italic and, at the right, one row of "Ask AI about Lienry"
- * pills, four link columns under small grey headings (two by two on phones), a hairline, and the
- * copyright line with the legal links. Under reduced motion the row stands still. Condensed on 23
+ * The footer, a sheet of flat near-black with the panel's corners on top (20px): the page ends on a
+ * finished edge. Behind the corners, a 20px ground strip (aria-hidden, no flow height) takes the tone of
+ * the band the page ends on (globals.css), so a corner never shows a white notch against paper. In the
+ * sheet: a row of round pictures drifting slowly across the top over a faint accent glow, then, on the
+ * page's rail, the logo (the link home, whose mark builds on hover or focus as in the intro) with the
+ * tagline in Inter italic and, at the right, one row of "Ask AI about Lienry" pills (names, never the
+ * assistants' marks), four link columns under small grey headings (two by two on phones), a hairline, and
+ * the copyright line with the legal links. Under reduced motion the row stands still. Condensed on 23
  * October at the owner's request: smaller pictures, logo and gaps.
  */
 export function Footer() {
   return (
-    <footer data-tone="ink" className="on-dark relative isolate overflow-hidden bg-night pb-16 text-white md:pb-8">
+    <>
+      <div aria-hidden="true" data-foot-ground="" className="-mb-5 h-5" />
+      <FooterSheet />
+    </>
+  );
+}
+
+function FooterSheet() {
+  return (
+    <footer data-tone="ink" className="on-dark relative isolate overflow-hidden rounded-t-panel bg-night pb-16 text-white md:pb-8">
       <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-12 -z-10 size-[26rem] -translate-x-1/2 rounded-pill bg-accent/[0.12] blur-[110px] md:top-16 md:size-[38rem]" />
       <div aria-hidden="true" className="flex overflow-hidden pt-16 md:pt-[4.5rem]">
         <div className="marquee flex w-max [animation-duration:30s] md:[animation-duration:60s]">

@@ -47,22 +47,29 @@ const off: Record<ButtonVariant, string> = {
 
 const arrowPath = <path d="M3 8h10M8.5 3.5 13 8l-4.5 4.5" />;
 
+// Inside a whole-card link (ButtonFace) the card is the pointer's target: a card that names itself
+// `group/card` drives the face's roll, badge, arrow and press with its own hover, keyboard focus and press.
+const cardRollOut = "group-hover/card:-translate-y-full group-focus-visible/card:-translate-y-full motion-reduce:group-hover/card:translate-y-0 motion-reduce:group-focus-visible/card:translate-y-0";
+const cardRollIn = "group-hover/card:translate-y-0 group-focus-visible/card:translate-y-0";
+const cardPress = "group-active/card:translate-y-px motion-reduce:group-active/card:translate-y-0";
+
 /**
  * The round badge a pill leads with: white with an accent arrow on the accent primary (inverted, it turns
  * accent as the pill turns white), the accent with a white arrow on a white pill (deepening on hover).
  */
-function Badge({ variant, size, invert = false }: { variant: ButtonVariant; size: ButtonSize; invert?: boolean }) {
+function Badge({ variant, size, invert = false, card = false }: { variant: ButtonVariant; size: ButtonSize; invert?: boolean; card?: boolean }) {
   const fade = "transition-[background-color,color] duration-200 motion-reduce:transition-none";
   const tone =
     variant === "primary"
       ? `bg-white text-accent ${invert ? `${fade} group-hover/btn:bg-accent group-hover/btn:text-white` : ""}`
-      : `bg-accent text-white ${fade} group-hover/btn:bg-accent-hover group-aria-disabled/btn:bg-muted`;
+      : `bg-accent text-white ${fade} group-hover/btn:bg-accent-hover group-aria-disabled/btn:bg-muted${card ? " group-hover/card:bg-accent-hover group-focus-visible/card:bg-accent-hover" : ""}`;
   const dim = size === "sm" ? "size-6" : size === "md" ? "size-[2.125rem]" : "size-9";
+  const slide = card ? " group-hover/card:translate-x-0.5 group-focus-visible/card:translate-x-0.5 motion-reduce:group-hover/card:translate-x-0 motion-reduce:group-focus-visible/card:translate-x-0" : "";
   return (
     <span aria-hidden="true" className={`flex ${dim} shrink-0 items-center justify-center rounded-pill ${tone}`}>
       <svg
         viewBox="0 0 16 16"
-        className="size-3.5 transition-transform duration-200 ease-instrument group-hover/btn:translate-x-0.5 motion-reduce:transition-none motion-reduce:group-hover/btn:translate-x-0"
+        className={`size-3.5 transition-transform duration-200 ease-instrument group-hover/btn:translate-x-0.5 motion-reduce:transition-none motion-reduce:group-hover/btn:translate-x-0${slide}`}
         fill="none"
         stroke="currentColor"
         strokeWidth="1.75"
@@ -75,11 +82,12 @@ function Badge({ variant, size, invert = false }: { variant: ButtonVariant; size
   );
 }
 
-function Arrow() {
+function Arrow({ card = false }: { card?: boolean }) {
+  const slide = card ? " group-hover/card:translate-x-1 group-focus-visible/card:translate-x-1 motion-reduce:group-hover/card:translate-x-0 motion-reduce:group-focus-visible/card:translate-x-0" : "";
   return (
     <svg
       viewBox="0 0 16 16"
-      className="h-3.5 w-3.5 shrink-0 transition-transform duration-200 ease-instrument group-hover/btn:translate-x-1 motion-reduce:transition-none motion-reduce:group-hover/btn:translate-x-0"
+      className={`h-3.5 w-3.5 shrink-0 transition-transform duration-200 ease-instrument group-hover/btn:translate-x-1 motion-reduce:transition-none motion-reduce:group-hover/btn:translate-x-0${slide}`}
       fill="none"
       stroke="currentColor"
       strokeWidth="1.5"
@@ -92,19 +100,38 @@ function Arrow() {
   );
 }
 
+// Pills roll their label up on hover: two copies in one clipped grid cell, the second (aria-hidden)
+// waiting a line below. Nothing is positioned, so contrast tools read the label against the pill.
+const roll = "[grid-area:1/1] flex items-center justify-center gap-2 transition-transform duration-300 ease-instrument motion-reduce:transition-none";
+
+function Label({ card = false, children }: { card?: boolean; children: ReactNode }) {
+  return (
+    <span className="[display:inline-grid] overflow-hidden">
+      <span className={`${roll} group-hover/btn:-translate-y-full motion-reduce:group-hover/btn:translate-y-0${card ? ` ${cardRollOut}` : ""}`}>{children}</span>
+      <span aria-hidden="true" className={`${roll} translate-y-full group-hover/btn:translate-y-0 motion-reduce:hidden${card ? ` ${cardRollIn}` : ""}`}>
+        {children}
+      </span>
+    </span>
+  );
+}
+
 /**
  * A pill's face without its element: Button's look, sizes, badge and label roll on a `<span>`, for a card
- * whose whole surface is the link (so no interactive element is nested). The card drives its states
- * through `className` (e.g. `group-hover/card:border-ink`). Carries `data-button={variant}` for the checks.
+ * whose whole surface is the link (so no interactive element is nested). The card names itself
+ * `group/card`: its hover and keyboard focus roll the label, deepen the badge and slide the arrow, and its
+ * press moves the face 1px down, as a pointer on the pill itself would. Colour changes are the card's to
+ * give, through `className` (e.g. `group-hover/card:border-ink group-hover/card:bg-ink
+ * group-hover/card:text-white`, with the same under `group-focus-visible/card:`). Carries
+ * `data-button={variant}` for the checks.
  */
 export function ButtonFace({ variant = "secondary", size = "md", arrow = false, className = "", children }: { variant?: ButtonVariant; size?: ButtonSize; arrow?: boolean; className?: string; children: ReactNode }) {
   const badge = arrow && variant !== "tertiary";
-  const cls = `${base} ${variant === "tertiary" ? "" : `${sizes[size]} ${pad[badge ? "badge" : "plain"][size]}`} ${variants[variant]} ${className}`;
+  const cls = `${base} ${cardPress} ${variant === "tertiary" ? "" : `${sizes[size]} ${pad[badge ? "badge" : "plain"][size]}`} ${variants[variant]} ${className}`;
   return (
     <span className={cls} data-button={variant}>
-      {badge ? <Badge variant={variant} size={size} /> : null}
-      {variant === "tertiary" ? children : <span>{children}</span>}
-      {arrow && variant === "tertiary" ? <Arrow /> : null}
+      {badge ? <Badge variant={variant} size={size} card /> : null}
+      {variant === "tertiary" ? children : <Label card>{children}</Label>}
+      {arrow && variant === "tertiary" ? <Arrow card /> : null}
     </span>
   );
 }
@@ -141,20 +168,7 @@ export function Button(props: ButtonProps) {
   // Inverted, the pill's own hover darkening gives way to the white turn (one hover background, no tie).
   const look = invert && variant === "primary" ? `${variants.primary.replace("hover:bg-action-hover", "")} hover:border-white hover:bg-white hover:text-accent` : variants[variant];
   const cls = `${base} ${variant === "tertiary" ? "" : `${sizes[size]} ${pad[badge ? "badge" : "plain"][size]}`} ${look} ${off[variant]} ${className}`;
-  // Pills roll their label up on hover: two copies in one clipped grid cell, the second (aria-hidden)
-  // waiting a line below. Nothing is positioned, so contrast tools read the label against the pill.
-  const roll = "[grid-area:1/1] flex items-center justify-center gap-2 transition-transform duration-300 ease-instrument motion-reduce:transition-none";
-  const label =
-    variant === "tertiary" ? (
-      children
-    ) : (
-      <span className="[display:inline-grid] overflow-hidden">
-        <span className={`${roll} group-hover/btn:-translate-y-full motion-reduce:group-hover/btn:translate-y-0`}>{children}</span>
-        <span aria-hidden="true" className={`${roll} translate-y-full group-hover/btn:translate-y-0 motion-reduce:hidden`}>
-          {children}
-        </span>
-      </span>
-    );
+  const label = variant === "tertiary" ? children : <Label>{children}</Label>;
   const content = (
     <>
       {badge ? <Badge variant={variant} size={size} invert={invert} /> : null}
