@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { preload } from "react-dom";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from "react";
 import { useCanRender3d, useMediaQuery, useOnScreen } from "@/lib/hooks";
 import { captureVariant, isCapture, now, onTick } from "@/lib/clock";
@@ -401,6 +402,9 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare", model
   const cells = live ? liveCells : M.demo.cells;
   const zoneShares = live ? shares : demoShares;
   const variant = wide ? "wide" : "tall";
+  // A first-screen window's phone poster is the page's LCP image there (/platform, /download): fetched
+  // from the head, ahead of the markup that names it. Phones only: from 768 the window shows the wide one.
+  if (priority) preload(`/video/${M.video}-tall-poster.webp`, { as: "image", type: "image/webp", fetchPriority: "high", media: "(max-width: 767px)" });
   const tall = capture === "tall";
   const showsPlaying = playing && !reduce;
   const complete = pct >= 100;
@@ -565,7 +569,7 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare", model
                     aria-hidden="true"
                     loading={priority ? "eager" : "lazy"}
                     fetchPriority={priority ? "high" : "auto"}
-                    decoding="async"
+                    decoding={priority ? "sync" : "async"}
                     className="pointer-events-none absolute inset-0 h-full w-full object-cover md:object-contain"
                   />
                 </picture>
