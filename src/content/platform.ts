@@ -3,14 +3,14 @@
 // `{ label, href }`. Facts come from docs/SITE-PLAN.md only.
 
 export const platformPage = {
+  // The page opens on the working software window (ProductHero), not a picture: the home film's still
+  // stays on home.
   hero: {
-    eyebrow: "The Lienry platform",
     headline: "One drone platform for every exterior you own",
     emphasis: "every exterior you own",
     lead: "A resident drone, its dock, a tether, a scan and the software that runs it. It maps the property, then cleans glass, panels, walls, roofing and driveways with nobody on site.",
     primary: { label: "Register interest", href: "/register-interest" },
     secondary: { label: "Check your building", href: "/fit-check" },
-    image: { id: "h0-hero-still", alt: "The Lienry drone finishing a glass wash at first light", position: "50% 50%" },
   },
   // Each tab panel's id is its part id, so the footer's /platform#dock ... #automation links land on it.
   parts: {
@@ -32,6 +32,9 @@ export const platformPage = {
       paragraphs: ["Glass, solar panels, render, roofing and paving all need different handling. The drone identifies each material as it cleans and sets the pressure to suit; you can change it in the software."],
       link: { label: "See the surfaces it cleans", href: "#faq" },
       image: { id: "m1-drone-master", alt: "The Lienry drone washing a glass wall, its spray bar, pad and rollers on the pane", position: "50% 50%" },
+      // A Demo-data card over the picture (FeatureRows' RowPanel): the pressure set for each material,
+      // on the clear glass at the picture's foot, away from the drone.
+      panel: { id: "right-pressure", corner: "end" } as const,
       facts: [
         { title: "Scan first", text: "The structure and dimensions are mapped before any clean." },
         { title: "Pressure by material", text: "Set by the software for each surface, adjustable." },
@@ -58,12 +61,41 @@ export const platformPage = {
       linkStyle: "primary" as const,
       aspect: "16/9" as const,
       image: { id: "m3-pod-master", alt: "The Lienry ground pod open beside a garden tap, the home drone inside", position: "35% 50%" },
+      // A Demo-data card over the lawn, away from the pod: the re-scan finding where to clean.
+      panel: { id: "more-often", corner: "end" } as const,
     },
   ],
-  statement: { headline: "Every clean is planned on a model of the building, and nobody has to be on site", action: { label: "Register interest", href: "/register-interest" } },
+  // The honest stand-in for the reference's integrations and security pair: what the site supplies, and
+  // how the design keeps people off ropes. Every tile is a design fact already on the site; no logos,
+  // badges or certifications.
+  pair: {
+    label: "What it needs, and how it keeps people safe",
+    provides: {
+      title: "What the building provides",
+      body: "Two supplies on site, and a screen to run it from.",
+      tiles: [
+        { icon: "tether", title: "Water", note: "The roof’s supply, or a garden tap at home" },
+        { icon: "dock", title: "Power", note: "For the roof capsule or the ground pod" },
+        { icon: "layers", title: "Desktop", note: "macOS 13 or later, or 64-bit Windows 10 or 11" },
+        { icon: "phone", title: "Phone app", note: "Home system, release still being finalised" },
+      ],
+    },
+    safety: {
+      title: "Built so nobody works at height",
+      body: "The tether, camera and surface checks are the design, not add-ons.",
+      tiles: [
+        { icon: "tether", title: "Tether", note: "Water and power, always connected" },
+        { icon: "camera", title: "Obstacle camera", note: "Avoidance built into the drone" },
+        { icon: "check", title: "Surface checks", note: "Onboard, on every pass" },
+        { icon: "person", title: "Nobody at height", note: "No rope access, no lift" },
+      ],
+      link: { label: "How it is kept safe", href: "#faq-safety" },
+    },
+  },
+  // The page's close: the statement in two short lines, the main ask and the lighter step.
   close: {
-    headline: "See the software that runs it",
-    body: "A demo building in the desktop software: the scan, the plan, the wash and the re-scan.",
-    action: { label: "Book a pilot conversation", href: "/register-interest?type=commercial" },
+    headline: "Planned on a model of the building. Cleaned with nobody on site.",
+    action: { label: "Register interest", href: "/register-interest" },
+    secondary: { label: "Check your building", href: "/fit-check" },
   },
 };

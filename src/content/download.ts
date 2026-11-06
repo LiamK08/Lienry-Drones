@@ -49,4 +49,10 @@ export const downloadPage = {
       { id: "updates", q: "How do updates work?", a: "How Lienry Desktop is updated is still being finalised." },
     ],
   },
+  /** The page's close: the main ask and the lighter step back to the platform. */
+  close: {
+    headline: "A model of your building on your desk, and every clean on it.",
+    action: { label: "Register interest", href: "/register-interest" },
+    secondary: { label: "See the platform", href: "/platform" },
+  },
 };
