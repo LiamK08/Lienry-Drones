@@ -516,14 +516,18 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare", model
                 </div>
                 {paint !== "settled" ? (
                   // The recording's poster is 1020x756: contained, so the roof and the base stay in frame.
-                  <img
-                    src={`/video/${M.video}-wide-poster.jpg`}
-                    alt=""
-                    aria-hidden="true"
-                    decoding="async"
-                    fetchPriority={priority ? "high" : "low"}
-                    className={`pointer-events-none absolute inset-0 h-full w-full object-contain transition-opacity duration-200 ease-instrument ${paint === "painted" ? "opacity-0" : "opacity-100"}`}
-                  />
+                  // WebP first, the JPEG for a browser without it.
+                  <picture>
+                    <source srcSet={`/video/${M.video}-wide-poster.webp`} type="image/webp" />
+                    <img
+                      src={`/video/${M.video}-wide-poster.jpg`}
+                      alt=""
+                      aria-hidden="true"
+                      decoding="async"
+                      fetchPriority={priority ? "high" : "low"}
+                      className={`pointer-events-none absolute inset-0 h-full w-full object-contain transition-opacity duration-200 ease-instrument ${paint === "painted" ? "opacity-0" : "opacity-100"}`}
+                    />
+                  </picture>
                 ) : null}
                 {lines && !tall ? (
                   <div className="pointer-events-none absolute left-3 top-3 max-w-[calc(100%-5rem)] rounded-[0.5rem] border border-hairline bg-white px-3 py-2 shadow-[0_8px_20px_-10px_rgb(17_26_34/0.3)]">
@@ -549,19 +553,22 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare", model
             ) : (
               <>
                 {/* The recording's first frame until the video has one of its own: a lazy image, not a
-                    poster attribute, so it never competes with the page's first screen. */}
-                <img
-                  key={`${variant}-poster`}
-                  ref={posterRef}
-                  onLoad={() => setPosterShown(true)}
-                  src={`/video/${M.video}-${variant}-poster.jpg`}
-                  alt=""
-                  aria-hidden="true"
-                  loading={priority ? "eager" : "lazy"}
-                  fetchPriority={priority ? "high" : "auto"}
-                  decoding="async"
-                  className="pointer-events-none absolute inset-0 h-full w-full object-cover md:object-contain"
-                />
+                    poster attribute, so it never competes with the page's first screen. WebP first (the
+                    phone LCP image on /platform and /download), the JPEG for a browser without it. */}
+                <picture key={`${variant}-poster`}>
+                  <source srcSet={`/video/${M.video}-${variant}-poster.webp`} type="image/webp" />
+                  <img
+                    ref={posterRef}
+                    onLoad={() => setPosterShown(true)}
+                    src={`/video/${M.video}-${variant}-poster.jpg`}
+                    alt=""
+                    aria-hidden="true"
+                    loading={priority ? "eager" : "lazy"}
+                    fetchPriority={priority ? "high" : "auto"}
+                    decoding="async"
+                    className="pointer-events-none absolute inset-0 h-full w-full object-cover md:object-contain"
+                  />
+                </picture>
                 {/* One pixel short at the top: Chrome rounds the image's painted rect but floors the video's,
                     so a full-size video can be one row larger than the image and take over as the page's
                     largest paint. The strip shows the image's own background beneath. */}

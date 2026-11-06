@@ -59,7 +59,7 @@
 //     state (a [data-hover-clip] frame's still and clip are one figure; media inside aria-hidden, the
 //     footer's picture loop and the bubble hero, are not frames); public/media holds only manifest
 //     files and nothing is added to public/video or media-src, but for a software window's own
-//     recordings (SPEC.windowRecordings: <stem>-wide and -tall, .mp4, .webm and -poster.jpg, recorded
+//     recordings (SPEC.windowRecordings: <stem>-wide and -tall, .mp4, .webm and -poster.jpg/.webp, recorded
 //     from the coded model by scripts/record-software-view.mjs; CLAUDE.md says so).
 // 21  Motion: under reduced motion no video plays, nothing reveals, crossfades or snaps smoothly, and
 //     the window shows its recording with native controls; without it never two videos play at once,
@@ -2961,7 +2961,7 @@ try {
   } catch {
     base = git("merge-base HEAD main");
   }
-  const recording = new RegExp(`^public/video/(?:${SPEC.windowRecordings.join("|")})-(?:wide|tall)(?:\\.mp4|\\.webm|-poster\\.jpg)$`);
+  const recording = new RegExp(`^public/video/(?:${SPEC.windowRecordings.join("|")})-(?:wide|tall)(?:\\.mp4|\\.webm|-poster\\.(?:jpg|webp))$`);
   for (const f of git(`diff --name-only --diff-filter=A ${base} HEAD -- public/media public/video media-src`).split("\n").filter(Boolean)) {
     if (!recording.test(f)) siteAdd(14, "a media file added on this branch", f);
   }

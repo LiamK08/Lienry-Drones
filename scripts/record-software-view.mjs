@@ -1,7 +1,7 @@
 // Record the software view for phones and reduced motion: 12 s of the model, stepped one frame at a
 // time so the recording is deterministic however slowly the headless renderer draws.
 // Usage: node scripts/record-software-view.mjs [baseUrl] [wide|tall] [--model=building|solar] [--encode-only]
-// Output: public/video/<stem>-<variant>.{mp4,webm} and -poster.jpg, where the stem is software-view
+// Output: public/video/<stem>-<variant>.{mp4,webm} and -poster.{jpg,webp}, where the stem is software-view
 // (the building, recorded on /download) or solar-view (the solar array, recorded on /solar).
 import { execFileSync } from "node:child_process";
 import { mkdirSync, readdirSync, rmSync, statSync } from "node:fs";
@@ -86,7 +86,10 @@ async function encode(name, frames, v) {
   execFileSync(ffmpeg, ["-y", "-loglevel", "error", "-framerate", String(FPS), "-i", path.join(frames, "%04d.jpg"), "-vf", vf, "-c:v", "libvpx-vp9", "-crf", "38", "-b:v", "0", "-deadline", "good", "-cpu-used", "2", "-row-mt", "1", "-pix_fmt", "yuv420p", "-an", webm]);
   // The poster is the phone LCP image on /download: mozjpeg at 76 keeps it near 55 KB.
   await sharp(path.join(frames, "poster.jpg")).resize(v.scale).extract({ left: 0, top: 0, width: v.scale, height: v.out }).jpeg({ quality: 76, mozjpeg: true }).toFile(poster);
-  for (const f of [mp4, webm, poster]) console.log(`${path.basename(f)}: ${(statSync(f).size / 1024).toFixed(0)} kB`);
+  // The WebP is what browsers fetch (about 37% lighter, the phone LCP image on /platform and /download);
+  // the JPEG stays as its fallback. Encoded from the JPEG so the two are the same picture.
+  await sharp(poster).webp({ quality: 78 }).toFile(poster.replace(/\.jpg$/, ".webp"));
+  for (const f of [mp4, webm, poster, poster.replace(/\.jpg$/, ".webp")]) console.log(`${path.basename(f)}: ${(statSync(f).size / 1024).toFixed(0)} kB`);
 }
 
 // The two recordings run side by side, each in its own headless browser.
