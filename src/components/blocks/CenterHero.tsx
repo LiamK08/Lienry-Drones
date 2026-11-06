@@ -8,7 +8,8 @@ import { holdLines } from "@/components/blocks/holdLines";
 /**
  * A solution page's first screen: two soft accent glows that fade out before the band ends, then the
  * centred h1 (700px at most), the lead (18/1.55, 608px at most, so a line stays under 70 characters)
- * and one pill. No picture, so the h1 is the LCP element. 64 under the bar and 96 above the strip at
+ * and its actions: the primary pill, and the `secondary` white pill beside it (stacked and centred
+ * below 640). No picture, so the h1 is the LCP element. 64 under the bar and 96 above the strip at
  * every width.
  *
  * Inter and its fallback wrap the lead differently, so it holds lines too: `leadLines` is the larger
@@ -20,6 +21,7 @@ export function CenterHero({
   emphasis,
   lead,
   primary,
+  secondary,
   mobileLines,
   leadLines,
 }: {
@@ -29,6 +31,8 @@ export function CenterHero({
   emphasis?: string;
   lead: string;
   primary: Action;
+  /** The lighter second path beside the ask (the fit check): the white pill with the accent badge. */
+  secondary?: Action;
   mobileLines?: number;
   leadLines?: { phone: number; wide: number };
 }) {
@@ -50,9 +54,16 @@ export function CenterHero({
           <p className={`mt-6 max-w-[38rem] text-lead leading-[1.55] text-fg-muted ${leadHold.className}`} style={leadHold.style}>
             {lead}
           </p>
-          <Button href={primary.href} arrow className="mt-8">
-            {primary.label}
-          </Button>
+          <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:flex-wrap sm:justify-center">
+            <Button href={primary.href} arrow>
+              {primary.label}
+            </Button>
+            {secondary ? (
+              <Button href={secondary.href} variant="secondary" arrow>
+                {secondary.label}
+              </Button>
+            ) : null}
+          </div>
         </div>
       </Container>
     </Band>

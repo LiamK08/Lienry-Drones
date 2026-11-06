@@ -42,7 +42,8 @@ function Chip({ shot, text, live }: { shot: Shot; text: string; live: boolean })
  * needed; the new one fades in over the last for 500ms (none under reduced motion), and only the one
  * on show is exposed to assistive tech (the panel's live region tells the story).
  *
- * From 768 a 5:4 frame of two rounded cells, 8 apart: the app centred on the pale tint, and the
+ * From 768 a 5:4 frame of two rounded cells, 8 apart: the app centred on the pale tint (white when the
+ * row's own band is the tint), and the
  * picture, the wider of the two (4 : 5, the app's cell at least 296px from 1024). Below 768 the picture
  * sits under the app at 5:4, so a phone shows the button and the picture together.
  */
@@ -60,7 +61,7 @@ export function LandlordAppFrame() {
 
   return (
     <div className="grid gap-2 md:aspect-[5/4] md:grid-cols-[minmax(0,4fr)_minmax(0,5fr)] lg:grid-cols-[minmax(18.5rem,4fr)_minmax(0,5fr)]">
-      <div className="flex items-center justify-center rounded-[0.75rem] bg-tint p-4 lg:rounded-[0.5rem] lg:p-3 xl:p-4">
+      <div className="flex items-center justify-center rounded-[0.75rem] bg-tint p-4 in-data-[tone=tint]:bg-white lg:rounded-[0.5rem] lg:p-3 xl:p-4">
         <div className="w-full max-w-[20rem]">
           <AppPanel demo={demo} />
         </div>
