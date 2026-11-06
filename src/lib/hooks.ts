@@ -27,17 +27,21 @@ export function useScrolledPast(px: number): boolean {
   return useSyncExternalStore(subscribeScroll, () => window.scrollY > px, () => false);
 }
 
-/** Whether an element is on screen, with an optional margin. IntersectionObserver only. */
-export function useOnScreen<T extends HTMLElement>(margin = "0px"): [React.RefObject<T | null>, boolean] {
+/** Whether an element is on screen, with an optional margin; with `minRatio`, only while at least that
+ *  share of it shows. IntersectionObserver only. */
+export function useOnScreen<T extends HTMLElement>(margin = "0px", minRatio = 0): [React.RefObject<T | null>, boolean] {
   const ref = useRef<T>(null);
   const [on, setOn] = useState(false);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const io = new IntersectionObserver(([entry]) => setOn(entry.isIntersecting), { rootMargin: margin, threshold: 0.01 });
+    const io = new IntersectionObserver(([entry]) => setOn(entry.isIntersecting && entry.intersectionRatio >= minRatio * 0.99), {
+      rootMargin: margin,
+      threshold: minRatio ? [0.01, minRatio] : 0.01,
+    });
     io.observe(el);
     return () => io.disconnect();
-  }, [margin]);
+  }, [margin, minRatio]);
   return [ref, on];
 }
 

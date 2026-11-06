@@ -161,7 +161,9 @@ export function SoftwareWindow({ preset, priority = false, frame = "bare", model
   const wide = useMediaQuery("(min-width: 768px)");
   const finePointer = useMediaQuery("(pointer: fine)");
   const [nearRef, near] = useOnScreen<HTMLDivElement>("600px 0px 600px 0px");
-  const [viewRef, onScreen] = useOnScreen<HTMLDivElement>("0px");
+  // The model plays while at least a fifth of its view shows: a sliver at the screen's edge holds its
+  // last frame rather than drawing every frame for it (the page's tabs or text in view beside it).
+  const [viewRef, onScreen] = useOnScreen<HTMLDivElement>("0px", 0.2);
   const controlRef = useRef(createControl(M.cellCount));
   const needleRef = useRef<SVGSVGElement>(null);
   const northRef = useRef<HTMLSpanElement>(null);
