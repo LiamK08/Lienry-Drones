@@ -9,18 +9,20 @@ export const homesPage = {
     emphasis: "Even from overseas.",
     lead: "A waterproof ground pod that powers the drone and feeds it water, a drone that knows each material, and an app that starts the clean wherever you are. For houses, townhouses and rentals.",
     primary: { label: "Register interest", href: "/register-interest?type=homeowner" },
+    secondary: { label: "Check your property", href: "/fit-check" },
   },
   strip: { label: "Designed for the exterior of a home", items: ["Windows", "Solar panels", "Rendered walls", "Roofing", "Driveways", "Rentals"] },
+  // Each row is a chapter band (tint, white, then the app on tint and the figures on white). A row's
+  // `panel` is a still Demo-data card over its picture, on the side away from the subject. The portrait
+  // rental is framed 3:2 from 1024, with its own crop there that keeps the drone above the card.
   rows: [
     {
       id: "pod",
       title: "A ground pod that powers the drone and feeds it water",
-      paragraphs: [
-        "The pod sits beside the house, near the garden tap. It shelters the drone between cleans and runs power and water through the same tether.",
-        "Nothing is carried, so the drone never stops halfway to refill.",
-      ],
+      paragraphs: ["The pod sits beside the house, near the garden tap. It shelters the drone between cleans and runs power and water through the same tether."],
       checks: ["Waterproof ground pod", "Power and water through one tether", "Shelter between cleans"],
       image: { id: "m3-pod-master", alt: "The Lienry ground pod open beside a garden tap, the home drone inside", position: "35% 50%" },
+      panel: { id: "ground-pod" as const, corner: "end" as const },
     },
     {
       id: "materials",
@@ -29,7 +31,8 @@ export const homesPage = {
         "The property is mapped first, so the drone knows every surface it can reach. As it cleans it identifies each material and adjusts its pressure, and you can change it in the app.",
       ],
       checks: ["A detailed scan of the property", "Glass, panels, render, roofing and paving", "Pressure you can adjust"],
-      image: { id: "p4-rental", alt: "The home drone washing the rooftop solar panels of a brick rental townhouse, the ground pod by the side fence", position: "50% 32%" },
+      image: { id: "p4-rental", alt: "The home drone washing the rooftop solar panels of a brick rental townhouse, the ground pod by the side fence", position: "50% 28%", positionMd: "50% 32%" },
+      panel: { id: "right-pressure" as const, corner: "start" as const },
     },
   ],
   stats: {
@@ -37,19 +40,23 @@ export const homesPage = {
     intro: "Two cited figures about the homes it is designed for.",
     action: { label: "I own rentals", href: "/register-interest?type=landlord" },
   },
+  // The night panel: what is designed in, as four fact tiles (the honest stand-in for badges).
   safety: {
-    eyebrow: "Safety by design",
     headline: "No ladders, and nobody walking the roof",
-    aside: "No ladders, no lifts, no crews to book",
-    tags: ["Tether", "Camera", "Ground pod"],
-    image: { id: "ho1-homes-hero", alt: "The Lienry ground pod beside a house at first light, the drone washing a window", position: "42% 55%" },
-    columns: [
-      { icon: "person", title: "Nobody at height", text: "No one climbs a ladder or walks the roof to clean it." },
+    aside: "No ladders, no lifts, no crews to book.",
+    action: { label: "How the ground pod works", href: "/platform#dock" },
+    tiles: [
+      { icon: "person", title: "Nobody at height", text: "No one climbs a ladder or walks the roof, and a camera on the drone watches the surface." },
       { icon: "phone", title: "Started from the app", text: "Pick the areas and start the clean from wherever you are." },
+      { icon: "dock", title: "Ground pod", text: "It shelters the drone and feeds it power and water on one tether." },
       { icon: "doc", title: "Site permissions", text: "We do not claim any approvals. What each site will need is still being finalised." },
     ],
   },
-  close: { headline: "Tell us about your property and we will reply personally", action: { label: "Register interest", href: "/register-interest?type=homeowner" } },
+  close: {
+    headline: "Tell us about your property and we will reply personally",
+    action: { label: "Register interest", href: "/register-interest?type=homeowner" },
+    secondary: { label: "Check your property", href: "/fit-check" },
+  },
 };
 
 /**

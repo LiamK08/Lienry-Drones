@@ -43,7 +43,7 @@ const appear = "transition-[opacity] duration-500 ease-instrument motion-reduce:
 const shown = (on: boolean) => (on ? "opacity-100" : "opacity-0");
 
 /** A row's mark: a tick (or the debris sign), or, while its step is still to come, an empty ring. */
-function Tick({ tone = "accent", waiting = false }: { tone?: "accent" | "debris"; waiting?: boolean }) {
+export function Tick({ tone = "accent", waiting = false }: { tone?: "accent" | "debris"; waiting?: boolean }) {
   const fill = waiting ? "border border-line bg-white text-transparent" : tone === "accent" ? "border border-transparent bg-tint text-accent" : "border border-transparent bg-fit-partly-soft text-debris-text";
   return (
     <span aria-hidden="true" className={`flex size-5 shrink-0 items-center justify-center rounded-pill transition-[background-color,border-color,color] duration-500 motion-reduce:transition-none ${fill}`}>
@@ -54,17 +54,27 @@ function Tick({ tone = "accent", waiting = false }: { tone?: "accent" | "debris"
   );
 }
 
+// The shell's sizes: the step stage's panel fills its stage; a reason card's panel is 280 by 216 (240
+// tall from 1024); a feature row's still card (RowPanel) is 256 by 216 at every width, so on a row's
+// 3:2 picture it covers no more of the subject than it must.
+const shellSizes = {
+  stage: "h-full w-full p-5",
+  card: "h-[13.5rem] w-full max-w-[17.5rem] p-4 shadow-[0_24px_48px_-24px_rgb(0_0_0/0.45)] lg:h-[15rem]",
+  row: "h-[13.5rem] w-full max-w-[16rem] p-4 shadow-[0_24px_48px_-24px_rgb(0_0_0/0.45)]",
+} as const;
+export type ShellSize = keyof typeof shellSizes;
+
 /**
  * The panel's shell: a white card with a title, a muted line and the Demo data tag, then its body. A
  * panel the visitor works (`interactive`) is a labelled group; the others are one image each.
  */
-function Shell({ label, title, sub, size, interactive = false, children }: { label: string; title: string; sub?: string; size: "card" | "stage"; interactive?: boolean; children: ReactNode }) {
+export function Shell({ label, title, sub, size, interactive = false, children }: { label: string; title: string; sub?: string; size: ShellSize; interactive?: boolean; children: ReactNode }) {
   return (
     <div
       data-ui=""
       role={interactive ? "group" : "img"}
       aria-label={`${label} Demo data.`}
-      className={`group/wash flex flex-col overflow-hidden rounded-card bg-white text-ink ${size === "stage" ? "h-full w-full p-5" : "h-[13.5rem] w-full max-w-[17.5rem] p-4 shadow-[0_24px_48px_-24px_rgb(0_0_0/0.45)] lg:h-[15rem]"}`}
+      className={`group/wash flex flex-col overflow-hidden rounded-card bg-white text-ink ${shellSizes[size]}`}
     >
       <div className="flex items-start justify-between gap-3">
         <span className="min-w-0">
@@ -90,7 +100,7 @@ function Bar({ to, tone = "accent" }: { to: number; tone?: "accent" | "debris" }
  * A panel's checklist: each row arrives on its beat. On the step stage (`waiting`) every row is there
  * from the first beat, muted with an empty ring, and ticks off on its beat, so no panel opens empty.
  */
-function Rows({ items, beat, from = 1, waiting = false }: { items: { text: string; note?: string; tone?: "accent" | "debris" }[]; beat: number; from?: number; waiting?: boolean }) {
+export function Rows({ items, beat, from = 1, waiting = false }: { items: { text: string; note?: string; tone?: "accent" | "debris" }[]; beat: number; from?: number; waiting?: boolean }) {
   return (
     <ul className="flex flex-col">
       {items.map((r, i) => {
@@ -120,10 +130,10 @@ function NobodyAtHeight({ beat }: { beat: number }) {
   );
 }
 
-function MoreOften({ beat }: { beat: number }) {
+function MoreOften({ beat, size = "card" }: { beat: number; size?: ShellSize }) {
   const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   return (
-    <Shell size="card" label="A week of re-scans every two days, one finding debris." title="Re-scan schedule" sub="Every two days">
+    <Shell size={size} label="A week of re-scans every two days, one finding debris." title="Re-scan schedule" sub="Every two days">
       <span className="grid grid-cols-7 gap-1 text-center">
         {days.map((d, i) => {
           const scan = i % 2 === 0;
@@ -146,12 +156,14 @@ function MoreOften({ beat }: { beat: number }) {
   );
 }
 
-function RightPressure({ beat }: { beat: number }) {
+function RightPressure({ beat, size = "card", solarFirst = false }: { beat: number; size?: ShellSize; solarFirst?: boolean }) {
   // The software's own presets (src/content/software.ts): each surface's bar against the strongest.
-  const rows = [...zones.filter((z) => z.id !== "east"), solarZones[0]].map((z) => ({ name: z.surface, preset: z.preset, bar: parseInt(z.pressure, 10) }));
+  // `solarFirst` (the /solar row) lists the solar glass first.
+  const building = zones.filter((z) => z.id !== "east");
+  const rows = (solarFirst ? [solarZones[0], ...building] : [...building, solarZones[0]]).map((z) => ({ name: z.surface, preset: z.preset, bar: parseInt(z.pressure, 10) }));
   const top = Math.max(...rows.map((r) => r.bar));
   return (
-    <Shell size="card" label="Water pressure set for each surface by its preset, gentlest on solar glass." title="Pressure by surface" sub="Presets in the software">
+    <Shell size={size} label="Water pressure set for each surface by its preset, gentlest on solar glass." title="Pressure by surface" sub="Presets in the software">
       <ul className="flex flex-1 flex-col justify-between">
         {rows.map((r, i) => (
           <li key={r.name} className="grid grid-cols-[minmax(0,1fr)_4.5rem] items-center gap-x-2 text-caption leading-tight">
@@ -223,6 +235,15 @@ export function CardPanel({ id, active }: { id: CardPanelId; active: boolean }) 
   const beat = useBeat(5, active, 650);
   const Panel = CARD_PANELS[id];
   return <Panel beat={beat} />;
+}
+
+/**
+ * A reason card's panel standing still at its final beat (no interval, nothing to play), at the feature
+ * row's card size: RowPanel lays it over a row's picture. "repeat" is the re-scan week, "sliders" the
+ * pressure by surface; `solarFirst` lists the solar glass first in the pressure panel.
+ */
+export function CardPanelStill({ id, solarFirst = false }: { id: "repeat" | "sliders"; solarFirst?: boolean }) {
+  return id === "repeat" ? <MoreOften beat={5} size="row" /> : <RightPressure beat={5} size="row" solarFirst={solarFirst} />;
 }
 
 // The step stage's panels: one record, the software's demo building (src/content/software.ts), followed

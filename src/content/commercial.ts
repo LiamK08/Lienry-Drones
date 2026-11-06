@@ -8,28 +8,27 @@ export const commercialPage = {
     emphasis: "Nobody on a rope.",
     lead: "A weatherproof capsule on the roof, a tether fed from above, and desktop software that runs the whole building. Designed for office and apartment buildings under 70 metres.",
     primary: { label: "Book a pilot conversation", href: "/register-interest?type=commercial" },
+    secondary: { label: "Check your building", href: "/fit-check" },
   },
   strip: { label: "Designed for buildings under 70 metres", items: ["Office towers", "Apartment blocks", "Mixed use", "Strata", "Glass facades", "Rendered walls"] },
+  // Each row is a chapter band (tint, white, tint). A row's `panel` is a still Demo-data card over its
+  // picture, on the side away from the subject.
   rows: [
     {
       id: "capsule",
       title: "A capsule on the roof that keeps the drone ready between cleans",
-      paragraphs: [
-        "The drone lives in a weatherproof capsule on the roof. Its water tether is fed from above, so the drone never carries water and never runs out mid-clean.",
-        "Between cleans the capsule shelters and powers it. When the scan says a clean is due, it rises, works down the facade and returns.",
-      ],
+      paragraphs: ["The drone lives in a weatherproof capsule on the roof. Its water tether is fed from above, so the drone never carries water and never runs out mid-clean."],
       checks: ["Weatherproof roof capsule", "Tether fed from above", "No water carried by the drone", "Back to the dock after every clean"],
       image: { id: "m2-capsule-master", alt: "The Lienry roof capsule open on a flat roof, the drone on its cradle beside the tether reel", position: "50% 50%" },
+      panel: { id: "between-cleans" as const, corner: "end" as const },
     },
     {
       id: "scan",
       title: "The building is scanned before the first clean, and re-scanned every two days",
-      paragraphs: [
-        "The drone maps the building's structure and dimensions, and the scan becomes a model in the desktop software. Every clean is planned on that model.",
-        "Every two days it re-scans and decides whether a clean is needed. You can change the interval in settings.",
-      ],
+      paragraphs: ["The drone maps the building's structure and dimensions, and the scan becomes a model in the desktop software. Every clean is planned on that model."],
       checks: ["Structure and dimensions mapped first", "Re-scan every two days, adjustable", "Debris shaded where it has built up", "The re-scan decides when to clean"],
       image: { id: "s4-scan", alt: "The drone holding off the corner of a glass building to scan it", position: "50% 40%" },
+      panel: { id: "more-often" as const, corner: "end" as const },
     },
     {
       id: "software",
@@ -41,19 +40,23 @@ export const commercialPage = {
       link: { label: "Lienry Desktop", href: "/download" },
     },
   ],
+  // The night panel: what is designed in, as four fact tiles (the honest stand-in for badges).
   safety: {
-    eyebrow: "Safety by design",
     headline: "Safety designed in from the dock up",
-    aside: "Designed in, not supervised in",
-    tags: ["Tether", "Obstacle camera", "Surface checks"],
-    image: { id: "f1-tether", alt: "The tether's metal coupling where it enters the underside of the drone", position: "43% 45%" },
-    columns: [
+    aside: "Designed in, not supervised in.",
+    action: { label: "Read about the tether", href: "/platform#tether" },
+    tiles: [
       { icon: "tether", title: "Always tethered", text: "Water and power through one line from the dock, for the whole clean." },
-      { icon: "camera", title: "Obstacle avoidance", text: "A camera on the drone watches the surface and what is around it." },
+      { icon: "camera", title: "Obstacle camera", text: "A camera on the drone watches the surface and what is around it." },
+      { icon: "check", title: "Surface checks", text: "The drone checks the surface onboard, on every pass." },
       { icon: "doc", title: "Site permissions", text: "We do not claim any approvals. What each site will need is still being finalised." },
     ],
   },
-  close: { headline: "A small number of buildings, first. Is yours one of them?", action: { label: "Book a pilot conversation", href: "/register-interest?type=commercial" } },
+  close: {
+    headline: "A small number of buildings, first. Is yours one of them?",
+    action: { label: "Book a pilot conversation", href: "/register-interest?type=commercial" },
+    secondary: { label: "Check your building", href: "/fit-check" },
+  },
 };
 
 /**

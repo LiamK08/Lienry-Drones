@@ -19,9 +19,11 @@ export const metadata: Metadata = pageMetadata(
 );
 
 /**
- * /homes-and-rentals: the solutions template. The hero, the strip, one white run of four feature
- * rows (the pod, the materials, the app as an interactive demo on a wider media column, and two cited
- * figures with the cited note), safety on paper, the questions on white, then the closing panel.
+ * /homes-and-rentals: the solutions template. The hero with its two paths, the strip, four feature rows
+ * as chapters (the pod on tint, the materials on white, the app as an interactive demo on a wider media
+ * column on tint, and two cited figures with the cited note on white), safety as the night panel (its
+ * band continuing the white of the figures above it), the questions, then the closing panel with its
+ * lighter step to the fit check.
  */
 export default function HomesPage() {
   const { hero, strip, rows, stats, safety, close } = homesPage;
@@ -47,12 +49,12 @@ export default function HomesPage() {
   ];
   return (
     <>
-      <CenterHero mobileLines={3} leadLines={{ phone: 5, wide: 3 }} headline={hero.headline} emphasis={hero.emphasis} lead={hero.lead} primary={hero.primary} />
+      <CenterHero mobileLines={3} leadLines={{ phone: 5, wide: 3 }} headline={hero.headline} emphasis={hero.emphasis} lead={hero.lead} primary={hero.primary} secondary={hero.secondary} />
       <WordStrip label={strip.label} items={strip.items} />
       <FeatureRows id="features" variant="solutions" items={items} />
-      <SafetyBlock {...safety} />
-      <FaqCentered items={faqFor("homes")} spacing="page" narrow />
-      <AccentPanel id="closing" headline={close.headline} action={close.action} band="close" />
+      <SafetyBlock {...safety} pad="attached" />
+      <FaqCentered items={faqFor("homes")} spacing="page" />
+      <AccentPanel id="closing" headline={close.headline} action={close.action} secondary={close.secondary} band="close" />
     </>
   );
 }

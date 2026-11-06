@@ -111,3 +111,31 @@ export const solarProject: Project = {
   nextClean: "Sat 06:30",
   debrisZones: 4,
 };
+
+/**
+ * The still Demo-data cards over the solution pages' row pictures (RowPanel). Illustrative, like
+ * everything here: no real building, home or array. The re-scan week and the pressure by surface are
+ * the home page's own panels (MoreOften and RightPressure in DemoPanels.tsx), standing still.
+ */
+export const rowPanels = {
+  betweenCleans: {
+    label: "The drone docked in its roof capsule between cleans, its tether reeled in and the next clean due.",
+    title: "Between cleans",
+    sub: "Roof capsule",
+    rows: ["Docked in the capsule", "Tether reeled in"],
+    next: "Next clean",
+  },
+  groundPod: {
+    label: "The ground pod fed from the garden tap, with power and water on one tether and the drone sheltered inside.",
+    title: "Ground pod",
+    sub: "Home system",
+    rows: ["Fed from the garden tap", "Power and water on one tether", "Drone sheltered"],
+  },
+  rowSchedule: {
+    label: "The demo array's four rows on their interval: rows A and B washed, rows C and D queued.",
+    title: "Row schedule",
+    /** The first `washed` rows of solarZones are washed; the rest are queued. */
+    washed: 2,
+    states: { washed: "Washed", queued: "Queued" },
+  },
+} as const;

@@ -18,28 +18,22 @@ export const metadata: Metadata = pageMetadata(
 );
 
 /**
- * /solar: the solutions template. The hero, the strip, one white run of feature rows (the software
- * window's solar model in the second), the three cited soiling figures on paper (with the cited
- * note), the questions on white, then the closing panel.
+ * /solar: the solutions template. The hero with its two paths, the strip, the feature rows as chapters
+ * (the panels on tint, the software window's solar model on white, the rows on tint), the three cited
+ * soiling figures on the night panel (with the cited note), the questions, then the closing panel with
+ * its lighter step to the fit check.
  */
 export default function SolarPage() {
   const { hero, strip, stats, rows, close } = solarPage;
-  const items = rows.map((r) => (r.id === "software" ? { ...r, media: <SoftwareWindow model="solar" /> } : r));
+  const items = rows.map((r) => (r.id === "software" ? { ...r, media: <SoftwareWindow model="solar" />, wideMedia: true } : r));
   return (
     <>
-      <CenterHero mobileLines={3} leadLines={{ phone: 4, wide: 3 }} headline={hero.headline} emphasis={hero.emphasis} lead={hero.lead} primary={hero.primary} />
+      <CenterHero mobileLines={3} leadLines={{ phone: 4, wide: 3 }} headline={hero.headline} emphasis={hero.emphasis} lead={hero.lead} primary={hero.primary} secondary={hero.secondary} />
       <WordStrip label={strip.label} items={strip.items} />
       <FeatureRows id="features" variant="solutions" items={items} />
-      <FiguresBlock
-        id="soiling"
-        headline={stats.headline}
-        aside={stats.intro}
-        image={stats.image}
-        items={pickStats(solarStats, ["unsw-soiling", "iea-soiling", "joule-soiling"])}
-        note={CITED_NOTE}
-      />
-      <FaqCentered items={faqFor("solar")} spacing="page" narrow />
-      <AccentPanel id="closing" headline={close.headline} action={close.action} band="close" />
+      <FiguresBlock id="soiling" headline={stats.headline} aside={stats.intro} items={pickStats(solarStats, ["unsw-soiling", "iea-soiling", "joule-soiling"])} note={CITED_NOTE} />
+      <FaqCentered items={faqFor("solar")} spacing="page" />
+      <AccentPanel id="closing" headline={close.headline} action={close.action} secondary={close.secondary} band="close" />
     </>
   );
 }
