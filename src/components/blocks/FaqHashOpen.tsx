@@ -36,9 +36,9 @@ export function FaqHashOpen() {
       const row = rowFor(hash);
       if (row) row.open = true;
     };
+    // The marker stays, so a second run (StrictMode, Fast Refresh) leaves a row closed since alone too.
     const arrived = rowFor(window.location.hash);
-    if (arrived?.hasAttribute("data-hash-open")) arrived.removeAttribute("data-hash-open");
-    else if (arrived) arrived.open = true;
+    if (arrived && !arrived.hasAttribute("data-hash-open")) arrived.open = true;
     const onHash = () => open(window.location.hash);
     const onClick = (e: MouseEvent) => {
       if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
