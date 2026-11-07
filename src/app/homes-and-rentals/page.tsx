@@ -32,6 +32,7 @@ export default function HomesPage() {
     {
       id: "app",
       title: landlordStory.headline,
+      emphasis: landlordStory.emphasis,
       paragraphs: [landlordStory.intro],
       checks: landlordStory.steps,
       media: <LandlordAppFrame />,

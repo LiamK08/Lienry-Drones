@@ -99,7 +99,7 @@ export function StepTimer() {
   return (
     <Band id="how" tone="plaster" labelledBy="how-heading">
       <Container>
-        <SectionHead id="how-heading" layout="center" headline={how.headline} intro={how.intro} />
+        <SectionHead id="how-heading" layout="center" headline={how.headline} emphasis={how.emphasis} intro={how.intro} />
         <div ref={ref} {...keys} className="mt-(--head-gap)">
           <div className="rounded-panel bg-paper p-1.5">
             <div

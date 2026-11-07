@@ -59,7 +59,7 @@ export default function DownloadPage() {
         </Container>
       </Band>
       <FaqCentered items={faq.items} />
-      <AccentPanel id="closing" band="close" headline={close.headline} action={close.action} secondary={close.secondary} />
+      <AccentPanel id="closing" band="close" headline={close.headline} emphasis={close.emphasis} action={close.action} secondary={close.secondary} />
     </>
   );
 }

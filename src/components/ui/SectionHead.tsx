@@ -20,7 +20,8 @@ type HeadBase = {
   eyebrow?: string;
   /** The whole heading, as stored in content: 7 words at most (throws in development otherwise). */
   headline: string;
-  /** The trailing phrase of `headline`, set in the italic: the section's one italic. */
+  /** The trailing phrase of `headline`, set in the italic in the surface's accent (`em-accent`): the
+   *  section's one italic, its payoff. */
   emphasis?: string;
   /** From 768, break the line before the italic. */
   breakBefore?: boolean;
@@ -64,8 +65,9 @@ export function Headline({ text, emphasis, breakBefore = false }: { text: string
  *   the 12-column grid; below 1024 the aside follows the heading 24 below.
  * - stack: heading, 24, aside, filling its parent (no inner grid), for a head in a narrow column.
  *
- * Colours come from the surface (role tokens), so the same head reads on plaster and on ink. The heading
- * has no margin.
+ * Colours come from the surface (role tokens), so the same head reads on plaster and on ink; an
+ * `emphasis` takes the surface's accent (the glass blue on light bands, its pale step on night). The
+ * heading has no margin.
  */
 export function SectionHead(props: SectionHeadProps) {
   const { id, as: H = "h2", size, headline, emphasis, breakBefore, below, reveal = true, className = "" } = props;
@@ -75,7 +77,7 @@ export function SectionHead(props: SectionHeadProps) {
 
   const heading = (
     <>
-      <H id={id} className={step}>
+      <H id={id} className={emphasis ? `em-accent ${step}` : step}>
         <Headline text={headline} emphasis={emphasis} breakBefore={breakBefore} />
       </H>
       {below ? <div className="mt-6">{below}</div> : null}

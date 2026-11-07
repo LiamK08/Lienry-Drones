@@ -5,12 +5,16 @@ import { Band, Container } from "@/components/ui/Band";
 import { Button } from "@/components/ui/Button";
 import { Picture } from "@/components/ui/Picture";
 import { Reveal } from "@/components/ui/Reveal";
+import { Headline } from "@/components/ui/SectionHead";
 
 export type FeatureRowItem = {
   /** The row's anchor id, e.g. "dock". */
   id: string;
   eyebrow?: string;
   title: string;
+  /** The trailing phrase of `title`, set in the accent italic. Solutions variant only, where the title
+   *  labels its own band (check 9); the default rows share one band and ignore it. */
+  emphasis?: string;
   paragraphs: readonly string[];
   checks?: readonly string[];
   /** A white card under the text: a title and a short list. */
@@ -179,8 +183,8 @@ export function FeatureRows({
     <>
       <div className="grid items-center gap-y-10 lg:grid-12 lg:gap-y-0">
         <Reveal className={`max-lg:max-w-[30rem] ${at.text}`}>
-          <h2 id={`${r.id}-heading`} className="text-h3">
-            {r.title}
+          <h2 id={`${r.id}-heading`} className={solutions && r.emphasis ? "em-accent text-h3" : "text-h3"}>
+            <Headline text={r.title} emphasis={solutions ? r.emphasis : undefined} />
           </h2>
           <div className="mt-5 space-y-4">
             {r.paragraphs.map((p) => (

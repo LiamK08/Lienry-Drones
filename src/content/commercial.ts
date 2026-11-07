@@ -43,6 +43,7 @@ export const commercialPage = {
   // The night panel: what is designed in, as four fact tiles (the honest stand-in for badges).
   safety: {
     headline: "Safety designed in from the dock up",
+    emphasis: "from the dock up",
     aside: "Designed in, not supervised in.",
     action: { label: "Read about the tether", href: "/platform#tether" },
     tiles: [
@@ -54,6 +55,7 @@ export const commercialPage = {
   },
   close: {
     headline: "A small number of buildings, first. Is yours one of them?",
+    emphasis: "Is yours one of them?",
     action: { label: "Book a pilot conversation", href: "/register-interest?type=commercial" },
     secondary: { label: "Check your building", href: "/fit-check" },
   },

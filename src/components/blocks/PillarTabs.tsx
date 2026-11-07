@@ -34,7 +34,7 @@ function revealTab(row: HTMLElement, tab: HTMLElement, last: boolean) {
  * the screen's edges and fades at the right while more tabs wait there. Each panel's id is its part id,
  * so a link such as /platform#tether selects that tab and scrolls the band into view.
  */
-export function PillarTabs({ id, headline, items }: { id: string; eyebrow?: string; headline: string; items: readonly Pillar[] }) {
+export function PillarTabs({ id, headline, emphasis, items }: { id: string; eyebrow?: string; headline: string; /** The trailing phrase of `headline`, in the accent italic. */ emphasis?: string; items: readonly Pillar[] }) {
   const [active, setActive] = useState(0);
   const listRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -101,7 +101,7 @@ export function PillarTabs({ id, headline, items }: { id: string; eyebrow?: stri
   return (
     <Band id={id} tone="plaster" pad="tabs" labelledBy={`${id}-heading`}>
       <Container>
-        <SectionHead id={`${id}-heading`} layout="center" size="h2s" headline={headline} className="scroll-mt-24" />
+        <SectionHead id={`${id}-heading`} layout="center" size="h2s" headline={headline} emphasis={emphasis} className="scroll-mt-24" />
         <div
           ref={scrollRef}
           className={`no-scrollbar -mx-(--page-margin) mt-10 overflow-x-auto scroll-px-(--page-margin) px-(--page-margin) md:mx-0 md:px-0 ${

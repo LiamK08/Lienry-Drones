@@ -16,6 +16,7 @@ export const platformPage = {
   parts: {
     eyebrow: "How Lienry works",
     headline: "Six parts that work as one",
+    emphasis: "as one",
     items: [
       { id: "dock", tab: "Dock", title: "A home on the property", body: "On a commercial building the drone lives in a weatherproof capsule on the roof. On a house it lives in a waterproof ground pod. Either way it is powered, sheltered and ready.", link: { label: "Compare the systems", href: "#systems" }, image: { id: "s1-dock", alt: "The roof capsule's lid closing over the drone on a wet roof", position: "50% 55%" } },
       { id: "tether", tab: "Tether", title: "Water and power, always connected", body: "A thin tether feeds the drone water for the whole clean. On the roof it is fed from above; from the ground pod it runs from the same line that powers the pod. Nothing is carried, so nothing runs out.", image: { id: "s2-tether", alt: "The drone's tether rising from its fitting past a wet glass facade", position: "50% 60%" } },
@@ -93,6 +94,7 @@ export const platformPage = {
   // The page's close: the statement in two short lines, the main ask and the lighter step.
   close: {
     headline: "Planned on a model of the building. Cleaned with nobody on site.",
+    emphasis: "Cleaned with nobody on site.",
     action: { label: "Register interest", href: "/register-interest" },
     secondary: { label: "Check your building", href: "/fit-check" },
   },

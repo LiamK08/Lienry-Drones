@@ -40,6 +40,7 @@ export const solarPage = {
     {
       id: "rows",
       title: "Rooftop arrays and solar farm rows, on your interval",
+      emphasis: "on your interval",
       paragraphs: [
         "From a home's roof to a row of ground-mounted panels, the clean runs with nobody on site.",
         "Set how often the drone should check and clean, and change it in the app after a dusty week or a run of rain.",

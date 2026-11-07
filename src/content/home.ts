@@ -33,6 +33,7 @@ export const strip = {
 
 export const why = {
   headline: "Clean glass shouldn't need someone on a rope",
+  emphasis: "someone on a rope",
   intro: "Lienry is a drone that lives on the property and cleans its exterior on a schedule, with nobody working at height.",
 };
 
@@ -160,6 +161,7 @@ export const benefits = {
  */
 export const how = {
   headline: "From scan to report, on its own",
+  emphasis: "on its own",
   intro: "Every clean follows the same five steps, planned on a model of your building.",
   // Under the stage: its panels are coded previews of the software's demo building.
   note: "Demo data. The building is illustrative; the software will model each property from its scan.",

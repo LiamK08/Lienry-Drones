@@ -44,13 +44,13 @@ export default function PlatformPage() {
           </div>
         }
       />
-      <PillarTabs id="parts" headline={parts.headline} items={parts.items} />
+      <PillarTabs id="parts" headline={parts.headline} emphasis={parts.emphasis} items={parts.items} />
       <FeatureRows id="features" tone="paper" pad="feature" items={[rows[0]]} startSide="right" />
       <FeatureRows id="systems-row" tone="plaster" pad="feature" items={[rows[1]]} startSide="left" />
       <FeatureRows id="planned-row" tone="paper" pad="feature" items={[rows[2]]} startSide="right" />
       <PanelPair id="on-site" label={pair.label} light={pair.provides} dark={pair.safety} />
       <FaqCentered tone="paper" items={faqFor("platform")} />
-      <AccentPanel id="closing" headline={close.headline} action={close.action} secondary={close.secondary} />
+      <AccentPanel id="closing" headline={close.headline} emphasis={close.emphasis} action={close.action} secondary={close.secondary} />
     </>
   );
 }
