@@ -67,8 +67,9 @@
 //     exempt bands (left L, width W). Every .eyebrow, h1, h2 and band-level p (by its content box: padding
 //     holds no text), figure frame and first [data-button] of an action row, and the outermost li, [data-card],
 //     [data-accordion], [data-calculator], form and [data-form-success] (by its own box; nothing inside one
-//     is measured) lies within L-1 to L+W+1. Below 768 the same edges lie within the 20px page margins (19 to
-//     viewport - 19). An in-flow centred h1 or h2 (computed text-align center) outside li and [data-card] is
+//     is measured) lies within L-1 to L+W+1 (inside [data-rail="wide"], within the header's wide rail instead:
+//     min(--container-wide, the viewport less both page margins), centred). Below 768 the same edges lie
+//     within the 20px page margins (19 to viewport - 19). An in-flow centred h1 or h2 (computed text-align center) outside li and [data-card] is
 //     centred where the flow places it, within 1px, and so is each box above it that centres it (centred
 //     text, or a flex column centring its items), up to its band: a centred head block held to one side
 //     fails. Where the flow places a box is its containing block's content box when that is a block
@@ -990,6 +991,13 @@ function pageLib(cfg) {
     const rr = rail.getBoundingClientRect();
     const lo = mode === "margin" ? margin : rr.left;
     const hi = mode === "margin" ? vw - margin : rr.right;
+    // The wide rail (the header's, --container-wide) holds what sits inside [data-rail="wide"]: taken from
+    // the tokens, not the wrapper's box, so a misbuilt wrapper cannot widen it.
+    const rs = getComputedStyle(document.documentElement);
+    const remPx = parseFloat(rs.fontSize) || 16;
+    const wideW = Math.min(parseFloat(rs.getPropertyValue("--container-wide")) * remPx || rr.width, vw - 2 * (parseFloat(rs.getPropertyValue("--page-margin")) || 0) * remPx);
+    const wideLo = mode === "margin" ? lo : (vw - wideW) / 2;
+    const wideHi = mode === "margin" ? hi : (vw + wideW) / 2;
     const items = new Map();
     const skipped = { exempt: 0, fullBleed: 0, list: [] };
     // A text element (an eyebrow, a heading, a paragraph) is measured by its content box: its padding
@@ -1009,7 +1017,7 @@ function pageLib(cfg) {
         return;
       }
       const box = text ? contentBox(el) : r;
-      items.set(el, { el, kind, left: box.left, right: box.right });
+      items.set(el, { el, kind, left: box.left, right: box.right, wide: !!el.closest('[data-rail="wide"]') });
     };
     const free = (el) => !el.closest(COMPONENT);
     for (const el of main.querySelectorAll(".eyebrow, h1, h2")) if (free(el)) add(el, el.matches(".eyebrow") ? "eyebrow" : el.tagName.toLowerCase(), { text: true });
@@ -1038,8 +1046,10 @@ function pageLib(cfg) {
     const span = mode === "margin" ? `the ${margin}px page margins (x ${r1(lo)} to ${r1(hi)})` : `the rail (x ${r1(lo)} to ${r1(hi)})`;
     for (const it of items.values()) {
       const what = P.describe(it.el);
-      if (it.left < lo - 1) out.push({ kind: it.kind, what, band: bandOf(it.el), message: `left edge at x ${r1(it.left)} is ${r1(lo - it.left)}px outside ${span}` });
-      if (it.right > hi + 1) out.push({ kind: it.kind, what, band: bandOf(it.el), message: `right edge at x ${r1(it.right)} is ${r1(it.right - hi)}px outside ${span}` });
+      const [L, H] = it.wide ? [wideLo, wideHi] : [lo, hi];
+      const where = it.wide && mode !== "margin" ? `the wide rail (x ${r1(L)} to ${r1(H)})` : span;
+      if (it.left < L - 1) out.push({ kind: it.kind, what, band: bandOf(it.el), message: `left edge at x ${r1(it.left)} is ${r1(L - it.left)}px outside ${where}` });
+      if (it.right > H + 1) out.push({ kind: it.kind, what, band: bandOf(it.el), message: `right edge at x ${r1(it.right)} is ${r1(it.right - H)}px outside ${where}` });
     }
     // Centred heads: the box itself is centred, not only its lines inside a box held to one side. From the
     // head up to its band, the head and each box that centres it are centred where the flow places them.

@@ -396,9 +396,9 @@
     animation: bubble-drift 10s ease-in-out infinite;
   }
 
-  /* Why Lienry's cards (from 1200, with a pointer): while one card is open, the other cards' titles
+  /* Why Lienry's cards (from 1400, with a pointer): while one card is open, the other cards' titles
      fade out, so a narrow card never shows a clipped title. */
-  @media (min-width: 75rem) and (hover: hover) {
+  @media (min-width: 87.5rem) and (hover: hover) {
     .why-row .why-text { transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1); }
     .why-row:hover .why-text,
     .why-row:has(li:focus-visible) .why-text { opacity: 0; }

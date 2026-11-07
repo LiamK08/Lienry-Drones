@@ -20,7 +20,10 @@ are part of the window, not imagery: each model's window brings its own (check 1
 
 Layout (since 20 October 2026, the owner's brief): the site follows refresh.tech's page
 templates, section order and interaction patterns, in Lienry's own words, fonts, colours and
-media. Colour is Glass and sky (the owner's palette, 28 October 2026): cool slate neutrals, a white ground, a
+media. Content sits on a 1200px rail (`--container-grid`, 75rem: twelve 78px columns, 24px gutters) inside
+the page margins; the header bar keeps a wider 1392px rail (`--container-wide`), and so does the home
+reasons row (`data-rail="wide"`, so its five resting cards hold their titles); the footer follows the
+content rail; full-bleed media, band grounds and the strips run edge to edge (the owner, 7 November 2026). Colour is Glass and sky (the owner's palette, 28 October 2026): cool slate neutrals, a white ground, a
 cool mist paper band and a pale glass-blue tint; Lienry's glass blue (`--color-accent` #1f5d8c) is the one
 accent, its lighter step (`--color-accent-on-night`) filling buttons on the dark bands; deep slate night
 (#111a22) for every dark band, the strip and the footer. Every colour comes from that palette: a token in
@@ -34,7 +37,10 @@ headings, display lines and the footer logo, and Inter for everything else (its 
 footer tagline, loaded on demand). FAQ questions are display lines: PT Serif at 20px (18 on
 phones) on hairline rows. Sizes follow the reference: page titles 40px (30 on phones), home
 section titles 48px (36), inner section titles 36px (36), card and row titles 32px (30), with tight
-negative tracking. A section's h2 set at the page-title step drops to 36px on phones. No eyebrows: headings stand alone,
+negative tracking. Section heads may end on an italic payoff, about one heading in three: the heading's own
+trailing phrase, at most one per band and only in the heading that labels it (check 9), in the accent on
+light bands, the night's pale glass blue on night panels and the heading's white on the accent close (the
+owner, 7 November 2026). A section's h2 set at the page-title step drops to 36px on phones. No eyebrows: headings stand alone,
 with no label above them (the owner's call, 21 October 2026). The header carries no pills.
 
 Shape: buttons are pills (`rounded-pill`, optional round arrow badge) in one system: `md` for a page's calls
@@ -49,7 +55,7 @@ gradient text.
 Checks: `check:a11y`, `perf:vitals`, `check:layout` and `check:rules` gate every route. Since
 20 October 2026 the last two encode this system: the radius set and pills, PT Serif over Inter at
 the token sizes, no eyebrows, centred heads centred where they sit,
-content inside the rail and the 20px phone margins, the band palette and Band's pads. Their
+content inside the rail (the wide rail inside `data-rail="wide"`) and the 20px phone margins, the band palette and Band's pads. Their
 honesty checks (11 claims, 12 captions, 22 titles, 24 enquiry labels, 44 no ReFresh or Legora)
 never relax. `check:layout`, `check:rules` and the motion and screenshot scripts judge each page as a
 visitor in a session that has seen the intro (its key seeded); `perf:vitals` and `check:a11y` load home as
