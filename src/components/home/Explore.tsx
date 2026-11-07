@@ -140,7 +140,7 @@ function Card({ card: c, tall = false }: { card: ExploreCard; tall?: boolean }) 
       <Link href={c.href} className="group group/card flex w-full flex-col overflow-hidden rounded-card bg-tint">
         <span className="on-light flex flex-1 flex-col">
           <span className={`relative block h-[11.25rem] shrink-0 md:h-[12.5rem] ${tall ? "min-[75rem]:h-[18.75rem]" : ""}`}>
-            <Picture id={c.image.id} alt="" position={c.image.position} fit="fill" rounded="none" zoom sizes={tall ? "(min-width: 768px) 50vw, 100vw" : "(min-width: 1200px) 33vw, (min-width: 768px) 50vw, 100vw"} className="absolute inset-0" />
+            <Picture id={c.image.id} alt="" position={c.image.position} fit="fill" rounded="none" zoom sizes={tall ? "(min-width: 1248px) 588px, (min-width: 768px) 50vw, 100vw" : "(min-width: 1248px) 384px, (min-width: 1200px) calc(33.3vw - 32px), (min-width: 768px) 50vw, 100vw"} className="absolute inset-0" />
           </span>
           <span className="flex flex-1 flex-col p-5 md:px-6 md:pb-6 md:pt-5">
             <span className="block text-balance font-display text-[1.3125rem] leading-[1.2] text-ink md:text-[1.5rem]">{c.title}</span>

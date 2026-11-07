@@ -33,10 +33,10 @@ export type StepCardsProps = {
   pad?: BandPad;
 };
 
-// Three columns are 448px at 1440 and four 330px; a track item is 46% from 768 and 82% below.
+// Three columns are 384px on the whole 75rem rail and four 282px; a track item is 46% from 768 and 82% below.
 const SIZES = {
-  3: "(min-width: 1440px) 448px, (min-width: 1024px) calc((100vw - 96px) / 3), (min-width: 768px) 46vw, 82vw",
-  4: "(min-width: 1440px) 330px, (min-width: 1024px) calc(25vw - 30px), (min-width: 768px) 46vw, 82vw",
+  3: "(min-width: 1248px) 384px, (min-width: 1024px) calc((100vw - 96px) / 3), (min-width: 768px) 46vw, 82vw",
+  4: "(min-width: 1248px) 282px, (min-width: 1024px) calc(25vw - 30px), (min-width: 768px) 46vw, 82vw",
 } as const;
 
 /**

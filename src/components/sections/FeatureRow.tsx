@@ -23,7 +23,7 @@ export type FeatureRowProps = {
   image: ImageRef;
 };
 
-const SIZES = "(min-width: 1440px) 684px, (min-width: 1024px) calc(50vw - 36px), (min-width: 768px) calc(100vw - 48px), calc(100vw - 32px)";
+const SIZES = "(min-width: 1248px) 588px, (min-width: 1024px) calc(50vw - 36px), (min-width: 768px) calc(100vw - 48px), calc(100vw - 32px)";
 
 /**
  * One feature as a band. From 1024 on the 12-column grid: the image in six columns (a fill frame,

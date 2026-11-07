@@ -162,7 +162,7 @@ export function PillarTabs({ id, headline, items }: { id: string; eyebrow?: stri
                   aspect="4/3"
                   rounded="image"
                   className="lg:col-span-6"
-                  sizes="(min-width: 1440px) 684px, (min-width: 1024px) 47vw, (min-width: 768px) calc(50vw - 2.25rem), calc(100vw - 2.5rem)"
+                  sizes="(min-width: 1248px) 588px, (min-width: 1024px) calc(50vw - 36px), (min-width: 768px) calc(50vw - 2.25rem), calc(100vw - 2.5rem)"
                 />
                 <div className="lg:col-span-5 lg:col-start-8">
                   <h3 className="text-h3">{p.title}</h3>

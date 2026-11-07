@@ -17,7 +17,8 @@ const ROW = "(min-width: 75rem)";
 const focusOnMount = (el: HTMLButtonElement | null) => el?.focus();
 
 /**
- * Why Lienry: five tall cards. From 1200 they stand in one row on the rail, a gutter apart: the card under the pointer
+ * Why Lienry: five tall cards. From 1200 they stand in one row on the header's wide rail (87rem, wider than the
+ * content's 75rem), a gutter apart: the card under the pointer
  * (or holding focus) widens to about 4.7 times the others over 700ms (the owner's half-speed call), its near-black left side darkens
  * in under the text, its two-line description fades in with the grow, and just after, its coded panel
  * (demo data, DemoPanels) fades in above the title and plays through. Each picture is drawn once at the
@@ -53,7 +54,10 @@ export function ExpandCards() {
       <Container>
         <SectionHead id="benefits-heading" layout="center" headline={benefits.headline} intro={benefits.intro} />
       </Container>
-      <div className="mx-auto mt-(--head-gap) w-full max-w-grid">
+      {/* The row on the header's wide rail (87rem), as the reference's row is wider than its content: on
+          the 75rem rail a resting card would be 221px, too narrow for a title such as "Started from
+          anywhere". Below 1248 the two rails are the same width. */}
+      <div data-rail="wide" className="mx-auto mt-(--head-gap) w-full max-w-wide">
         <ul
           ref={trackRef}
           id="why-track"
@@ -91,7 +95,7 @@ export function ExpandCards() {
                 position={c.image.position}
                 fit="fill"
                 rounded="none"
-                sizes="(min-width: 1200px) 54vw, (min-width: 768px) 50vw, 100vw"
+                sizes="(min-width: 1440px) 700px, (min-width: 1200px) calc(54vw - 78px), (min-width: 768px) 50vw, 100vw"
                 className="absolute inset-0 min-[75rem]:left-1/2 min-[75rem]:right-auto min-[75rem]:w-[calc((100cqw-4*var(--gutter))*0.54)] min-[75rem]:-translate-x-1/2"
               />
               <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(to_top,color-mix(in_srgb,var(--color-night)_80%,transparent)_0%,color-mix(in_srgb,var(--color-night)_15%,transparent)_45%,color-mix(in_srgb,var(--color-night)_25%,transparent)_100%)]" />
@@ -129,11 +133,12 @@ export function ExpandCards() {
             </li>
           ))}
         </ul>
-
+      </div>
+      <Container>
         {/* Below 1200: previous, the pager and next, centred under the track. */}
         <Pager trackId="why-track" index={index} positions={positions} count={benefits.cards.length} go={step} noun="reason" className="mt-6 min-[75rem]:hidden" />
         <p className="mx-auto mt-4 max-w-none text-center text-caption text-muted min-[75rem]:mt-5">{benefits.note}</p>
-      </div>
+      </Container>
     </Band>
   );
 }

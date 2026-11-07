@@ -67,26 +67,27 @@ const defaultCells = (right: boolean): Cells =>
     ? { text: "lg:col-span-5 lg:row-start-1", media: "lg:col-span-6 lg:col-start-7 lg:row-start-1" }
     : { text: "lg:col-span-5 lg:col-start-8 lg:row-start-1", media: "lg:col-span-6 lg:col-start-1 lg:row-start-1" };
 
-// The solutions chapters run on the calmer measure of columns 2 to 11 from 1280: the text in 4 columns,
-// one free, then the picture in 5 (mirrored: the picture in 2-6, the text in 8-11). A wide-media row (the
-// software window, the app demo) gives the media 6 columns beside the text's 4, the text held 32px off
-// the media's edge. From 1024 to 1279 the rail is too narrow for that measure (a 309px text column, a
-// 393px picture under a 256px card, a 172px picture beside the app), so the rows take the full twelve:
-// the text in 5 and the picture in 6, or the text in 4 and the wide media in 8.
+// The solutions chapters take the rail's full twelve columns from 1024, as the reference's chapters do
+// on its 1,200px measure: the text in 5 and the picture in 6, one column apart (mirrored: the picture in
+// 1-6, the text in 8-12). A wide-media row (the software window, the app demo) gives the media 8 columns
+// beside the text's 4 from 1024, and 7 beside 5 from 1280, where the rail is whole (a 690px window, wide
+// enough for its two-column layout, beside a 454px text column); the text is held 32px off the media.
 const solutionCells = (right: boolean, wide: boolean): Cells => {
   if (wide) {
     return right
-      ? { text: "lg:col-span-4 lg:row-start-1 lg:pr-8 xl:col-start-2", media: "lg:col-span-8 lg:col-start-5 lg:row-start-1 xl:col-span-6 xl:col-start-6" }
-      : { text: "lg:col-span-4 lg:col-start-9 lg:row-start-1 lg:pl-8 xl:col-start-8", media: "lg:col-span-8 lg:col-start-1 lg:row-start-1 xl:col-span-6 xl:col-start-2" };
+      ? { text: "lg:col-span-4 lg:row-start-1 lg:pr-8 xl:col-span-5", media: "lg:col-span-8 lg:col-start-5 lg:row-start-1 xl:col-span-7 xl:col-start-6" }
+      : { text: "lg:col-span-4 lg:col-start-9 lg:row-start-1 lg:pl-8 xl:col-span-5 xl:col-start-8", media: "lg:col-span-8 lg:col-start-1 lg:row-start-1 xl:col-span-7" };
   }
   return right
-    ? { text: "lg:col-span-5 lg:row-start-1 xl:col-span-4 xl:col-start-2", media: "lg:col-span-6 lg:col-start-7 lg:row-start-1 xl:col-span-5" }
-    : { text: "lg:col-span-5 lg:col-start-8 lg:row-start-1 xl:col-span-4", media: "lg:col-span-6 lg:col-start-1 lg:row-start-1 xl:col-span-5 xl:col-start-2" };
+    ? { text: "lg:col-span-5 lg:row-start-1", media: "lg:col-span-6 lg:col-start-7 lg:row-start-1" }
+    : { text: "lg:col-span-5 lg:col-start-8 lg:row-start-1", media: "lg:col-span-6 lg:col-start-1 lg:row-start-1" };
 };
 
+// Both variants' pictures fill 6 of the 12 columns from 1024: 588px once the 75rem rail is whole (from
+// 1248), half the rail less half a gutter below that.
 const sizes = {
-  default: "(min-width: 1440px) 684px, (min-width: 1024px) 47vw, (min-width: 768px) calc(100vw - 3rem), calc(100vw - 2.5rem)",
-  solutions: "(min-width: 1440px) 566px, (min-width: 1280px) 39vw, (min-width: 1024px) 47vw, (min-width: 768px) calc(100vw - 3rem), calc(100vw - 2.5rem)",
+  default: "(min-width: 1248px) 588px, (min-width: 1024px) calc(50vw - 36px), (min-width: 768px) calc(100vw - 3rem), calc(100vw - 2.5rem)",
+  solutions: "(min-width: 1248px) 588px, (min-width: 1024px) calc(50vw - 36px), (min-width: 768px) calc(100vw - 3rem), calc(100vw - 2.5rem)",
 };
 
 /**
@@ -100,8 +101,8 @@ const sizes = {
  *   16:9 pictures; below 1024 the picture follows the text.
  * variant "solutions" (/commercial, /homes-and-rentals, /solar): chapters. Each row is a band of its
  *   own at the feature pad (88 from 1024, 64 below), the tones alternating tint then white from the
- *   word strip down, so a long page reads in steps; from 1280 the rows sit on the calmer measure of
- *   columns 2 to 11; pictures are 3:2 from 1024 and 5:4 below. Below 1024 the text comes first, then
+ *   word strip down, so a long page reads in steps; the rows take the rail's full twelve columns;
+ *   pictures are 3:2 from 1024 and 5:4 below. Below 1024 the text comes first, then
  *   its picture, so on a phone the first picture stays under the fold.
  */
 export function FeatureRows({

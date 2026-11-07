@@ -29,8 +29,8 @@ export type ClosingSectionProps = {
 };
 
 // A collage frame: half the media column (columns 7-12 from 1024), half the grid from 768, half the page below.
-const HALF = "(min-width: 1440px) 330px, (min-width: 1024px) calc(25vw - 30px), (min-width: 768px) calc(50vw - 36px), calc(50vw - 24px)";
-const SINGLE = "(min-width: 1440px) 684px, (min-width: 1024px) calc(50vw - 36px), (min-width: 768px) calc(100vw - 48px), calc(100vw - 32px)";
+const HALF = "(min-width: 1248px) 282px, (min-width: 1024px) calc(25vw - 30px), (min-width: 768px) calc(50vw - 36px), calc(50vw - 24px)";
+const SINGLE = "(min-width: 1248px) 588px, (min-width: 1024px) calc(50vw - 36px), (min-width: 768px) calc(100vw - 48px), calc(100vw - 32px)";
 
 function Frame({ item, children }: { item: CollageItem; children: ReactNode }) {
   return (

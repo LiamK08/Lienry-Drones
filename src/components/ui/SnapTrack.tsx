@@ -49,8 +49,8 @@ const layout = {
   },
 } as const;
 
-// A track at every width. It bleeds to the right screen edge: past 1440 the grid centres, so the
-// bleed (--bleed) is whichever is wider, the page margin or the space beside the 87rem grid. The
+// A track at every width. It bleeds to the right screen edge: past 1248 the 75rem grid centres, so the
+// bleed (--bleed) is whichever is wider, the page margin or the space beside the grid. The
 // padding matches the bleed, so percentage widths still measure against the grid.
 const always =
   "flex overflow-x-auto snap-x snap-mandatory gap-4 md:gap-6 -ml-2 pl-2 scroll-pl-2 -my-2 py-2 -mr-(--bleed) pr-(--bleed) [&>li]:shrink-0 [&>li]:snap-start max-md:[&>li]:w-[82%] md:max-lg:[&>li]:w-[46%]";

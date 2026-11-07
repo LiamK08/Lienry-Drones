@@ -34,8 +34,8 @@ export type CardGridProps = {
 };
 
 const SIZES = {
-  2: "(min-width: 1440px) 684px, (min-width: 768px) calc(50vw - 36px), calc(100vw - 32px)",
-  3: "(min-width: 1440px) 448px, (min-width: 1024px) 31vw, (min-width: 768px) calc(50vw - 36px), calc(100vw - 32px)",
+  2: "(min-width: 1248px) 588px, (min-width: 768px) calc(50vw - 36px), calc(100vw - 32px)",
+  3: "(min-width: 1248px) 384px, (min-width: 1024px) calc(33.3vw - 32px), (min-width: 768px) calc(50vw - 36px), calc(100vw - 32px)",
 } as const;
 
 const SPAN = { 2: "lg:col-span-6", 3: "lg:col-span-4" } as const;

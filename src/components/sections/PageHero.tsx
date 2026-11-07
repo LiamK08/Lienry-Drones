@@ -8,9 +8,9 @@ import { HeroFilmFrame, type HeroFilmMedia } from "@/components/sections/HeroFil
 
 export { HeroFilmFrame };
 
-/** The hero frame's widths: the grid at 1440, the page less its margins below. Defined here, in a
+/** The hero frame's widths: the 75rem rail from 1248, the page less its margins below. Defined here, in a
  *  server module: a value imported from a "use client" module is only a reference on the server. */
-export const HERO_SIZES = "(min-width: 1440px) 1392px, (min-width: 768px) calc(100vw - 48px), calc(100vw - 32px)";
+export const HERO_SIZES = "(min-width: 1248px) 1200px, (min-width: 768px) calc(100vw - 48px), calc(100vw - 32px)";
 
 export type PageHeroMedia = (
   | { kind: "image"; id: string; alt: string }

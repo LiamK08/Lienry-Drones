@@ -64,7 +64,8 @@ function heroGround(): string {
  * October): Lienry Desktop sits in Resources, and every page closes on its own Register interest.
  * Over the home film it is clear with white text; anywhere else it is a soft white veil at the top of
  * the page and, once scrolled, a white bar with a hairline. The logo sits on
- * the page's rail (the Container's left edge: 20px on phones, 24px from 768, centred past 1440). An open
+ * the bar's own wide rail (87rem: 20px in on phones, 24px from 768, centred past 1440), wider than the
+ * content's 75rem rail, as the reference's bar is. An open
  * panel dims the page under it. Below 1024 the bar holds the logo and the burger, which drops a
  * short white sheet under the bar with the four sections as 56px rows on hairlines (each opens in place on
  * the tint: its groups under their heads, then its panel's feature as a text link) over the dimmed page;
@@ -211,8 +212,9 @@ export function Nav() {
           />
         ) : null}
       </AnimatePresence>
-      {/* The rail: the Container's 87rem inside the page margin, so the logo starts where the page's content does. */}
-      <nav aria-label="Primary" className="relative mx-auto flex h-full max-w-[calc(var(--container-grid)+2*var(--page-margin))] items-center px-(--page-margin)" onMouseLeave={hoverClose}>
+      {/* The bar's own rail, wider than the content's: 87rem (--container-wide) inside the page margin, so the
+          logo and the menus hold their places while the pages read on the 75rem content rail. */}
+      <nav aria-label="Primary" className="relative mx-auto flex h-full max-w-[calc(var(--container-wide)+2*var(--page-margin))] items-center px-(--page-margin)" onMouseLeave={hoverClose}>
         <Logo />
         <ul className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 lg:flex">
           {menus.map((m) => (
