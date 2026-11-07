@@ -32,9 +32,9 @@ export type FeatureRowItem = {
   aspect?: "4/3" | "16/9";
   /** The row's pill: the white one (default) or the accent one, both with the arrow badge. */
   linkStyle?: "secondary" | "primary";
-  /** Solutions variant only: the media takes 8 of the 12 columns from 1024 and 6 from 1280, the text 4
-   *  (the software window, the /homes-and-rentals app demo). Other solutions rows give the text 5 and
-   *  the picture 6 from 1024, then the text 4 and the picture 5 from 1280. */
+  /** Solutions variant only: the media takes 8 of the 12 columns from 1024 and 7 from 1280, beside the
+   *  text's 4, then 5 (the software window, the /homes-and-rentals app demo). Other solutions rows give
+   *  the text 5 and the picture 6 from 1024. */
   wideMedia?: boolean;
   /** A static, coded Demo-data card over the row's picture (RowPanel), on the `corner` side away from
    *  the subject (default: the picture's outer side). Never on a software-window or app row.

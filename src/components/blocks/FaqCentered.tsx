@@ -16,7 +16,8 @@ const noStop = (s: string) => (/[.?!]\s/.test(s) ? s : s.replace(/\.\s*$/, ""));
  * The questions, split: from 1024 the head holds columns 1 to 4 and stays in view under the bar while
  * the rows scroll past in columns 6 to 12; below 1024 the head sits above the rows, 32px over them, and
  * never beside them. The head is the heading at the inner section step (36, left-aligned; no italic payoff:
- * "questions" is not one), then the optional `intro` line and `link`. Nothing is centred.
+ * the home FAQ carries the site's one "questions" payoff and the inner pages' FAQ heads stay plain, so the
+ * italics stay at about one heading in three), then the optional `intro` line and `link`. Nothing is centred.
  * The name keeps its history: the questions were once a centred column.
  */
 export function FaqCentered({
