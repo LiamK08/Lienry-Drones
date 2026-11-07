@@ -429,13 +429,30 @@ NODE_USE_ENV_PROXY=1 node scripts/perf-vitals.mjs http://localhost:3000 [routes]
 1. Which ground pod design is real: the closed lid or the open one?
 2. Can `co1-company` and `s5-software` be regenerated to the overcast look?
 3. Which system serves solar farms? Until we know, no copy names one.
-4. What contact email should /privacy give?
+4. A contact email for /privacy, if one should be published. Until then the policy sends people to the
+   enquiry form (the owner's call, 7 November: no address is invented). The policy should still be read by
+   a legal adviser before launch; that note is off the live page and lives here.
 5. Lienry Desktop: the installer URLs and version for `src/lib/download.ts`, and whether signing in
    needs a software plan.
 6. `c2-commercial-clip`: show it on a page again, or retire it from the manifest?
 7. Is `ENQUIRY_WEBHOOK_URL` set in production? Without it /api/enquiry answers 503, so the booking
    card, the fit check's "Send me my result" and the enquiry form all show their "could not send" line.
 8. Are the fit check's red and amber answer tones acceptable beside the one glass-blue accent?
+
+## The 6 November review's decisions (the owner, 7 November: "go with your recommendations")
+
+1. Home keeps the booking calendar beside the FAQ (a working tool refresh's closing panel cannot match).
+2. Section heads may end on an italic payoff, about one in three (built 7 November).
+3. Content sits in a 1200px rail; the header bar stays wide (built 7 November).
+4. No announcement strip until there is a true, dated message (a Desktop release, a pilot opening day).
+5. No signed vision statement until Liam approves its words. A draft from words already on the site:
+   "Exterior cleaning still means a crew, a rope and a date weeks away. We are building Lienry so a
+   property can look after its own exterior: a drone that lives on site, cleans from a model of the
+   building, and keeps people off ropes. We say only what we can stand behind, and every decision is
+   measured against one question: does this make a property easier to own?"
+6. Menu group headings stay in Inter: they are navigation labels, and the feature cards carry the colour.
+7. /privacy keeps the enquiry form as its contact route; the "reviewed by a legal adviser" line is off the
+   live page (see Waiting on the owner, 4).
 
 ## Owner's calls left open by the second pass
 
