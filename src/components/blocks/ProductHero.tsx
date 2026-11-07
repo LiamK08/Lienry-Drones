@@ -27,7 +27,9 @@ export type ProductHeroProps = {
  * A product page's first screen (/platform, /download): the product itself under its headline. On white,
  * behind the head, one still blurred accent glow; a centred column of the h1 with its accent italic, the
  * lead (18/1.55, 608px at most) and the actions. Below it, on the 12-column grid's middle ten columns from
- * 1024, the working software window in a translucent white frame (the panel corners, a white edge, a
+ * 1024 and the rail's full width from 1280 (as the reference's frame spans its 1,200px measure, so the
+ * window keeps its three columns with the model wide between them), the working software window in a
+ * translucent white frame (the panel corners, a white edge, a
  * long soft shadow; solid, never a backdrop blur). Behind the frame's lower part a pale sky pool rises
  * from the white to the tint and settles back to white before the band ends: an empty layer, so no
  * gradient sits behind any text, and the band meets the next one without a seam.
@@ -71,7 +73,7 @@ export function ProductHero({ headingId = "hero-heading", headline, emphasis, le
         />
         <Container>
           <div className="lg:grid-12">
-            <div className="rounded-panel border border-white bg-white/60 p-2 shadow-[0_48px_96px_-48px_rgb(17_26_34/0.28)] md:p-3 lg:col-span-10 lg:col-start-2">
+            <div className="rounded-panel border border-white bg-white/60 p-2 shadow-[0_48px_96px_-48px_rgb(17_26_34/0.28)] md:p-3 lg:col-span-10 lg:col-start-2 xl:col-span-12 xl:col-start-1">
               <SoftwareWindow priority frame="inset" />
             </div>
           </div>

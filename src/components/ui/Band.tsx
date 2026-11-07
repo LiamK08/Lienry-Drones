@@ -21,7 +21,7 @@ export type BandProps = {
 };
 
 export type ContainerProps = {
-  /** Default "grid" (1,392px, centred). "prose" (45ch) and "form" (40rem) sit on the grid's left edge. */
+  /** Default "grid" (the 1,200px content rail, centred). "prose" (45ch) and "form" (40rem) sit on the grid's left edge. */
   width?: "grid" | "prose" | "form";
   className?: string;
   children: ReactNode;

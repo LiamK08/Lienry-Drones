@@ -82,7 +82,7 @@ export function LandlordAppFrame() {
                 fit="fill"
                 frameAspect={0.66}
                 rounded="image"
-                sizes="(min-width: 1440px) 413px, (min-width: 1280px) 30vw, (min-width: 1024px) 34vw, (min-width: 768px) 52vw, calc(100vw - 2.5rem)"
+                sizes="(min-width: 1280px) 379px, (min-width: 1248px) 436px, (min-width: 1072px) calc(37vw - 27px), (min-width: 1024px) calc(66.7vw - 344px), (min-width: 768px) 52vw, calc(100vw - 2.5rem)"
               />
               <Chip shot={key} text={pic.chip} live={on} />
             </div>

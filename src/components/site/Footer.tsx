@@ -68,7 +68,8 @@ function FooterSheet() {
         </div>
       </div>
 
-      {/* The rail: the Container's 87rem inside the page margin, the left edge of every band above. */}
+      {/* The content rail: the Container's 75rem inside the page margin, the left edge of every band above
+          (the reference's footer follows its content, not its wider header bar). */}
       <div className="page-x mt-10 md:mt-12">
         <div className="mx-auto w-full max-w-grid">
           <div className="grid gap-y-8 lg:grid-cols-4 lg:items-end lg:gap-x-6">

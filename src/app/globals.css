@@ -101,8 +101,12 @@
   --text-numeral--line-height: 1;
   --text-numeral--letter-spacing: -0.02em;
 
-  /* 1,392px: 12 columns of 94px with 24px gutters at 1440. */
-  --container-grid: 87rem;
+  /* The content rail, 1,200px: 12 columns of 78px with 24px gutters (the owner's call, 7 November
+     2026: refresh's narrower measure). Every Container, the home hero's words and the footer sit on it. */
+  --container-grid: 75rem;
+  /* The header bar's own rail, 1,392px, wider than the content: the logo and the menus keep their
+     places while the pages read in the narrower measure (Nav.tsx). */
+  --container-wide: 87rem;
   /* The 68-character cap, set in characters rather than zeroes. CSS ch is the advance of "0",
      which Inter renders at 0.65em with optical sizing on, while a character of this site's own
      prose averages about 0.47em, so 68ch sets 91 characters a line, not 68. This value was found
@@ -163,7 +167,7 @@
     --head-gap: 2.5rem;       /* 40 below 1024 */
     --hero-gap: 3.5rem;       /* 56 below 768 */
     --hero-top: calc(var(--nav-h) + var(--hero-gap));
-    --bleed: max(var(--page-margin), calc((100vw - 87rem) / 2));
+    --bleed: max(var(--page-margin), calc((100vw - var(--container-grid)) / 2));
   }
   @media (min-width: 48rem) {
     :root { --page-margin: 1.5rem; --gutter: 1.5rem; --section-y: 5rem; --hero-gap: 4rem; }

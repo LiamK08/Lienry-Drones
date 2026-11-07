@@ -114,7 +114,7 @@ export function StepTimer() {
               <div className="relative aspect-[16/10] lg:col-span-7 lg:aspect-auto lg:[-webkit-mask-image:linear-gradient(90deg,#000_70%,transparent)] lg:[mask-image:linear-gradient(90deg,#000_70%,transparent)]">
                 {how.steps.map((s, i) => (
                   <div key={s.id} aria-hidden={i !== active} className={`absolute inset-0 transition-opacity duration-700 ease-instrument motion-reduce:transition-none ${i === active ? "opacity-100" : "opacity-0"}`}>
-                    <Picture id={s.image.id} alt={i === active ? s.image.alt : ""} position={s.image.position} fit="fill" frameAspect={1.5} rounded="none" sizes="(min-width: 1440px) 820px, (min-width: 1024px) 58vw, 100vw" className="absolute inset-0" />
+                    <Picture id={s.image.id} alt={i === active ? s.image.alt : ""} position={s.image.position} fit="fill" frameAspect={1.5} rounded="none" sizes="(min-width: 1280px) 816px, (min-width: 1024px) 720px, 100vw" className="absolute inset-0" />
                   </div>
                 ))}
                 <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(to_top,color-mix(in_srgb,var(--color-night)_75%,transparent)_0%,transparent_55%)]" />
