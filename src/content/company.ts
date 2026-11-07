@@ -39,7 +39,8 @@ export const companyPage = {
     ],
     values: {
       lead: "How we work.",
-      text: "We say only what we can stand behind, and we design safety in rather than leaving it to supervision. Every decision is measured against one question: does this make a property easier to own?",
+      // Cut to what Liam's statement just below does not already say (its closing sentence carries the rest).
+      text: "We design safety in rather than leaving it to supervision.",
     },
   },
   // The plan, as a ruler of stems (PlanTimeline). It opens on the stage marked "now".
