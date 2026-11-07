@@ -62,6 +62,17 @@ export const companyPage = {
       { title: "Built for owners", body: "If it does not make a property easier to own, it does not ship." },
     ],
   },
+  // Liam's vision statement, in the words he approved on 7 November 2026: the first two sentences as the
+  // display line, the third under it, then his name and title. Over the home hero's still, darkened.
+  vision: {
+    label: "A note from our founder",
+    lead: "Exterior cleaning still means a crew, a rope and a date weeks away.",
+    line: "We are building Lienry so a property can look after its own exterior: a drone that lives on site, cleans from a model of the building, and keeps people off ropes.",
+    close: "We say only what we can stand behind, and every decision is measured against one question: does this make a property easier to own?",
+    name: "Liam Kennedy",
+    title: "Founder and CEO",
+    image: { id: "h0-hero-still", alt: "", position: "62% 45%" },
+  },
   // The pre-seed round, centred: who leads the company, three facts from the round's own paragraph (what
   // it funds, who we want to hear from, what we share), then the investor action. No amounts, no backers.
   round: {

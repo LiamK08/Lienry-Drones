@@ -423,8 +423,9 @@ NODE_USE_ENV_PROXY=1 node scripts/perf-vitals.mjs http://localhost:3000 [routes]
   on /fit-check), `Icon`, `holdLines`, `FiguresPanel`, `CostCalculator layout="listing"`, `EnquiryTypeTabs`
   (with `EnquiryTypeProvider`). `ui/Button` exports `ButtonFace`, the pill drawn inside a card link that
   names itself `group/card`.
-- **Company** (`src/components/company`): `PictureFan` (three framed stills) and `PlanTimeline` (the five
-  plan stages as tabs on a ruler, no dates or amounts).
+- **Company** (`src/components/company`): `PictureFan` (three framed stills), `PlanTimeline` (the five
+  plan stages as tabs on a ruler, no dates or amounts) and `VisionBand` (Liam's statement, a quotation on a
+  night panel over a darkened full-bleed still).
 - **Home** (`src/components/home`): `Hero`, `Strip` (marquee), `WhyFit`, `ExpandCards`, `StepTimer`,
   `SystemCards`, `Explore`, `SafetyPanel`, `FaqForm`; `DemoPanels` (the coded panels in the reason
   cards and the step stage); `WashMap` (the Clean step's hands-on map), `DroneGlyph` (the intro's
@@ -460,11 +461,10 @@ NODE_USE_ENV_PROXY=1 node scripts/perf-vitals.mjs http://localhost:3000 [routes]
 2. Section heads may end on an italic payoff, about one in three (built 7 November).
 3. Content sits in a 1200px rail; the header bar stays wide (built 7 November).
 4. No announcement strip until there is a true, dated message (a Desktop release, a pilot opening day).
-5. No signed vision statement until Liam approves its words. A draft from words already on the site:
-   "Exterior cleaning still means a crew, a rope and a date weeks away. We are building Lienry so a
-   property can look after its own exterior: a drone that lives on site, cleans from a model of the
-   building, and keeps people off ropes. We say only what we can stand behind, and every decision is
-   measured against one question: does this make a property easier to own?"
+5. The vision statement: the owner approved the draft on 7 November ("approve the vision statement and
+   add it to company"). It is on /company between the story and the round (`company/VisionBand.tsx`,
+   words in `companyPage.vision`), signed Liam Kennedy, Founder and CEO, on a night panel over the
+   darkened `h0-hero-still`. It is Liam's own statement: change its words only with his approval.
 6. Menu group headings stay in Inter: they are navigation labels, and the feature cards carry the colour.
 7. /privacy keeps the enquiry form as its contact route; the "reviewed by a legal adviser" line is off the
    live page (see Waiting on the owner, 4).

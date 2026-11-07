@@ -5,6 +5,7 @@ import { AccentPanel } from "@/components/blocks/AccentPanel";
 import { BubbleHero } from "@/components/blocks/BubbleHero";
 import { PictureFan } from "@/components/company/PictureFan";
 import { PlanTimeline } from "@/components/company/PlanTimeline";
+import { VisionBand } from "@/components/company/VisionBand";
 import { MenuTile } from "@/components/site/MenuTile";
 import { Band, Container } from "@/components/ui/Band";
 import { Button } from "@/components/ui/Button";
@@ -19,12 +20,13 @@ export const metadata: Metadata = pageMetadata(
 /**
  * /company: the tinted hero with round pictures around the headline; the story as one pale panel on the
  * rail (its heading in columns 1-5 beside where we are in 7-12, three framed pictures fanned, the plan as
- * a ruler of stages and how we work as its closing line); the pre-seed round centred on paper (who leads
+ * a ruler of stages and how we work as its closing line); Liam's statement on a night panel over a darkened
+ * still (VisionBand); the pre-seed round centred on paper (who leads
  * the company, three facts from the round, the investor action over the media line); then the closing
  * panel with its two steps.
  */
 export default function CompanyPage() {
-  const { hero, story, plan, round, close, media } = companyPage;
+  const { hero, story, plan, vision, round, close, media } = companyPage;
   return (
     <>
       <BubbleHero mobileLines={3} headline={hero.headline} emphasis={hero.emphasis} lead={hero.lead} images={hero.images} />
@@ -51,6 +53,7 @@ export default function CompanyPage() {
           </div>
         </Container>
       </Band>
+      <VisionBand id="vision" {...vision} />
       <Band id="round" tone="paper" labelledBy="round-heading">
         <Container className="flex flex-col items-center text-center">
           {/* The heading keeps "pre-seed" whole, so it breaks between words. */}
