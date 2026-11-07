@@ -1,4 +1,4 @@
-# Handoff, 6 November 2026
+# Handoff, 7 November 2026
 
 Read this first in a new session, then `CLAUDE.md`. Update this file at the end of each session.
 
@@ -324,6 +324,21 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
     before); `npm run contrast` at 1440 and 390 (6.53:1 at worst); `perf:vitals` alone on all 11 pages,
     mobile median LCP 1.93-2.01s, /download 2.28s and /platform 2.35s (the window's poster), CLS at
     most 0.065. PR frames: `docs/screenshots/refresh-nov/`.
+- 7 November (the owner, on the review's seven decisions: "go with your recommendations"; the answers are
+  under "The 6 November review's decisions" below). Built: content on a 1200px rail (`--container-grid`
+  75rem) with the header bar and the home reasons row on the 1392px wide rail (`--container-wide`,
+  `data-rail="wide"`; check 32 measures that row against the wide rail, from the tokens); the footer follows
+  the content rail; image `sizes` recomputed; the solutions chapters back on all 12 columns; the product
+  window full-rail from 1280; the reasons row five across from 1400 (its titles clipped below that), the
+  carousel under it. Italic payoffs on 12 of the 46 section heads that can carry one (check 9: only in the
+  heading that labels its band): the accent on light bands, the pale glass blue on night panels, white on
+  the accent close. /privacy's legal-adviser draft note is off the page. CLAUDE.md's Layout and Type say so.
+  - Gates on 7 November: typecheck, lint and build; `check:layout` all 12 routes at 1440, 1024, 768 and 390
+    (three warnings: /company's story head at 1024, the italic saving it a line, and /register-interest's
+    form columns as before); `check:rules` with motion all 12; `check:a11y` all 12; `npm run contrast` 6.53:1
+    at worst; `perf:vitals` alone on all 11 pages (mobile LCP 1.88-2.02s, /platform 2.29s, /download 2.31s,
+    CLS at most 0.065); a three-lens review (3 small findings, fixed). PR frames:
+    `docs/screenshots/owner-decisions/`.
 ## How the owner works
 
 - They want results fast. Prefer to build, check, commit and push over long plans or multi-agent
