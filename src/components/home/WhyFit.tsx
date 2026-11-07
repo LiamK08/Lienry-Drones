@@ -12,7 +12,7 @@ export function WhyFit() {
   return (
     <Band id="fit-check" tone="tint" labelledBy="why-heading" className="bg-[linear-gradient(165deg,var(--color-tint)_0%,color-mix(in_srgb,var(--color-tint)_55%,var(--color-plaster))_40%,var(--color-plaster)_100%)]">
       <Container>
-        <SectionHead id="why-heading" layout="center" headline={why.headline} intro={why.intro} />
+        <SectionHead id="why-heading" layout="center" headline={why.headline} emphasis={why.emphasis} intro={why.intro} />
         <div className="mt-(--head-gap) min-[75rem]:mx-auto min-[75rem]:max-w-[calc(100%*10/12)]">
           <FitCheck />
         </div>

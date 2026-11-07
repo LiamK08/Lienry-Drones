@@ -43,6 +43,7 @@ export const homesPage = {
   // The night panel: what is designed in, as four fact tiles (the honest stand-in for badges).
   safety: {
     headline: "No ladders, and nobody walking the roof",
+    emphasis: "nobody walking the roof",
     aside: "No ladders, no lifts, no crews to book.",
     action: { label: "How the ground pod works", href: "/platform#dock" },
     tiles: [
@@ -65,6 +66,7 @@ export const homesPage = {
  */
 export const landlordStory = {
   headline: "Your property, wherever you are",
+  emphasis: "wherever you are",
   intro: "You own a rental in Sydney and live overseas. It needs a clean before the next tenant.",
   steps: ["Choose the areas to clean", "Tap start, wherever you are", "Watch each area clean in turn", "See the house after the clean"],
   pictures: {

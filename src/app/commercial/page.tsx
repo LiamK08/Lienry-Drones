@@ -31,7 +31,7 @@ export default function CommercialPage() {
       <FeatureRows id="features" variant="solutions" items={items} />
       <SafetyBlock {...safety} />
       <FaqCentered items={faqFor("commercial")} spacing="page" />
-      <AccentPanel id="closing" headline={close.headline} action={close.action} secondary={close.secondary} band="close" />
+      <AccentPanel id="closing" headline={close.headline} emphasis={close.emphasis} action={close.action} secondary={close.secondary} band="close" />
     </>
   );
 }

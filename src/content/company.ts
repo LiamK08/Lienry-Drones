@@ -29,6 +29,7 @@ export const companyPage = {
   // The story, as one pale panel: where the company stands, three framed pictures, the plan, and how we work.
   story: {
     headline: "From the drawing board to a Sydney roof",
+    emphasis: "to a Sydney roof",
     where: "Everything on this site describes the design, and none of it is in service yet. The platform, both systems and the software are designed. We are raising a pre-seed round to build the system and run a pilot with a small number of commercial buildings under 70 metres in Sydney.",
     // Framed once each on the page (the bubble hero's are decorative). Below 768 the first is left out.
     pictures: [

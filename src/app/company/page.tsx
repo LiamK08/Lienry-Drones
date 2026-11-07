@@ -9,6 +9,7 @@ import { MenuTile } from "@/components/site/MenuTile";
 import { Band, Container } from "@/components/ui/Band";
 import { Button } from "@/components/ui/Button";
 import { keepWhole } from "@/components/ui/keepWhole";
+import { Headline } from "@/components/ui/SectionHead";
 
 export const metadata: Metadata = pageMetadata(
   "/company",
@@ -31,8 +32,8 @@ export default function CompanyPage() {
         <Container>
           <div className="rounded-panel bg-tint px-6 py-12 md:px-10 lg:px-[4.5rem] lg:pt-16 lg:pb-24">
             <div className="grid gap-6 lg:grid-12 lg:items-start lg:gap-y-0">
-              <h2 id="story-heading" className="text-h2s text-balance lg:col-span-5">
-                {story.headline}
+              <h2 id="story-heading" className="em-accent text-h2s text-balance lg:col-span-5">
+                <Headline text={story.headline} emphasis={story.emphasis} />
               </h2>
               <p className="max-w-[36rem] text-lead leading-[1.55] text-fg-muted lg:col-span-6 lg:col-start-7">{story.where}</p>
             </div>

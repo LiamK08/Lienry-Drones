@@ -33,7 +33,7 @@ export const privacyPage: {
   sections: [
     {
       title: "Who we are",
-      body: "Lienry Drones is a Sydney-based company at concept stage. This policy explains what we collect through this website and how we use it. It should be reviewed by a legal adviser before launch.",
+      body: "Lienry Drones is a Sydney-based company at concept stage. This policy explains what we collect through this website and how we use it.",
     },
     {
       title: "What we collect",

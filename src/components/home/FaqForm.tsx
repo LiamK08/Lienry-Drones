@@ -20,7 +20,7 @@ export function FaqForm() {
         <div className="grid gap-12 lg:grid-12 lg:gap-y-0">
           <div className="lg:col-span-6">
             <Reveal animate y={10}>
-              <h2 id="faq-heading" className="text-h2">
+              <h2 id="faq-heading" className="em-accent text-h2">
                 <Headline text={faq.headline} emphasis={faq.emphasis} />
               </h2>
             </Reveal>

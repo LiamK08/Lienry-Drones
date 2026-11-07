@@ -1,6 +1,7 @@
 import type { Action } from "@/lib/types";
 import { Band, Container } from "@/components/ui/Band";
 import { Button } from "@/components/ui/Button";
+import { Headline } from "@/components/ui/SectionHead";
 
 // The inset panel's band: "section" rhythm, or "close" (no top padding, 56/80 below) after a band
 // that already ends with its own space.
@@ -15,7 +16,9 @@ const noStop = (s: string) => (/[.?!]\s/.test(s) ? s : s.replace(/\.\s*$/, ""));
  * - inset (default): the site's compact close. An accent card with the panel corners, about 1000px wide
  *   and centred on the rail (the full rail below that), 312px tall from 1024, with one still, soft light
  *   in its top-left corner. In it, centred: the line at the inner section step (36, white, balanced, two
- *   lines at most from 768, no italic, no closing full stop), then the main ask as the white pill with
+ *   lines at most from 768, no closing full stop on one sentence; an `emphasis` is set in the italic in
+ *   the heading's white, on its own line from 768 when it is the second sentence: the pale glass blue
+ *   falls to 2.84:1 over the corner light on a phone), then the main ask as the white pill with
  *   its arrow badge and, when given, the lighter `secondary` step beside it as a white text link with its
  *   arrow (`.on-accent`, so its underline thickens on hover). `note` sits centred below the card.
  * - `bleed` + `dark`: the platform's statement band, a full-bleed night band with one still accent glow,
@@ -24,6 +27,7 @@ const noStop = (s: string) => (/[.?!]\s/.test(s) ? s : s.replace(/\.\s*$/, ""));
 export function AccentPanel({
   id,
   headline,
+  emphasis,
   action,
   bleed = false,
   dark = false,
@@ -33,6 +37,8 @@ export function AccentPanel({
 }: {
   id: string;
   headline: string;
+  /** The trailing phrase of `headline` (its second sentence, say), set in the italic: its payoff. */
+  emphasis?: string;
   action: Action;
   /** The lighter second step beside the main ask (usually "Check your building"), as a text link. */
   secondary?: Action;
@@ -41,10 +47,15 @@ export function AccentPanel({
   note?: string;
   band?: keyof typeof bandPads;
 }) {
+  const line = noStop(headline);
+  // The payoff loses its full stop where the line does (one sentence) and keeps it where the line keeps both.
+  const em = emphasis && (line.endsWith(emphasis) ? emphasis : noStop(emphasis));
+  // A payoff that is the line's second sentence starts its own line from 768.
+  const ownLine = Boolean(em && /[.?!]\s*$/.test(line.slice(0, line.length - em.length)));
   const content = (
     <div className="relative mx-auto flex w-full max-w-[40rem] flex-col items-center text-center">
       <h2 id={`${id}-heading`} className="text-h2s text-balance text-white">
-        {noStop(headline)}
+        <Headline text={line} emphasis={em} breakBefore={ownLine} />
       </h2>
       <div data-actions="" className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-6">
         <Button href={action.href} variant="glass" arrow>
