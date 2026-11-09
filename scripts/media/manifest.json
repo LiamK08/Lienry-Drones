@@ -1,6 +1,6 @@
 {
   "$schema": "./manifest.schema.json",
-  "note": "Source URLs are Higgsfield generation results made from the approved design sheet of 18 September 2026 (see docs/MEDIA.md for the references and prompts). Run `npm run media:fetch` (or the media workflow on GitHub Actions) to download, optimise and write public/media. Prompts and references are logged in docs/MEDIA.md.",
+  "note": "Source URLs are Higgsfield generation results made from the approved design sheet of 18 September 2026 (see docs/MEDIA.md for the references and prompts), except the home hero film and its first frames (h1-hero-film, h2-hero-frame, h3-hero-film-tall, h4-hero-frame-tall): a Blender render of the owner's H1 model, kept in scripts/media/masters and listed as repo: sources. Run `npm run media:fetch` (or the media workflow on GitHub Actions) to download, optimise and write public/media. Prompts and references are logged in docs/MEDIA.md.",
   "assets": [
     {
       "id": "h0-hero-still",
@@ -12,7 +12,7 @@
         1920,
         2560
       ],
-      "placement": "Home hero poster, Platform hero, first and last frame of the hero film"
+      "placement": "Company page vision band backdrop"
     },
     {
       "id": "m1-drone-master",
@@ -303,11 +303,41 @@
     {
       "id": "h1-hero-film",
       "kind": "video",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_092015_a83c481d-8ce0-41d0-8472-251e408404e3.mp4",
+      "url": "repo:scripts/media/masters/h1-hero-film-v2-1280x720.mp4",
+      "height": 720,
+      "duration": 8,
+      "grade": false,
+      "placement": "Home hero film from 768px: a Blender render of the owner's H1 model cleaning a window (docs/MEDIA.md)"
+    },
+    {
+      "id": "h2-hero-frame",
+      "kind": "image",
+      "url": "repo:scripts/media/masters/h2-hero-frame-v2-1280x720.png",
+      "widths": [
+        768,
+        1280
+      ],
+      "grade": false,
+      "placement": "Home hero poster from 768px: frame 1 of h1-hero-film"
+    },
+    {
+      "id": "h3-hero-film-tall",
+      "kind": "video",
+      "url": "repo:scripts/media/masters/h3-hero-film-tall-v2-608x1080.mp4",
       "height": 1080,
       "duration": 8,
-      "placement": "Home hero film",
-      "gradeFrom": "h0-hero-still"
+      "grade": false,
+      "placement": "Home hero film below 768px: the portrait cut of h1-hero-film"
+    },
+    {
+      "id": "h4-hero-frame-tall",
+      "kind": "image",
+      "url": "repo:scripts/media/masters/h4-hero-frame-tall-v2-608x1080.png",
+      "widths": [
+        608
+      ],
+      "grade": false,
+      "placement": "Home hero poster below 768px: frame 1 of h3-hero-film-tall"
     },
     {
       "id": "c2-commercial-clip",

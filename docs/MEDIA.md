@@ -1,6 +1,6 @@
 # Media log
 
-Every AI-generated asset on the site, with its prompt, model, references, file path and placement. Assets are generated with the connected Higgsfield account, downloaded and optimised by `scripts/media/fetch.mjs` (locally, as the `prebuild` step on the host, or via the "Fetch and optimise media" GitHub Actions workflow), and written to `public/media/`. No image or film on the site carries a Concept render caption: the owner removed them on 26 September 2026.
+Every AI-generated asset on the site, with its prompt, model, references, file path and placement, and the one asset that is not AI-generated: the home hero film, a Blender render of the owner's H1 model (see "Home hero film", below). Assets are generated with the connected Higgsfield account, downloaded and optimised by `scripts/media/fetch.mjs` (locally, as the `prebuild` step on the host, or via the "Fetch and optimise media" GitHub Actions workflow), and written to `public/media/`. No image or film on the site carries a Concept render caption: the owner removed them on 26 September 2026.
 
 The whole set was regenerated on 18 September 2026 from an approved design sheet, replacing the pale-grey quadcopter renders of 17 and 18 September. The asset ids and file paths are unchanged, so nothing on the site had to move.
 
@@ -18,7 +18,7 @@ The transform for each asset is baked into one 33-point 3D colour table:
 
 - **Stills** go through the table in JavaScript before resizing.
 - **Films** go through the same table with ffmpeg's `lut3d`.
-- **Films made from a still** use that still's measurements (`gradeFrom` in the manifest), so the hero film matches its still and the commercial clip matches the commercial hero.
+- **Films made from a still** use that still's measurements (`gradeFrom` in the manifest), so the commercial clip matches the commercial hero. The Blender hero film and its first frames are graded in their own render pipeline and skip the house grade (`"grade": false`).
 
 Each index entry records the grade it was made with, so changing the grade re-processes everything on the next build. Set `"grade": false` on a manifest asset to leave it ungraded, or override any value with `"grade": { … }`. The source files are untouched. No grain is added: it would inflate every AVIF, WebP and film past their size budgets.
 
@@ -31,7 +31,7 @@ Measured on the output, against the ungraded set:
 | Mid-tone b* | -11.8 to +10.1 | -2.6 to +4.1 |
 | Highlight b* | -8.3 to +9.5 | -1.7 to +2.8 (one outlier at +6.9, the wet driveway) |
 | Mean chroma C* | 3.3 to 11.1 | 1.4 to 7.4 |
-| Hero film against its still (mean ΔE) | 0.6 | 1.4 |
+| Hero film against its still (mean ΔE; the retired MiniMax film) | 0.6 | 1.4 |
 | Commercial clip against its still (mean ΔE) | 0.2 | 1.2 |
 
 Two differences a grade cannot fix need the owner: `co1-company` is a backlit sunrise and `s5-software` is an indoor frame, and neither belongs in an overcast exterior set. The ground pod also appears in two designs across the stills.
@@ -126,10 +126,9 @@ All at 2K. Nano Banana 2 unless noted. "Job" is the Higgsfield generation the ma
 
 | ID | Model | Length | Frames | Credits | Job | Prompt |
 | --- | --- | --- | --- | --- | --- | --- |
-| h1-hero-film | MiniMax H3, 2K, 16:9 | 6 s | h0-hero-still as first and last frame | 12 | a83c481d-8ce0-41d0-8472-251e408404e3 | The tethered cleaning drone holds a slow steady horizontal pass along the glass facade, 40 centimetres from the panes, drifting half a metre to the right and back to where it started. Its spray bar throws a wide flat fan of water that sheets down the glass; the glass behind it stays clean and wet. The single tether follows in a smooth slack curve up toward the roof, never taut. The camera pushes in five percent and settles. No other motion, no people, nothing appears or disappears, seamless loop returning exactly to the first frame, silent. |
 | c2-commercial-clip | MiniMax H3, 2K, 16:9 | 6 s | c1-commercial-hero as first and last frame | 12 | 257ae3d1-c319-4cd4-bf28-0afc0ec19a55 | The capsule lid is already open. The tethered drone rises vertically forty centimetres above its cradle, pauses, turns slightly toward the parapet, then settles back down onto the cradle. The tether pays out and back in a smooth curve from the reel. The camera is locked off with a slight slow push in. Nobody on the roof, nothing else moves, seamless loop returning exactly to the first frame, silent. |
 
-The site uses `h1-hero-film` for the home hero and `c2-commercial-clip` for the film band and the Commercial hero.
+The home hero plays the Blender film (`h1-hero-film`, and `h3-hero-film-tall` below 768px; see "Home hero film"). `c2-commercial-clip` is kept but unplaced.
 
 ## Review notes (Higgsfield video analysis, 18 September 2026)
 
@@ -163,7 +162,7 @@ Until an id exists in `public/media/index.json` the site shows a labelled placeh
 
 ## Retired
 
-The 17 September review candidates `m1-drone-master-a` and `m1-drone-master-b` and the Kling 3.0 Turbo alternative `h1-hero-film-kling` are no longer in the manifest. The design sheet replaced the candidate pair as the approval gate, and the Kling clip showed the old drone.
+The 17 September review candidates `m1-drone-master-a` and `m1-drone-master-b` and the Kling 3.0 Turbo alternative `h1-hero-film-kling` are no longer in the manifest. The MiniMax hero film (MiniMax H3, 6 s, job a83c481d-8ce0-41d0-8472-251e408404e3, made from `h0-hero-still`) was replaced at the owner's request on 9 November 2026 by the Blender film; `h0-hero-still` stays as the /company vision band backdrop. The design sheet replaced the candidate pair as the approval gate, and the Kling clip showed the old drone.
 
 ## Software view
 
