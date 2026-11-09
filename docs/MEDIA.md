@@ -42,7 +42,7 @@ Two differences a grade cannot fix need the owner: `co1-company` is a backlit su
 | --- | --- |
 | Design sheet (commercial drone, home drone, roof capsule, ground pod) | Approved (Liam, 18 Sep 2026). Registered as Higgsfield elements (below). The PNGs are in `docs/references` (added 17 October 2026, recompressed losslessly), with their source URLs in the table below. |
 | 27 stills | Generated from the approved elements, checked scene by scene with Higgsfield's video analysis, seven regenerated (two of them twice) where the read missed the brief (tether direction, spray running during a scan, twilight instead of morning). |
-| 2 films | MiniMax H3, 6 s, first and last frame from the approved hero stills so each loops seamlessly. |
+| Films | `c2-commercial-clip`: MiniMax H3, 6 s, first and last frame from the approved commercial hero still so it loops seamlessly. The home hero film is not generated: a Blender render of the owner's H1 model, made at the owner's request on 9 November 2026 (see "Home hero film"). |
 
 Model note: the account is on Higgsfield's starter plan, which serves every `nano_banana_pro` request as Nano Banana 2 (2 credits at 2K). Seedream 4.5 (1 credit) was used for the two shots without a product in them. Kling 3.0 pro and Nano Banana Pro at 4K stay gated to the Plus plan.
 
@@ -94,7 +94,7 @@ All at 2K. Nano Banana 2 unless noted. "Job" is the Higgsfield generation the ma
 
 | ID | Aspect | Refs | Placement | Job | Scene prompt |
 | --- | --- | --- | --- | --- | --- |
-| h0-hero-still | 16:9 | @commercial | Home hero poster, Platform hero, first and last frame of the hero film | 6a0673d6 | Cinematic wide still of the commercial cleaning hexacopter @commercial washing the glass curtain wall of a generic eleven-storey office building, three-quarter view from slightly below at the fourth floor. The drone flies a slow horizontal pass 40 centimetres from the glass, its spray bar throwing a wide flat fan of water that sheets down the panes, the glass behind it clean and wet, the glass ahead of it dull. Its single bonded tether, dark grey with a thin teal tracer stripe, rises in a smooth slack curve toward the roof, never taut, clear of the windows. The drone is 1.2 metres across, in true proportion to the 3.5-metre floors. Quiet empty street below, light haze, anamorphic 40mm, premium architectural photography. |
+| h0-hero-still | 16:9 | @commercial | Company page vision band backdrop (until 9 November 2026 also the home hero poster and the MiniMax hero film's first and last frame) | 6a0673d6 | Cinematic wide still of the commercial cleaning hexacopter @commercial washing the glass curtain wall of a generic eleven-storey office building, three-quarter view from slightly below at the fourth floor. The drone flies a slow horizontal pass 40 centimetres from the glass, its spray bar throwing a wide flat fan of water that sheets down the panes, the glass behind it clean and wet, the glass ahead of it dull. Its single bonded tether, dark grey with a thin teal tracer stripe, rises in a smooth slack curve toward the roof, never taut, clear of the windows. The drone is 1.2 metres across, in true proportion to the 3.5-metre floors. Quiet empty street below, light haze, anamorphic 40mm, premium architectural photography. |
 | m1-drone-master | 3:2 | @commercial | Explainer Drone tab, Platform Drone row | 2bb59c62 | Product photograph of the commercial cleaning hexacopter @commercial hovering in a slow horizontal pass across a clean glass curtain wall, three-quarter front view at eye level filling the frame, spray bar throwing a wide flat fan of water onto the glass, the microfibre pad on its sprung arm touching the pane, the two rubber standoff rollers riding on the glass, its dark grey tether with a thin teal tracer curving up and away with a little slack, the glass behind it clean and wet, 85mm lens, shallow depth of field. |
 | m2-capsule-master | 3:2 | @capsule, @commercial | Two systems (Commercial), Commercial pilot block, Platform Dock row | 46e7dba7 | Product photograph of the roof capsule @capsule on the flat roof of a generic mid-rise office building, standing on its adjustable feet and concrete ballast blocks on a grey membrane roof, its two-part lid slid open, the commercial hexacopter @commercial resting on the cradle inside with its skids on the charging contacts, the tether reel beside it, water inlet and small control panel on the side, rooftop plant and the tops of neighbouring buildings soft behind, 50mm lens. |
 | m3-pod-master | 3:2 | @pod, @home | Two systems (Home), closing CTA, Homes CTA | b4ef94d8 | Product photograph of the ground pod @pod standing on a concrete paver beside a garden tap at the side of an Australian suburban house with rendered walls, a metal roof and rooftop solar, a short hose to the tap and a short cable to an outdoor power point, its clamshell lid open upward with the home quadcopter @home resting on the cradle inside, tidy garden bed and lawn, dew on the paver, 50mm lens. |
@@ -130,6 +130,36 @@ All at 2K. Nano Banana 2 unless noted. "Job" is the Higgsfield generation the ma
 
 The home hero plays the Blender film (`h1-hero-film`, and `h3-hero-film-tall` below 768px; see "Home hero film"). `c2-commercial-clip` is kept but unplaced.
 
+## Home hero film (Blender, 9 November 2026)
+
+The home hero film is not AI-generated. At the owner's request ("create the super realistic drone cleaning video using my blender model and then upload that to the website"), it was rendered in Blender from the owner's own H1 model (`Lienry_H1_v3_Revision_B`, supplied as a Blender 4.2 file), with refresh.tech's hero film as the bar for realism only: nothing of theirs was used. The .blend file stays out of this public repository; the scene is built around it in code (`scripts/media/hero-film/`).
+
+What it shows, in 8 s at 24 fps (192 frames): from inside a quiet office, the H1 washes the window from outside, its spray boom aimed at the glass. It works down its lane spraying, stops at the bottom of the lane as the valve closes and the jet dies back, levels out, then side-steps one lane to the left. Three shots: a wide through the window (frames 1 to 72, 46 mm), a close-up on the nozzle and the strike on the glass (73 to 124, 70 mm) and a medium on the drone (125 to 192, 60 mm). The phone cut (`h3-hero-film-tall`) is rendered again from the same scene in portrait, not cropped from the landscape film.
+
+| Part | Source | Licence |
+| --- | --- | --- |
+| Drone | The owner's H1 model: its geometry, materials and markings as supplied, posed and flown, its props spun, its strobe set to blink, and its 1.8 m supply hose left out for the scene's longer hose | The owner's |
+| City, sky and light | Poly Haven HDRI "Joburg Central Sunset" (`sunset_jhbcentral`, 8K EXR), photographed by Greg Zaal and Dimitrios Savva from a city-centre rooftop at dusk | CC0 |
+| Floor and desk | Poly Haven textures `concrete_floor_worn_001` and `black_oak_veneer` (2K) | CC0 |
+| Everything else | Built in code: the office, window frame and glass, the dirt on the glass and the clean lane, the water (spray droplets, mist, the sheet on the glass, beads and rivulets), and the supply hose it trails | This repository |
+
+How it was made:
+
+- Renderer: Blender 5.0.1 (the `bpy` module), Cycles on the CPU, AgX with the Medium High Contrast look. Each shot has its own sampling (the wide and the medium up to 48 samples a pixel, adaptive at a 0.08 noise threshold after 8; the close-up up to 24 at a tighter 0.02, so the spray, mist and water sample evenly), denoised with OpenImageDenoise on albedo and normals. Motion blur at a half shutter, depth of field at f/2.0 (the portrait medium at f/1.4).
+- Motion: the flight is simulated, not keyframed: a position controller flying the pass against gusts and fine turbulence. While it sprays, the drone leans into the glass against the jet's push; once the valve closes it levels out. The cameras are hand-held operators that follow the drone with a slight lag and drift.
+- Water: the spray is geometry, rebuilt every frame from the valve's pressure (its cone, speed, droop and splash fall away as the valve closes); the washed lane stays wet behind the strike and drains down the pane.
+- Grade (`post.py`, at render, so the house grade is off for these four: `grade: false`): fixed levels, a soft highlight shoulder and toe, halation, slight lens softness and colour fringing, a light vignette, saturation 0.93 and fine grain.
+- Masters: H.264 High, CRF 17 tuned for grain, BT.709 tags, fast start, no audio; the posters are frame 1 of each graded film. `scripts/media/fetch.mjs` copies them from `scripts/media/masters` (`repo:` sources) and encodes the site's WebM, MP4 and poster renditions like any other asset.
+
+| ID | Master in `scripts/media/masters` | What it is | Placement |
+| --- | --- | --- | --- |
+| h1-hero-film | `h1-hero-film-v2-1280x720.mp4` | The landscape film, 1280x720, 192 frames | Home hero from 768px |
+| h2-hero-frame | `h2-hero-frame-v2-1280x720.png` | Frame 1 of h1, graded (encoded at 768 and 1280 wide) | Its poster |
+| h3-hero-film-tall | `h3-hero-film-tall-v2-608x1080.mp4` | The portrait film, 608x1080, 192 frames | Home hero below 768px |
+| h4-hero-frame-tall | `h4-hero-frame-tall-v2-608x1080.png` | Frame 1 of h3, graded (encoded at 608 wide) | Its poster |
+
+To render it again: put the owner's .blend next to `scripts/media/hero-film/glass.py` (or set `DRONE` to its path); make a Python 3.11 virtual environment there with `pip install bpy==5.0.1 numpy` (as `venv/`, or point `PY` at its python); run `render_final.sh` (here, on four CPU cores, the two cuts took most of a day; `DEVICE=AUTO` uses a GPU, many times faster), then `finish_final.sh`, which needs ffmpeg and writes the masters and posters into `scripts/media/masters`. The city photograph and textures download on the first run. Rendered frames stay out of the repository (the folder's `.gitignore`). A new render takes new file names (`-v3`), changed in the manifest's `repo:` sources at the same time, so the pipeline encodes it afresh.
+
 ## Review notes (Higgsfield video analysis, 18 September 2026)
 
 This session's container cannot reach the Higgsfield CDN, so every still was checked by stitching the results into a short review video in the Higgsfield sandbox (full frame, then a 60 percent centre crop) and reading Higgsfield's scene-by-scene analysis. What it reported, and what changed:
@@ -156,7 +186,7 @@ Everything else read as the product: hexacopter with six guards on the commercia
 
 ## Site asset ids the components expect
 
-`h0-hero-still`, `h1-hero-film` (video), `m1-drone-master`, `m2-capsule-master`, `m3-pod-master`, `s1-dock`, `s2-tether`, `s4-scan`, `s5-software`, `s5-software-clip` (video, optional), `s6-automation`, `p1-tower`, `p2-apartments`, `p3-house`, `p4-rental`, `p5-solar-farm`, `y1-story-before`, `y2-story-panels`, `y3-story-driveway`, `y5-story-done`, `f1-tether`, `f2-camera`, `f3-surface`, `f4-dock`, `c1-commercial-hero`, `c2-commercial-clip` (video, optional), `ho1-homes-hero`, `so1-solar-hero`, `so2-solar-closeup`, `co1-company`.
+`h0-hero-still`, `h1-hero-film` (video), `h2-hero-frame`, `h3-hero-film-tall` (video), `h4-hero-frame-tall`, `m1-drone-master`, `m2-capsule-master`, `m3-pod-master`, `s1-dock`, `s2-tether`, `s4-scan`, `s5-software`, `s5-software-clip` (video, optional), `s6-automation`, `p1-tower`, `p2-apartments`, `p3-house`, `p4-rental`, `p5-solar-farm`, `y1-story-before`, `y2-story-panels`, `y3-story-driveway`, `y5-story-done`, `f1-tether`, `f2-camera`, `f3-surface`, `f4-dock`, `c1-commercial-hero`, `c2-commercial-clip` (video, optional), `ho1-homes-hero`, `so1-solar-hero`, `so2-solar-closeup`, `co1-company`.
 
 Until an id exists in `public/media/index.json` the site shows a labelled placeholder panel in its place.
 
@@ -166,7 +196,7 @@ The 17 September review candidates `m1-drone-master-a` and `m1-drone-master-b` a
 
 ## Software view
 
-The home page software view is rendered in code, not generated: a React Three Fiber model of a 12-storey block inside a mock of the desktop window. The commercial hexacopter in it is built from primitives to the design above (charcoal base, off-white shell with a gasket seam, six guarded rotors with the accent lip, sensor bar, scanner, spray bar over the pad, standoff rollers, rear tether port, skids, status light). A Higgsfield or Meshy GLB was not commissioned: the account had 8 credits left when the section was rebuilt, which does not cover a model and a matching film, and a generated mesh could not be inspected from this environment. The film tile beside the window reuses the hero film (`h1-hero-film`) until a dedicated clip of the same facade being washed is generated. `public/video/software-view-{wide,tall}.{mp4,webm}` are recordings of the model made with `scripts/record-software-view.mjs`, kept under 3 MB each, and are not part of the media pipeline.
+The home page software view is rendered in code, not generated: a React Three Fiber model of a 12-storey block inside a mock of the desktop window. The commercial hexacopter in it is built from primitives to the design above (charcoal base, off-white shell with a gasket seam, six guarded rotors with the accent lip, sensor bar, scanner, spray bar over the pad, standoff rollers, rear tether port, skids, status light). A Higgsfield or Meshy GLB was not commissioned: the account had 8 credits left when the section was rebuilt, which does not cover a model and a matching film, and a generated mesh could not be inspected from this environment. No film tile plays beside the window any more: `h1-hero-film` plays only in the home hero. `public/video/software-view-{wide,tall}.{mp4,webm}` are recordings of the model made with `scripts/record-software-view.mjs`, kept under 3 MB each, and are not part of the media pipeline.
 
 ## Presentation update — 22 September 2026
 

@@ -54,14 +54,15 @@
 //     and its note. Windows on /platform, /commercial, /solar (its solar array) and /download, the app
 //     panel on /homes-and-rentals.
 // 14  Media: every /media/ path in the served HTML and JS is a manifest id (variants --name-w and
-//     renditions --r included); every manifest id appears on the site but those SPEC.unplaced lists (each with its
+//     renditions --r included); every manifest id appears on the site (judged when every route runs on both
+//     sides of 768, where the home hero swaps cuts) but those SPEC.unplaced lists (each with its
 //     reason, reported as a note, and a failure once it is placed again so the list stays true); no id shows in two frames on a route in any
 //     state (a [data-hover-clip] frame's still and clip are one figure; media inside aria-hidden, the
 //     footer's picture loop and the bubble hero, are not frames); public/media holds only manifest
 //     files and nothing is added to public/video or media-src, but for a software window's own
 //     recordings (SPEC.windowRecordings: <stem>-wide and -tall, .mp4, .webm and -poster.jpg/.webp, recorded
 //     from the coded model by scripts/record-software-view.mjs; CLAUDE.md says so); scripts/media/masters
-//     holds only the owner-supplied renders that manifest repo: sources name, each committed (CLAUDE.md).
+//     holds only the owner-supplied renders that manifest repo: sources name, each committed as it stands (CLAUDE.md).
 // 21  Motion: under reduced motion no video plays, nothing reveals, crossfades or snaps smoothly, and
 //     the window shows its recording with native controls; without it never two videos play at once,
 //     the live window stops drawing once off screen (judged no sooner than 2.5s after it leaves, then
@@ -2932,7 +2933,9 @@ for (const [where, text] of texts) {
     pathsSeen.set(file, where);
   }
 }
-if (ROUTES.every((r) => r === NOT_FOUND || opts.routes.includes(r))) {
+// The home hero swaps cuts at 768 (h1 from 768, h3 below), so every id shows only in a run on both sides.
+const bothSides = opts.widths.some((w) => w < 768) && opts.widths.some((w) => w >= 768);
+if (bothSides && ROUTES.every((r) => r === NOT_FOUND || opts.routes.includes(r))) {
   const missing = [...manifestIds].filter((id) => !idsSeen.has(id));
   for (const id of missing) {
     if (SPEC.unplaced[id]) console.log(`  note  14: ${id} is kept but not shown (${SPEC.unplaced[id]})`);
@@ -2942,7 +2945,7 @@ if (ROUTES.every((r) => r === NOT_FOUND || opts.routes.includes(r))) {
     if (!manifestIds.has(id)) siteAdd(14, "SPEC.unplaced names an id that is not in the manifest", id);
     else if (idsSeen.has(id)) siteAdd(14, "an id SPEC.unplaced calls unplaced shows on the site: remove it from the list", id);
   }
-} else console.log(`  note  all ${manifestIds.size} manifest ids are checked only when every route runs`);
+} else console.log(`  note  all ${manifestIds.size} manifest ids are checked only when every route runs, at a width below 768 and one of 768 or more`);
 
 // Check 14: public/media holds only what media:fetch writes; nothing added to public/video or media-src.
 const mediaDir = path.join(ROOT, "public/media");
@@ -2970,18 +2973,27 @@ try {
   console.log("  note  git is unavailable: the public/video and media-src history was not checked");
 }
 // Check 14: scripts/media/masters holds the owner-supplied renders and nothing else: each file there is a
-// manifest repo: source, committed (the host's build copies it from the checkout), and each repo:
-// source is there.
+// manifest repo: source, committed as it stands (the host's build copies it from the checkout, so a
+// staged, changed or new file there would leave the host encoding other bytes), and each repo: source
+// is there.
 {
   const mastersDir = path.join(ROOT, "scripts/media/masters");
   const repoSources = new Set(manifest.filter((a) => a.url.startsWith("repo:")).map((a) => a.url.slice("repo:".length)));
   const masters = existsSync(mastersDir) ? readdirSync(mastersDir).map((f) => `scripts/media/masters/${f}`) : [];
   for (const f of masters) if (!repoSources.has(f)) siteAdd(14, "a file in scripts/media/masters that no manifest repo: source names", f);
+  let gitOk = true;
+  try {
+    const out = execSync("git status --porcelain --untracked-files=all -- scripts/media/masters", { cwd: ROOT, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
+    for (const line of out.split("\n").filter(Boolean)) siteAdd(14, "an uncommitted change in scripts/media/masters", line.trim());
+  } catch {
+    gitOk = false;
+    console.log("  note  git is unavailable: scripts/media/masters was not checked against the commit");
+  }
   for (const f of repoSources) {
     if (!masters.includes(f)) siteAdd(14, "a manifest repo: source with no file in scripts/media/masters", f);
-    else {
+    else if (gitOk) {
       try {
-        execSync(`git ls-files --error-unmatch -- ${JSON.stringify(f)}`, { cwd: ROOT, stdio: "ignore" });
+        execSync(`git cat-file -e ${JSON.stringify(`HEAD:${f}`)}`, { cwd: ROOT, stdio: "ignore" });
       } catch {
         siteAdd(14, "a manifest repo: source that is not committed", f);
       }
