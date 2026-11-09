@@ -1,0 +1,10 @@
+# Rendered frames, logs, the downloaded city photograph and textures, and the owner's model never enter
+# the repository: only the scripts do. The finished masters go to ../masters.
+*.blend
+*.blend1
+assets/
+final-*/
+final.*
+*.log
+venv/
+__pycache__/
