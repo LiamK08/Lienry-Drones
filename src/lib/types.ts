@@ -20,10 +20,10 @@ export type Action = { label: string; href: string };
 export type ImageRef = { id: string; alt: string; position?: string; positionMd?: string; positionSm?: string };
 
 /** The films in scripts/media/manifest.json. A future film is added here, to the manifest and to docs/MEDIA.md. */
-export type FilmId = "h1-hero-film" | "c2-commercial-clip";
+export type FilmId = "h1-hero-film" | "c2-commercial-clip" | "h3-hero-film-tall";
 
 /** The stills that stand in for those films as posters. */
-export type PosterId = "h0-hero-still" | "c1-commercial-hero";
+export type PosterId = "h0-hero-still" | "c1-commercial-hero" | "h2-hero-frame" | "h4-hero-frame-tall";
 
 /** A hover clip: a whole film (start and end unset; loops natively) or the segment start..end in seconds. */
 export type ClipRef = { videoId: FilmId; start?: number; end?: number; rendition?: number };

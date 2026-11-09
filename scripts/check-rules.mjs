@@ -54,13 +54,14 @@
 //     and its note. Windows on /platform, /commercial, /solar (its solar array) and /download, the app
 //     panel on /homes-and-rentals.
 // 14  Media: every /media/ path in the served HTML and JS is a manifest id (variants --name-w and
-//     renditions --r included); all 29 appear on the site but those SPEC.unplaced lists (each with its
+//     renditions --r included); every manifest id appears on the site but those SPEC.unplaced lists (each with its
 //     reason, reported as a note, and a failure once it is placed again so the list stays true); no id shows in two frames on a route in any
 //     state (a [data-hover-clip] frame's still and clip are one figure; media inside aria-hidden, the
 //     footer's picture loop and the bubble hero, are not frames); public/media holds only manifest
 //     files and nothing is added to public/video or media-src, but for a software window's own
 //     recordings (SPEC.windowRecordings: <stem>-wide and -tall, .mp4, .webm and -poster.jpg/.webp, recorded
-//     from the coded model by scripts/record-software-view.mjs; CLAUDE.md says so).
+//     from the coded model by scripts/record-software-view.mjs; CLAUDE.md says so); scripts/media/masters
+//     holds only the owner-supplied renders that manifest repo: sources name, each committed (CLAUDE.md).
 // 21  Motion: under reduced motion no video plays, nothing reveals, crossfades or snaps smoothly, and
 //     the window shows its recording with native controls; without it never two videos play at once,
 //     the live window stops drawing once off screen (judged no sooner than 2.5s after it leaves, then
@@ -2941,7 +2942,7 @@ if (ROUTES.every((r) => r === NOT_FOUND || opts.routes.includes(r))) {
     if (!manifestIds.has(id)) siteAdd(14, "SPEC.unplaced names an id that is not in the manifest", id);
     else if (idsSeen.has(id)) siteAdd(14, "an id SPEC.unplaced calls unplaced shows on the site: remove it from the list", id);
   }
-} else console.log("  note  all 29 manifest ids are checked only when every route runs");
+} else console.log(`  note  all ${manifestIds.size} manifest ids are checked only when every route runs`);
 
 // Check 14: public/media holds only what media:fetch writes; nothing added to public/video or media-src.
 const mediaDir = path.join(ROOT, "public/media");
@@ -2967,6 +2968,25 @@ try {
   }
 } catch {
   console.log("  note  git is unavailable: the public/video and media-src history was not checked");
+}
+// Check 14: scripts/media/masters holds the owner-supplied renders and nothing else: each file there is a
+// manifest repo: source, committed (the host's build copies it from the checkout), and each repo:
+// source is there.
+{
+  const mastersDir = path.join(ROOT, "scripts/media/masters");
+  const repoSources = new Set(manifest.filter((a) => a.url.startsWith("repo:")).map((a) => a.url.slice("repo:".length)));
+  const masters = existsSync(mastersDir) ? readdirSync(mastersDir).map((f) => `scripts/media/masters/${f}`) : [];
+  for (const f of masters) if (!repoSources.has(f)) siteAdd(14, "a file in scripts/media/masters that no manifest repo: source names", f);
+  for (const f of repoSources) {
+    if (!masters.includes(f)) siteAdd(14, "a manifest repo: source with no file in scripts/media/masters", f);
+    else {
+      try {
+        execSync(`git ls-files --error-unmatch -- ${JSON.stringify(f)}`, { cwd: ROOT, stdio: "ignore" });
+      } catch {
+        siteAdd(14, "a manifest repo: source that is not committed", f);
+      }
+    }
+  }
 }
 
 // Check 22: no two routes share a tab title or a description.

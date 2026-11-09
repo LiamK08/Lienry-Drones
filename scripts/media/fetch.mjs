@@ -1,5 +1,5 @@
-// Download Higgsfield generation results listed in manifest.json and write optimised
-// web assets into public/media. Images become AVIF + WebP at the listed widths plus a
+// Download Higgsfield generation results listed in manifest.json (and copy the owner-supplied renders
+// kept in scripts/media/masters, listed as repo: sources) and write optimised web assets into public/media. Images become AVIF + WebP at the listed widths plus a
 // 24px blur placeholder; videos become H.264 MP4 + VP9 WebM under the size budget, with
 // a poster taken from the first frame.
 //
@@ -99,8 +99,24 @@ async function ffmpegPath() {
   return "ffmpeg";
 }
 
+// A source the repository carries itself, written "repo:<path from the repository root>": an
+// owner-supplied render kept in scripts/media/masters, which has no CDN URL. Its file name carries a
+// version (…-v2.mp4), so a new render is a new URL and re-encodes, like a new generation.
+const REPO_SOURCE = "repo:";
+function repoPath(url) {
+  const file = path.resolve(ROOT, url.slice(REPO_SOURCE.length));
+  if (!file.startsWith(path.join(ROOT, "scripts", "media", "masters") + path.sep)) throw new Error(`A repo: source must be in scripts/media/masters: ${url}`);
+  return file;
+}
+
 async function download(url, dest) {
   if (existsSync(dest) && !force) return dest;
+  if (url.startsWith(REPO_SOURCE)) {
+    const file = repoPath(url);
+    if (!existsSync(file)) throw new Error(`No file for ${url}`);
+    cpSync(file, dest);
+    return dest;
+  }
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Download failed ${res.status} for ${url}`);
   const part = `${dest}.part`;

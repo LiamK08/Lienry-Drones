@@ -11,7 +11,9 @@ export const hero = {
   emphasis: "Nobody on site.",
   support: "A cleaning drone that lives on your property, maps it, and washes glass, panels, walls, roofing and driveways.",
   videoId: "h1-hero-film" as const,
-  posterId: "h0-hero-still" as const,
+  posterId: "h2-hero-frame" as const,
+  /** Below 768 the hero plays the portrait cut of the same film, over its own first frame. */
+  tall: { videoId: "h3-hero-film-tall" as const, posterId: "h4-hero-frame-tall" as const },
 };
 
 /** The slow strip of words under the hero: what the system is designed for. */

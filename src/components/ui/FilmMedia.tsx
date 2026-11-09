@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react";
-import { afterLoadIdle, usePrefersReducedMotion, useSaveData } from "@/lib/hooks";
+import { afterLoadIdle, useMediaQuery, usePrefersReducedMotion, useSaveData } from "@/lib/hooks";
 import { getImage, getVideo, largest, srcSet } from "@/lib/media";
 import type { FilmId, PosterId } from "@/lib/types";
 import { bindPlayback, refresh } from "@/lib/video";
@@ -76,6 +76,9 @@ export type FilmLayerProps = {
   deferSources?: boolean;
   /** The video's preload once its sources are attached. Default "metadata". */
   preload?: "metadata" | "none";
+  /** A portrait cut of the film and its first frame, for screens below 768. The same <video> plays it:
+   *  only its sources change, so the one-video rule and the playback binding hold. */
+  tall?: { videoId: FilmId; posterId: PosterId };
 };
 
 /**
@@ -106,12 +109,18 @@ export function FilmLayer({
   overlays,
   deferSources,
   preload = "metadata",
+  tall,
 }: FilmLayerProps) {
   const { videoRef, showVideo, ready, onCanPlay } = film;
   const defer = deferSources ?? priority;
   const [sourced, setSourced] = useState(!defer);
   const poster = getImage(posterId);
   const video = getVideo(videoId);
+  // Below 768 the portrait cut, when the index has it. The sources attach after load and an idle
+  // moment, by when the query has its client value; crossing 768 later reloads the new cut.
+  const wide = useMediaQuery("(min-width: 768px)");
+  const src = tall && !wide && getVideo(tall.videoId) ? tall.videoId : videoId;
+  const tallPoster = tall && getImage(tall.posterId) ? tall.posterId : null;
 
   useEffect(() => {
     if (sourced || !showVideo) return;
@@ -125,7 +134,7 @@ export function FilmLayer({
     el.preload = preload;
     el.load();
     refresh(el);
-  }, [defer, sourced, preload, videoRef]);
+  }, [defer, sourced, preload, videoRef, src]);
 
   const style = positionVars(posterId, position, positionMd, positionSm) as CSSProperties;
   const still = poster ? stillSources(posterId, sizes, frame ?? null, variant) : null;
@@ -135,6 +144,12 @@ export function FilmLayer({
     <div className="absolute inset-0 -z-10 overflow-hidden bg-ink" aria-hidden="true" style={style}>
       {poster && still ? (
         <picture>
+          {tallPoster ? (
+            <>
+              <source media="(max-width: 767px)" type="image/avif" srcSet={srcSet(tallPoster, "avif")} sizes="100vw" />
+              <source media="(max-width: 767px)" type="image/webp" srcSet={srcSet(tallPoster, "webp")} sizes="100vw" />
+            </>
+          ) : null}
           {still.sources}
           <img
             src={largest(posterId, "webp") ?? ""}
@@ -164,8 +179,8 @@ export function FilmLayer({
         >
           {sourced ? (
             <>
-              <source src={`/media/${videoId}.webm`} type="video/webm" />
-              <source src={`/media/${videoId}.mp4`} type="video/mp4" />
+              <source src={`/media/${src}.webm`} type="video/webm" />
+              <source src={`/media/${src}.mp4`} type="video/mp4" />
             </>
           ) : null}
         </video>
