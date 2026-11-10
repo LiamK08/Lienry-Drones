@@ -536,9 +536,17 @@ def tether(root, end, sag=0.6, radius=0.007, name="tether"):
     cu.bevel_resolution = 6
     cu.resolution_u = 64
     sp = cu.splines.new("BEZIER")
-    mid1 = start + stub * 0.35 + Vector((0, 0, -sag))
-    mid2 = start + d * 0.45 + Vector((0, 0, -sag * 0.35))
-    pts = [(start, stub * 0.15), (mid1, (d.normalized() * 0.3 + Vector((0, 0, 0.0)))), (mid2, d * 0.18), (end, d.normalized() * 0.5)]
+    if d.z > 0.5 * d.length:
+        # fed from above (a roof parapet): the hose rises from the swivel toward the feed in a shallow bow
+        # under its own weight, never dipping below the drone first
+        side = Vector((d.x, d.y, 0))
+        side = side.normalized() if side.length > 1e-6 else Vector((1, 0, 0))
+        mid = start + d * 0.5 + side * (sag * 0.35) + Vector((0, 0, -sag * 0.2))
+        pts = [(start, d * 0.12), (mid, d * 0.22), (end, d * 0.12)]
+    else:
+        mid1 = start + stub * 0.35 + Vector((0, 0, -sag))
+        mid2 = start + d * 0.45 + Vector((0, 0, -sag * 0.35))
+        pts = [(start, stub * 0.15), (mid1, (d.normalized() * 0.3 + Vector((0, 0, 0.0)))), (mid2, d * 0.18), (end, d.normalized() * 0.5)]
     sp.bezier_points.add(len(pts) - 1)
     for bp, (co, hd) in zip(sp.bezier_points, pts):
         bp.co = co
