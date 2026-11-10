@@ -264,7 +264,7 @@ export const explore = {
   actions: { Solutions: "See the system", Platform: "Open the part", Tools: "Try the tool", Company: "Read our story" } as Record<string, string>,
   all: ["commercial", "homes", "platform", "fit-check", "solar", "company"],
   cards: [
-    { id: "commercial", kind: "Solutions", tag: "Commercial", title: "A capsule on the roof, and nobody on a rope", href: "/commercial", image: { id: "c1-commercial-hero", alt: "The Lienry dock open on a rooftop deck, the drone lifting off above it", position: "75% 50%" } },
+    { id: "commercial", kind: "Solutions", tag: "Commercial", title: "A capsule on the roof, and nobody on a rope", href: "/commercial", image: { id: "c1-commercial-hero", alt: "The Lienry dock open on a rooftop deck, the drone lifting off above it", position: "50% 40%" } },
     { id: "homes", kind: "Solutions", tag: "Homes", title: "Homes and rentals, cleaned from your phone", href: "/homes-and-rentals", image: { id: "ho1-homes-hero", alt: "The Lienry drone washing the glass doors of a white house", position: "45% 50%" } },
     { id: "solar", kind: "Solutions", tag: "Solar", action: "See solar", title: "Solar panels at the right pressure", href: "/solar", image: { id: "so2-solar-closeup", alt: "The drone's nozzle washing a dusty solar panel, close up", position: "50% 50%" } },
     { id: "soiling", kind: "Solutions", tag: "Soiling", action: "See the figures", title: "What dust costs a solar array", href: "/solar#soiling", image: { id: "so1-solar-hero", alt: "The Lienry drone washing a row of ground-mounted solar panels", position: "60% 55%" } },

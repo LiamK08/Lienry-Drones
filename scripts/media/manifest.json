@@ -5,14 +5,15 @@
     {
       "id": "h0-hero-still",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090605_6a0673d6-ac1f-40f6-9127-8cc5e0bf3b50.png",
+      "url": "repo:scripts/media/masters/h0-hero-still-h1-2560x1430.jpg",
       "widths": [
         768,
         1280,
         1920,
         2560
       ],
-      "placement": "Company page vision band backdrop"
+      "placement": "Company page vision band backdrop",
+      "grade": false
     },
     {
       "id": "m1-drone-master",
@@ -187,13 +188,14 @@
     {
       "id": "y3-story-driveway",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090605_6d066e57-b9f5-42ad-bc10-45be0e79b867.png",
+      "url": "repo:scripts/media/masters/y3-story-driveway-h1-1200x1600.jpg",
       "widths": [
         480,
         800,
         1200
       ],
-      "placement": "Landlord story beat 4"
+      "placement": "Landlord story beat 4",
+      "grade": false
     },
     {
       "id": "y5-story-done",
@@ -251,14 +253,15 @@
     {
       "id": "c1-commercial-hero",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090925_8796da8d-562f-47c2-9c48-6c858f35cf9f.png",
+      "url": "repo:scripts/media/masters/c1-commercial-hero-h1-2560x1440.jpg",
       "widths": [
         768,
         1280,
         1920,
         2560
       ],
-      "placement": "Commercial hero, film band poster, first and last frame of the commercial clip"
+      "placement": "Commercial hero, film band poster, first and last frame of the commercial clip",
+      "grade": false
     },
     {
       "id": "ho1-homes-hero",
