@@ -108,13 +108,14 @@
     {
       "id": "p1-tower",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_092635_a8ea2517-f4e2-49c4-941c-a4fcd900010c.png",
+      "url": "repo:scripts/media/masters/p1-tower-h1-1200x1800.jpg",
       "widths": [
         480,
         800,
         1200
       ],
-      "placement": "Places carousel: commercial towers"
+      "placement": "Places carousel: commercial towers",
+      "grade": false
     },
     {
       "id": "p2-apartments",
