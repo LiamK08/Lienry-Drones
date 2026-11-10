@@ -6,7 +6,7 @@ export const commercialPage = {
     eyebrow: "Commercial buildings",
     headline: "Window cleaning that lives on the roof. Nobody on a rope.",
     emphasis: "Nobody on a rope.",
-    lead: "A weatherproof capsule on the roof, a tether fed from above, and desktop software that runs the whole building. Designed for office and apartment buildings under 70 metres.",
+    lead: "A weatherproof dock on the roof, a tether fed from above, and desktop software that runs the whole building. Designed for office and apartment buildings under 70 metres.",
     primary: { label: "Book a pilot conversation", href: "/register-interest?type=commercial" },
     secondary: { label: "Check your building", href: "/fit-check" },
   },
@@ -16,9 +16,9 @@ export const commercialPage = {
   rows: [
     {
       id: "capsule",
-      title: "A capsule on the roof that keeps the drone ready between cleans",
-      paragraphs: ["The drone lives in a weatherproof capsule on the roof. Its water tether is fed from above, so the drone never carries water and never runs out mid-clean."],
-      checks: ["Weatherproof roof capsule", "Tether fed from above", "No water carried by the drone", "Back to the dock after every clean"],
+      title: "A dock on the roof that keeps the drone ready between cleans",
+      paragraphs: ["The drone lives in a weatherproof dock on the roof. Its water tether is fed from above, so the drone never carries water and never runs out mid-clean."],
+      checks: ["Weatherproof roof dock", "Tether fed from above", "No water carried by the drone", "Back to the dock after every clean"],
       image: { id: "m2-capsule-master", alt: "The Lienry dock open on a roof deck, the drone parked on its landing pad", position: "0% 50%" },
       panel: { id: "between-cleans" as const, corner: "end" as const },
     },
@@ -73,7 +73,7 @@ export const designFacts = {
     { term: "Re-scan interval", value: "2", unit: "days" },
     { term: "People at height", value: "0" },
     { term: "Surface types", value: "5" },
-    { term: "Ground pod", value: "1" },
+    { term: "Dock", value: "1" },
     { term: "Crews to book", value: "0" },
   ],
 };

@@ -196,8 +196,8 @@ export const systems = {
       icon: "building",
       name: "Commercial",
       meta: ["Office and apartment buildings", "Pilot in preparation"],
-      statement: "A capsule on the roof feeds the drone from above, and the desktop software runs the whole building.",
-      part: { icon: "dock", name: "Roof capsule", line: "Shelters, powers and feeds the drone" },
+      statement: "A dock on the roof feeds the drone from above, and the desktop software runs the whole building.",
+      part: { icon: "dock", name: "Roof dock", line: "Shelters, powers and feeds the drone" },
       figures: [
         { value: "<70", unit: "m", label: "Building height" },
         { value: "2", unit: "days", label: "Re-scan interval" },
@@ -211,11 +211,11 @@ export const systems = {
       icon: "home",
       name: "Homes and rentals",
       meta: ["Houses and rentals", "Home system"],
-      statement: "A ground pod powers the drone and feeds it water. You start the clean from your phone.",
+      statement: "A dock beside the house powers the drone and feeds it water. You start the clean from your phone.",
       part: { icon: "phone", name: "Phone app", line: "Pick the areas, then start the clean" },
       figures: [
         { value: "5", label: "Surface types" },
-        { value: "1", label: "Ground pod" },
+        { value: "1", label: "Dock" },
         { value: "0", label: "Crews to book" },
       ],
       note: designNote,
@@ -246,8 +246,8 @@ export const systems = {
  * action its kind leads to (`actions`, or the card's own `action` where the kind's would not fit) and its
  * subject, `tag`, on the right: the honest stand-in for the reference's dates (the filter already says
  * its kind; no date is invented). Every card links to a page or an anchor that exists, and each picture
- * appears nowhere else on the home page (check 14), with no open ground pod beside the closed ones (the
- * pod pairing rule). `all` is the six that "All" shows, one of each kind at least; a filter shows its
+ * appears nowhere else on the home page (check 14), with no open dock beside the closed ones (the
+ * dock pairing rule). `all` is the six that "All" shows, one of each kind at least; a filter shows its
  * own, six at most.
  */
 export const explore = {
@@ -264,7 +264,7 @@ export const explore = {
   actions: { Solutions: "See the system", Platform: "Open the part", Tools: "Try the tool", Company: "Read our story" } as Record<string, string>,
   all: ["commercial", "homes", "platform", "fit-check", "solar", "company"],
   cards: [
-    { id: "commercial", kind: "Solutions", tag: "Commercial", title: "A capsule on the roof, and nobody on a rope", href: "/commercial", image: { id: "c1-commercial-hero", alt: "The Lienry dock open on a rooftop deck, the drone lifting off above it", position: "50% 40%" } },
+    { id: "commercial", kind: "Solutions", tag: "Commercial", title: "A dock on the roof, and nobody on a rope", href: "/commercial", image: { id: "c1-commercial-hero", alt: "The Lienry dock open on a rooftop deck, the drone lifting off above it", position: "50% 40%" } },
     { id: "homes", kind: "Solutions", tag: "Homes", title: "Homes and rentals, cleaned from your phone", href: "/homes-and-rentals", image: { id: "ho1-homes-hero", alt: "The Lienry drone washing the glass doors of a white house", position: "45% 50%" } },
     { id: "solar", kind: "Solutions", tag: "Solar", action: "See solar", title: "Solar panels at the right pressure", href: "/solar", image: { id: "so2-solar-closeup", alt: "The drone's nozzle washing a dusty solar panel, close up", position: "50% 15%" } },
     { id: "soiling", kind: "Solutions", tag: "Soiling", action: "See the figures", title: "What dust costs a solar array", href: "/solar#soiling", image: { id: "so1-solar-hero", alt: "The Lienry drone washing a row of ground-mounted solar panels", position: "60% 55%" } },

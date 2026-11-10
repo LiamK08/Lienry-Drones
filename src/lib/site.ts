@@ -106,7 +106,7 @@ export const menus: readonly { id: string; label: string; groups: readonly MenuG
         heading: "Hardware",
         tone: "teal",
         links: [
-          { href: "/platform#dock", label: "Dock", note: "A weatherproof roof capsule or a waterproof ground pod.", icon: "dock" },
+          { href: "/platform#dock", label: "Dock", note: "Weatherproof, on the roof or beside the house.", icon: "dock" },
           { href: "/platform#tether", label: "Tether", note: "Water and power through one line, for the whole clean.", icon: "tether" },
           { href: "/platform#drone", label: "Drone", note: "Short, planned routes across five kinds of surface.", icon: "drone" },
         ],

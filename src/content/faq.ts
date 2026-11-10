@@ -31,7 +31,7 @@ export const faqItems: readonly FaqEntry[] = [
     q: "How tall a building can it clean?",
     a: "The commercial system is designed for buildings under 70 metres:",
     points: [
-      { label: "Where it lives", text: "a weatherproof capsule on the roof" },
+      { label: "Where it lives", text: "a weatherproof dock on the roof" },
       { label: "How it reaches the facade", text: "on a tether fed from above, so it never carries water" },
       { label: "How often it looks", text: "a re-scan every two days, which you can change" },
     ],
@@ -48,9 +48,9 @@ export const faqItems: readonly FaqEntry[] = [
     ],
     after: "Fail-safes are still being finalised.",
   },
-  { id: "weather", q: "What happens in bad weather?", a: "Between cleans it shelters in a weatherproof capsule or waterproof pod. Its weather limits are still being finalised." },
+  { id: "weather", q: "What happens in bad weather?", a: "Between cleans it shelters in its weatherproof dock. Its weather limits are still being finalised." },
   { id: "water", q: "How much water does it use?", a: "On the roof system the tether is fed from above. Water use per clean is still being finalised." },
-  { id: "roof", q: "Does it need rooftop access?", a: "On commercial buildings it lives in a capsule on the roof. What the roof needs is still being finalised." },
+  { id: "roof", q: "Does it need rooftop access?", a: "On commercial buildings it lives in a dock on the roof. What the roof needs is still being finalised." },
   { id: "approvals", q: "What permissions will it need?", a: "We do not claim any approvals. Lienry is at concept stage, and what each site will need is still being finalised." },
   {
     id: "app",
@@ -69,7 +69,7 @@ export const faqItems: readonly FaqEntry[] = [
     a: "We are preparing a pilot program for commercial buildings under 70 metres:",
     points: [
       { label: "Who it is for", text: "building owners and facilities managers in Sydney" },
-      { label: "What runs", text: "the roof capsule, its tether and the desktop software" },
+      { label: "What runs", text: "the roof dock, its tether and the desktop software" },
       { label: "The first step", text: "a conversation about your building" },
     ],
     after: "Dates and terms are still being finalised.",

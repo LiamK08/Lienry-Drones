@@ -15,12 +15,12 @@ import { CITED_NOTE, pickStats } from "@/components/sections/StatBand";
 
 export const metadata: Metadata = pageMetadata(
   "/homes-and-rentals",
-  "A waterproof ground pod, a drone that knows each material, and an app that starts the clean wherever you are. For houses, apartments and rentals.",
+  "A waterproof dock beside the house, a drone that knows each material, and an app that starts the clean wherever you are. For houses, apartments and rentals.",
 );
 
 /**
  * /homes-and-rentals: the solutions template. The hero with its two paths, the strip, four feature rows
- * as chapters (the pod on tint, the materials on white, the app as an interactive demo on a wider media
+ * as chapters (the dock on tint, the materials on white, the app as an interactive demo on a wider media
  * column on tint, and two cited figures with the cited note on white), safety as the night panel (its
  * band continuing the white of the figures above it), the questions, then the closing panel with its
  * lighter step to the fit check.
