@@ -25,7 +25,7 @@ export const solarPage = {
       title: "It knows a panel is a panel",
       paragraphs: ["During a clean the drone identifies each material it is cleaning and adjusts its pressure to suit. Water comes through the tether, so the drone never carries it."],
       checks: ["Material identified during the clean", "Pressure set for solar glass", "Adjustable in the app"],
-      image: { id: "y2-story-panels", alt: "The drone over rooftop panels, half the array already clean", position: "50% 50%", positionMd: "50% 45%" },
+      image: { id: "y2-story-panels", alt: "The Lienry drone washing solar panels on a metal roof, the washed half of the array wet and dark", position: "50% 40%", positionMd: "50% 45%" },
       panel: { id: "right-pressure" as const, corner: "end" as const, solarFirst: true },
     },
     {

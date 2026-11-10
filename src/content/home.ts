@@ -151,7 +151,7 @@ export const benefits = {
       icon: "record",
       title: "Every clean on record",
       body: "The desktop software shows what was cleaned, when, and what is due next.",
-      image: { id: "y2-story-panels", alt: "The drone washing rooftop solar panels, half the array clean and wet", position: "50% 45%" },
+      image: { id: "y2-story-panels", alt: "The Lienry drone washing solar panels on a metal roof, the washed half of the array wet and dark", position: "50% 45%" },
     },
   ],
 };

@@ -72,7 +72,7 @@ export const landlordStory = {
   pictures: {
     before: { id: "y1-story-before", alt: "The house before its clean, the Lienry dock on the patio near the garden tap, its lids closed over the drone", chip: "Before the clean", position: "50% 78%" },
     driveway: { id: "y3-story-driveway", alt: "The Lienry drone washing the brick path in front of the house", chip: "Washing the driveway", position: "50% 50%" },
-    panels: { id: "y2-story-panels", alt: "The drone washing the rooftop solar panels, half the array clean and wet", chip: "Washing the solar panels", position: "50% 50%" },
+    panels: { id: "y2-story-panels", alt: "The Lienry drone washing solar panels on a metal roof, the washed half of the array wet and dark", chip: "Washing the solar panels", position: "50% 50%" },
     windows: { id: "p3-house", alt: "The Lienry drone washing the bay window of a house", chip: "Washing the windows", position: "50% 50%" },
     after: { id: "y5-story-done", alt: "The house after its clean, the Lienry dock open on the patio, the drone back inside", chip: "After the clean", position: "50% 78%" },
   },
