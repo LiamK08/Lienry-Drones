@@ -33,8 +33,8 @@ export const companyPage = {
     where: "Everything on this site describes the design, and none of it is in service yet. The platform, both systems and the software are designed. We are raising a pre-seed round to build the system and run a pilot with a small number of commercial buildings under 70 metres in Sydney.",
     // Framed once each on the page (the bubble hero's are decorative). Below 768 the first is left out.
     pictures: [
-      { id: "s6-automation", alt: "The roof capsule open at dawn, the drone above its cradle", position: "50% 40%" },
-      { id: "co1-company", alt: "A harbour-side street of mid-rise buildings at dawn", position: "52% 50%" },
+      { id: "s6-automation", alt: "The Lienry dock open on a roof deck, the drone settling above it", position: "50% 40%" },
+      { id: "co1-company", alt: "The Lienry drone washing the glass of an office tower, seen from the street", position: "52% 50%" },
       { id: "m1-drone-master", alt: "The Lienry drone washing a glass wall", position: "48% 50%" },
     ],
     values: {

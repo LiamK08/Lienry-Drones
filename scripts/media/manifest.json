@@ -61,24 +61,26 @@
     {
       "id": "s2-tether",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090350_d7e0073a-c89d-4708-a235-ba2032a3d16d.png",
+      "url": "repo:scripts/media/masters/s2-tether-h1-1920x1440.jpg",
       "widths": [
         640,
         1280,
         1920
       ],
-      "placement": "Explainer Tether tab, Platform Tether row"
+      "placement": "Explainer Tether tab, Platform Tether row",
+      "grade": false
     },
     {
       "id": "s4-scan",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_091722_cdbeb491-a6c1-48e5-a025-555b7713072d.png",
+      "url": "repo:scripts/media/masters/s4-scan-h1-1920x1440.jpg",
       "widths": [
         640,
         1280,
         1920
       ],
-      "placement": "Explainer Scan tab, Platform Scan row"
+      "placement": "Explainer Scan tab, Platform Scan row",
+      "grade": false
     },
     {
       "id": "s5-software",
@@ -116,13 +118,14 @@
     {
       "id": "p2-apartments",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_091722_413c0863-0239-4b19-a34f-89ae7bbf29ff.png",
+      "url": "repo:scripts/media/masters/p2-apartments-h1-1200x1800.jpg",
       "widths": [
         480,
         800,
         1200
       ],
-      "placement": "Places carousel: apartment buildings"
+      "placement": "Places carousel: apartment buildings",
+      "grade": false
     },
     {
       "id": "p3-house",
@@ -204,22 +207,24 @@
     {
       "id": "f1-tether",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090605_4ddbecc8-d67d-4949-9167-3d7622ee3f8a.png",
+      "url": "repo:scripts/media/masters/f1-tether-h1-1600x1600.jpg",
       "widths": [
         400,
         800
       ],
-      "placement": "Safety by design: tether"
+      "placement": "Safety by design: tether",
+      "grade": false
     },
     {
       "id": "f2-camera",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090944_5e82974c-c42d-4db7-b7ac-c47089821f5d.png",
+      "url": "repo:scripts/media/masters/f2-camera-h1-1600x1600.jpg",
       "widths": [
         400,
         800
       ],
-      "placement": "Safety by design: obstacle-avoidance camera"
+      "placement": "Safety by design: obstacle-avoidance camera",
+      "grade": false
     },
     {
       "id": "f3-surface",
@@ -291,14 +296,15 @@
     {
       "id": "co1-company",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_092030_2a8f4edf-53e4-46a0-86ce-df677a79b409.png",
+      "url": "repo:scripts/media/masters/co1-company-h1-3360x1440.jpg",
       "widths": [
         768,
         1280,
         1920,
         2560
       ],
-      "placement": "Company page"
+      "placement": "Company page",
+      "grade": false
     },
     {
       "id": "h1-hero-film",

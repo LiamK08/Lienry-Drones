@@ -11,15 +11,16 @@ The user's current project brief wins over older notes in this repository.
 
 Honesty: no customers, logos, testimonials, results, prices, certifications or approvals
 are claimed anywhere. Statistics come only from `src/content/stats.ts`, each cited to its
-primary source. The imagery is AI-generated, but for the home hero film (h1 and h2): a Blender render of the
-owner's H1 model over a CC0 photographed city, its masters in `scripts/media/masters` (docs/MEDIA.md).
+primary source. Every image and film on the site is a Blender render of the owner's H1 model (the docks are the
+owner's own dock design), set into CC0 photographs or built in code under CC0 skies (the user's brief, 10 November
+2026), its masters in `scripts/media/masters` (docs/MEDIA.md): no signage, landmarks or people in frame.
 The owner removed the Concept render captions on
 26 September 2026, so no image or film carries one, and `npm run check:rules` fails if one returns.
 The coded software preview carries Demo data and an illustrative-model note.
 No new or replacement media without the user's instructions. The software window's own recordings
 (`public/video/<model>-view-*`, recorded from the coded model by `scripts/record-software-view.mjs`)
 are part of the window, not imagery: each model's window brings its own (check 14 lists the stems).
-`scripts/media/masters` holds only the owner-supplied renders that the manifest's `repo:` sources name, each
+`scripts/media/masters` holds only the renders of the owner's model that the manifest's `repo:` sources name, each
 committed, so the host's build can encode them (check 14).
 
 Layout (since 20 October 2026, the owner's brief): the site follows refresh.tech's page

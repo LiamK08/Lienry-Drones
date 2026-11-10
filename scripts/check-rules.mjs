@@ -62,7 +62,7 @@
 //     files and nothing is added to public/video or media-src, but for a software window's own
 //     recordings (SPEC.windowRecordings: <stem>-wide and -tall, .mp4, .webm and -poster.jpg/.webp, recorded
 //     from the coded model by scripts/record-software-view.mjs; CLAUDE.md says so); scripts/media/masters
-//     holds only the owner-supplied renders that manifest repo: sources name, each committed as it stands (CLAUDE.md).
+//     holds only the renders of the owner's model that manifest repo: sources name, each committed as it stands (CLAUDE.md).
 // 21  Motion: under reduced motion no video plays, nothing reveals, crossfades or snaps smoothly, and
 //     the window shows its recording with native controls; without it never two videos play at once,
 //     the live window stops drawing once off screen (judged no sooner than 2.5s after it leaves, then
@@ -2972,7 +2972,7 @@ try {
 } catch {
   console.log("  note  git is unavailable: the public/video and media-src history was not checked");
 }
-// Check 14: scripts/media/masters holds the owner-supplied renders and nothing else: each file there is a
+// Check 14: scripts/media/masters holds the renders of the owner's model and nothing else: each file there is a
 // manifest repo: source, committed as it stands (the host's build copies it from the checkout, so a
 // staged, changed or new file there would leave the host encoding other bytes), and each repo: source
 // is there.

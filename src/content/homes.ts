@@ -21,7 +21,7 @@ export const homesPage = {
       title: "A ground pod that powers the drone and feeds it water",
       paragraphs: ["The pod sits beside the house, near the garden tap. It shelters the drone between cleans and runs power and water through the same tether."],
       checks: ["Waterproof ground pod", "Power and water through one tether", "Shelter between cleans"],
-      image: { id: "m3-pod-master", alt: "The Lienry ground pod open beside a garden tap, the home drone inside", position: "35% 50%" },
+      image: { id: "m3-pod-master", alt: "The Lienry dock open on a garden patio near the tap, the drone inside", position: "35% 50%" },
       panel: { id: "ground-pod" as const, corner: "end" as const },
     },
     {
@@ -31,7 +31,7 @@ export const homesPage = {
         "The property is mapped first, so the drone knows every surface it can reach. As it cleans it identifies each material and adjusts its pressure, and you can change it in the app.",
       ],
       checks: ["A detailed scan of the property", "Glass, panels, render, roofing and paving", "Pressure you can adjust"],
-      image: { id: "p4-rental", alt: "The home drone washing the rooftop solar panels of a brick rental townhouse, the ground pod by the side fence", position: "50% 28%", positionMd: "50% 32%" },
+      image: { id: "p4-rental", alt: "The Lienry drone washing the rooftop solar panels of a brick terrace", position: "50% 28%", positionMd: "50% 32%" },
       panel: { id: "right-pressure" as const, corner: "start" as const },
     },
   ],
@@ -70,11 +70,11 @@ export const landlordStory = {
   intro: "You own a rental in Sydney and live overseas. It needs a clean before the next tenant.",
   steps: ["Choose the areas to clean", "Tap start, wherever you are", "Watch each area clean in turn", "See the house after the clean"],
   pictures: {
-    before: { id: "y1-story-before", alt: "A rental house before its clean, the ground pod closed beside the garden tap", chip: "Before the clean" },
-    driveway: { id: "y3-story-driveway", alt: "The drone washing the concrete driveway of the rental house", chip: "Washing the driveway" },
+    before: { id: "y1-story-before", alt: "The house before its clean, the Lienry dock closed on the patio near the garden tap", chip: "Before the clean" },
+    driveway: { id: "y3-story-driveway", alt: "The Lienry drone washing the brick path in front of the house", chip: "Washing the driveway" },
     panels: { id: "y2-story-panels", alt: "The drone washing the rooftop solar panels, half the array clean and wet", chip: "Washing the solar panels" },
-    windows: { id: "p3-house", alt: "The home drone washing the front windows of a house", chip: "Washing the windows" },
-    after: { id: "y5-story-done", alt: "The rental house after its clean, the ground pod open by the garden tap", chip: "After the clean" },
+    windows: { id: "p3-house", alt: "The Lienry drone washing the bay window of a house", chip: "Washing the windows" },
+    after: { id: "y5-story-done", alt: "The house after its clean, the Lienry dock open on the patio, the drone back inside", chip: "After the clean" },
   },
 };
 

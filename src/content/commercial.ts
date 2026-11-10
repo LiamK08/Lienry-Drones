@@ -19,7 +19,7 @@ export const commercialPage = {
       title: "A capsule on the roof that keeps the drone ready between cleans",
       paragraphs: ["The drone lives in a weatherproof capsule on the roof. Its water tether is fed from above, so the drone never carries water and never runs out mid-clean."],
       checks: ["Weatherproof roof capsule", "Tether fed from above", "No water carried by the drone", "Back to the dock after every clean"],
-      image: { id: "m2-capsule-master", alt: "The Lienry roof capsule open on a flat roof, the drone on its cradle beside the tether reel", position: "50% 50%" },
+      image: { id: "m2-capsule-master", alt: "The Lienry dock open on a roof deck, the drone parked on its landing pad", position: "50% 50%" },
       panel: { id: "between-cleans" as const, corner: "end" as const },
     },
     {

@@ -46,7 +46,7 @@ export const solarPage = {
         "Set how often the drone should check and clean, and change it in the app after a dusty week or a run of rain.",
       ],
       checks: ["Rooftops and ground-mounted rows", "Nobody on site during a clean", "How often it checks and cleans, changed whenever you like", "A record of each clean"],
-      image: { id: "p5-solar-farm", alt: "The drone passing low over a row of solar panels, its tether curving back along the row", position: "50% 50%", positionMd: "50% 60%" },
+      image: { id: "p5-solar-farm", alt: "The drone washing a row of solar panels, its tether dropping into the aisle", position: "50% 50%", positionMd: "50% 60%" },
       panel: { id: "row-schedule" as const, corner: "start" as const },
     },
   ],
