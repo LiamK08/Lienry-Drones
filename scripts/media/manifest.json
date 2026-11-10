@@ -18,7 +18,7 @@
     {
       "id": "m1-drone-master",
       "kind": "image",
-      "url": "repo:scripts/media/masters/m1-drone-master-h1-2048x1536.jpg",
+      "url": "repo:scripts/media/masters/m1-drone-master-h1-v2-2048x1536.jpg",
       "widths": [
         640,
         1280,
@@ -66,7 +66,7 @@
     {
       "id": "s2-tether",
       "kind": "image",
-      "url": "repo:scripts/media/masters/s2-tether-h1-1920x1440.jpg",
+      "url": "repo:scripts/media/masters/s2-tether-h1-v2-1920x1440.jpg",
       "widths": [
         640,
         1280,
@@ -78,7 +78,7 @@
     {
       "id": "s4-scan",
       "kind": "image",
-      "url": "repo:scripts/media/masters/s4-scan-h1-1920x1440.jpg",
+      "url": "repo:scripts/media/masters/s4-scan-h1-v2-1920x1440.jpg",
       "widths": [
         640,
         1280,
@@ -126,7 +126,7 @@
     {
       "id": "p2-apartments",
       "kind": "image",
-      "url": "repo:scripts/media/masters/p2-apartments-h1-1200x1800.jpg",
+      "url": "repo:scripts/media/masters/p2-apartments-h1-v2-1200x1800.jpg",
       "widths": [
         480,
         800,
@@ -174,7 +174,7 @@
     {
       "id": "y1-story-before",
       "kind": "image",
-      "url": "repo:scripts/media/masters/y1-story-before-h1-1200x1600.jpg",
+      "url": "repo:scripts/media/masters/y1-story-before-h1-v2-1200x1600.jpg",
       "widths": [
         480,
         800,
@@ -186,7 +186,7 @@
     {
       "id": "y2-story-panels",
       "kind": "image",
-      "url": "repo:scripts/media/masters/y2-story-panels-h1-1200x1600.jpg",
+      "url": "repo:scripts/media/masters/y2-story-panels-h1-v2-1200x1600.jpg",
       "widths": [
         480,
         800,
@@ -222,7 +222,7 @@
     {
       "id": "f1-tether",
       "kind": "image",
-      "url": "repo:scripts/media/masters/f1-tether-h1-1600x1600.jpg",
+      "url": "repo:scripts/media/masters/f1-tether-h1-v2-1600x1600.jpg",
       "widths": [
         400,
         800
