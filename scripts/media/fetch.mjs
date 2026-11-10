@@ -39,6 +39,9 @@ const CACHE_OUT = path.join(CACHE_DIR, "out");
 const OUT_DIR = path.join(ROOT, "public", "media");
 const MANIFEST = path.join(ROOT, "scripts", "media", "manifest.json");
 const VIDEO_BUDGET_BYTES = 4 * 1024 * 1024;
+// A film may carry its own size budget (`budgetMB`) and WebM quality (`webmCrf`, VP9 CRF, lower is finer):
+// the 15 s home hero film keeps the 8 s film's bitrate and grain that way. The defaults are 4 MB and 34.
+const encodeKey = (asset) => `${asset.budgetMB ?? 4}/${asset.webmCrf ?? 34}`;
 
 const args = process.argv.slice(2);
 const only = (args.find((a) => a.startsWith("--only="))?.split("=")[1] ?? "").split(",").filter(Boolean);
@@ -65,6 +68,7 @@ function complete(entry, dir, asset) {
   return (
     entry?.source === asset.url &&
     entry?.grade === gradeKey(gradeFor(asset), asset.gradeFrom) &&
+    (asset.kind !== "video" || (entry?.encode ?? "4/34") === encodeKey(asset)) &&
     Array.isArray(entry?.files) &&
     entry.files.length > 0 &&
     entry.files.every((f) => existsSync(path.join(dir, f)))
@@ -160,7 +164,8 @@ async function processVideo(asset, src, ffmpeg) {
     duration = asset.duration ?? 8;
   }
   const height = asset.height ?? 1080;
-  const targetBits = Math.floor((VIDEO_BUDGET_BYTES * 8 * 0.9) / duration);
+  const budget = asset.budgetMB ? asset.budgetMB * 1024 * 1024 : VIDEO_BUDGET_BYTES;
+  const targetBits = Math.floor((budget * 8 * 0.9) / duration);
   const mp4 = path.join(OUT_DIR, `${asset.id}.mp4`);
   const webm = path.join(OUT_DIR, `${asset.id}.webm`);
   const poster = path.join(OUT_DIR, `${asset.id}-poster.webp`);
@@ -183,12 +188,12 @@ async function processVideo(asset, src, ffmpeg) {
   const mp4Bits = Math.min(targetBits, 3_200_000);
   const webmBits = Math.min(Math.floor(targetBits * 0.8), 2_400_000);
   run(ffmpeg, ["-y", "-i", src, "-an", "-vf", vf, "-c:v", "libx264", "-preset", "slow", "-profile:v", "high", "-pix_fmt", "yuv420p", "-b:v", `${mp4Bits}`, "-maxrate", `${mp4Bits}`, "-bufsize", "6000k", "-movflags", "+faststart", mp4]);
-  run(ffmpeg, ["-y", "-i", src, "-an", "-vf", vf, "-c:v", "libvpx-vp9", "-b:v", `${webmBits}`, "-crf", "34", "-row-mt", "1", "-deadline", "good", "-cpu-used", "2", webm]);
+  run(ffmpeg, ["-y", "-i", src, "-an", "-vf", vf, "-c:v", "libvpx-vp9", "-b:v", `${webmBits}`, "-crf", `${asset.webmCrf ?? 34}`, "-row-mt", "1", "-deadline", "good", "-cpu-used", "2", webm]);
   run(ffmpeg, ["-y", "-i", src, "-vf", `select=eq(n\\,0),${vf}`, "-frames:v", "1", "-update", "1", posterJpg]);
   await sharp(posterJpg).webp({ quality: 74 }).toFile(poster);
   const sizes = { mp4: statSync(mp4).size, webm: statSync(webm).size };
-  if (sizes.mp4 > VIDEO_BUDGET_BYTES) console.warn(`WARNING ${asset.id}.mp4 is ${(sizes.mp4 / 1e6).toFixed(2)} MB, over the 4 MB budget`);
-  return { duration, files: [`${asset.id}.mp4`, `${asset.id}.webm`, `${asset.id}-poster.webp`, `${asset.id}-poster.jpg`], sizes, grade: gradeKey(grade, asset.gradeFrom), points: table?.points };
+  if (sizes.mp4 > budget) console.warn(`WARNING ${asset.id}.mp4 is ${(sizes.mp4 / 1e6).toFixed(2)} MB, over its ${(budget / 1048576).toFixed(0)} MB budget`);
+  return { encode: encodeKey(asset), duration, files: [`${asset.id}.mp4`, `${asset.id}.webm`, `${asset.id}-poster.webp`, `${asset.id}-poster.jpg`], sizes, grade: gradeKey(grade, asset.gradeFrom), points: table?.points };
 }
 
 const manifest = JSON.parse(readFileSync(MANIFEST, "utf8"));
