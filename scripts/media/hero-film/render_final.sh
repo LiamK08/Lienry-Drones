@@ -1,5 +1,5 @@
 #!/bin/bash
-# The final hero film, rendered here on the CPU: each shot with its own sampling, landscape then portrait.
+# The final 15 s hero film, rendered here on the CPU: each shot with its own sampling, landscape then portrait.
 # Re-running carries on: frames already on disk are kept (use_overwrite False).
 cd "$(dirname "$0")"
 B=$PWD
@@ -13,6 +13,9 @@ for pass in landscape portrait; do
   run $M $D $R 1 72 48 0.08 8 "$X"      # the wide
   run $M $D $R 73 124 24 0.02 0 "$X"    # the close-up: spray, mist and water need even sampling
   run $M $D $R 125 192 48 0.08 8 "$X"   # the medium
+  run $M $D $R 193 233 48 0.08 8 "$X"   # lane 2: the wide again, as it climbs to the top of the next lane
+  run $M $D $R 234 277 24 0.02 0 "$X"   # the close-up as the valve opens beside the washed lane
+  run $M $D $R 278 360 48 0.08 8 "$X"   # the medium, washing down
   echo "$pass done $(date +%H:%M)" >> "$B/final.progress"
 done
 echo done > "$B/final.done"

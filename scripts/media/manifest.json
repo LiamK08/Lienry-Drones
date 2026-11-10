@@ -303,9 +303,10 @@
     {
       "id": "h1-hero-film",
       "kind": "video",
-      "url": "repo:scripts/media/masters/h1-hero-film-v2-1280x720.mp4",
+      "url": "repo:scripts/media/masters/h1-hero-film-v3-1280x720.mp4",
       "height": 720,
-      "duration": 8,
+      "duration": 15,
+      "budgetMB": 8,
       "grade": false,
       "placement": "Home hero film: a Blender render of the owner's H1 model cleaning a window (docs/MEDIA.md)"
     },

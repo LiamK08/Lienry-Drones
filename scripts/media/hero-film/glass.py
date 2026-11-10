@@ -21,10 +21,18 @@ OUT = ARGS[1] if len(ARGS) > 1 else os.path.join(HERE, f"glass-{MODE}.png")
 # and the drone hovers. LOOP frames at 24 fps; LOOP is a multiple of 3 so the two-blade props come round.
 MOTION = MODE.startswith("motion")
 LOOP = int(os.environ.get("LOOP", "192" if MODE in ("motion-full", "motion-portrait") else "48"))
+# The 15 s cut (10 November): the first 8 s stay exactly as first rendered, timed on LOOP; the film runs to END.
+# Lane 2: after the side-step it climbs back to the top of the next lane, leans into the jet as the valve
+# opens and washes down it beside the lane it has just washed, still spraying as the film ends (it loops to
+# frame 1, mid-wash on lane 1). Nothing new moves before S2: the flight looks 1.4 frames ahead.
+END = int(os.environ.get("END", "360" if MODE in ("motion-full", "motion-portrait") else "0")) or LOOP
+S2, C_END = 196, 230  # the climb back to the top of the lane
+LEAD, F_O2 = 4, 238  # the valve opens over LEAD frames, the drone leaning in step; the jet reaches the glass at F_O2
+D2_START = 242  # and it starts down lane 2, easing into lane 1's speed
 # The cleaning pass: the drone works down its lane, top-down as facade cleaning is done, DESCENT metres over
 # the clip, so the strike line moves down the pane and leaves clean, wet glass above it.
 DESCENT = float(os.environ.get("DESCENT", "0.42" if MOTION else "0.0"))
-# The 8 s operation: it descends its lane spraying (about 5.5 s), eases to a stop as the spray shuts off,
+# Lane 1, the first 8 s: it descends its lane spraying (about 5.5 s), eases to a stop as the spray shuts off,
 # then side-steps one lane to the left with a slight climb, banking into the move, and settles.
 STEP = float(os.environ.get("STEP", "0.27"))
 CLIMB = float(os.environ.get("CLIMB", "0.04"))
@@ -45,14 +53,43 @@ F_V = A_END + 4  # the valve closes once the drone has stopped at the lane's foo
 
 
 def valve(f):
-    """Nozzle pressure, 1 while the valve is open, then an exponential collapse (tau 2 frames)."""
+    """Nozzle pressure, 1 while the valve is open, then an exponential collapse (tau 2 frames). For lane 2 it
+    opens again, the pressure building over LEAD frames to F_O2."""
+    if END > LOOP and f >= F_O2 - LEAD:  # lane 2: the pressure builds over LEAD frames
+        u = min(1.0, (f - (F_O2 - LEAD)) / LEAD)
+        return u * u * (3 - 2 * u)
     return 1.0 if f <= F_V else math.exp(-(f - F_V) / 2.0)
+
+
+def lean(x):
+    """The controller's lean into the jet: a frame behind the valve, except as lane 2's valve opens, which the
+    controller knows ahead: it leans in step with the building pressure, so the push and the lean cancel and
+    the jet lands on its line."""
+    if END > LOOP and x >= F_O2 - LEAD:
+        return valve(x)
+    return valve(x - 1.0)
+
+
+def _lane2_z(f):
+    """Lane 2's height offset: a quintic climb from where the side-step left it to the lane's top, a hover,
+    then down at lane 1's constant speed, eased in over half a second."""
+    top, park = DESCENT / 2, -DESCENT / 2 + CLIMB
+    if f <= C_END:
+        u = max(0.0, (f - S2) / (C_END - S2))
+        return park + (top - park) * (6 * u ** 5 - 15 * u ** 4 + 10 * u ** 3)
+    if f <= D2_START:
+        return top
+    speed = DESCENT / 0.925 / max(1, A_END - 1)  # lane 1's, per frame
+    t, r_ = f - D2_START, 12.0
+    return top - speed * ((t ** 3 / r_ ** 2 - t ** 4 / (2 * r_ ** 3)) if t < r_ else (r_ / 2 + t - r_))
 
 
 def pass_state(f):
     """(offset from the mid-pass position, extra roll in radians, spray on 0..1) at frame f."""
     if not MOTION or DESCENT <= 0:
         return Vector((0.0, 0.0, 0.0)), 0.0, 1.0
+    if END > LOOP and f > S2:  # lane 2 (ahead of every lane 1 expression, which stays as it was)
+        return Vector((-STEP, 0.0, _lane2_z(f))), 0.0, (valve(f) if f >= F_O2 - LEAD else 0.0)
     spray = valve(f)
     if f <= A_END:
         u = (f - 1) / max(1, A_END - 1)
@@ -731,6 +768,48 @@ def paint_glass(imp, gain=1.0, t_off=0.0):
     st_band = np.exp(-(ex * ex / 0.012 ** 2 + (dz + 0.004) ** 2 / 0.011 ** 2) / 2) * gain * _outer
     panes.data.attributes["strike"].data.foreach_set("value", st_band.astype(np.float32))
     panes.data.update()
+def lane_fields(imp, gain=1.0, t_off=0.0, top=None, front=None):
+    """paint_glass's fields for one lane, returned, not written: lane 2 needs the union with lane 1's. top caps
+    the washed band (and its film) where this lane's washing began; front cuts the falling sheet below the
+    height it has run down to."""
+    half = NOZZLE.y * math.tan(math.radians(12.5))
+    dx = _pv[:, 0] - imp[0]
+    dz = _pv[:, 2] - imp[1]
+    ex = np.maximum(0.0, np.abs(dx) - half)
+    strike = np.exp(-(ex * ex / 0.02 ** 2 + dz * dz / 0.03 ** 2) / 2) * gain
+    ew = np.maximum(0.0, np.abs(dx) - np.maximum(0.4 * half, half - np.maximum(0.0, -dz) * 0.35))
+    lane_x = np.exp(-(ew * ew) / (2 * 0.025 ** 2))
+    above = 0.5 + 0.35 * np.exp(-np.maximum(dz, 0.0) / 0.19)
+    below = np.exp(np.minimum(dz, 0.0) * 0.7)
+    capz = 1.0
+    if top is not None:
+        capz = 1.0 / (1.0 + np.exp((_pv[:, 2] - top) / 0.015))  # 1 below where this lane began, 0 above
+        above = above * capz
+    if front is not None:
+        below = below / (1.0 + np.exp((front - _pv[:, 2]) / 0.015))  # 1 above the sheet's foot, 0 below
+    sheet = lane_x * np.where(dz < 0.0, below, above)
+    if t_off > 0.0:
+        top_ = -0.8 * t_off
+        edge = 1.0 / (1.0 + np.exp(-(top_ - dz) / 0.015))
+        sheet = sheet * (0.5 + 0.5 * edge) * (0.6 + 0.4 * math.exp(-t_off / 0.8))
+    w_ = np.minimum(1.0, np.maximum(strike, sheet) * _jit) * _outer
+    el = np.maximum(0.0, np.abs(dx) - (half + 0.015))
+    lane = np.exp(-(el * el) / (2 * 0.02 ** 2)) * (dz > -0.02) * capz
+    c_ = np.minimum(1.0, np.maximum(lane, w_ * 1.2)) * _outer
+    st_band = np.exp(-(ex * ex / 0.012 ** 2 + (dz + 0.004) ** 2 / 0.011 ** 2) / 2) * gain * _outer
+    return w_, c_, st_band
+
+
+def paint_two_lanes(f):
+    """Lane 1 as it stood, its last strike long drained, and lane 2 washing: their union on the glass."""
+    w1, c1, s1 = lane_fields(strike_point(F_V), 0.0, (f - F_V) / 24.0)
+    w2, c2, s2 = lane_fields(strike_point(f), 1.0, 0.0, top=Z_TOP2, front=lane2_front(f))
+    panes.data.attributes["wet"].data.foreach_set("value", np.maximum(w1, w2).astype(np.float32))
+    panes.data.attributes["clean"].data.foreach_set("value", np.maximum(c1, c2).astype(np.float32))
+    panes.data.attributes["strike"].data.foreach_set("value", np.maximum(s1, s2).astype(np.float32))
+    panes.data.update()
+
+
 def strike_point(f):
     """Where the fan's centre meets the pane at frame f, from the simulated pose when there is one."""
     pose = globals().get("SIM_POSE", {}).get(f)
@@ -910,7 +989,7 @@ if MOTION:
     SIG_CALM = (np.array([0.3, 0.12, 0.12]), np.array([0.12, 0.10, 0.08]))  # gusts and fast turbulence, m/s^2
     SIG_WIDE = (np.array([0.3, 0.25, 0.12]), np.array([0.12, 0.3, 0.08]))
     CUT1_ = int(os.environ.get("CUT1", str(round(LOOP * 0.375) + 1)))
-    FLIGHTS = [(*SIG_CALM, 1, LOOP + 1)] if "portrait" in MODE else [(*SIG_WIDE, 1, CUT1_ - 1), (*SIG_CALM, CUT1_, LOOP + 1)]
+    FLIGHTS = [(*SIG_CALM, 1, END + 1)] if "portrait" in MODE else [(*SIG_WIDE, 1, CUT1_ - 1), (*SIG_CALM, CUT1_, END + 1)]
     for SIG, SIG_F, f_lo, f_hi in FLIGHTS:
         rs = np.random.default_rng(21)  # the same draws in every flight: x, z, roll and yaw come out identical
         gust_f = np.zeros(3)
@@ -919,7 +998,7 @@ if MOTION:
         v_ = (ref(1.5) - ref(0.5)) * 24
         gust = np.zeros(3)
         yaw_n = 0.0
-        for f in range(-47, LOOP + 2):  # two seconds of settling before the first frame
+        for f in range(-47, END + 2):  # two seconds of settling before the first frame
             for k in range(SUB):
                 fr = max(1.0, f + k / SUB)
                 r_ = ref(fr)
@@ -929,7 +1008,7 @@ if MOTION:
                 att_n += -att_n / 0.1 * dt + math.radians(0.2) * math.sqrt(2 / 0.1 * dt) * rs.normal(0, 1, 2)
                 pv_ = valve(fr)
                 jet = np.array([0.0, J0 * pv_, 0.0])  # the fan pushes it back from the glass
-                ff_ = np.array([0.0, -J0 * valve(fr - 1.0), 0.0])  # the controller leans into it, a frame behind the valve
+                ff_ = np.array([0.0, -J0 * lean(fr), 0.0])  # the controller leans into it, a frame behind the valve
                 a_cmd = wn * wn * (r_ - p_) + 2 * ze * wn * (vr - v_) + ff_
                 a_att = np.array([-G * math.tan(att_n[0]), -G * math.tan(att_n[1]), 0.0])
                 v_ += (a_cmd + gust + gust_f + jet + a_att) * dt
@@ -938,7 +1017,7 @@ if MOTION:
             if f < f_lo or f > f_hi:
                 continue
             a_cmd = wn * wn * (ref(f) - p_) + 2 * ze * wn * ((ref(f + 0.5) - ref(f - 0.5)) * 24 - v_)
-            a_cmd = a_cmd + np.array([0.0, -J0 * valve(f - 1.0), 0.0])
+            a_cmd = a_cmd + np.array([0.0, -J0 * lean(f), 0.0])
             # the thrust tilts toward the commanded acceleration: along the glass (world x) is roll, toward the
             # glass (world -y) is nose-down pitch. The lean into the jet is part of it, so once the valve closes
             # the drone levels out.
@@ -954,7 +1033,7 @@ if MOTION:
     strobe = bpy.data.materials.get("White strobe")
     if strobe:
         sp_ = [n_ for n_ in strobe.node_tree.nodes if n_.bl_idname == "ShaderNodeBsdfPrincipled"][0].inputs["Emission Strength"]
-        for f in range(1, LOOP + 2):
+        for f in range(1, END + 2):
             sp_.default_value = 6.0 if ((f - 1) % 24) < 2 else 0.0
             sp_.keyframe_insert("default_value", frame=f)
             # constant between keys: a blink, not a fade
@@ -1003,7 +1082,7 @@ def _rotz_to(d):
     return np.array(d.to_track_quat("Z", "Y").to_matrix(), np.float64)
 
 
-def spray_arrays(seed, k_=1.0, t_off=None):
+def spray_arrays(seed, k_=1.0, t_off=None, opening=False):
     """The spray's droplets as one mesh (vertex and face arrays): each drop an icosphere stretched along its
     path over the exposure. Built with numpy: building it drop by drop in bmesh took 20 s a frame.
     k_ is the nozzle pressure (1 open): as it collapses the fan narrows, the jet slows and sags, and the drops
@@ -1043,7 +1122,7 @@ def spray_arrays(seed, k_=1.0, t_off=None):
             st_ = max(1.0, 9.81 * tau / 48 / r)  # stretched over the exposure as it speeds up
             drops.append((r, st_, _rotz_to(Vector((0.0, 0.0, -1.0))), p[:]))
     # Rebound off the strike: a shallow cone back toward the drone and down.
-    for k in range(int(120 * k_ * k_)):
+    for k in range(int(120 * k_ * k_ * (0.0 if opening and k_ < 1.0 else 1.0))):
         th = math.radians(rng.uniform(0, 30))
         ph = rng.uniform(0, 2 * math.pi)
         dirv = Vector((math.sin(th) * math.cos(ph), math.cos(th), math.sin(th) * math.sin(ph) - 0.35)).normalized()
@@ -1051,7 +1130,7 @@ def spray_arrays(seed, k_=1.0, t_off=None):
         r = rng.uniform(0.0003, 0.0008)
         drops.append((r, rng.uniform(3, 8), _rotz_to(dirv), p[:]))
     # Splash thrown out along the pane from the strike.
-    for k in range(int(150 * k_ * k_)):  # thrown down and sideways along the pane; only fine mist would rise
+    for k in range(int(150 * k_ * k_ * (0.0 if opening and k_ < 1.0 else 1.0))):  # thrown down and sideways along the pane; only fine mist would rise
         a = rng.uniform(math.pi, 2 * math.pi)
         dirv = Vector((math.cos(a), 0.15 * rng.random(), math.sin(a) * 0.8)).normalized()
         p = IMPACT + Vector((rng.uniform(-HALF0, HALF0), rng.uniform(0.005, 0.03), rng.uniform(-0.02, 0.0))) + dirv * rng.uniform(0.02, 0.07)
@@ -1223,6 +1302,80 @@ def run_beads_mesh(t):
 
 
 run_obj = link_obj("running beads", run_beads_mesh(0.0), water)
+if MOTION and END > LOOP and DESCENT > 0:
+    # Lane 2's strike starts where the drone, leaning in, aims as the valve opens; its washed band runs from
+    # there down (lane 1's ran to the head of the pane, washed before the film began). Its drops and rivulets
+    # come from their own random stream, so nothing built before them changes.
+    Z_TOP2 = max(strike_point(F_O2 + k)[1] for k in range(3)) + 0.05  # above the strike's halo
+    X2 = IMPACT.x - STEP
+    r2 = random.Random(2026)
+    LANE2_RIV = []  # (points, widths): the falling sheet's edges and a few runs inside it
+    for k in range(5):
+        x = X2 + ((-1 if k == 0 else 1) * 0.9 * HALF_S if k < 2 else HALF_S * (r2.random() * 2 - 1) * 0.8)
+        z = Z_TOP2 - (r2.uniform(0.0, 0.03) if k < 2 else r2.uniform(0.04, 0.5))
+        stop = BOTTOM if r2.random() < 0.65 else r2.uniform(BOTTOM + 0.15, Z_TOP2 - 0.45)
+        w = r2.uniform(0.003, 0.008)
+        path, zz = [], z
+        while zz > stop:
+            path.append((x, zz))
+            x += r2.gauss(0, 0.0012) + (r2.choice((-1, 1)) * r2.uniform(0.003, 0.010) if r2.random() < 0.12 else 0.0)
+            zz -= 0.012
+        if len(path) > 2:
+            LANE2_RIV.append((path, [w * (0.75 + 0.5 * r2.random()) for _ in path], stop > BOTTOM))
+    Z2_MID = Z_TOP2 - 0.21  # the middle of what lane 2 washes before the film ends
+    LANE2_DROPS = [(X2 + r2.gauss(0, HALF_S * 0.8), min(Z_TOP2, Z2_MID - abs(r2.gauss(0, 0.35))), r2.uniform(0.0006, 0.0024))
+                   for _ in range(320)]
+    LANE2_DROPS += [(X2 + r2.uniform(-HALF_S, HALF_S), r2.uniform(Z2_MID - 0.2, Z_TOP2 - 0.01), r2.uniform(0.0005, 0.0016))
+                    for _ in range(90)]
+
+    def _tube2(bm_, path, widths, segs=12):
+        """tube(), into bm_ and with fixed widths: the same channel, drawn afresh each frame."""
+        rings = []
+        n_ = len(path)
+        for i_, ((x, z), w0) in enumerate(zip(path, widths)):
+            wi = w0 * max(0.12, min(1.0, (i_ + 1) / 4.0, (n_ - i_) / 4.0))
+            R_ = wi / math.sin(RIV_TH)
+            rings.append([bm_.verts.new((x + R_ * math.sin(ph), GY + AIR + R_ * (math.cos(ph) - math.cos(RIV_TH)), z))
+                          for ph in (-RIV_TH + 2 * RIV_TH * j / (segs - 1) for j in range(segs))])
+        for r0, r1 in zip(rings, rings[1:]):
+            for j in range(segs):
+                bm_.faces.new((r0[j], r0[(j + 1) % segs], r1[(j + 1) % segs], r1[j]))
+        bm_.faces.new(rings[0])
+        bm_.faces.new(rings[-1][::-1])
+
+    LANE2_RUN = [(r2.randrange(len(LANE2_RIV)), r2.random(), r2.uniform(0.002, 0.004), r2.randrange(1, 3)) for _ in range(10)]
+
+    def lane2_front(f):
+        """How far down the pane lane 2's falling sheet has run, about a metre a second from the strike."""
+        return Z_TOP2 - 1.0 * (f - F_O2 + 1) / 24.0
+
+    def lane2_mesh(f):
+        bm2 = bmesh.new()
+        if f >= F_O2:
+            lo = lane2_front(f)
+            for (x, z, r) in LANE2_DROPS:
+                if lo <= z <= Z_TOP2:
+                    cap(bm2, x, z, r)
+            for path, widths, beaded in LANE2_RIV:
+                keep = [i_ for i_, (x, z) in enumerate(path) if z >= lo]
+                if len(keep) > 2:
+                    _tube2(bm2, path[:keep[-1] + 1], widths[:keep[-1] + 1])
+                    if beaded and keep[-1] == len(path) - 1:
+                        cap(bm2, path[-1][0], path[-1][1], widths[-1] * 1.4, 55.0)
+            for (ri, phase, r, laps) in LANE2_RUN:  # beads sliding down its rivulets in stick-slip steps
+                path = LANE2_RIV[ri][0]
+                u = (phase + (f - F_O2) / 96.0 * laps) % 1.0
+                u = (u + 0.06 * math.sin(2 * math.pi * 3 * u) / (2 * math.pi)) % 1.0
+                fi = u * (len(path) - 1)
+                i_, a_ = int(fi), fi - int(fi)
+                j_ = min(i_ + 1, len(path) - 1)
+                x, z = path[i_][0] * (1 - a_) + path[j_][0] * a_, path[i_][1] * (1 - a_) + path[j_][1] * a_
+                if z >= lo:
+                    cap(bm2, x, z, r, 50.0, sz=1.6, n=12, rings_=5)
+        bmesh.ops.recalc_face_normals(bm2, faces=bm2.faces)
+        return bm2
+
+    lane2_obj = link_obj("lane 2 water", lane2_mesh(1), water)  # empty until the valve opens
 # the nozzle head is wet while it sprays
 bmh = bmesh.new()
 for k in range(30):
@@ -1420,10 +1573,21 @@ if MOTION:
             return  # motion-blur sub-steps of the same frame keep the same droplets
         _last[0] = f
         _off, _roll, k_spray = pass_state(f)
-        write_mesh(spray_obj.data, *spray_arrays(1000 + f, k_spray, (f - F_V) / 24.0 if f > F_V else None))
+        if END > LOOP and f >= F_O2 - LEAD:  # lane 2's valve open or opening
+            write_mesh(spray_obj.data, *spray_arrays(1000 + f, k_spray, None, opening=True))
+        else:
+            write_mesh(spray_obj.data, *spray_arrays(1000 + f, k_spray, (f - F_V) / 24.0 if f > F_V else None))
         s_a3.inputs[1].default_value = float(os.environ.get("FAN", "0.12")) * k_spray
-        if DESCENT > 0:
-            paint_glass(strike_point(min(f, F_V)), pass_state(f)[2], max(0.0, (f - F_V) / 24.0))
+        if DESCENT > 0 and END > LOOP and f >= F_O2:
+            paint_two_lanes(f)
+        elif DESCENT > 0:  # (lane 1 only; once lane 2 is under way its gain is lane 2's, not lane 1's)
+            paint_glass(strike_point(min(f, F_V)), pass_state(f)[2] if f <= S2 else 0.0, max(0.0, (f - F_V) / 24.0))
+        if END > LOOP and DESCENT > 0:
+            b2 = lane2_mesh(f)
+            b2.to_mesh(lane2_obj.data)
+            b2.free()
+            for p_ in lane2_obj.data.polygons:
+                p_.use_smooth = True
         b_ = run_beads_mesh(((f - 1) % LOOP) / LOOP)
         b_.to_mesh(run_obj.data)
         b_.free()
@@ -1480,7 +1644,7 @@ lag = bpy.data.objects.new("tether lag", None)
 col.objects.link(lag)
 lag.matrix_world = model_to_world
 if MOTION:
-    for f in range(1, LOOP + 2):
+    for f in range(1, END + 2):
         src = SIM_POSE.get(max(1, f - 7))
         base_ = src[0] if src else root.location
         t_ = (f - 1) / 24.0
@@ -1631,19 +1795,23 @@ if CAMMOVE:
     def _float(t, seeds):
         return sum(a * math.sin(2 * math.pi * f_ * t + ph) for a, f_, ph in seeds)
 
-    JXw, JZw = _jitter(LOOP + 2, 0.15, 11), _jitter(LOOP + 2, 0.15, 12)
+    JXw, JZw = _jitter(END + 2, 0.15, 11), _jitter(END + 2, 0.15, 12)
+    # lane 2: the operator on the wide follows the climb late, as on the shot cameras
+    OFF_W = _follow(lambda f_: pass_offset(f_).copy(), LOOP + 1, END + 2) if END > LOOP else {}
 
-    for f in range(1, LOOP + 1):
+    for f in range(1, END + 2):
         t = (f - 1) / 24.0
         if os.environ.get("SHOTS", "1") == "1":  # a steady push over the wide alone, no ease-in from rest
             ease = min(1.0, (f - 1) / max(1, int(os.environ.get("CUT1", str(round(LOOP * 0.375) + 1))) - 1)) * 0.31
         else:
-            u = (f - 1) / max(1, LOOP - 1)
+            u = min(1.0, (f - 1) / max(1, LOOP - 1))
             ease = u * u * (3 - 2 * u)
         off_, _r, _k = pass_state(f)
         c = C0 + view * (PUSH * ease) + Vector((_float(t, ((0.0018, 0.31, 0.2), (0.0008, 0.83, 1.9))),
                                                  _float(t, ((0.0012, 0.27, 2.4),)),
                                                  _float(t, ((0.0015, 0.37, 0.9), (0.0006, 1.1, 0.3)))))
+        if f > LOOP and f in OFF_W:
+            off_ = OFF_W[f]
         tg = T0 + Vector((off_.x * 0.35, 0.0, off_.z * 0.3)) + Vector((_float(t, ((0.004, 0.23, 1.3), (0.0015, 0.71, 0.6))), 0.0,
                                                                        _float(t, ((0.003, 0.29, 2.2), (0.0012, 0.9, 1.1)))))
         cam.location = c
@@ -1672,7 +1840,8 @@ if SHOTS:
     CUT1 = int(os.environ.get("CUT1", str(round(LOOP * 0.375) + 1)))  # 3.0 s
     CUT2 = int(os.environ.get("CUT2", str(A_END - 8)))  # just before the spray cuts
 
-    def shot_camera(name, lens, f0, f1, loc0, loc1, aim, focus, pfac=0.66, seeds=(31, 32), fstop_p=None):
+    def shot_camera(name, lens, f0, f1, loc0, loc1, aim, focus, pfac=0.66, seeds=(31, 32), fstop_p=None, last=None):
+        last = LOOP if last is None else last  # its last key: lane 1's shots stop at LOOP, as they always did
         cd = bpy.data.cameras.new(name)
         cd.lens = lens * (pfac if PORTRAIT else 1.0)
         cd.sensor_width = 36
@@ -1682,9 +1851,9 @@ if SHOTS:
         cd.dof.aperture_rotation = 0.3
         co = bpy.data.objects.new(name, cd)
         col.objects.link(co)
-        A_ = _follow(aim, max(1, f0 - 2), min(LOOP, f1 + 2))
-        JX, JZ = _jitter(LOOP + 2, 0.10, seeds[0]), _jitter(LOOP + 2, 0.10, seeds[1])
-        for f in range(max(1, f0 - 2), min(LOOP, f1 + 2) + 1):
+        A_ = _follow(aim, max(1, f0 - 2), min(last, f1 + 2))
+        JX, JZ = _jitter(max(LOOP, last) + 2, 0.10, seeds[0]), _jitter(max(LOOP, last) + 2, 0.10, seeds[1])
+        for f in range(max(1, f0 - 2), min(last, f1 + 2) + 1):
             u = (f - f0) / max(1, f1 - f0)
             u = min(1.0, max(0.0, u))
             ease = u * u * (3 - 2 * u)
@@ -1718,10 +1887,27 @@ if SHOTS:
     camC = shot_camera("cam medium", 60, CUT2, LOOP, Vector((0.25, -2.05, 1.24)), Vector((0.2, -1.95, 1.24)),
                        lambda f: body_at(f) * 0.7 + body_at(CUT2) * 0.3 + (Vector((-0.07, 0.0, -0.20)) if PORTRAIT else Vector((0.12, 0.0, -0.03))),
                        body_at, pfac=0.50, seeds=(41, 42), fstop_p=1.4)
-    for fr, c_ in ((1, cam), (CUT1, camB), (CUT2, camC)):
+    MARKS = [(1, cam), (CUT1, camB), (CUT2, camC)]
+    if END > LOOP:
+        # Lane 2, cut on the action again: the wide as it climbs to the top of the next lane beside the one it
+        # washed; the close-up as it leans in and the jet opens onto the glass beside the clean lane; then a
+        # medium that eases back as it washes down, both lanes in view.
+        CUT3, CUT4, CUT5 = LOOP + 1, F_O2 - LEAD, F_O2 + 40
+        lift = pass_offset(CUT4) - pass_offset(CUT1)  # lane 2's top against the first close-up's start
+        aim_e0 = nozzle_at(CUT4).lerp(strike_at(CUT4), 0.45) + Vector((0.0, 0.0, 0.02))
+        camE = shot_camera("cam close 2", 70, CUT4, CUT5, Vector((0.99, -1.24, 1.15)) + lift, Vector((0.93, -1.27, 1.16)) + lift,
+                           lambda f: aim_e0 + Vector((0.0, 0.0, -0.03)) + 0.6 * (pass_offset(f) - pass_offset(CUT4)), nozzle_at,
+                           seeds=(51, 52), last=END + 1)
+        drop = pass_offset((CUT5 + END) // 2) - pass_offset(CUT2)  # level with the drone half way down
+        right = Vector((0.12, 0.0, 0.0))  # so the washed lane is in frame from the first
+        camF = shot_camera("cam medium 2", 60, CUT5, END, Vector((0.25, -1.95, 1.24)) + drop + right, Vector((0.18, -2.2, 1.22)) + drop + right,
+                           lambda f: body_at(f) * 0.7 + body_at(CUT5) * 0.3 + right + (Vector((-0.07, 0.0, -0.20)) if PORTRAIT else Vector((0.12, 0.0, -0.03))),
+                           body_at, pfac=0.50, seeds=(61, 62), fstop_p=1.4, last=END + 1)
+        MARKS += [(CUT3, cam), (CUT4, camE), (CUT5, camF)]
+    for fr, c_ in MARKS:
         mk = scene.timeline_markers.new(f"shot {fr}", frame=fr)
         mk.camera = c_
-    print("shots: wide 1-%d, close %d-%d, medium %d-%d" % (CUT1 - 1, CUT1, CUT2 - 1, CUT2, LOOP))
+    print("shots:", ", ".join(f"{c_.name} from {fr}" for fr, c_ in MARKS), "to", END)
 
 if os.environ.get("FOREGROUND", "0") == "1":
     half_h = math.atan((cam_data.sensor_width / 2) / cam_data.lens) if not PORTRAIT else math.atan((cam_data.sensor_width / 2 * 9 / 16) / cam_data.lens)
@@ -1855,7 +2041,7 @@ if MOTION:
     scene.render.use_lock_interface = True
     scene.render.use_overwrite = False  # a re-run picks up where it stopped: frames already on disk are kept
     scene.render.use_placeholder = False
-    scene.frame_start, scene.frame_end = int(os.environ.get("FRAME_START") or 1), int(os.environ.get("FRAME_END") or LOOP)
+    scene.frame_start, scene.frame_end = int(os.environ.get("FRAME_START") or 1), int(os.environ.get("FRAME_END") or END)
     scene.frame_step = int(os.environ.get("FRAME_STEP", "1"))
     if os.environ.get("AUTO_REGION"):
         from bpy_extras.object_utils import world_to_camera_view
@@ -1894,7 +2080,7 @@ if MOTION:
     os.makedirs(frames_dir, exist_ok=True)
     scene.render.filepath = os.path.join(frames_dir, "f_####")
     bpy.ops.render.render(animation=True)
-    print(f"rendered {MODE} ({LOOP} frames) in {time.time() - t:.0f}s -> {frames_dir}", flush=True)
+    print(f"rendered {MODE} ({END} frames) in {time.time() - t:.0f}s -> {frames_dir}", flush=True)
     # leave at once: the frames are on disk, and tearing down a scene with live handlers can crash on exit,
     # which would read as a failure to the batch file
     bpy.app.handlers.frame_change_pre.clear()
