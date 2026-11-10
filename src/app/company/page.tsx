@@ -60,7 +60,6 @@ export default function CompanyPage() {
           <h2 id="round-heading" className="text-h2s text-balance">
             {keepWhole(round.headline)}
           </h2>
-          <p className="mt-5 max-w-[36rem] text-lead leading-[1.55] text-balance text-fg-muted">{round.lead}</p>
           <ul className="mx-auto mt-12 grid w-full max-w-[56rem] gap-8 md:grid-cols-3 md:gap-6">
             {round.facts.map((f) => (
               <li key={f.title} className="flex flex-col items-center">

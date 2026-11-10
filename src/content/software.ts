@@ -119,15 +119,15 @@ export const solarProject: Project = {
  */
 export const rowPanels = {
   betweenCleans: {
-    label: "The drone docked in its roof capsule between cleans, its tether reeled in and the next clean due.",
+    label: "The drone in its dock on the roof between cleans, its tether reeled in and the next clean due.",
     title: "Between cleans",
-    sub: "Roof capsule",
-    rows: ["Docked in the capsule", "Tether reeled in"],
+    sub: "Roof dock",
+    rows: ["In the dock", "Tether reeled in"],
     next: "Next clean",
   },
   groundPod: {
-    label: "The ground pod fed from the garden tap, with power and water on one tether and the drone sheltered inside.",
-    title: "Ground pod",
+    label: "The dock fed from the garden tap, with power and water on one tether and the drone sheltered inside.",
+    title: "Dock",
     sub: "Home system",
     rows: ["Fed from the garden tap", "Power and water on one tether", "Drone sheltered"],
   },

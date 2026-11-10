@@ -74,11 +74,10 @@ export const companyPage = {
     title: "Founder and CEO",
     image: { id: "h0-hero-still", alt: "", position: "62% 45%" },
   },
-  // The pre-seed round, centred: who leads the company, three facts from the round's own paragraph (what
-  // it funds, who we want to hear from, what we share), then the investor action. No amounts, no backers.
+  // The pre-seed round, centred: three facts from the round's own paragraph (what it funds, who we want to
+  // hear from, what we share), then the investor action. No amounts, no backers.
   round: {
     headline: "Raising our pre-seed round",
-    lead: "Liam Kennedy, our founder and CEO, leads Lienry Drones from Sydney with a co-founder.",
     // Each fact's glyph is one of the menus' tiles (MenuTile).
     facts: [
       { glyph: "chart", title: "What the round funds", text: "Building the system and running the Sydney pilot." },

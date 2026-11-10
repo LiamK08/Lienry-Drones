@@ -12,12 +12,12 @@ import { SoftwareWindow } from "@/components/software/SoftwareWindow";
 
 export const metadata: Metadata = pageMetadata(
   "/commercial",
-  "A weatherproof roof capsule, a tether fed from above, and desktop software that runs the whole building. Window cleaning that lives on the roof.",
+  "A weatherproof roof dock, a tether fed from above, and desktop software that runs the whole building. Window cleaning that lives on the roof.",
 );
 
 /**
  * /commercial: the solutions template. The hero with its two paths, the strip, the feature rows as
- * chapters (the capsule on tint, the scan on white, the software window on tint), safety as the night
+ * chapters (the dock on tint, the scan on white, the software window on tint), safety as the night
  * panel, the questions, then the closing panel with its lighter step to the fit check. The cost
  * calculator has its own page; the cost answer links to it.
  */

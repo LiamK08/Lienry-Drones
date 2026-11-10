@@ -18,7 +18,7 @@ export const registerPage = {
       },
       landlord: {
         tab: "Landlords",
-        line: "Own rentals, nearby or from overseas? We explain how the ground pod and the app are designed to clean a property between tenants with nobody on site.",
+        line: "Own rentals, nearby or from overseas? We explain how the dock and the app are designed to clean a property between tenants with nobody on site.",
         link: { label: "Homes and rentals", href: "/homes-and-rentals" },
       },
       commercial: {
