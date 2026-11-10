@@ -1,6 +1,6 @@
 {
   "$schema": "./manifest.schema.json",
-  "note": "Source URLs are Higgsfield generation results made from the approved design sheet of 18 September 2026 (see docs/MEDIA.md for the references and prompts), except the home hero film and its first frames (h1-hero-film, h2-hero-frame, h3-hero-film-tall, h4-hero-frame-tall): a Blender render of the owner's H1 model, kept in scripts/media/masters and listed as repo: sources. Run `npm run media:fetch` (or the media workflow on GitHub Actions) to download, optimise and write public/media. Prompts and references are logged in docs/MEDIA.md.",
+  "note": "Source URLs are Higgsfield generation results made from the approved design sheet of 18 September 2026 (see docs/MEDIA.md for the references and prompts), except the home hero film and its first frames (h1-hero-film, h2-hero-frame): a Blender render of the owner's H1 model, kept in scripts/media/masters and listed as repo: sources. Run `npm run media:fetch` (or the media workflow on GitHub Actions) to download, optimise and write public/media. Prompts and references are logged in docs/MEDIA.md.",
   "assets": [
     {
       "id": "h0-hero-still",
@@ -307,7 +307,7 @@
       "height": 720,
       "duration": 8,
       "grade": false,
-      "placement": "Home hero film from 768px: a Blender render of the owner's H1 model cleaning a window (docs/MEDIA.md)"
+      "placement": "Home hero film: a Blender render of the owner's H1 model cleaning a window (docs/MEDIA.md)"
     },
     {
       "id": "h2-hero-frame",
@@ -318,26 +318,7 @@
         1280
       ],
       "grade": false,
-      "placement": "Home hero poster from 768px: frame 1 of h1-hero-film"
-    },
-    {
-      "id": "h3-hero-film-tall",
-      "kind": "video",
-      "url": "repo:scripts/media/masters/h3-hero-film-tall-v2-608x1080.mp4",
-      "height": 1080,
-      "duration": 8,
-      "grade": false,
-      "placement": "Home hero film below 768px: the portrait cut of h1-hero-film"
-    },
-    {
-      "id": "h4-hero-frame-tall",
-      "kind": "image",
-      "url": "repo:scripts/media/masters/h4-hero-frame-tall-v2-608x1080.png",
-      "widths": [
-        608
-      ],
-      "grade": false,
-      "placement": "Home hero poster below 768px: frame 1 of h3-hero-film-tall"
+      "placement": "Home hero poster: frame 1 of h1-hero-film"
     },
     {
       "id": "c2-commercial-clip",

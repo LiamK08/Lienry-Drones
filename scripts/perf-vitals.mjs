@@ -39,7 +39,7 @@ const LCP_IMAGE_KB = 80;
 const OTHER_KB = 100;
 // What the spec expects each route's mobile LCP image to be (D4), printed beside what was measured.
 const EXPECTED_LCP = {
-  "/": "h4-hero-frame-tall 608w on phones, h2-hero-frame 1280w on desktop",
+  "/": "h2-hero-frame 768w on phones (h4-hero-frame-tall 608w once the portrait cut is added), 1280w on desktop",
   "/platform": "the software window's tall poster (software-view-tall-poster.webp, about 32 KB)",
   "/commercial": "c1 m43 (about 41 KB), or c1 1280w (63 KB) before P9",
   "/homes-and-rentals": "ho1 1280w (57 KB)",

@@ -11,7 +11,7 @@ The user's current project brief wins over older notes in this repository.
 
 Honesty: no customers, logos, testimonials, results, prices, certifications or approvals
 are claimed anywhere. Statistics come only from `src/content/stats.ts`, each cited to its
-primary source. The imagery is AI-generated, but for the home hero film (h1 to h4): a Blender render of the
+primary source. The imagery is AI-generated, but for the home hero film (h1 and h2): a Blender render of the
 owner's H1 model over a CC0 photographed city, its masters in `scripts/media/masters` (docs/MEDIA.md).
 The owner removed the Concept render captions on
 26 September 2026, so no image or film carries one, and `npm run check:rules` fails if one returns.

@@ -128,13 +128,13 @@ All at 2K. Nano Banana 2 unless noted. "Job" is the Higgsfield generation the ma
 | --- | --- | --- | --- | --- | --- | --- |
 | c2-commercial-clip | MiniMax H3, 2K, 16:9 | 6 s | c1-commercial-hero as first and last frame | 12 | 257ae3d1-c319-4cd4-bf28-0afc0ec19a55 | The capsule lid is already open. The tethered drone rises vertically forty centimetres above its cradle, pauses, turns slightly toward the parapet, then settles back down onto the cradle. The tether pays out and back in a smooth curve from the reel. The camera is locked off with a slight slow push in. Nobody on the roof, nothing else moves, seamless loop returning exactly to the first frame, silent. |
 
-The home hero plays the Blender film (`h1-hero-film`, and `h3-hero-film-tall` below 768px; see "Home hero film"). `c2-commercial-clip` is kept but unplaced.
+The home hero plays the Blender film (`h1-hero-film`, on phones too until its portrait cut is added; see "Home hero film"). `c2-commercial-clip` is kept but unplaced.
 
 ## Home hero film (Blender, 9 November 2026)
 
 The home hero film is not AI-generated. At the owner's request ("create the super realistic drone cleaning video using my blender model and then upload that to the website"), it was rendered in Blender from the owner's own H1 model (`Lienry_H1_v3_Revision_B`, supplied as a Blender 4.2 file), with refresh.tech's hero film as the bar for realism only: nothing of theirs was used. The .blend file stays out of this public repository; the scene is built around it in code (`scripts/media/hero-film/`).
 
-What it shows, in 8 s at 24 fps (192 frames): from inside a quiet office, the H1 washes the window from outside, its spray boom aimed at the glass. It works down its lane spraying, stops at the bottom of the lane as the valve closes and the jet dies back, levels out, then side-steps one lane to the left. Three shots: a wide through the window (frames 1 to 72, 46 mm), a close-up on the nozzle and the strike on the glass (73 to 124, 70 mm) and a medium on the drone (125 to 192, 60 mm). The phone cut (`h3-hero-film-tall`) is rendered again from the same scene in portrait, not cropped from the landscape film.
+What it shows, in 8 s at 24 fps (192 frames): from inside a quiet office, the H1 washes the window from outside, its spray boom aimed at the glass. It works down its lane spraying, stops at the bottom of the lane as the valve closes and the jet dies back, levels out, then side-steps one lane to the left. Three shots: a wide through the window (frames 1 to 72, 46 mm), a close-up on the nozzle and the strike on the glass (73 to 124, 70 mm) and a medium on the drone (125 to 192, 60 mm). A phone cut is being rendered again from the same scene in portrait, not cropped from the landscape film; until it is added (as `h3-hero-film-tall`, with its poster `h4-hero-frame-tall`), phones play the landscape film, cropped to the screen.
 
 | Part | Source | Licence |
 | --- | --- | --- |
@@ -148,17 +148,15 @@ How it was made:
 - Renderer: Blender 5.0.1 (the `bpy` module), Cycles on the CPU, AgX with the Medium High Contrast look. Each shot has its own sampling (the wide and the medium up to 48 samples a pixel, adaptive at a 0.08 noise threshold after 8; the close-up up to 24 at a tighter 0.02, so the spray, mist and water sample evenly), denoised with OpenImageDenoise on albedo and normals. Motion blur at a half shutter, depth of field at f/2.0 (the portrait medium at f/1.4).
 - Motion: the flight is simulated, not keyframed: a position controller flying the pass against gusts and fine turbulence. While it sprays, the drone leans into the glass against the jet's push; once the valve closes it levels out. The cameras are hand-held operators that follow the drone with a slight lag and drift.
 - Water: the spray is geometry, rebuilt every frame from the valve's pressure (its cone, speed, droop and splash fall away as the valve closes); the washed lane stays wet behind the strike and drains down the pane.
-- Grade (`post.py`, at render, so the house grade is off for these four: `grade: false`): fixed levels, a soft highlight shoulder and toe, halation, slight lens softness and colour fringing, a light vignette, saturation 0.93 and fine grain.
+- Grade (`post.py`, at render, so the house grade is off for these: `grade: false`): fixed levels, a soft highlight shoulder and toe, halation, slight lens softness and colour fringing, a light vignette, saturation 0.93 and fine grain.
 - Masters: H.264 High, CRF 17 tuned for grain, BT.709 tags, fast start, no audio; the posters are frame 1 of each graded film. `scripts/media/fetch.mjs` copies them from `scripts/media/masters` (`repo:` sources) and encodes the site's WebM, MP4 and poster renditions like any other asset.
 
 | ID | Master in `scripts/media/masters` | What it is | Placement |
 | --- | --- | --- | --- |
-| h1-hero-film | `h1-hero-film-v2-1280x720.mp4` | The landscape film, 1280x720, 192 frames | Home hero from 768px |
+| h1-hero-film | `h1-hero-film-v2-1280x720.mp4` | The landscape film, 1280x720, 192 frames | Home hero |
 | h2-hero-frame | `h2-hero-frame-v2-1280x720.png` | Frame 1 of h1, graded (encoded at 768 and 1280 wide) | Its poster |
-| h3-hero-film-tall | `h3-hero-film-tall-v2-608x1080.mp4` | The portrait film, 608x1080, 192 frames | Home hero below 768px |
-| h4-hero-frame-tall | `h4-hero-frame-tall-v2-608x1080.png` | Frame 1 of h3, graded (encoded at 608 wide) | Its poster |
 
-To render it again: put the owner's .blend next to `scripts/media/hero-film/glass.py` (or set `DRONE` to its path); make a Python 3.11 virtual environment there with `pip install bpy==5.0.1 numpy` (as `venv/`, or point `PY` at its python); run `render_final.sh` (here, on four CPU cores, the two cuts took most of a day; `DEVICE=AUTO` uses a GPU, many times faster), then `finish_final.sh`, which needs ffmpeg and writes the masters and posters into `scripts/media/masters`. The city photograph and textures download on the first run. Rendered frames stay out of the repository (the folder's `.gitignore`). A new render takes new file names (`-v3`), changed in the manifest's `repo:` sources at the same time, so the pipeline encodes it afresh.
+To render it again: put the owner's .blend next to `scripts/media/hero-film/glass.py` (or set `DRONE` to its path); make a Python 3.11 virtual environment there with `pip install bpy==5.0.1 numpy` (as `venv/`, or point `PY` at its python); run `render_final.sh` (here, on four CPU cores, the landscape cut took about seven hours; `DEVICE=AUTO` uses a GPU, many times faster), then `finish_final.sh`, which needs ffmpeg and writes the masters and posters into `scripts/media/masters`. The city photograph and textures download on the first run. Rendered frames stay out of the repository (the folder's `.gitignore`). A new render takes new file names (`-v3`), changed in the manifest's `repo:` sources at the same time, so the pipeline encodes it afresh.
 
 ## Review notes (Higgsfield video analysis, 18 September 2026)
 
@@ -186,7 +184,7 @@ Everything else read as the product: hexacopter with six guards on the commercia
 
 ## Site asset ids the components expect
 
-`h0-hero-still`, `h1-hero-film` (video), `h2-hero-frame`, `h3-hero-film-tall` (video), `h4-hero-frame-tall`, `m1-drone-master`, `m2-capsule-master`, `m3-pod-master`, `s1-dock`, `s2-tether`, `s4-scan`, `s5-software`, `s5-software-clip` (video, optional), `s6-automation`, `p1-tower`, `p2-apartments`, `p3-house`, `p4-rental`, `p5-solar-farm`, `y1-story-before`, `y2-story-panels`, `y3-story-driveway`, `y5-story-done`, `f1-tether`, `f2-camera`, `f3-surface`, `f4-dock`, `c1-commercial-hero`, `c2-commercial-clip` (video, optional), `ho1-homes-hero`, `so1-solar-hero`, `so2-solar-closeup`, `co1-company`.
+`h0-hero-still`, `h1-hero-film` (video), `h2-hero-frame`, `m1-drone-master`, `m2-capsule-master`, `m3-pod-master`, `s1-dock`, `s2-tether`, `s4-scan`, `s5-software`, `s5-software-clip` (video, optional), `s6-automation`, `p1-tower`, `p2-apartments`, `p3-house`, `p4-rental`, `p5-solar-farm`, `y1-story-before`, `y2-story-panels`, `y3-story-driveway`, `y5-story-done`, `f1-tether`, `f2-camera`, `f3-surface`, `f4-dock`, `c1-commercial-hero`, `c2-commercial-clip` (video, optional), `ho1-homes-hero`, `so1-solar-hero`, `so2-solar-closeup`, `co1-company`.
 
 Until an id exists in `public/media/index.json` the site shows a labelled placeholder panel in its place.
 

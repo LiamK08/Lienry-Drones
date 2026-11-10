@@ -1,6 +1,6 @@
 # Lienry hero film, step 3: paste each moving-region frame onto the full plate, grade it like the stills
-# (levels, a faint lens glare, slight chromatic aberration, bloom, vignette, sensor-like grain), and encode
-# the result to MP4. Uses only Blender's own Python and numpy.
+# (levels, a faint lens glare, slight chromatic aberration, bloom, vignette, sensor-like grain) into NAME-graded.
+# Uses only Blender's own Python and numpy; finish_final.sh encodes the graded frames with ffmpeg.
 # Run: blender -b --factory-startup -P post.py -- NAME   (NAME = landscape or portrait)
 import glob
 import os
@@ -12,7 +12,6 @@ import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 ARGS = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else sys.argv[1:]
 NAME = ARGS[0] if ARGS else "landscape"
-FPS = int(os.environ.get("FPS", "24"))
 plate_p = os.path.join(HERE, f"{NAME}-plate", "f_0001.png")
 region_p = os.path.join(HERE, f"{NAME}-frames.region")
 frames = sorted(glob.glob(os.path.join(HERE, f"{NAME}-frames", "f_*.png")))
@@ -23,7 +22,6 @@ REGIONED = os.path.exists(region_p) and os.path.exists(plate_p)
 rx, ry = (float(v) for v in open(region_p).read().split()) if REGIONED else (0.0, 0.0)
 out_dir = os.path.join(HERE, f"{NAME}-graded")
 os.makedirs(out_dir, exist_ok=True)
-out_mp4 = os.path.join(HERE, f"lienry-hero-{NAME}.mp4")
 
 
 def load(p):
@@ -174,27 +172,4 @@ for i, f in enumerate(frames):
     graded.append(out)
     print(f"graded {i + 1}/{len(frames)}", flush=True)
 
-# encode with Blender's own video output: the graded frames are already display-ready, so no view transform
-sc = bpy.data.scenes.new("encode")
-sc.render.resolution_x, sc.render.resolution_y, sc.render.resolution_percentage = W, H, 100
-sc.render.fps = FPS
-sc.view_settings.view_transform = "Standard"
-sc.view_settings.look = "None"
-sc.sequencer_colorspace_settings.name = "sRGB"
-se = sc.sequence_editor_create()
-coll = se.strips if hasattr(se, "strips") else se.sequences  # an empty strips collection is falsy
-strip = coll.new_image(name="frames", filepath=graded[0], channel=1, frame_start=1)
-for g_ in graded[1:]:
-    strip.elements.append(os.path.basename(g_))
-sc.frame_start, sc.frame_end = 1, len(graded)
-r = sc.render
-r.use_sequencer = True
-r.image_settings.file_format = "FFMPEG"
-r.ffmpeg.format = "MPEG4"
-r.ffmpeg.codec = "H264"
-r.ffmpeg.constant_rate_factor = "HIGH"
-r.ffmpeg.ffmpeg_preset = "GOOD"
-r.ffmpeg.gopsize = FPS
-r.filepath = out_mp4
-bpy.ops.render.render(animation=True, scene=sc.name)
-print("wrote", out_mp4, flush=True)
+print("graded", len(graded), "frames ->", out_dir, flush=True)
