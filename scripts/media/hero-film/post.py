@@ -1,7 +1,7 @@
 # Lienry hero film, step 3: paste each moving-region frame onto the full plate, grade it like the stills
 # (levels, a faint lens glare, slight chromatic aberration, bloom, vignette, sensor-like grain) into NAME-graded.
 # Uses only Blender's own Python and numpy; finish_final.sh encodes the graded frames with ffmpeg.
-# Run: blender -b --factory-startup -P post.py -- NAME   (NAME = landscape or portrait)
+# Run: venv/bin/python post.py NAME   (NAME = final-landscape or final-portrait; finish_final.sh runs it)
 import glob
 import os
 import sys
@@ -11,7 +11,7 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ARGS = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else sys.argv[1:]
-NAME = ARGS[0] if ARGS else "landscape"
+NAME = ARGS[0] if ARGS else "final-landscape"
 plate_p = os.path.join(HERE, f"{NAME}-plate", "f_0001.png")
 region_p = os.path.join(HERE, f"{NAME}-frames.region")
 frames = sorted(glob.glob(os.path.join(HERE, f"{NAME}-frames", "f_*.png")))
