@@ -1,4 +1,4 @@
-# Handoff, 7 November 2026
+# Handoff, 10 November 2026
 
 Read this first in a new session, then `CLAUDE.md`. Update this file at the end of each session.
 
@@ -339,6 +339,25 @@ Read this first in a new session, then `CLAUDE.md`. Update this file at the end 
     at worst; `perf:vitals` alone on all 11 pages (mobile LCP 1.88-2.02s, /platform 2.29s, /download 2.31s,
     CLS at most 0.065); a three-lens review (3 small findings, fixed). PR frames:
     `docs/screenshots/owner-decisions/`.
+- 9 and 10 November (the owner: "create the super realistic drone cleaning video using my blender model and
+  then upload that to the website ... use refreshs realisticness as a benchamark"). The home hero film is now
+  a Blender render of the owner's own H1 model (`Lienry_H1_v3_Revision_B`, a Blender 4.2 file the owner
+  uploaded) washing an office window from outside, over Poly Haven's CC0 "Joburg Central Sunset" city, in
+  8 s and three shots (wide, close-up on the strike, medium). The scene, grade and render scripts are in
+  `scripts/media/hero-film/` (the .blend stays out of this public repository); the graded masters are
+  committed in `scripts/media/masters` as `repo:` sources, which `fetch.mjs` copies and encodes like any
+  other asset. docs/MEDIA.md, "Home hero film", has the parts, licences, settings and how to render again.
+  - Rendered here on four CPU cores, Cycles at adaptive 48 samples (the close-up 24 at a tighter
+    threshold), OIDN, motion blur and depth of field; the container restarted twice during the landscape
+    render and the render carried on from the frames on disk (`render_final.sh` keeps them).
+  - Interim: the landscape cut (`h1-hero-film`, poster `h2-hero-frame`) went live first, on phones too
+    (cropped). The portrait cut (`h3-hero-film-tall`, `h4-hero-frame-tall`, 608x1080) was still
+    rendering; when it is done, `finish_final.sh portrait` writes its masters, and
+    `git checkout 434888c -- scripts/media/manifest.json CLAUDE.md docs/MEDIA.md scripts/perf-vitals.mjs`
+    restores the entries and wording that name it, then the same gates and a deploy.
+  - Check 14 now judges `scripts/media/masters` against the commit (each `repo:` source committed as it
+    stands) and judges "every manifest id is placed" only from a run on both sides of 768.
+  - Gates on 10 November: typecheck, lint and build; `check:layout` all 12 routes at 1440 and 390 (one warning, as before); `check:rules` with motion all 12 routes (check 14 sees h1 and h2 placed); `check:a11y` all 12 routes; `npm run contrast` over the poster and the brightest frames under the bar at 1440 and 390 (6.53:1 at worst); `perf:vitals` (the render paused while it ran): home's mobile median LCP 1.91s, CLS 0.065, the rest of the pages @@PERF@@. A three-lens review of the interim change confirmed one finding (the render time in docs/MEDIA.md), fixed. PR frames: `docs/screenshots/hero-film/` (the hero at 1, 3, 4.6 and 7.3 s).
 ## How the owner works
 
 - They want results fast. Prefer to build, check, commit and push over long plans or multi-agent
