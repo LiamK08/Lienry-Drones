@@ -17,7 +17,7 @@ export const commercialPage = {
     {
       id: "capsule",
       title: "A dock on the roof that keeps the drone ready between cleans",
-      paragraphs: ["The drone lives in a weatherproof dock on the roof. Its water tether is fed from above, so the drone never carries water and never runs out mid-clean."],
+      paragraphs: ["The drone lives in a weatherproof dock on the roof. Its water tether is fed from above, so the drone never carries water and never runs out\u00a0mid-clean."],
       checks: ["Weatherproof roof dock", "Tether fed from above", "No water carried by the drone", "Back to the dock after every clean"],
       image: { id: "m2-capsule-master", alt: "The Lienry dock open on a roof deck, the drone parked on its landing pad", position: "0% 50%" },
       panel: { id: "between-cleans" as const, corner: "end" as const },
