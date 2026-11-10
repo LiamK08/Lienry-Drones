@@ -85,13 +85,14 @@
     {
       "id": "s5-software",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090739_677280bd-fb72-48b7-8680-13fe2cf5f81b.png",
+      "url": "repo:scripts/media/masters/s5-software-h1-1920x1440.jpg",
       "widths": [
         640,
         1280,
         1920
       ],
-      "placement": "Explainer Software tab, Platform Software row"
+      "placement": "Explainer Software tab, Platform Software row",
+      "grade": false
     },
     {
       "id": "s6-automation",
