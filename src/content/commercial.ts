@@ -19,7 +19,7 @@ export const commercialPage = {
       title: "A capsule on the roof that keeps the drone ready between cleans",
       paragraphs: ["The drone lives in a weatherproof capsule on the roof. Its water tether is fed from above, so the drone never carries water and never runs out mid-clean."],
       checks: ["Weatherproof roof capsule", "Tether fed from above", "No water carried by the drone", "Back to the dock after every clean"],
-      image: { id: "m2-capsule-master", alt: "The Lienry dock open on a roof deck, the drone parked on its landing pad", position: "50% 50%" },
+      image: { id: "m2-capsule-master", alt: "The Lienry dock open on a roof deck, the drone parked on its landing pad", position: "0% 50%" },
       panel: { id: "between-cleans" as const, corner: "end" as const },
     },
     {
@@ -27,7 +27,7 @@ export const commercialPage = {
       title: "The building is scanned before the first clean, and re-scanned every two days",
       paragraphs: ["The drone maps the building's structure and dimensions, and the scan becomes a model in the desktop software. Every clean is planned on that model."],
       checks: ["Structure and dimensions mapped first", "Re-scan every two days, adjustable", "Debris shaded where it has built up", "The re-scan decides when to clean"],
-      image: { id: "s4-scan", alt: "The drone holding off the corner of a glass building to scan it", position: "50% 40%" },
+      image: { id: "s4-scan", alt: "The Lienry drone on its tether beside the glass face of an office tower, scanning it", position: "50% 40%" },
       panel: { id: "more-often" as const, corner: "end" as const },
     },
     {

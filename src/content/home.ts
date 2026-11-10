@@ -126,7 +126,7 @@ export const benefits = {
       icon: "shield",
       title: "Nobody at height",
       body: "The drone works on a tether from its dock, so nobody goes up on a rope or a lift.",
-      image: { id: "p1-tower", alt: "The Lienry drone mid-clean on a glass office building, its tether rising to the roof", position: "50% 40%" },
+      image: { id: "p1-tower", alt: "The Lienry drone mid-clean on a glass office building, its tether rising to the roof", position: "50% 20%" },
     },
     {
       icon: "repeat",
@@ -145,7 +145,7 @@ export const benefits = {
       icon: "phone",
       title: "Started from\u00a0anywhere",
       body: "On the home system, start a clean from the app wherever you are.",
-      image: { id: "p4-rental", alt: "The Lienry drone washing the rooftop solar panels of a brick terrace", position: "50% 40%" },
+      image: { id: "p4-rental", alt: "The Lienry drone washing the rooftop solar panels of a brick terrace", position: "50% 12%" },
     },
     {
       icon: "record",
@@ -169,11 +169,11 @@ export const how = {
   note: "Demo data. The building is illustrative; the software will model each property from its scan.",
   label: "Steps of a clean",
   steps: [
-    { id: "scan", n: "01", short: "Scan", tab: "Scans it", title: "Maps the building first.", body: "Structure and dimensions, before the first clean.", image: { id: "s4-scan", alt: "The drone holding off the corner of a glass building to scan it", position: "50% 40%" } },
-    { id: "plan", n: "02", short: "Plan", tab: "Plans it", title: "Every zone gets a plan.", body: "Surface, pressure and route for each part of the building.", image: { id: "s5-software", alt: "A laptop showing the desktop software's shaded 3D building", position: "50% 50%" } },
+    { id: "scan", n: "01", short: "Scan", tab: "Scans it", title: "Maps the building first.", body: "Structure and dimensions, before the first clean.", image: { id: "s4-scan", alt: "The Lienry drone on its tether beside the glass face of an office tower, scanning it", position: "50% 40%" } },
+    { id: "plan", n: "02", short: "Plan", tab: "Plans it", title: "Every zone gets a plan.", body: "Surface, pressure and route for each part of the building.", image: { id: "s5-software", alt: "A laptop on an office desk showing the desktop software's shaded 3D building, the drone washing the window outside", position: "50% 50%" } },
     { id: "clean", n: "03", short: "Clean", tab: "Cleans it", title: "Washes with nobody on site.", body: "Water through the tether, two passes per floor.", image: { id: "m1-drone-master", alt: "The Lienry drone washing a glass wall, its spray lance aimed at the pane", position: "50% 50%" } },
-    { id: "check", n: "04", short: "Check", tab: "Checks it", title: "Looks again.", body: "A re-scan shades where debris has built up.", image: { id: "f2-camera", alt: "The Lienry drone close beside a glass wall, its sensors on the pane", position: "50% 45%" } },
-    { id: "report", n: "05", short: "Report", tab: "Reports it", title: "Back to the dock, on record.", body: "What was cleaned, and when the next clean is due.", image: { id: "s6-automation", alt: "The Lienry dock open on a roof deck, the drone settling above it", position: "50% 40%" } },
+    { id: "check", n: "04", short: "Check", tab: "Checks it", title: "Looks again.", body: "A re-scan shades where debris has built up.", image: { id: "f2-camera", alt: "The Lienry drone hovering close to a dark glass facade, its spray lance held out toward the pane", position: "50% 15%" } },
+    { id: "report", n: "05", short: "Report", tab: "Reports it", title: "Back to the dock, on record.", body: "What was cleaned, and when the next clean is due.", image: { id: "s6-automation", alt: "The Lienry dock open beside a building, the drone rising above it on its tether", position: "50% 40%" } },
   ],
 };
 
@@ -266,10 +266,10 @@ export const explore = {
   cards: [
     { id: "commercial", kind: "Solutions", tag: "Commercial", title: "A capsule on the roof, and nobody on a rope", href: "/commercial", image: { id: "c1-commercial-hero", alt: "The Lienry dock open on a rooftop deck, the drone lifting off above it", position: "50% 40%" } },
     { id: "homes", kind: "Solutions", tag: "Homes", title: "Homes and rentals, cleaned from your phone", href: "/homes-and-rentals", image: { id: "ho1-homes-hero", alt: "The Lienry drone washing the glass doors of a white house", position: "45% 50%" } },
-    { id: "solar", kind: "Solutions", tag: "Solar", action: "See solar", title: "Solar panels at the right pressure", href: "/solar", image: { id: "so2-solar-closeup", alt: "The drone's nozzle washing a dusty solar panel, close up", position: "50% 50%" } },
+    { id: "solar", kind: "Solutions", tag: "Solar", action: "See solar", title: "Solar panels at the right pressure", href: "/solar", image: { id: "so2-solar-closeup", alt: "The drone's nozzle washing a dusty solar panel, close up", position: "50% 15%" } },
     { id: "soiling", kind: "Solutions", tag: "Soiling", action: "See the figures", title: "What dust costs a solar array", href: "/solar#soiling", image: { id: "so1-solar-hero", alt: "The Lienry drone washing a row of ground-mounted solar panels", position: "60% 55%" } },
     { id: "platform", kind: "Platform", tag: "Six parts", action: "See the platform", title: "Six parts of one platform", href: "/platform", image: { id: "m2-capsule-master", alt: "The Lienry dock open on a roof deck, the drone parked inside", position: "50% 50%" } },
-    { id: "dock", kind: "Platform", tag: "Dock", title: "A home on the property", href: "/platform#dock", image: { id: "s1-dock", alt: "The Lienry dock's lids closing over the drone on a wet roof", position: "50% 55%" } },
+    { id: "dock", kind: "Platform", tag: "Dock", title: "A home on the property", href: "/platform#dock", image: { id: "s1-dock", alt: "The Lienry dock shut on a wet roof terrace, the drone parked inside behind its lit front", position: "50% 55%" } },
     { id: "tether", kind: "Platform", tag: "Tether", title: "Water and power, always connected", href: "/platform#tether", image: { id: "s2-tether", alt: "The drone's tether rising past a glass facade to the roof", position: "50% 60%" } },
     { id: "drone", kind: "Platform", tag: "Drone", title: "Built to wash, not to fly far", href: "/platform#drone", image: { id: "f3-surface", alt: "The Lienry drone washing a window in a rendered wall", position: "50% 50%" } },
     { id: "fit-check", kind: "Tools", tag: "Fit check", title: "Seven questions: is your building a fit?", href: "/fit-check", image: { id: "p5-solar-farm", alt: "The drone low over a solar farm row", position: "50% 60%" } },

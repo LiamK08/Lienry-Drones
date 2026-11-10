@@ -31,7 +31,7 @@ export const homesPage = {
         "The property is mapped first, so the drone knows every surface it can reach. As it cleans it identifies each material and adjusts its pressure, and you can change it in the app.",
       ],
       checks: ["A detailed scan of the property", "Glass, panels, render, roofing and paving", "Pressure you can adjust"],
-      image: { id: "p4-rental", alt: "The Lienry drone washing the rooftop solar panels of a brick terrace", position: "50% 28%", positionMd: "50% 32%" },
+      image: { id: "p4-rental", alt: "The Lienry drone washing the rooftop solar panels of a brick terrace", position: "50% 28%", positionMd: "50% 10%" },
       panel: { id: "right-pressure" as const, corner: "start" as const },
     },
   ],
@@ -70,11 +70,11 @@ export const landlordStory = {
   intro: "You own a rental in Sydney and live overseas. It needs a clean before the next tenant.",
   steps: ["Choose the areas to clean", "Tap start, wherever you are", "Watch each area clean in turn", "See the house after the clean"],
   pictures: {
-    before: { id: "y1-story-before", alt: "The house before its clean, the Lienry dock closed on the patio near the garden tap", chip: "Before the clean" },
-    driveway: { id: "y3-story-driveway", alt: "The Lienry drone washing the brick path in front of the house", chip: "Washing the driveway" },
-    panels: { id: "y2-story-panels", alt: "The drone washing the rooftop solar panels, half the array clean and wet", chip: "Washing the solar panels" },
-    windows: { id: "p3-house", alt: "The Lienry drone washing the bay window of a house", chip: "Washing the windows" },
-    after: { id: "y5-story-done", alt: "The house after its clean, the Lienry dock open on the patio, the drone back inside", chip: "After the clean" },
+    before: { id: "y1-story-before", alt: "The house before its clean, the Lienry dock on the patio near the garden tap, its lids closed over the drone", chip: "Before the clean", position: "50% 78%" },
+    driveway: { id: "y3-story-driveway", alt: "The Lienry drone washing the brick path in front of the house", chip: "Washing the driveway", position: "50% 50%" },
+    panels: { id: "y2-story-panels", alt: "The drone washing the rooftop solar panels, half the array clean and wet", chip: "Washing the solar panels", position: "50% 50%" },
+    windows: { id: "p3-house", alt: "The Lienry drone washing the bay window of a house", chip: "Washing the windows", position: "50% 50%" },
+    after: { id: "y5-story-done", alt: "The house after its clean, the Lienry dock open on the patio, the drone back inside", chip: "After the clean", position: "50% 78%" },
   },
 };
 

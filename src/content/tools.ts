@@ -18,7 +18,7 @@ export const fitCheckPage = {
       "The result is indicative, not a site survey. Lienry is at concept stage and site requirements are still being finalised, so treat it as the start of a conversation.",
     ],
     link: { label: "See the platform", href: "/platform" },
-    image: { id: "s4-scan", alt: "The drone holding off the corner of a glass building to scan it", position: "50% 40%" },
+    image: { id: "s4-scan", alt: "The Lienry drone on its tether beside the glass face of an office tower, scanning it", position: "50% 40%" },
   },
   faq: { headline: "Questions about the fit check" },
   close: {

@@ -18,12 +18,12 @@ export const platformPage = {
     headline: "Six parts that work as one",
     emphasis: "as one",
     items: [
-      { id: "dock", tab: "Dock", title: "A home on the property", body: "On a commercial building the drone lives in a weatherproof capsule on the roof. On a house it lives in a waterproof ground pod. Either way it is powered, sheltered and ready.", link: { label: "Compare the systems", href: "#systems" }, image: { id: "s1-dock", alt: "The Lienry dock's lids closing over the drone on a wet roof", position: "50% 55%" } },
+      { id: "dock", tab: "Dock", title: "A home on the property", body: "On a commercial building the drone lives in a weatherproof capsule on the roof. On a house it lives in a waterproof ground pod. Either way it is powered, sheltered and ready.", link: { label: "Compare the systems", href: "#systems" }, image: { id: "s1-dock", alt: "The Lienry dock shut on a wet roof terrace, the drone parked inside behind its lit front", position: "50% 55%" } },
       { id: "tether", tab: "Tether", title: "Water and power, always connected", body: "A thin tether feeds the drone water for the whole clean. On the roof it is fed from above; from the ground pod it runs from the same line that powers the pod. Nothing is carried, so nothing runs out.", image: { id: "s2-tether", alt: "The drone's tether rising past a glass facade to the roof", position: "50% 60%" } },
       { id: "drone", tab: "Drone", title: "Built to wash, not to fly far", body: "Short, planned routes across glass, solar panels, walls, roofing and driveways, keeping the tether clear and its sensors on the surface in front of it.", link: { label: "See the surfaces", href: "#features" }, image: { id: "f3-surface", alt: "The Lienry drone washing a window in a rendered wall", position: "50% 50%" } },
       { id: "scan", tab: "Scan", title: "It maps the building first", body: "Before the first clean the drone scans the property for its structure and dimensions. On commercial buildings it re-scans every two days and decides whether a clean is needed.", link: { label: "How the scan plans a clean", href: "#planned" }, image: { id: "s4-scan", alt: "The drone holding off the corner of a glass building to scan it", position: "50% 40%" } },
-      { id: "software", tab: "Software", title: "Everything runs from one screen", body: "The scan uploads to desktop software that sets the pressure and where to wash, shows a 3D model of the building, tracks the wash live and shades built-up\u00a0debris.", link: { label: "Lienry Desktop", href: "/download" }, image: { id: "s5-software", alt: "A laptop showing the desktop software's shaded 3D building", position: "50% 50%" } },
-      { id: "automation", tab: "Automation", title: "Nobody has to be there", body: "Once it is set up, the system runs itself. Start a clean from anywhere, or let the re-scan decide. No cleaners to book, no one on site.", link: { label: "Register interest", href: "/register-interest" }, image: { id: "s6-automation", alt: "The Lienry dock open on a roof deck, the drone settling above it", position: "50% 40%" } },
+      { id: "software", tab: "Software", title: "Everything runs from one screen", body: "The scan uploads to desktop software that sets the pressure and where to wash, shows a 3D model of the building, tracks the wash live and shades built-up\u00a0debris.", link: { label: "Lienry Desktop", href: "/download" }, image: { id: "s5-software", alt: "A laptop on an office desk showing the desktop software's shaded 3D building, the drone washing the window outside", position: "50% 50%" } },
+      { id: "automation", tab: "Automation", title: "Nobody has to be there", body: "Once it is set up, the system runs itself. Start a clean from anywhere, or let the re-scan decide. No cleaners to book, no one on site.", link: { label: "Register interest", href: "/register-interest" }, image: { id: "s6-automation", alt: "The Lienry dock open beside a building, the drone rising above it on its tether", position: "50% 40%" } },
     ],
   },
   rows: [
@@ -50,7 +50,7 @@ export const platformPage = {
       paragraphs: ["The commercial system docks in a roof capsule and is fed from above, for buildings under 70 metres. The home system docks in a ground pod that powers the drone and feeds it water."],
       callout: { title: "What both systems share", items: ["The same drone, scan and software", "A tether, so nothing is carried", "A clean with nobody on site"] },
       aspect: "16/9" as const,
-      image: { id: "m2-capsule-master", alt: "The Lienry dock open on a roof deck, the drone parked on its landing pad", position: "50% 50%" },
+      image: { id: "m2-capsule-master", alt: "The Lienry dock open on a roof deck, the drone parked on its landing pad", position: "0% 50%" },
     },
     {
       id: "planned",

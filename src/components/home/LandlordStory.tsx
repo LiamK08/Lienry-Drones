@@ -79,6 +79,7 @@ export function LandlordAppFrame() {
               <Picture
                 id={pic.id}
                 alt={pic.alt}
+                position={pic.position}
                 fit="fill"
                 frameAspect={0.66}
                 rounded="image"

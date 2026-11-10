@@ -6,17 +6,17 @@ import { Mark } from "@/components/ui/Wordmark";
 
 // The round pictures that drift across the top of the footer: each one's still, its reference diameter
 // (drawn at 80% of it from 768, and at 80% of the reference's half-size phone circles, so 40%, below)
-// and how far it sits below the row's top edge.
-const CIRCLES = [
+// how far it sits below the row's top edge and, where the subject is off centre, its crop.
+const CIRCLES: readonly { id: string; d: number; y: number; pos?: string }[] = [
   { id: "p1-tower", d: 18.75, y: 0 },
   { id: "s1-dock", d: 15.625, y: 2.5 },
   { id: "p3-house", d: 17.5, y: 0.625 },
-  { id: "so2-solar-closeup", d: 14.375, y: 4.375 },
-  { id: "m2-capsule-master", d: 12.5, y: 6.25 },
+  { id: "so2-solar-closeup", d: 14.375, y: 4.375, pos: "65% 50%" },
+  { id: "m2-capsule-master", d: 12.5, y: 6.25, pos: "0% 50%" },
   { id: "f2-camera", d: 16.25, y: 1.875 },
-  { id: "y5-story-done", d: 15, y: 3.75 },
-  { id: "c1-commercial-hero", d: 13.75, y: 1.25 },
-] as const;
+  { id: "y5-story-done", d: 15, y: 3.75, pos: "50% 70%" },
+  { id: "s6-automation", d: 13.75, y: 1.25 },
+];
 
 function Circles({ hidden }: { hidden?: boolean }) {
   return (
@@ -27,7 +27,7 @@ function Circles({ hidden }: { hidden?: boolean }) {
           style={{ "--d": `${c.d}rem`, "--y": `${c.y}rem` } as CSSProperties}
           className="mt-[calc(var(--y)*0.4)] size-[calc(var(--d)*0.4)] shrink-0 overflow-hidden rounded-pill md:mt-[calc(var(--y)*0.8)] md:size-[calc(var(--d)*0.8)]"
         >
-          <Picture id={c.id} alt="" aspect="1/1" rounded="none" sizes="(min-width: 768px) 240px, 120px" />
+          <Picture id={c.id} alt="" aspect="1/1" rounded="none" position={c.pos} sizes="(min-width: 768px) 240px, 120px" />
         </li>
       ))}
     </ul>
