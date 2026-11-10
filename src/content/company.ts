@@ -35,7 +35,7 @@ export const companyPage = {
     pictures: [
       { id: "s6-automation", alt: "The Lienry dock open beside a building, the drone rising above it on its tether", position: "50% 40%" },
       { id: "co1-company", alt: "The Lienry drone washing the glass of an office tower, seen from the street", position: "52% 50%" },
-      { id: "m1-drone-master", alt: "The Lienry drone washing a glass wall", position: "48% 50%" },
+      { id: "m1-drone-master", alt: "The Lienry drone washing a glass wall", position: "55% 50%" },
     ],
     values: {
       lead: "How we work.",
