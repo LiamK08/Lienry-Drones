@@ -1,12 +1,60 @@
 # Media log
 
-Every AI-generated asset on the site, with its prompt, model, references, file path and placement, and the one asset that is not AI-generated: the home hero film, a Blender render of the owner's H1 model (see "Home hero film", below). Assets are generated with the connected Higgsfield account, downloaded and optimised by `scripts/media/fetch.mjs` (locally, as the `prebuild` step on the host, or via the "Fetch and optimise media" GitHub Actions workflow), and written to `public/media/`. No image or film on the site carries a Concept render caption: the owner removed them on 26 September 2026.
+Every image and film on the site is a Blender render of the owner's H1 model: the 27 stills (made on 10 November 2026, see "Stills (Blender, 10 November 2026)", below) and the home hero film (see "Home hero film"). Their masters are in `scripts/media/masters`, listed in the manifest as `repo:` sources; `scripts/media/fetch.mjs` encodes them (locally, as the `prebuild` step on the host, or via the "Fetch and optimise media" GitHub Actions workflow) into `public/media/`. No image or film on the site carries a Concept render caption: the owner removed them on 26 September 2026. One AI-generated asset is left in the manifest, unplaced: the commercial clip (`c2-commercial-clip`). The sections on the Higgsfield set below are its record, kept for history.
 
-The whole set was regenerated on 18 September 2026 from an approved design sheet, replacing the pale-grey quadcopter renders of 17 and 18 September. The asset ids and file paths are unchanged, so nothing on the site had to move.
+The Higgsfield set was regenerated on 18 September 2026 from an approved design sheet, replacing the pale-grey quadcopter renders of 17 and 18 September; the Blender stills replaced it on 10 November 2026 under the same asset ids and file paths.
 
 Credit balance at the start of this round: 138. Spent: 37 on the design sheet (eleven attempts across three models to get a true six-rotor drone), 52 on the 27 stills, 17 on nine regenerations, 24 on the two films. 8 credits remain.
 
+## Stills (Blender, 10 November 2026)
+
+At the owner's request ("change every single image on the website to a higher quality relevant one especially using the current drone model that i have ... make sure that the setting (eg like a house) look extremely realistic"), every still on the site was made again in Blender from the owner's own H1 model, the model the home hero film flies, with refresh.tech's imagery as the bar for realism and framing only: nothing of theirs was used. The 27 asset ids, placements and crops are unchanged, so nothing on the site had to move. No still carries a caption, a sign, a landmark or a person.
+
+Three kinds of scene:
+
+- **Photographs.** The H1 composited into a real photograph: a Poly Haven CC0 backplate, with the camera matched to it (the photograph's focal length and sensor from its EXIF data, its height measured against something of known size in frame, such as a garden table, a planter or a door), the matching CC0 HDRI of the same spot for its light and reflections, shadow catchers for every surface the drone, its hose or its water touches, and the render laid over the linearised photograph in linear light. Wet paving and walls darken the photograph's own pixels under a mask rendered from the wet area, so the bricks and render keep their texture. The H1 and its water are the only CG in frame, except where a dock or a tap is placed too.
+- **Built scenes.** A glass office tower, solar farm rows and roofs, modelled in code (curtain wall bays with dusty and washed glass, interiors and blinds behind; 72-cell modules on racking; corrugated and slate roofs with gutters and arrays), lit and reflected by a CC0 HDRI of a real place, which also shows behind them.
+- **The dock.** The docks are the owner's own design: the dock the owner's file builds with its `SHOW_DOCK` option (1750 x 1750 x 1100 mm, two clamshell lids, the landing pad with its H and LED ring, the weather mast and hose port), built from the owner's script and composited like the drone. The .blend files stay out of this repository.
+
+Every still is rendered with Cycles on the CPU (64 to 128 samples a pixel, adaptive, denoised with OpenImageDenoise), the props spun with motion blur, depth of field from the matched lens. The spray is geometry: a fan of droplet streaks and mist from the nozzle tip in use, its strike on the surface, and the wet lane behind it. Each still's finish (levels, a light vignette and grain) is set at render, so the house grade is off for these (`grade: false`). The masters are JPEGs at quality 94 in `scripts/media/masters`, named `<id>-h1-<width>x<height>.jpg`, listed in the manifest as `repo:` sources. Where a photograph carried a sign (a building name, a fire-hose or exit pictogram), it was retouched out of the plate or toned into the wall behind it, as the table notes; the CG in front of it (a dock's weather mast) was kept by its render alpha.
+
+| ID | Scene | Source (CC0) | Script | Placement |
+| --- | --- | --- | --- | --- |
+| h0-hero-still | Street-level look up a nine-storey glass office tower, the H1 washing a lane high on the face, its reflection and shadow on the glass | HDRI `docklands_02` | `tower.py` | Company page vision band backdrop |
+| c1-commercial-hero | The owner's dock open on a rooftop deck in low sun, the H1 lifting off above it on its hose | `rooftop_day` backplate IMG_6246 and HDRI | `dk_roof.py` | Commercial hero, film band poster, first and last frame of the commercial clip |
+| ho1-homes-hero | The H1 washing the glass doors of a white gabled house on an overcast day, its hose trailing to the terrace | Poly Haven `lythwood_terrace` backplate DSC08801 and HDRI | `house_bay.py` | Homes and Rentals hero |
+| so1-solar-hero | The H1 washing fixed-tilt solar farm rows in low sun, a clean band behind the fan, its shadow on the glass | HDRI `dry_field` (sky, light and ground); `grass_ground` texture | `farm.py` | Solar hero |
+| co1-company | Street-level look up the glass tower, the H1 mid-wash with its reflection | HDRI `docklands_02` | `tower.py` | Company page |
+| m1-drone-master | The H1 washing a glass curtain wall, three-quarter, 100 mm | HDRI `docklands_02` | `m1.py` | Explainer Drone tab, Platform Drone row |
+| m2-capsule-master | The owner's dock open on a roof deck, the H1 parked on its pad (a fire-hose sign and reel behind the glass toned out) | Poly Haven `rooftop_day` backplate IMG_6240 and HDRI | `dk_roof.py` | Two systems (Commercial), Commercial pilot block, Platform Dock row |
+| m3-pod-master | The owner's dock open on a wet brick patio by a garden tap, the H1 inside, the cottage behind | Poly Haven `lythwood_terrace` backplate DSC08806 and HDRI | `dk_home.py` | Two systems (Home), closing CTA, Homes CTA |
+| s1-dock | The owner's dock, lids nearly closed, on a rain-wet roof deck (a fire-hose sign and reel toned out) | Poly Haven `rooftop_day` backplate IMG_6243 and HDRI | `dk_roof.py` | Explainer Dock tab, Platform Dock row |
+| s2-tether | The H1 below a glass facade, its hose rising to the parapet | HDRI `docklands_02` | `m1.py` | Explainer Tether tab, Platform Tether row |
+| s4-scan | The H1 holding off the corner of the glass tower, not spraying | HDRI `docklands_02` | `tower.py` | Explainer Scan tab, Platform Scan row |
+| s5-software | From inside an office at dusk: a laptop showing the site's own software window (Demo data), the H1 washing outside the window | HDRI `sunset_jhbcentral` (as the hero film); the screen is a capture of the site's software window | `s5_q.py` (`s5_glass.py`) | Explainer Software tab, Platform Software row |
+| s6-automation | The owner's dock open on a roof deck, the H1 settling above it on its hose | Poly Haven `rooftop_day` backplate IMG_6228 and HDRI | `dk_roof.py` | Explainer Automation tab, Platform Automation row |
+| p1-tower | Street-level look up the glass tower, the H1 washing a lane, 110 mm | HDRI `docklands_02` | `tower.py` | Places carousel: commercial towers |
+| p2-apartments | The H1 washing the rendered balcony wall of an apartment block (a building-name sign retouched out of the plate) | Poly Haven `residential_garden` backplate IMG_0600 and HDRI | `house_bay.py` | Places carousel: apartment buildings |
+| p3-house | The H1 washing the bay window of a white weatherboard house, cut from a taller frame | Poly Haven `lythwood_terrace` backplate DSC08820 and HDRI | `house_bay.py` | Places carousel: homes |
+| p4-rental | The H1 washing the rooftop array of a brick terrace with a slate roof | HDRI `bloem_olive_house`; `brick_wall_09` and `grey_roof_tiles_02` textures | `roof.py` | Places carousel: rental properties |
+| p5-solar-farm | The H1 washing a solar farm row, seen from the aisle | HDRI `dry_field`; `grass_ground` texture | `farm.py` | Places carousel: solar farms |
+| y1-story-before | The owner's dock closed on the wet patio by the garden tap (an exit sign and extinguisher on the cottage toned out) | Poly Haven `lythwood_terrace` backplate DSC08806 and HDRI | `dk_home.py` | Landlord story beats 1 and 2 |
+| y2-story-panels | The H1 washing a rooftop array on a corrugated roof, half the array wet and clean | HDRI `balcony`; `brick_wall_09` texture | `roof.py` | Landlord story beat 3 |
+| y3-story-driveway | The H1 washing the brick path along a garden wall in front of the house | Poly Haven `lythwood_terrace` backplate DSC08816 and HDRI | `driveway.py` | Landlord story beat 4 |
+| y5-story-done | The owner's dock open on the patio, the H1 back inside | Poly Haven `lythwood_terrace` backplate DSC08806 and HDRI | `dk_home.py` | Landlord story beat 5 |
+| so2-solar-closeup | Close on the H1's nozzle turret spraying a dusty solar module, 85 mm | HDRI `dry_field` | `farm.py` | Solar rooftop section |
+| f1-tether | The H1 on its hose at the corner of the glass tower, from below | HDRI `docklands_02` | `m1.py` | Safety by design: tether |
+| f2-camera | The H1 close beside a glass wall, its sensors toward the pane | HDRI `docklands_02` | `m1.py` | Safety by design: obstacle-avoidance camera |
+| f3-surface | The H1 washing a window in a rendered wall | Poly Haven `residential_garden` backplate IMG_0613 and HDRI | `house_bay.py` | Safety by design: onboard surface checks |
+| f4-dock | The owner's dock closed on the wet roof deck, the H1 inside (a fire-hose reel toned out) | Poly Haven `rooftop_day` backplate IMG_6243 and HDRI | `dk_roof.py` | Safety by design: weatherproof dock |
+
+Sources: Poly Haven backplates and HDRIs (polyhaven.com, CC0): `lythwood_terrace` (backplates DSC08801, DSC08806, DSC08816, DSC08820; HDRI), `residential_garden` (backplates IMG_0600, IMG_0613; HDRI), `rooftop_day` (backplates IMG_6228, IMG_6240, IMG_6243, IMG_6246; HDRI), and the HDRIs `docklands_02`, `dry_field`, `balcony`, `bloem_olive_house` and (for the laptop still, as in the hero film) `sunset_jhbcentral`; Poly Haven textures `grass_ground`, `brick_wall_09` and `grey_roof_tiles_02`. The solar cells are drawn in code.
+
+To render them again: the scene scripts are in `scripts/media/stills/`, each reading its settings from the environment; `queue.txt` holds every still's exact settings under its asset id and `queue.sh` renders them in turn into `final/`. Put the owner's .blend next to `h1lib.py` (or set `DRONE` to its path). For the dock, run the owner's own script from that file with its `SHOW_DOCK` and `SAVE_BLEND` options on, which writes `H1_with_dock.blend`, and put that beside the scripts (or set `DOCK_BLEND`); neither file enters this repository. Use the same Python 3.11 virtual environment as the hero film (`pip install bpy==5.0.1 numpy`, as `venv/`, or point `PY` at its python), and fetch the photographs, HDRIs and textures with `fetch_assets.sh`. Finishing: `ho1-homes-hero` and `p3-house` are recomposited with `recomp.py` (`HI=0.82 SAT=1.05`), and `p3-house` is the 1500 x 2250 crop at x 120 of its composite, scaled to 1200 x 1800; the signs noted in the table were toned out with `unsign.py` (with `alpha_png.py`'s render alpha guarding the dock's mast) and the extinguisher in `y1-story-before` patched with `patchcopy.py`. Rendered files stay out of the repository (the folder's `.gitignore`).
+
 ## House grade (17 October 2026)
+
+The Blender stills and the hero film are finished at render and skip this grade (`grade: false`); it applies to what is left of the Higgsfield set.
 
 Every still and film goes through one house grade in the pipeline (`scripts/media/grade.mjs`), so the set reads as one shoot: an overcast morning, slightly warm in the shadows and mid-tones, with neutral highlights. The sources differed a lot. Some were cold blue-grey (scan, tether, apartments), one was warm interior light (software), several had washed-out blacks and the solar hero was close to grey. A single filter would have left those differences in place, so the grade measures each source in CIE Lab and corrects it toward common targets:
 
@@ -41,7 +89,7 @@ Two differences a grade cannot fix need the owner: `co1-company` is a backlit su
 | Gate | Status |
 | --- | --- |
 | Design sheet (commercial drone, home drone, roof capsule, ground pod) | Approved (Liam, 18 Sep 2026). Registered as Higgsfield elements (below). The PNGs are in `docs/references` (added 17 October 2026, recompressed losslessly), with their source URLs in the table below. |
-| 27 stills | Generated from the approved elements, checked scene by scene with Higgsfield's video analysis, seven regenerated (two of them twice) where the read missed the brief (tether direction, spray running during a scan, twilight instead of morning). |
+| 27 stills | Generated from the approved elements, checked scene by scene with Higgsfield's video analysis, seven regenerated (two of them twice) where the read missed the brief (tether direction, spray running during a scan, twilight instead of morning). Replaced on 10 November 2026 by the Blender stills, at the owner's request. |
 | Films | `c2-commercial-clip`: MiniMax H3, 6 s, first and last frame from the approved commercial hero still so it loops seamlessly. The home hero film is not generated: a Blender render of the owner's H1 model, made at the owner's request on 9 November 2026 (see "Home hero film"). |
 
 Model note: the account is on Higgsfield's starter plan, which serves every `nano_banana_pro` request as Nano Banana 2 (2 credits at 2K). Seedream 4.5 (1 credit) was used for the two shots without a product in them. Kling 3.0 pro and Nano Banana Pro at 4K stay gated to the Plus plan.
@@ -88,7 +136,9 @@ Every scene prompt below ends with this clause (docks-only shots drop the drone 
 
 In the prompts, `@commercial` is the `lienry-commercial-drone` element, `@home` the `lienry-home-drone` element, `@capsule` the `lienry-roof-capsule` element and `@pod` the `lienry-ground-pod` element.
 
-## Stills (18 September 2026)
+## Higgsfield stills (18 September 2026, replaced 10 November 2026)
+
+The AI-generated set the Blender stills replaced, kept for history: none of these is on the site any more.
 
 All at 2K. Nano Banana 2 unless noted. "Job" is the Higgsfield generation the manifest points at; where a shot was regenerated the first job is listed in the review notes below.
 
@@ -189,6 +239,8 @@ Everything else read as the product: hexacopter with six guards on the commercia
 Until an id exists in `public/media/index.json` the site shows a labelled placeholder panel in its place.
 
 ## Retired
+
+The 27 Higgsfield stills of 18 September 2026 were replaced on 10 November 2026 by Blender renders of the owner's H1 model, at the owner's request; their source URLs and prompts stay in this file ("Higgsfield stills") and in the repository's history.
 
 The 17 September review candidates `m1-drone-master-a` and `m1-drone-master-b` and the Kling 3.0 Turbo alternative `h1-hero-film-kling` are no longer in the manifest. The MiniMax hero film (MiniMax H3, 6 s, job a83c481d-8ce0-41d0-8472-251e408404e3, made from `h0-hero-still`) was replaced at the owner's request on 9 November 2026 by the Blender film; `h0-hero-still` stays as the /company vision band backdrop. The design sheet replaced the candidate pair as the approval gate, and the Kling clip showed the old drone.
 

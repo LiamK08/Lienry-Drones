@@ -1,0 +1,8 @@
+assets/
+final/
+venv/
+*.blend
+*.blend1
+queue.done
+queue.log
+__pycache__/

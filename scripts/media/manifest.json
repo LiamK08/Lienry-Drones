@@ -1,6 +1,6 @@
 {
   "$schema": "./manifest.schema.json",
-  "note": "Source URLs are Higgsfield generation results made from the approved design sheet of 18 September 2026 (see docs/MEDIA.md for the references and prompts), except the home hero film and its first frames (h1-hero-film, h2-hero-frame): a Blender render of the owner's H1 model, kept in scripts/media/masters and listed as repo: sources. Run `npm run media:fetch` (or the media workflow on GitHub Actions) to download, optimise and write public/media. Prompts and references are logged in docs/MEDIA.md.",
+  "note": "Every still and the home hero film (h1-hero-film, h2-hero-frame) are Blender renders of the owner's H1 model, kept in scripts/media/masters and listed as repo: sources (docs/MEDIA.md: \"Stills (Blender, 10 November 2026)\" and \"Home hero film\"). The one remote source left is the unplaced Higgsfield commercial clip (c2-commercial-clip). Run `npm run media:fetch` (or the media workflow on GitHub Actions) to encode them and write public/media.",
   "assets": [
     {
       "id": "h0-hero-still",
@@ -18,13 +18,14 @@
     {
       "id": "m1-drone-master",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090350_2bb59c62-2397-4ab0-9e09-b630f0086b36.png",
+      "url": "repo:scripts/media/masters/m1-drone-master-h1-2048x1536.jpg",
       "widths": [
         640,
         1280,
         2048
       ],
-      "placement": "Explainer Drone tab, Platform Drone row"
+      "placement": "Explainer Drone tab, Platform Drone row",
+      "grade": false
     },
     {
       "id": "m2-capsule-master",
@@ -137,13 +138,14 @@
     {
       "id": "p3-house",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090350_3521fdcb-450b-46c5-91fa-6b4c1a4e237b.png",
+      "url": "repo:scripts/media/masters/p3-house-h1-1200x1800.jpg",
       "widths": [
         480,
         800,
         1200
       ],
-      "placement": "Places carousel: homes"
+      "placement": "Places carousel: homes",
+      "grade": false
     },
     {
       "id": "p4-rental",
@@ -172,13 +174,14 @@
     {
       "id": "y1-story-before",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090605_62c6eb53-a837-4605-abe1-861972636c6e.png",
+      "url": "repo:scripts/media/masters/y1-story-before-h1-1200x1600.jpg",
       "widths": [
         480,
         800,
         1200
       ],
-      "placement": "Landlord story beats 1 and 2"
+      "placement": "Landlord story beats 1 and 2",
+      "grade": false
     },
     {
       "id": "y2-story-panels",
@@ -207,13 +210,14 @@
     {
       "id": "y5-story-done",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_092635_191ec774-ea01-4dee-b9b4-c00ccb5b4ed7.png",
+      "url": "repo:scripts/media/masters/y5-story-done-h1-1200x1600.jpg",
       "widths": [
         480,
         800,
         1200
       ],
-      "placement": "Landlord story beat 5"
+      "placement": "Landlord story beat 5",
+      "grade": false
     },
     {
       "id": "f1-tether",
@@ -240,22 +244,24 @@
     {
       "id": "f3-surface",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090739_7099fcbe-da1c-4d97-9cce-eec158424d63.png",
+      "url": "repo:scripts/media/masters/f3-surface-h1-1631x1088.jpg",
       "widths": [
         400,
         800
       ],
-      "placement": "Safety by design: onboard surface checks"
+      "placement": "Safety by design: onboard surface checks",
+      "grade": false
     },
     {
       "id": "f4-dock",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090739_8a45b2ea-b3ad-4ca6-89c1-c9b545a95064.png",
+      "url": "repo:scripts/media/masters/f4-dock-h1-1200x1200.jpg",
       "widths": [
         400,
         800
       ],
-      "placement": "Safety by design: weatherproof dock"
+      "placement": "Safety by design: weatherproof dock",
+      "grade": false
     },
     {
       "id": "c1-commercial-hero",
@@ -273,14 +279,15 @@
     {
       "id": "ho1-homes-hero",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090739_ff8f347b-022d-4bee-af76-d605e1050ede.png",
+      "url": "repo:scripts/media/masters/ho1-homes-hero-h1-3168x1344.jpg",
       "widths": [
         768,
         1280,
         1920,
         2560
       ],
-      "placement": "Homes and Rentals hero"
+      "placement": "Homes and Rentals hero",
+      "grade": false
     },
     {
       "id": "so1-solar-hero",
