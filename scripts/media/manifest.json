@@ -29,35 +29,38 @@
     {
       "id": "m2-capsule-master",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090350_46e7dba7-5990-4f08-babc-4c197ff5de77.png",
+      "url": "repo:scripts/media/masters/m2-capsule-master-h1-2048x1365.jpg",
       "widths": [
         640,
         1280,
         2048
       ],
-      "placement": "Two systems (Commercial), Commercial pilot block, Platform Dock row"
+      "placement": "Two systems (Commercial), Commercial pilot block, Platform Dock row",
+      "grade": false
     },
     {
       "id": "m3-pod-master",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090350_b4ef94d8-2b0d-4678-b8e0-0b6620ce7c9a.png",
+      "url": "repo:scripts/media/masters/m3-pod-master-h1-2048x1365.jpg",
       "widths": [
         640,
         1280,
         2048
       ],
-      "placement": "Two systems (Home), closing CTA, Homes CTA"
+      "placement": "Two systems (Home), closing CTA, Homes CTA",
+      "grade": false
     },
     {
       "id": "s1-dock",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_092029_de895bd9-185f-46e0-96ec-09dd9df04739.png",
+      "url": "repo:scripts/media/masters/s1-dock-h1-1920x1440.jpg",
       "widths": [
         640,
         1280,
         1920
       ],
-      "placement": "Explainer Dock tab, Platform Dock row"
+      "placement": "Explainer Dock tab, Platform Dock row",
+      "grade": false
     },
     {
       "id": "s2-tether",
@@ -98,13 +101,14 @@
     {
       "id": "s6-automation",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090605_d19b788e-8372-4eb1-bbbb-052f2d7ab3ce.png",
+      "url": "repo:scripts/media/masters/s6-automation-h1-1920x1440.jpg",
       "widths": [
         640,
         1280,
         1920
       ],
-      "placement": "Explainer Automation tab, Platform Automation row"
+      "placement": "Explainer Automation tab, Platform Automation row",
+      "grade": false
     },
     {
       "id": "p1-tower",
@@ -144,24 +148,26 @@
     {
       "id": "p4-rental",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_091722_ceb7456c-141c-4984-920f-0dea2a2c5d32.png",
+      "url": "repo:scripts/media/masters/p4-rental-h1-1200x1800.jpg",
       "widths": [
         480,
         800,
         1200
       ],
-      "placement": "Places carousel: rental properties"
+      "placement": "Places carousel: rental properties",
+      "grade": false
     },
     {
       "id": "p5-solar-farm",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090605_76f91d2b-7730-498e-abce-db189c87ace8.png",
+      "url": "repo:scripts/media/masters/p5-solar-farm-h1-1200x1800.jpg",
       "widths": [
         480,
         800,
         1200
       ],
-      "placement": "Places carousel: solar farms"
+      "placement": "Places carousel: solar farms",
+      "grade": false
     },
     {
       "id": "y1-story-before",
@@ -177,13 +183,14 @@
     {
       "id": "y2-story-panels",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090605_d5c7c910-9acf-4a71-a025-188f981e5c6e.png",
+      "url": "repo:scripts/media/masters/y2-story-panels-h1-1200x1600.jpg",
       "widths": [
         480,
         800,
         1200
       ],
-      "placement": "Landlord story beat 3"
+      "placement": "Landlord story beat 3",
+      "grade": false
     },
     {
       "id": "y3-story-driveway",
@@ -278,25 +285,27 @@
     {
       "id": "so1-solar-hero",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090739_7d8db1ea-4cfb-41fb-b58f-fe286ea36cdc.png",
+      "url": "repo:scripts/media/masters/so1-solar-hero-h1-3168x1344.jpg",
       "widths": [
         768,
         1280,
         1920,
         2560
       ],
-      "placement": "Solar hero"
+      "placement": "Solar hero",
+      "grade": false
     },
     {
       "id": "so2-solar-closeup",
       "kind": "image",
-      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J8Mu3IaCOUKKQFrt2Kj5oC8qmY/hf_20260918_090926_225fe37a-0988-4cd1-abe8-9b988c4e1b71.png",
+      "url": "repo:scripts/media/masters/so2-solar-closeup-h1-1920x1280.jpg",
       "widths": [
         640,
         1280,
         1920
       ],
-      "placement": "Solar rooftop section"
+      "placement": "Solar rooftop section",
+      "grade": false
     },
     {
       "id": "co1-company",
