@@ -1,11 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useRef, useState, useSyncExternalStore } from "react";
 import { explore } from "@/content/home";
 import { Band, Container } from "@/components/ui/Band";
-import { Button, ButtonFace } from "@/components/ui/Button";
-import { Picture } from "@/components/ui/Picture";
+import { Button } from "@/components/ui/Button";
+import { LinkCard } from "@/components/ui/LinkCard";
+import { RevealItem, RevealList } from "@/components/ui/Reveal";
 import { SectionHead } from "@/components/ui/SectionHead";
 import { useIndicator } from "@/components/home/useIndicator";
 
@@ -42,6 +42,14 @@ const choose = (id: FilterId) => {
 const filteredGrid = (n: number) =>
   `${n % 3 === 0 ? "min-[75rem]:grid-cols-3" : n % 4 === 0 ? "min-[75rem]:grid-cols-4" : "min-[75rem]:grid-cols-2"} md:[&>li:last-child:nth-child(odd)]:col-span-2 ${n % 3 === 0 ? "min-[75rem]:[&>li:last-child:nth-child(odd)]:col-span-1" : ""}`;
 
+// The pictures' sizes for a row of two, three or four cards.
+const sizes = (across: 2 | 3 | 4) =>
+  across === 2
+    ? "(min-width: 1248px) 588px, (min-width: 768px) 50vw, 100vw"
+    : across === 4
+      ? "(min-width: 1248px) 282px, (min-width: 1200px) calc(25vw - 30px), (min-width: 768px) 50vw, 100vw"
+      : "(min-width: 1248px) 384px, (min-width: 1200px) calc(33.3vw - 32px), (min-width: 768px) 50vw, 100vw";
+
 /**
  * Explore, on near-black: a centred head with its pill under it, a row of filter pills (a sideways
  * scrolling row on a phone, never wrapping; resting pills filled, the chosen one under a white marker
@@ -49,7 +57,8 @@ const filteredGrid = (n: number) =>
  * one of each kind at least; a filter shows its own. Either way the cards stand in one even grid with no
  * card alone on a row (filteredGrid), four at most on a phone, and they fade in as the choice changes.
  * Each card is one link: its picture, its title, then the action its kind leads to and its subject
- * (Card). The choice is kept in the address.
+ * (LinkCard). The cards rise in once, one after another, when the grid first scrolls into view (a grid
+ * already on screen, and one swapped in by a filter, simply shows). The choice is kept in the address.
  */
 export function Explore() {
   const filter = useSyncExternalStore(subscribe, read, () => "all" as FilterId);
@@ -116,41 +125,22 @@ export function Explore() {
             })}
           </div>
         </div>
-        <ul key={filter} className={`mt-10 grid gap-4 md:grid-cols-2 min-[75rem]:gap-6 max-md:[&>li:nth-child(n+5)]:hidden ${filteredGrid(cards.length)} ${fade}`}>
+        <RevealList animate key={filter} className={`mt-10 grid gap-4 md:grid-cols-2 min-[75rem]:gap-6 max-md:[&>li:nth-child(n+5)]:hidden ${filteredGrid(cards.length)} ${fade}`}>
           {cards.map((c) => (
-            <Card key={c.id} card={c} tall={pair} four={!all && cards.length % 3 !== 0 && cards.length % 4 === 0} />
+            <RevealItem key={c.id} className="flex">
+              <LinkCard
+                href={c.href}
+                title={c.title}
+                action={("action" in c ? c.action : undefined) ?? explore.actions[c.kind]}
+                // The subject on the right: Lienry's honest stand-in for a date.
+                meta={c.tag}
+                picture={{ id: c.image.id, position: c.image.position, sizes: sizes(pair ? 2 : !all && cards.length % 3 !== 0 && cards.length % 4 === 0 ? 4 : 3) }}
+                tall={pair}
+              />
+            </RevealItem>
           ))}
-        </ul>
+        </RevealList>
       </Container>
     </Band>
-  );
-}
-
-/**
- * A link card, light on the night band (`.on-light` restores the light tokens inside it, while the link
- * keeps the band's focus ring): its picture on top at a fixed height (200px, 180 below 768, and 300 from
- * 1200 when two share a filter's row), then its title in the serif with nothing above it, and a foot with
- * the card's action as a pill's face (the card itself is the link) and, on the right, its subject:
- * Lienry's honest stand-in for a date. Hovered or focused, the pill fills ink.
- */
-function Card({ card: c, tall = false, four = false }: { card: ExploreCard; tall?: boolean; four?: boolean }) {
-  const action = ("action" in c ? c.action : undefined) ?? explore.actions[c.kind];
-  return (
-    <li className="flex">
-      <Link href={c.href} className="group group/card flex w-full flex-col overflow-hidden rounded-card bg-tint">
-        <span className="on-light flex flex-1 flex-col">
-          <span className={`relative block h-[11.25rem] shrink-0 md:h-[12.5rem] ${tall ? "min-[75rem]:h-[18.75rem]" : ""}`}>
-            <Picture id={c.image.id} alt="" position={c.image.position} fit="fill" rounded="none" zoom sizes={tall ? "(min-width: 1248px) 588px, (min-width: 768px) 50vw, 100vw" : four ? "(min-width: 1248px) 282px, (min-width: 1200px) calc(25vw - 30px), (min-width: 768px) 50vw, 100vw" : "(min-width: 1248px) 384px, (min-width: 1200px) calc(33.3vw - 32px), (min-width: 768px) 50vw, 100vw"} className="absolute inset-0" />
-          </span>
-          <span className="flex flex-1 flex-col p-5 md:px-6 md:pb-6 md:pt-5">
-            <span className="block text-balance font-display text-[1.3125rem] leading-[1.2] text-ink md:text-[1.5rem]">{c.title}</span>
-            <span className="mt-auto flex items-center justify-between gap-4 pt-8">
-              <ButtonFace className="group-hover/card:border-ink group-hover/card:bg-ink group-hover/card:text-white group-focus-visible/card:border-ink group-focus-visible/card:bg-ink group-focus-visible/card:text-white">{action}</ButtonFace>
-              <span className="min-w-0 text-right text-small text-muted">{c.tag}</span>
-            </span>
-          </span>
-        </span>
-      </Link>
-    </li>
   );
 }

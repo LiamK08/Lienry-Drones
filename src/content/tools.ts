@@ -10,15 +10,32 @@ export const fitCheckPage = {
      *  how long they take, and that nothing leaves the page unless asked. */
     lead: "Seven questions from the design brief, for one building. It takes a minute, and nothing is sent unless you ask.",
   },
-  /** What the check covers and what it is not: a feature row under the check, beside the scan picture. */
+  /** What the check covers and what it is not: three cards under the check, each over a small coded
+   *  picture drawn from the check's own parts (the example result is tagged as one). */
   about: {
     headline: "What the fit check tells you",
-    paragraphs: [
-      "It asks about the seven things the Lienry design brief rests on: the building's height, room for a dock, water and power nearby, what the outside is made of and how you clean it now.",
-      "The result is indicative, not a site survey. Lienry is at concept stage and site requirements are still being finalised, so treat it as the start of a conversation.",
+    emphasis: "tells you",
+    cards: [
+      {
+        id: "questions",
+        title: "Seven questions, one score",
+        body: "It asks about the seven things the Lienry design brief rests on: the building's height, room for a dock, water and power nearby, what the outside is made of and how you clean it now.",
+      },
+      {
+        id: "points",
+        title: "The points to talk through",
+        body: "Every No and every Partly comes back as a point worth a conversation, the building's first.",
+        // A made-up set of answers, scored by the check's own sums (74, "A likely fit", two points).
+        example: { tag: "Example", answers: { height: "yes", dock: "partly", supply: "yes", surfaces: "yes", regular: "no", "height-work": "yes", remote: "yes" } },
+      },
+      {
+        id: "indicative",
+        title: "Indicative, not a site survey",
+        body: "Lienry is at concept stage and site requirements are still being finalised, so treat the result as the start of a conversation.",
+        needs: ["Under 70 metres tall", "Room for a dock, on the roof or the ground", "Water and power close to the dock"],
+      },
     ],
     link: { label: "See the platform", href: "/platform" },
-    image: { id: "s4-scan", alt: "The Lienry drone on its tether beside the glass face of an office tower, scanning it", position: "50% 40%" },
   },
   faq: { headline: "Questions about the fit check" },
   close: {

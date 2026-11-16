@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, type CSSProperties } from "react";
 import { CELLS, FLOORS, MAP } from "@/components/three/software/dims";
 import type { ZoneId } from "@/content/software";
 
@@ -101,6 +101,14 @@ type FacadeMapProps = {
   decorative?: boolean;
   /** Pending cells a step darker, for a map on a white card of its own (at least 1.5:1 on white). */
   strong?: boolean;
+  /**
+   * Leaves on each cell what a parent's CSS needs to play the clean in, and draws nothing differently:
+   * its row from the top and its place across the map (--map-row, --map-x from 0 to 1), the state a
+   * cell the wash has reached rests in (data-rest: half or washed), and the debris that was on it
+   * before (--map-debris, on a shading rect that rests clear). The Platform menu's card
+   * (MenuPanel.module.css).
+   */
+  staged?: boolean;
 };
 
 /**
@@ -111,7 +119,7 @@ type FacadeMapProps = {
  * canvas: the window's only canvas is the live model. `cells` is read in place, so `version` (the
  * count of washed passes) is what tells the memo it has changed.
  */
-export const FacadeMap = memo(function FacadeMap({ cells, wash, debris, selected, reach, lit = null, ease = false, debrisLayer = false, decorative = false, strong = false }: FacadeMapProps) {
+export const FacadeMap = memo(function FacadeMap({ cells, wash, debris, selected, reach, lit = null, ease = false, debrisLayer = false, decorative = false, strong = false, staged = false }: FacadeMapProps) {
   const edge = reach === undefined ? FLOORS : reach * FLOORS;
   const motion = ease ? "transition-[fill,fill-opacity,stroke] duration-300 ease-instrument motion-reduce:transition-none" : "";
   return (
@@ -127,8 +135,12 @@ export const FacadeMap = memo(function FacadeMap({ cells, wash, debris, selected
         const residue = debris && mapped ? c.debris * (1 - done) : 0;
         const tone = !mapped ? FILL.outline : lit && c.zone === lit && done === 0 ? FILL.lit : done >= 0.999 ? FILL.washed : done > 0 ? FILL.half : strong ? FILL.strong : FILL.pending;
         const stroked = !mapped;
+        // A staged cell the wash has reached: where it rests, and the debris it carried before the wash.
+        const rest = staged && done > 0 ? (done >= 0.999 ? "washed" : "half") : undefined;
+        const before = rest && debris && c.debris > DEBRIS_SHOWN ? Math.min(0.95, 0.25 + c.debris * 0.8) : 0;
+        const stage = staged ? ({ "--map-row": ROW_FROM_TOP[i], "--map-x": Number((x / WIDTH).toFixed(3)), "--map-debris": before || undefined } as CSSProperties) : undefined;
         return (
-          <g key={i} opacity={selected && c.zone !== selected ? 0.32 : 1}>
+          <g key={i} opacity={selected && c.zone !== selected ? 0.32 : 1} data-rest={rest} style={stage}>
             <rect
               x={stroked ? x + 0.5 : x}
               y={stroked ? y + 0.5 : y}
@@ -137,7 +149,7 @@ export const FacadeMap = memo(function FacadeMap({ cells, wash, debris, selected
               strokeWidth={stroked ? 1 : undefined}
               className={`${tone} ${motion}`}
             />
-            {residue > DEBRIS_SHOWN || (ease && debrisLayer && c.debris > DEBRIS_SHOWN) ? (
+            {residue > DEBRIS_SHOWN || before > 0 || (ease && debrisLayer && c.debris > DEBRIS_SHOWN) ? (
               <rect x={x} y={y} width={CW - INSET} height={CH - INSET} fillOpacity={residue > DEBRIS_SHOWN ? Math.min(0.95, 0.25 + residue * 0.8) : 0} className={`${FILL.debris} ${motion}`} />
             ) : null}
           </g>

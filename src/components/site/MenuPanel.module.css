@@ -1,0 +1,62 @@
+/* The Platform card's facade map (MenuPanel.tsx) plays once each time the panel opens: from a building
+   still to wash, the clean runs in from the top floor down and along each floor from the left, a cell
+   taking its first pass and then its second, and the debris on it clearing as it goes. About 1.1s from
+   the panel's opening, then it rests as drawn: no loop. CSS only, on what FacadeMap's `staged` leaves
+   on each cell (--map-row, --map-x, --map-debris, data-rest); a cell the wash has not reached never
+   moves. Under reduced motion none of it applies: the map is simply as drawn. */
+.play {
+  /* A pending cell on a white card, as FacadeMap's `strong` draws it. */
+  --pending: color-mix(in srgb, var(--color-map-pending), var(--color-border-strong) 25%);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Each cell waits for the panel's own fade (240ms), its floor (110ms a floor) and its place along it. */
+  .play g[data-rest] > rect {
+    animation-delay: calc(240ms + var(--map-row) * 110ms + var(--map-x) * 220ms);
+    animation-duration: 520ms;
+    animation-timing-function: linear;
+    animation-fill-mode: backwards;
+  }
+  .play g[data-rest="half"] > rect {
+    animation-duration: 120ms;
+  }
+  .play g[data-rest="half"] > rect:first-child {
+    animation-name: one-pass;
+  }
+  .play g[data-rest="washed"] > rect:first-child {
+    animation-name: two-passes;
+  }
+  /* The debris shading over a cell (its second rect) clears with the wash. */
+  .play g[data-rest] > rect + rect {
+    animation-name: debris-off;
+  }
+}
+
+/* Each ends on the fill FacadeMap gives the cell (one pass: map-half; washed: the glass), so the map
+   rests exactly as drawn. The end is spelled out: left to the cell's own fill, Chrome paints the way
+   there from a color-mix() as black. */
+@keyframes one-pass {
+  from {
+    fill: var(--pending);
+  }
+  to {
+    fill: var(--color-map-half);
+  }
+}
+@keyframes two-passes {
+  0% {
+    fill: var(--pending);
+  }
+  23%,
+  77% {
+    fill: var(--color-map-half);
+  }
+  100% {
+    fill: var(--color-glass);
+  }
+}
+@keyframes debris-off {
+  from {
+    fill-opacity: var(--map-debris);
+  }
+}

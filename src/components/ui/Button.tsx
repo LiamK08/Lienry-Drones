@@ -142,10 +142,11 @@ function Label({ card = false, flood = false, children }: { card?: boolean; floo
   // A flood pill: the first copy keeps the pill's own colour (it turns only once it has rolled out of
   // sight); the second waits below in the flooded colour, so the roll lands in it.
   // The badge keeps the pill's left end (the flood starts from it), so in a pill wider than its content
-  // the label takes the room that is left and centres in it.
+  // the label grows from its own width into the room that is left and centres in it (globals.css gives
+  // the far end a matching share, so the label centres on the pill).
   if (flood) {
     return (
-      <span className="[display:inline-grid] flex-1 overflow-hidden">
+      <span className="[display:inline-grid] flex-auto overflow-hidden">
         <span className={`${roll} translate-y-[calc(var(--lit)_*_-100%)] motion-reduce:translate-y-0`}>{children}</span>
         <span aria-hidden="true" className={`${roll} translate-y-[calc((1_-_var(--lit))_*_100%)] text-(color:--pill-fg-on) motion-reduce:hidden`}>
           {children}

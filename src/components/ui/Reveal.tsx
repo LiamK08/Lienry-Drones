@@ -20,7 +20,8 @@ export type RevealPhase = "shown" | "hidden" | "visible";
 /**
  * The reveal gate shared by Reveal, RevealList and SnapTrack's list. IntersectionObserver only.
  * Like the reference site, sections do not fade in as they scroll: a reveal runs only where it is
- * asked for (`enabled`), which today is the questions' heading.
+ * asked for (`enabled`). That is the questions' heading and, since November 2026, grids of cards
+ * (`RevealList animate`): cards only, never a section's heading or its body text.
  */
 export function useRevealPhase<T extends Element>(enabled = false): [RefObject<T | null>, RevealPhase] {
   const ref = useRef<T>(null);
@@ -118,10 +119,30 @@ export function Reveal({ children, animate = false, delay = 0, className = "", a
   );
 }
 
-/** A list whose RevealItems rise in with a 60ms stagger as the list enters the viewport. */
-export function RevealList({ children, className = "", stagger = 0.06, ...rest }: { children: ReactNode; className?: string; stagger?: number } & DataAttributes) {
+/**
+ * A plain element that carries its reveal phase as `data-arrive` ("shown", "hidden" or "visible"), for
+ * an entrance written in CSS (the footer's round pictures). It never hides anything itself, and the
+ * server render says "shown".
+ */
+export function RevealGate({ children, className = "", ...rest }: { children: ReactNode; className?: string } & DataAttributes & { "aria-hidden"?: boolean | "true" }) {
+  const [ref, phase] = useRevealPhase<HTMLDivElement>(true);
+  return (
+    <div ref={ref} className={className} aria-hidden={rest["aria-hidden"]} {...pick(rest)} data-arrive={phase}>
+      {children}
+    </div>
+  );
+}
+
+/**
+ * A list of cards. With `animate`, its RevealItems fade and rise 16px over 450ms, 40ms apart, once, as
+ * the list enters the viewport; a list on screen when the page hydrates (or mounted on screen later)
+ * stays shown, and so does every list without JavaScript or under reduced motion. Without `animate`
+ * (the default) it is a plain list. Use it for grids of cards only:
+ *   <RevealList animate className="grid ..."><RevealItem className="flex"><LinkCard ... /></RevealItem></RevealList>
+ */
+export function RevealList({ children, animate = false, className = "", stagger = 0.04, ...rest }: { children: ReactNode; animate?: boolean; className?: string; stagger?: number } & DataAttributes) {
   const reduce = useReducedMotion();
-  const [ref, phase] = useRevealPhase<HTMLUListElement>();
+  const [ref, phase] = useRevealPhase<HTMLUListElement>(animate);
   return (
     <motion.ul
       ref={ref}
@@ -151,8 +172,8 @@ export function RevealItem({ children, id, className = "", ...rest }: { children
       data-reveal=""
       transformTemplate={restTransform(phase)}
       variants={{
-        hidden: { opacity: 0, y: 12, transition: { duration: 0 } },
-        visible: { opacity: 1, y: 0, transition: reduce ? { duration: 0 } : { duration: 0.64, ease: settle } },
+        hidden: { opacity: 0, y: 16, transition: { duration: 0 } },
+        visible: { opacity: 1, y: 0, transition: reduce ? { duration: 0 } : { duration: 0.45, ease: settle } },
       }}
     >
       {children}

@@ -413,19 +413,11 @@
     .why-row .why-text { transition: none; }
   }
 
-  /* The fit check: a point it raises rises 8px into place as it joins the list; the empty panel's
-     arrow nudges toward the questions (left beside them, up when they sit below on a phone). */
+  /* The fit check: a point it raises rises 8px into place as it joins the list. (Its other motion is in
+     src/components/blocks/fitcheck/FitCheck.module.css.) */
   @keyframes gap-in {
     from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: none; }
-  }
-  @keyframes nudge-x {
-    0%, 100% { translate: 0 0; }
-    50% { translate: -4px 0; }
-  }
-  @keyframes nudge-y {
-    0%, 100% { translate: 0 0; }
-    50% { translate: 0 4px; }
   }
 
   /* Below 1024, while the fit check's score strip shows at the foot of the screen, keyboard focus
@@ -801,8 +793,9 @@
 }
 
 /* ── Hover and ambient motion (the refresh update, November 2026) ─────────────────────────────────────
-   One block: the pill's flood, the linked cards' answer, the card grids' reveal, the footer pictures'
-   entrance, the pane texture, the paired tiles' rings and the link inside body copy. Each is off, or an
+   One block: the pill's flood, the linked cards' answer, the footer pictures' entrance and the link
+   inside body copy. (Their neighbours live with their components: the card grids' reveal in Reveal.tsx,
+   the pane texture in PaneField.module.css, the paired tiles' rings in PanelPair.tsx.) Each is off, or an
    instant change of state, under reduced motion (the base rule above zeroes every transition and delay). */
 @layer components {
   /* The pill's flood (Button.tsx). A pill that leads with the round arrow badge (md and lg) carries
@@ -833,14 +826,18 @@
     --flood-x: 1.5rem;
   }
   /* In a pill wider than its content (full width on a phone) the badge keeps the left end and the label
-     centres on the pill, not on the room beside the badge: an empty item after the label takes up to the
-     badge's share of the spare room (its margin undoes the pill's gap). A pill that hugs its label has no
-     spare room, so the item has no width. */
+     centres on the pill, not on the room beside the badge: an empty item after the label shares the spare
+     room with it, up to the width that evens the two ends (badge, gap and padding on the left; this and
+     the padding on the right; its margin undoes the pill's gap). A pill that hugs its label has no spare
+     room, so the item has no width and the label keeps its own. */
   [data-flood]::after {
     content: "";
     flex: 1 1 0;
-    max-width: 2.375rem;
+    max-width: 1.875rem;
     margin-left: -0.5rem;
+  }
+  [data-flood="lg"]::after {
+    max-width: 1.625rem;
   }
   /* The primary: the white badge floods the accent pill white; the label and the arrow are the accent
      (6.99:1 on white) and the pill keeps its accent edge. */
@@ -912,5 +909,132 @@
   }
   :is([data-flood]:hover, [data-flood]:focus-visible, .group\/card:hover [data-flood], .group\/card:focus-visible [data-flood]) > .pill-flood {
     transition-duration: 450ms;
+  }
+
+  /* The linked card (LinkCard.tsx, and MediaCard with `href`). A card that is one link answers the
+     pointer and keyboard focus as one object: it rises 3px over 300ms on the settle curve, with a soft
+     slate shadow on a light band, or its ground one step lighter on a night band (where a shadow would
+     not show); its picture grows to 1.04 inside its frame over 500ms (Picture's zoom), so it trails the
+     card. Hover only where a pointer can hover. Under reduced motion nothing moves: the shadow and the
+     ground answer at once.
+       --card-lift                the shadow a lifted card casts on this surface (none on the night)
+       --card-bg, --card-bg-lit   a LinkCard's ground at rest and lifted (per ground and surface) */
+  :root, .on-light, .surface-raised, .surface-sunken {
+    --card-lift: 0 12px 28px rgb(17 26 34 / 0.12);
+    --card-tint-lit: var(--color-tint);
+    --card-white-lit: var(--color-white);
+  }
+  .on-dark, .surface-ink-raised {
+    --card-lift: none;
+    --card-tint-lit: var(--color-white);
+    --card-white-lit: var(--color-tint);
+  }
+  .link-card {
+    --card-bg: var(--color-tint);
+    --card-bg-lit: var(--card-tint-lit);
+    background-color: var(--card-bg);
+    transition: translate 300ms var(--ease-settle), box-shadow 300ms var(--ease-settle), background-color 300ms var(--ease-settle);
+  }
+  .link-card[data-link-card="white"] {
+    --card-bg: var(--color-white);
+    --card-bg-lit: var(--card-white-lit);
+  }
+  /* A stand in place of a picture: a quiet panel a step off the card's ground. */
+  .link-card [data-link-card-stand] {
+    background-color: color-mix(in srgb, var(--color-white) 60%, transparent);
+  }
+  .link-card[data-link-card="white"] [data-link-card-stand] {
+    background-color: var(--color-mist);
+  }
+  /* MediaCard has no box: the card rises and its picture's frame casts the shadow. */
+  [data-card-link] {
+    transition: translate 300ms var(--ease-settle);
+  }
+  [data-card-link] > figure > div {
+    transition: box-shadow 300ms var(--ease-settle);
+  }
+  @media (hover: hover) {
+    .link-card:hover {
+      translate: 0 -3px;
+      box-shadow: var(--card-lift);
+      background-color: var(--card-bg-lit);
+    }
+    [data-card-link]:hover {
+      translate: 0 -3px;
+    }
+    [data-card-link]:hover > figure > div {
+      box-shadow: var(--card-lift);
+    }
+  }
+  .link-card:focus-visible {
+    translate: 0 -3px;
+    box-shadow: var(--card-lift);
+    background-color: var(--card-bg-lit);
+  }
+  /* Picture's zoom answers a hover and a focus inside its group; the card itself is the focused link. */
+  .link-card:focus-visible [data-zoom] {
+    scale: 1.04;
+  }
+  [data-card-link]:has(:focus-visible) {
+    translate: 0 -3px;
+  }
+  [data-card-link]:has(:focus-visible) > figure > div {
+    box-shadow: var(--card-lift);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .link-card, .link-card:hover, .link-card:focus-visible,
+    [data-card-link], [data-card-link]:hover, [data-card-link]:has(:focus-visible) {
+      translate: none;
+    }
+  }
+
+  /* The footer's round pictures (Footer.tsx): the first time their row scrolls into view each one
+     arrives with a fade and a small growth (0.85 to 1, 400ms on the settle curve, 70ms apart), then
+     the row drifts on as before. The row carries its reveal phase (RevealGate): a row on screen at
+     hydration, a page without JavaScript and reduced motion all leave the pictures simply shown. The
+     growth is on each picture and the drift on their wrapper, so the two never share a property. */
+  @keyframes circle-arrive {
+    from { opacity: 0; scale: 0.85; }
+    to { opacity: 1; scale: 1; }
+  }
+  [data-arrive="hidden"] .foot-circle {
+    opacity: 0;
+  }
+  [data-arrive="visible"] .foot-circle {
+    animation: circle-arrive 400ms var(--ease-settle) calc(var(--i, 0) * 70ms) both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-arrive] .foot-circle {
+      opacity: 1;
+      animation: none;
+    }
+  }
+
+  /* A link inside a line of body copy (a paragraph in a feature row, a note, an answer). The surface's
+     link colour with a 1px underline at 35% of it at rest, so the link is never told apart by colour
+     alone; the underline takes the full colour on hover and keyboard focus, over 200ms. Put
+     `className="link-copy"` on the `<a>` or `<Link>`; the site's focus ring applies as everywhere.
+     (.link, further up, is the stand-alone text link: a full underline that thickens.) */
+  .link-copy {
+    color: var(--s-link);
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+    text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
+    transition: text-decoration-color 200ms var(--ease-instrument);
+  }
+  @media (hover: hover) {
+    .link-copy:hover {
+      text-decoration-color: currentColor;
+    }
+  }
+  .link-copy:focus-visible,
+  .link-copy:active {
+    text-decoration-color: currentColor;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .link-copy {
+      transition: none;
+    }
   }
 }

@@ -1,3 +1,4 @@
+import { PaneField } from "@/components/ui/PaneField";
 import type { CSSProperties, ReactNode } from "react";
 import { Band, Container } from "@/components/ui/Band";
 import { Headline } from "@/components/ui/SectionHead";
@@ -51,6 +52,10 @@ export function ProductHero({ headingId = "hero-heading", headline, emphasis, le
   return (
     <Band id="hero" as="header" tone="plaster" pad="hero" labelledBy={headingId} className="isolate overflow-hidden">
       <div aria-hidden="true" className="pointer-events-none absolute -top-48 left-1/2 -z-10 h-[32rem] w-[56rem] max-w-full -translate-x-1/2 rounded-pill bg-accent-on-dark/30 blur-3xl" />
+      {/* The pane texture on the band's two flanks, from 1024 (below it the head fills the width): each
+          stops short of the head's column (48rem), so no pane sits behind the headline or the lead. */}
+      <PaneField tone="light" at={[0, 30]} drift={[60, 30]} className="left-0 top-0 hidden h-[30rem] w-[calc(50%-24rem)] lg:block" />
+      <PaneField tone="light" at={[100, 30]} drift={[-60, 30]} className="right-0 top-0 hidden h-[30rem] w-[calc(50%-24rem)] lg:block" />
       <Container>
         <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
           <h1 id={headingId} className={`em-accent text-h1 text-balance ${hold.className}`} style={hold.style}>

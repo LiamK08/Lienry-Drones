@@ -1,5 +1,6 @@
 import type { Action } from "@/lib/types";
 import { Band, Container } from "@/components/ui/Band";
+import { PaneField } from "@/components/ui/PaneField";
 import { Button } from "@/components/ui/Button";
 import { Headline } from "@/components/ui/SectionHead";
 
@@ -87,6 +88,10 @@ export function AccentPanel({
           {/* Inside the card's own box (its blur spills over the edges, clipped): a box past them would sit
               over the band above it, and axe could no longer read the contrast of the text there. */}
           <div aria-hidden="true" className="pointer-events-none absolute left-0 top-0 -z-10 h-48 w-96 max-w-full rounded-pill bg-white/15 blur-[90px]" />
+          {/* The pane texture, from the corner opposite the light and gone by the panel's top and left
+              edges. Its box is the whole panel, so every line of the text sits over it alike; the text
+              link sits clear of the light's box, so the two washes never add up behind small text. */}
+          <PaneField tone={dark ? "night" : "accent"} at={[100, 100]} drift={[-45, -40]} className="inset-0" />
           {content}
         </div>
         {note ? <p className="mx-auto mt-10 text-center text-small leading-[1.5] text-fg-muted lg:mt-12">{note}</p> : null}

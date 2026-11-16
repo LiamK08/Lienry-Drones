@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { FacadeMap } from "@/components/software/FacadeMap";
 import { CELLS, FLOORS } from "@/components/three/software/dims";
 import { fitCheck } from "@/content/home";
+import styles from "./MenuPanel.module.css";
 
 // One tile for every group: a night tile with a white and water-blue glyph (MenuTile). A
 // group's `tone` in src/lib/site.ts is not read: three hues read as a rainbow, and amber is a status tone.
@@ -24,8 +25,8 @@ function Item({ href, label, note, icon, onPick }: MenuLink & { onPick: () => vo
 }
 
 /**
- * The demo building partway through a clean, for the Platform card's map (static; the software's own
- * facade map, src/components/software): from the top, the roof glazing and the top floors washed, the
+ * The demo building partway through a clean, for the Platform card's map (the software's own facade
+ * map, src/components/software; it plays in to this state once each time the panel opens, then rests): from the top, the roof glazing and the top floors washed, the
  * next floors on their first pass, the rest still to wash, with the debris the re-scan shaded still on
  * the cells not yet washed. Demo data, as everywhere the coded model shows.
  */
@@ -71,14 +72,15 @@ function Feature({ feature: f, onPick }: { feature: MenuFeature; onPick: () => v
           {f.link.label}
         </Button>
         {/* A tray of the software's facade map, cut off by the card's foot: decorative, so hidden from
-            assistive technology with its tag. */}
+            assistive technology with its tag. The clean plays in once as the panel opens, top floors
+            first (MenuPanel.module.css; the card mounts with its menu), and then holds still. */}
         <div aria-hidden="true" className="mt-4 min-h-[7.5rem] flex-1 basis-0 overflow-hidden rounded-t-[0.625rem] bg-white px-3 pt-3">
           <div className="flex items-center justify-between gap-3">
             <span className="text-caption font-medium leading-none text-ink">Demo building, mid-clean</span>
             <span className="shrink-0 rounded-hard border border-line px-1.5 py-0.5 text-[0.6875rem] leading-none text-muted">Demo data</span>
           </div>
-          <div className="mt-3">
-            <FacadeMap cells={DEMO_CLEAN} version={1} wash debris selected={null} decorative strong />
+          <div className={`mt-3 ${styles.play}`}>
+            <FacadeMap cells={DEMO_CLEAN} version={1} wash debris selected={null} decorative strong staged />
           </div>
         </div>
       </div>
@@ -121,7 +123,7 @@ function Feature({ feature: f, onPick }: { feature: MenuFeature; onPick: () => v
  * A header panel: its feature card (22.5rem) beside one column per group under a small Inter heading,
  * its links as an icon tile (one tone), a label and a one-line note, all in Inter (the serif is for
  * headings, not menus); a link hovers on the tint. Platform opens on the accent card with the coded
- * facade map, Solutions on the fit check's tint card, Resources on the dark list card with its pill.
+ * facade map (its clean plays in once per opening), Solutions on the fit check's tint card, Resources on the dark list card with its pill.
  */
 export function MenuPanel({ groups, feature, onPick }: { groups: readonly MenuGroup[]; feature: MenuFeature; onPick: () => void }) {
   const cols = groups.reduce((n, g) => n + (g.cols ?? 1), 0);
