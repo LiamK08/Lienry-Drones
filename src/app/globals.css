@@ -599,8 +599,15 @@
     color: var(--s-logo);
     transition: color 200ms var(--ease-instrument);
   }
+  /* Into a dark ground the logo takes the header's own animated colour as it goes, in step with the bar
+     (its own transition would restart every frame and trail the bar by some 200ms, dark over the film). */
+  .on-dark .logo-tone { transition: none; }
   @media (prefers-reduced-motion: reduce) {
     .logo-tone { transition: none; }
+  }
+  /* In forced colours the logo takes its link's forced colour, as text does, never navy on a forced black. */
+  @media (forced-colors: active) {
+    .logo-tone { color: inherit; }
   }
 
   /* The logo builds (Wordmark.tsx, build): hovering or focusing the header's or the footer's home link
