@@ -1,8 +1,9 @@
 import type { CSSProperties } from "react";
 import Link from "next/link";
-import { brand, footer } from "@/lib/site";
+import { footer } from "@/lib/site";
 import { Picture } from "@/components/ui/Picture";
-import { Mark } from "@/components/ui/Wordmark";
+import { Wordmark } from "@/components/ui/Wordmark";
+import { HomeLink } from "@/components/site/HomeLink";
 
 // The round pictures that drift across the top of the footer: each one's still, its reference diameter
 // (drawn at 80% of it from 768, and at 80% of the reference's half-size phone circles, so 40%, below)
@@ -74,13 +75,10 @@ function FooterSheet() {
         <div className="mx-auto w-full max-w-grid">
           <div className="grid gap-y-8 lg:grid-cols-4 lg:items-end lg:gap-x-6">
             <div className="lg:col-span-2">
-              <Link href="/" aria-label="Lienry Drones home" data-mark-host="" className="flex w-fit items-center gap-3 rounded-hard">
-                {/* The trace in the mark's own units: about 1.4px at 36px tall, 1.6px at 44. */}
-                <Mark className="h-9 w-auto [--mark-stroke:30px] md:h-11" build />
-                <span aria-hidden="true" className="font-display text-[2.5rem] leading-none tracking-[-0.02em] md:text-[3rem]">
-                  {brand.name.split(" ")[0]}
-                </span>
-              </Link>
+              <HomeLink aria-label="Lienry Drones home" data-mark-host="" className="flex w-fit items-center rounded-hard">
+                {/* The trace in the logo's own units: about 1.3px at 48px tall, 1.5px at 60. */}
+                <Wordmark className="h-12 w-auto [--mark-stroke:26px] md:h-15" build />
+              </HomeLink>
               <p className="mt-3 max-w-none font-[family-name:var(--font-inter-italic)] text-[1.0625rem] italic tracking-[-0.01em] md:text-[1.125rem]">{footer.tagline}</p>
             </div>
             {/* Ask an AI assistant about Lienry: text pills, on one row at the right, each opening its assistant with the question filled in. */}

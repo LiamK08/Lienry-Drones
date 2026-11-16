@@ -1,43 +1,66 @@
-// The Lienry Drones mark: three building silhouettes with the flight arc cut through them.
-// Left block, centre block, right block and base. Drawn in a 529 x 785 box, filled with
-// currentColor so it follows light and dark surfaces. Source: docs/brand/lienry-mark-source.png.
-export const MARK_VIEWBOX = "0 0 529 785";
-export const MARK_PATHS = [
-  "M0 370 121 294v344A894.9 894.9 0 0 1 0 732.6Z",
-  "M159 91 296 0l96 67v82A894.9 894.9 0 0 1 159 599Z",
-  "M405 248l124 88v449H18.6A618.1 618.1 0 0 0 405 248Z",
+import type { CSSProperties } from "react";
+
+// The Lienry Drones logo, the owner's own (16 November 2026): LIENRY with DRONES set under its right-hand
+// end. Traced from the owner's file (docs/brand/lienry-logo-source.png) into a vector, one path a letter,
+// in a 4895 x 1039 box, and filled with currentColor so it follows light and dark surfaces: ink on the
+// light ground, white on the night bands and over the hero film. The master is public/brand/lienry-logo.svg;
+// the round badge (public/brand/lienry-badge.svg) is the favicon and app icon.
+export const LOGO_VIEWBOX = "0 0 4895 1039";
+export const LOGO_LETTERS = [
+  "M0 0v740h801v-94h-664v-646h-137Z", // L
+  "M864 0v740h135v-740h-135Z", // I
+  "M1085 0v740h813v-94h-677v-238h488v-92h-488v-222h677v-94h-813Z", // E
+  "M1966 0v739h122v-601l603 586l21 16h154v-740h-125v601l-598-579l-20-16l-11-6h-146Z", // N
+  "M2948 0v740h136v-308h243c242 0 247 0 267 4l16 3c53 7 73 43 75 130c1 58 11 123 28 171h140c-17-48-30-113-32-179c-1-48-8-85-21-109c-15-27-34-42-73-60l-15-6l38-18c76-43 112-115 97-198c-12-69-67-125-145-148c-30-11-62-22-105-22h-649ZM3084 94h486c24 1 36 5 45 8c126 21 135 192 11 226c-21 6-36 11-56 11h-486Z", // R
+  "M3808 0l63 65l414 412v262h136v-266l474-473h-164l-61 64l-314 314l-379-378h-169Z", // Y
+  "M2984 783c-5 3-5-1-5 123c0 125 0 120 6 123c4 1 146 2 159 0c4-1 11-2 15-2c84-12 136-69 125-139c-10-57-55-93-132-104c-13-2-163-2-168-1ZM3142 814c75 7 115 59 96 121c-10 33-46 57-93 63c-18 3-113 3-118 1c-6-3-6-1-6-93c0-92 0-90 5-93c5-2 96-2 116 1Z", // D
+  "M3312 783c-5 3-5-1-5 123c0 125 0 120 6 123c6 2 29 2 33-1l4-3v-99h86c80 1 81 1 86 3c16 6 23 17 23 39c0 18 4 46 7 54c3 7 5 7 21 8h24l-4-16c-3-14-6-38-6-53c0-16-8-33-21-43l-9-8l11-8c50-34 34-99-29-116l-14-4h-105c-87 0-105 0-108 1ZM3520 814c47 13 47 67 0 80c-7 2-158 3-164 1c-10-3-11-77-2-82c5-2 158-1 166 1Z", // R
+  "M3753 776c-73 8-126 43-141 93c-34 111 81 194 223 162c141-32 155-196 22-244c-32-11-70-15-104-11ZM3805 806c122 17 140 158 24 194c-66 20-140-1-167-47c-7-12-8-14-10-26c-17-77 56-134 153-121Z", // O
+  "M3973 782v248h39v-201l197 200h51v-247h-39v204l-166-171l-33-33h-49Z", // N
+  "M4292 782v248h259v-30h-218v-83h158v-29h-158v-76h218v-30h-259Z", // E
+  "M4656 776c-66 9-102 36-102 75c-1 44 37 62 140 70l39 4c59 6 82 21 74 48c-8 27-62 41-127 34c-40-5-71-26-82-55c-5-12-46-15-46-4c0 13 21 45 39 58c64 47 212 42 249-9c24-35 14-70-26-88c-12-6-41-13-62-15l-71-7c-57-6-81-16-84-37c-3-28 33-46 93-46c59 0 98 18 117 55c4 10 5 10 23 10h15l3-2c2-4 2-5-2-17c-22-53-106-87-190-74Z", // S
 ] as const;
 
-// Each block's class for the hover build (globals.css "The mark builds"): left, centre, right.
-const BLOCK = ["mark-l", "mark-c", "mark-r"] as const;
+// The hover build's stagger, per letter: LIENRY left to right, then DRONES a beat behind it, its line
+// drawn at a little over half the weight so the small letters keep their counters while it traces.
+const DELAY = [60, 88, 116, 144, 172, 200, 170, 184, 198, 212, 226, 240] as const;
+const SMALL = 6;
 
-/** The mark alone. The header centres it inside its home link, which carries the name. */
-export function Mark({
+/** The logo. The header and the footer set it inside their home links, which carry its name. */
+export function Wordmark({
   className = "h-7 w-auto",
   title,
   build = false,
 }: {
   className?: string;
-  /** Accessible name when the mark stands alone; leave unset inside a link or beside text that already names it. */
+  /** Accessible name when the logo stands alone; leave unset inside a link or beside text that already names it. */
   title?: string;
   /**
    * The intro in miniature: while the nearest `[data-mark-host]` (the header's and the footer's home links)
-   * is hovered or focused, each block traces its outline in the surface's accent, in the intro's order
-   * (centre, left, right), then fills back in, in about 700ms. CSS only, and none under reduced motion.
+   * is hovered or focused, each letter traces its outline in the surface's accent while its fill drops to
+   * a ghost, LIENRY left to right and then DRONES, and fills back in, in about 700ms. CSS only, and none
+   * under reduced motion (globals.css, "The logo builds").
    */
   build?: boolean;
 }) {
   return (
-    <svg className={`${className} ${build ? "mark-build" : ""}`} viewBox={MARK_VIEWBOX} fill="currentColor" role={title ? "img" : undefined} aria-hidden={title ? undefined : true}>
+    <svg
+      className={`${className} ${build ? "mark-build" : ""}`}
+      viewBox={LOGO_VIEWBOX}
+      fill="currentColor"
+      overflow="visible"
+      role={title ? "img" : undefined}
+      aria-hidden={title ? undefined : true}
+    >
       {title ? <title>{title}</title> : null}
-      {MARK_PATHS.map((d, i) =>
+      {LOGO_LETTERS.map((d, i) =>
         build ? (
-          <g key={d} className={BLOCK[i]}>
+          <g key={i} style={{ "--mark-delay": `${DELAY[i]}ms`, ...(i >= SMALL ? { "--mark-k": 0.55 } : null) } as CSSProperties}>
             <path d={d} className="mark-fill" />
             <path d={d} pathLength={1} className="mark-trace" />
           </g>
         ) : (
-          <path key={d} d={d} />
+          <path key={i} d={d} />
         ),
       )}
     </svg>

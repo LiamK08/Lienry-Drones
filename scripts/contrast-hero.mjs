@@ -36,11 +36,11 @@ const ELEMENTS =
   VW >= 1024
     ? [
         { name: "Menu buttons, white text", box: [531, 12, 909, 44], need: 4.5, gate: true, fg: [255, 255, 255] },
-        { name: "Logo, white fill", box: [24, 16, 110, 40], need: 3, gate: true, fg: [255, 255, 255] },
+        { name: "Logo, white fill", box: [24, 13, 156, 42], need: 3, gate: true, fg: [255, 255, 255] },
       ]
     : [
         { name: "Burger, white glyph", box: [VW - 52, 6, VW - 8, 50], need: 3, gate: true, fg: [255, 255, 255] },
-        { name: "Logo, white fill", box: [20, 16, 106, 40], need: 3, gate: true, fg: [255, 255, 255] },
+        { name: "Logo, white fill", box: [20, 13, 152, 42], need: 3, gate: true, fg: [255, 255, 255] },
       ];
 
 const lum = ([r, g, b]) => {

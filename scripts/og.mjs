@@ -1,4 +1,4 @@
-// Render public/og.png (1200x630) with the site's real fonts via headless Chromium.
+// Render public/og.png (1200x630) with the site's real fonts and the owner's logo via headless Chromium.
 import { createRequire } from "node:module";
 import path from "node:path";
 import { readFileSync } from "node:fs";
@@ -6,24 +6,26 @@ const require = createRequire(import.meta.url);
 let chromium;
 try { ({ chromium } = require("playwright")); } catch { ({ chromium } = require("/opt/node22/lib/node_modules/playwright")); }
 const root = path.resolve(".");
-const font = (file) => `file://${path.join(root, "src/fonts", file)}`;
-const markPath = readFileSync(path.join(root, "public/brand/lienry-mark.svg"), "utf8").match(/ d="([^"]+)"/)[1];
-const mark = (cls) => `<svg class="${cls}" viewBox="0 0 529 785" fill="currentColor"><path d="${markPath}"/></svg>`;
+// The fonts as data URLs: a page set from a string cannot load file:// fonts, and would fall back to Times.
+const font = (file) => `data:font/woff2;base64,${readFileSync(path.join(root, "src/fonts", file)).toString("base64")}`;
+// The wordmark, inlined and filled with the current colour, and the badge's ring alone, faint at the right.
+const inline = (file, cls) =>
+  readFileSync(path.join(root, "public/brand", file), "utf8")
+    .replace(/<svg ([^>]*)role="img" aria-label="[^"]*"/, `<svg class="${cls}" $1aria-hidden="true"`)
+    .replace(/fill="#141e28"/, 'fill="currentColor"');
 const html = `<!doctype html><html><head><meta charset="utf-8"><style>
-@font-face{font-family:"Instrument Serif";src:url("${font("instrument-serif-latin-400-normal.woff2")}") format("woff2");font-weight:400}
+@font-face{font-family:"PT Serif";src:url("${font("pt-serif-latin-400-normal.woff2")}") format("woff2");font-weight:400}
 @font-face{font-family:"Inter";src:url("${font("inter-latin-opsz-normal.woff2")}") format("woff2-variations");font-weight:100 900}
 html,body{margin:0}body{width:1200px;height:630px;background:#f4f6f8;color:#141e28;font-family:Inter,sans-serif;font-optical-sizing:auto;position:relative;overflow:hidden}
-.wm{position:absolute;left:72px;top:64px;display:flex;align-items:center;gap:14px;font-family:"Instrument Serif";font-size:30px;letter-spacing:-.02em}
-.wm span{font-family:Inter;font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:500;opacity:.7;margin-left:6px}
+.logo{position:absolute;left:72px;top:64px;height:44px;width:auto;display:block}
+.ring{position:absolute;right:-210px;top:40px;width:720px;height:720px;border:20px solid #141e28;border-radius:50%;box-sizing:border-box;opacity:.05}
 .line{position:absolute;left:72px;right:72px;top:236px;height:1px;background:#d5dde5}
-.label{position:absolute;left:72px;top:256px;font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#52606e}
-h1{position:absolute;left:72px;top:286px;margin:0;font-family:"Instrument Serif";font-weight:400;font-size:100px;line-height:1.02;letter-spacing:-.02em;width:960px}
+.label{position:absolute;left:72px;top:258px;font-size:15px;font-weight:500;color:#52606e}
+h1{position:absolute;left:72px;top:290px;margin:0;font-family:"PT Serif";font-weight:400;font-size:92px;line-height:1.05;letter-spacing:-.025em;width:960px}
 p{position:absolute;left:72px;top:520px;margin:0;font-size:22px;color:#52606e;width:820px;line-height:1.45}
-.mark{height:40px;width:auto;display:block}
-.big{position:absolute;right:56px;top:96px;height:560px;width:auto;color:#141e28;opacity:.06}
 </style></head><body>
-${mark("big")}
-<div class="wm">${mark("mark")}Lienry<span>Drones</span></div>
+<div class="ring"></div>
+${inline("lienry-logo.svg", "logo")}
 <div class="line"></div>
 <div class="label">Resident exterior cleaning · Sydney · Pre-launch</div>
 <h1>Clean exteriors.<br>Nobody on site.</h1>

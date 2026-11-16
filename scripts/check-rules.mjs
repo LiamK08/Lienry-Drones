@@ -25,7 +25,7 @@
 //     --font-inter and --font-inter-italic); every h1-h3 is in PT Serif; PT Serif italic only inside an
 //     em or i, and Inter italic only on the footer tagline; [data-button], form fields (input, select,
 //     textarea, option) with their labels and legends, .eyebrow, .label and [data-prose] paragraphs are
-//     never in the serif (display lines, the menus and the footer logo may be); the fonts loaded are
+//     never in the serif (display lines and the menus may be); the fonts loaded are
 //     files of src/fonts from the site's own origin (compared by content).
 //  7  Type: the tokens compute to CLAUDE.md's sizes (--text-h1 40/30, --text-h2 48/31, --text-h2s 36/30,
 //     --text-h3 32/26, --text-label 12, --text-body 16 at 1440/390); every h1 in <main> is on the h1

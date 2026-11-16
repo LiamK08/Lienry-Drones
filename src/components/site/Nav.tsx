@@ -6,7 +6,8 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 import { featureLink, menus, navAbout } from "@/lib/site";
 import { useScrolledPast } from "@/lib/hooks";
-import { Mark } from "@/components/ui/Wordmark";
+import { Wordmark } from "@/components/ui/Wordmark";
+import { HomeLink } from "@/components/site/HomeLink";
 import { MenuPanel } from "@/components/site/MenuPanel";
 import { MenuTile } from "@/components/site/MenuTile";
 
@@ -20,15 +21,12 @@ function Chevron({ open }: { open: boolean }) {
   );
 }
 
-/** The logo: the mark and the name, as the link home. Hovered or focused, the mark builds as in the intro. */
-function Logo({ className = "" }: { className?: string }) {
+/** The logo, as the link home (back to the top on the home page). Hovered or focused, its letters build as in the intro. */
+function Logo({ className = "", onClick }: { className?: string; onClick?: () => void }) {
   return (
-    <Link href="/" aria-label="Lienry Drones home" data-mark-host="" className={`flex items-center gap-2 rounded-hard ${className}`}>
-      <Mark className="h-6 w-auto" build />
-      <span aria-hidden="true" className="font-display text-[1.375rem] leading-none tracking-[-0.01em]">
-        Lienry
-      </span>
-    </Link>
+    <HomeLink aria-label="Lienry Drones home" data-mark-host="" onClick={onClick} className={`flex items-center rounded-hard ${className}`}>
+      <Wordmark className="h-7 w-auto" build />
+    </HomeLink>
   );
 }
 
@@ -215,7 +213,13 @@ export function Nav() {
       {/* The bar's own rail, wider than the content's: 87rem (--container-wide) inside the page margin, so the
           logo and the menus hold their places while the pages read on the 75rem content rail. */}
       <nav aria-label="Primary" className="relative mx-auto flex h-full max-w-[calc(var(--container-wide)+2*var(--page-margin))] items-center px-(--page-margin)" onMouseLeave={hoverClose}>
-        <Logo />
+        {/* On the home page the logo goes back to the top, so it closes whatever menu is open on its way. */}
+        <Logo
+          onClick={() => {
+            setOpen(false);
+            setMenu(null);
+          }}
+        />
         <ul className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 lg:flex">
           {menus.map((m) => (
             <li key={m.id} onMouseEnter={(e) => hoverOpen(m.id, e.timeStamp)}>

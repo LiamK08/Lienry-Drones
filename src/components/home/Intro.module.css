@@ -1,18 +1,21 @@
 /*
- * The first-visit intro (Intro.tsx). Hidden unless the head script sets data-intro="play" on <html>.
- * Timeline, in seconds from the first paint:
+ * The first-visit intro (Intro.tsx), drawn in the owner's logo. Hidden unless the head script sets
+ * data-intro="play" on <html>. Timeline, in seconds from the first paint:
  *   0.05  corner ticks and the three guide curves draw in
- *   0.30  drones set off from well off screen (0.30, 0.45, 0.60); they arrive at 1.30, 1.45, 1.60
- *         and trace their blocks in the accent, the outline drawn under them
- *   2.00  the centre and left blocks fill, their drones dock (fade); 2.45 the right block fills and
- *         its drone leaves along the flight arc, drawing it, until 2.95
- *   2.75  the mark turns ink; it fades from 3.15, a little ahead of the paper, which fades from 3.30
- *         (the film starts again from its first frame) to 3.95, so the mark is gone before the hero's
- *         headline shows through (at 1920x1080 it sits behind the mark)
+ *   0.25  drones set off from well off screen (0.25, 0.40, 0.55); they arrive at 1.15, 1.30, 1.45
+ *         at the top-left corners of E, R and L and trace two letters each in the accent (E then N,
+ *         R then Y, L then I), the outline drawn under them, each letter filling as its outline closes;
+ *         the traces end at 2.44, 2.39 and 2.41
+ *   2.20  DRONES draws in under them, letter by letter, and fills
+ *         the E and L drones dock (fade) on their last letters; the R drone leaves from the top of the Y
+ *         along the flight arc, drawing it, from 2.39 to 2.89 (the line gone by 3.04)
+ *   2.75  the logo turns ink; it fades from 3.15, a little ahead of the paper, which fades from 3.30
+ *         (the film starts again from its first frame) to 3.95, so the logo is gone before the hero's
+ *         headline shows through
  *   4.15  the overlay hides itself (introEnd), and the head script clears data-intro
- * Each drone moves along one path (approach, its block's outline, then a dock or an exit), keyed at the
- * share of the path's length where each stage ends (measured in Chromium), so the outline is drawn
- * exactly under the drone.
+ * Each drone moves along one path (approach, its first letter's outline, a hop, its second letter's
+ * outline, then a dock or an exit), keyed at the share of the path's length where each stage ends
+ * (measured in Chromium), so the outline is drawn exactly under the drone.
  */
 
 .overlay {
@@ -84,14 +87,14 @@
   border-bottom: 1px solid;
 }
 
-/* The mark's own box, centred; three quarters of its size below 768. */
+/* The logo's own box, centred; three quarters of its size below 768. */
 .stage {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 86.26px;
-  height: 128px;
-  margin: -64px 0 0 -43.13px;
+  width: 340px;
+  height: 72.17px;
+  margin: -36.085px 0 0 -170px;
   transform: scale(0.75);
 }
 @media (min-width: 48rem) {
@@ -104,8 +107,8 @@
 .mark {
   position: absolute;
   inset: 0;
-  width: 86.26px;
-  height: 128px;
+  width: 340px;
+  height: 72.17px;
   overflow: visible;
 }
 
@@ -121,13 +124,13 @@
     fadeOut 500ms 1400ms forwards;
 }
 .g1 {
-  animation-delay: 50ms, 1400ms;
+  animation-delay: 50ms, 1350ms;
 }
 .g2 {
   animation-delay: 150ms, 1450ms;
 }
 .g3 {
-  animation-delay: 100ms, 1500ms;
+  animation-delay: 100ms, 1550ms;
 }
 
 .trail {
@@ -138,11 +141,11 @@
   stroke-dasharray: 1 1;
   stroke-dashoffset: 1;
   animation:
-    draw 500ms 2450ms cubic-bezier(0.5, 0.04, 0.85, 0.5) forwards,
-    fadeOut 300ms 2950ms forwards;
+    draw 500ms 2390ms cubic-bezier(0.5, 0.04, 0.85, 0.5) forwards,
+    fadeOut 220ms 2820ms forwards;
 }
 
-/* The mark: accent while it is built, ink once whole, then gone just ahead of the paper. */
+/* The logo: accent while it is built, ink once whole, then gone just ahead of the paper. */
 .mark {
   color: var(--color-accent);
   transform-origin: 50% 50%;
@@ -158,36 +161,113 @@
 .outline {
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.5;
+  stroke-width: 1.25;
   stroke-linejoin: round;
   stroke-dasharray: 1 1;
   stroke-dashoffset: 1;
 }
+.small .outline {
+  stroke-width: 0.75;
+}
 
-/* Each block: its outline drawn while its drone traces it, then the fill takes over from the line. */
-.blockC .outline {
+/* Each letter of LIENRY: its outline drawn while its drone traces it, then the fill takes over from the line. */
+.big0 .outline {
   animation:
-    draw 700ms 1300ms linear forwards,
-    fadeOut 300ms 2000ms forwards;
+    draw 535ms 1450ms linear forwards,
+    fadeOut 300ms 1985ms forwards;
 }
-.blockC .fill {
-  animation: fillIn 300ms 2000ms var(--ease-instrument) forwards;
+.big0 .fill {
+  animation: fillIn 300ms 1985ms var(--ease-instrument) forwards;
 }
-.blockR .outline {
+.big1 .outline {
   animation:
-    draw 850ms 1600ms linear forwards,
-    fadeOut 300ms 2450ms forwards;
+    draw 304ms 2105ms linear forwards,
+    fadeOut 300ms 2409ms forwards;
 }
-.blockR .fill {
-  animation: fillIn 300ms 2450ms var(--ease-instrument) forwards;
+.big1 .fill {
+  animation: fillIn 300ms 2409ms var(--ease-instrument) forwards;
 }
-.blockL .outline {
+.big2 .outline {
   animation:
-    draw 550ms 1450ms linear forwards,
-    fadeOut 300ms 2000ms forwards;
+    draw 609ms 1150ms linear forwards,
+    fadeOut 300ms 1759ms forwards;
 }
-.blockL .fill {
-  animation: fillIn 300ms 2000ms var(--ease-instrument) forwards;
+.big2 .fill {
+  animation: fillIn 300ms 1759ms var(--ease-instrument) forwards;
+}
+.big3 .outline {
+  animation:
+    draw 556ms 1879ms linear forwards,
+    fadeOut 300ms 2435ms forwards;
+}
+.big3 .fill {
+  animation: fillIn 300ms 2435ms var(--ease-instrument) forwards;
+}
+.big4 .outline {
+  animation:
+    draw 515ms 1300ms linear forwards,
+    fadeOut 300ms 1815ms forwards;
+}
+.big4 .fill {
+  animation: fillIn 300ms 1815ms var(--ease-instrument) forwards;
+}
+.big5 .outline {
+  animation:
+    draw 455ms 1935ms linear forwards,
+    fadeOut 300ms 2390ms forwards;
+}
+.big5 .fill {
+  animation: fillIn 300ms 2390ms var(--ease-instrument) forwards;
+}
+
+/* DRONES, without drones: each letter's outline in turn, then its fill. */
+.small0 .outline {
+  animation:
+    draw 300ms 2200ms linear forwards,
+    fadeOut 250ms 2500ms forwards;
+}
+.small0 .fill {
+  animation: fillIn 250ms 2500ms var(--ease-instrument) forwards;
+}
+.small1 .outline {
+  animation:
+    draw 300ms 2235ms linear forwards,
+    fadeOut 250ms 2535ms forwards;
+}
+.small1 .fill {
+  animation: fillIn 250ms 2535ms var(--ease-instrument) forwards;
+}
+.small2 .outline {
+  animation:
+    draw 300ms 2270ms linear forwards,
+    fadeOut 250ms 2570ms forwards;
+}
+.small2 .fill {
+  animation: fillIn 250ms 2570ms var(--ease-instrument) forwards;
+}
+.small3 .outline {
+  animation:
+    draw 300ms 2305ms linear forwards,
+    fadeOut 250ms 2605ms forwards;
+}
+.small3 .fill {
+  animation: fillIn 250ms 2605ms var(--ease-instrument) forwards;
+}
+.small4 .outline {
+  animation:
+    draw 300ms 2340ms linear forwards,
+    fadeOut 250ms 2640ms forwards;
+}
+.small4 .fill {
+  animation: fillIn 250ms 2640ms var(--ease-instrument) forwards;
+}
+.small5 .outline {
+  animation:
+    draw 300ms 2375ms linear forwards,
+    fadeOut 250ms 2675ms forwards;
+}
+.small5 .fill {
+  animation: fillIn 250ms 2675ms var(--ease-instrument) forwards;
 }
 
 .drone {
@@ -214,15 +294,16 @@
 
 /*
  * The approaches start some 2000px out, past the edge of any screen, and fade in as they set off; they
- * cover the off-screen part fast and slow to about 220px/s on arrival, so each is in view for about
- * 0.75s at 1440 (0.6s at 390); the traces run at about 330px/s. The right-hand drone accelerates
- * away along the flight arc, some 2100px, and fades as it goes.
+ * cover the off-screen part fast and slow on arrival. The traces run at a steady pace each (the E drone
+ * at about 620px/s, the R drone 520 and the L drone 400 at 1440, three quarters of that on a phone), so
+ * all three finish within a few hundredths of a second; the hops between letters take 120ms. The R drone
+ * accelerates away along the flight arc, some 2100px, and fades as it goes.
  */
-.droneC {
-  offset-path: path("M1112.88 -1601.81 C892.88 -677.81 25.93 -589.81 25.93 14.84 L48.26 0 L63.92 10.92 L63.92 24.3 A145.92 145.92 0 0 1 25.93 97.67 L25.93 14.84");
-  animation: flyC 1950ms 300ms both;
+.droneE {
+  offset-path: path("M1112.88 -1601.81 C892.88 -677.81 75.36 -589.81 75.36 0 L75.36 51.4 L131.83 51.4 L131.83 44.87 L84.81 44.87 L84.81 28.34 L118.7 28.34 L118.7 21.95 L84.81 21.95 L84.81 6.53 L131.83 6.53 L131.83 0 L75.36 0 L75.36 0 Q105.96 -12 136.56 0 L136.56 51.33 L145.03 51.33 L145.03 9.59 L186.91 50.29 L188.37 51.4 L199.07 51.4 L199.07 0 L190.39 0 L190.39 41.74 L148.85 1.53 L147.46 0.42 L146.7 0 L136.56 0 L136.56 0");
+  animation: flyE 2485ms 250ms both;
 }
-@keyframes flyC {
+@keyframes flyE {
   0% {
     offset-distance: 0%;
     opacity: 0;
@@ -231,11 +312,19 @@
   4% {
     opacity: 1;
   }
-  51.28% {
-    offset-distance: 89.85%;
+  36.21% {
+    offset-distance: 71.36%;
     animation-timing-function: linear;
   }
-  87.18% {
+  60.72% {
+    offset-distance: 85.13%;
+    animation-timing-function: ease-in-out;
+  }
+  65.55% {
+    offset-distance: 87.42%;
+    animation-timing-function: linear;
+  }
+  87.93% {
     offset-distance: 100%;
     opacity: 1;
     scale: 1;
@@ -249,8 +338,8 @@
 }
 
 .droneR {
-  offset-path: path("M1900.75 677.47 C1064.75 677.47 492.75 40.44 66.04 40.44 L86.26 54.79 L86.26 128 L3.03 128 A100.79 100.79 0 0 0 66.04 40.44 C75.63 -115.14 310.34 -376.7 1870.34 -1000.7");
-  animation: flyR 2350ms 600ms both;
+  offset-path: path("M1900.75 677.47 C1064.75 677.47 480 -120 204.76 0 L204.76 51.4 L214.21 51.4 L214.21 30.01 L231.09 30.01 C247.9 30.01 248.25 30.01 249.63 30.28 L250.75 30.49 C254.43 30.98 255.82 33.48 255.96 39.52 C256.02 43.55 256.72 48.07 257.9 51.4 L267.62 51.4 C266.44 48.07 265.54 43.55 265.4 38.97 C265.33 35.63 264.85 33.06 263.94 31.4 C262.9 29.52 261.58 28.48 258.87 27.23 L257.83 26.81 L260.47 25.56 C265.75 22.57 268.25 17.57 267.21 11.81 C266.37 7.02 262.55 3.13 257.14 1.53 C255.05 0.76 252.83 0 249.84 0 L204.76 0 L204.76 0 Q234.63 -12 264.5 0 L268.87 4.51 L297.63 33.13 L297.63 51.33 L307.08 51.33 L307.08 32.85 L340 0 L328.61 0 L324.37 4.45 L302.56 26.26 L276.24 0 L264.5 0 L264.5 0 C274 -150 520 -420 2080 -1040");
+  animation: flyR 2490ms 400ms both;
 }
 @keyframes flyR {
   0% {
@@ -261,12 +350,20 @@
   4% {
     opacity: 1;
   }
-  42.55% {
-    offset-distance: 44.79%;
+  36.15% {
+    offset-distance: 40.85%;
     animation-timing-function: linear;
   }
-  78.72% {
-    offset-distance: 51.52%;
+  56.81% {
+    offset-distance: 46.71%;
+    animation-timing-function: ease-in-out;
+  }
+  61.63% {
+    offset-distance: 48.06%;
+    animation-timing-function: linear;
+  }
+  79.92% {
+    offset-distance: 53.25%;
     animation-timing-function: cubic-bezier(0.5, 0.04, 0.85, 0.5);
   }
   92% {
@@ -279,8 +376,8 @@
 }
 
 .droneL {
-  offset-path: path("M-1584 1071.6 C-660 1159.6 -352 60.33 0 60.33 L19.73 47.94 L19.73 104.03 A145.92 145.92 0 0 1 0 119.46 L0 60.33");
-  animation: flyL 1800ms 450ms both;
+  offset-path: path("M-1584 1071.6 C-660 1159.6 -352 0 0 0 L0 51.4 L55.64 51.4 L55.64 44.87 L9.52 44.87 L9.52 0 L0 0 L0 0 Q30.01 -12 60.01 0 L60.01 51.4 L69.39 51.4 L69.39 0 L60.01 0 L60.01 0");
+  animation: flyL 2159ms 550ms both;
 }
 @keyframes flyL {
   0% {
@@ -291,8 +388,16 @@
   4% {
     opacity: 1;
   }
-  55.56% {
-    offset-distance: 92.32%;
+  41.68% {
+    offset-distance: 83.46%;
+    animation-timing-function: linear;
+  }
+  66.47% {
+    offset-distance: 92.37%;
+    animation-timing-function: ease-in-out;
+  }
+  72.03% {
+    offset-distance: 94.94%;
     animation-timing-function: linear;
   }
   86.11% {

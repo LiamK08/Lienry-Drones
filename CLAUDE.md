@@ -38,7 +38,7 @@ debris, and with the fit check's soft red (`fit-*` tokens) a Partly or a No and 
 a second accent. Section heads may be centred.
 
 Type: two families only, both open-licensed and self-hosted: PT Serif (regular and italic) for
-headings, display lines and the footer logo, and Inter for everything else (its italic only in the
+headings and display lines, and Inter for everything else (its italic only in the
 footer tagline, loaded on demand). FAQ questions are display lines: PT Serif at 20px (18 on
 phones) on hairline rows. Sizes follow the reference: page titles 40px (30 on phones), home
 section titles 48px (36), inner section titles 36px (36), card and row titles 32px (30), with tight
@@ -47,6 +47,15 @@ trailing phrase, at most one per band and only in the heading that labels it (ch
 light bands, the night's pale glass blue on night panels and the heading's white on the accent close (the
 owner, 7 November 2026). A section's h2 set at the page-title step drops to 36px on phones. No eyebrows: headings stand alone,
 with no label above them (the owner's call, 21 October 2026). The header carries no pills.
+
+Logo (the owner's own, 16 November 2026): the LIENRY wordmark with DRONES under its right-hand end, and
+the round badge that sets it in a ring. Both are traced from the owner's files (`docs/brand`) into
+vectors (`public/brand/lienry-logo.svg`, `public/brand/lienry-badge.svg`) and never redrawn, re-set in a
+font or recoloured: the wordmark fills with the surface's ink or white (currentColor), so it stays
+monochrome like the reference's. The wordmark is the header's and the footer's link home
+(`src/components/ui/Wordmark.tsx`; 28px tall in the bar, 48px and 60px in the footer); the badge is the
+favicon, the app icons and the JSON-LD logo (`scripts/icons.mjs`), and the share image carries the
+wordmark (`scripts/og.mjs`). It is artwork, not text, so the type rules above do not reach it.
 
 Shape: buttons are pills (`rounded-pill`, optional round arrow badge) in one system: `md` for a page's calls
 to action, `lg` only for form submits, `sm` only inside app UI; icon buttons are round. Cards are `rounded-card`
@@ -73,18 +82,19 @@ its card's question column (the owner's brief, 26 October 2026). Check 21 encode
 the header (with its dim page scrim while a desktop menu is open), the skip link and, while it plays, the intro's overlay.
 
 Intro (the owner's brief, 28 October 2026): when a browser session starts on the home page, a first-visit
-intro plays over it, after breakerindustries.com's loader in Lienry's own mark, colours and code: on the
-paper, three drones fly in on guide curves and trace the mark's blocks in the accent while they fill, one
-leaving along the flight arc; the mark turns ink and fades as the paper fades into the hero film, which
-starts again from its first frame. About four seconds, never past five, all CSS
+intro plays over it, after breakerindustries.com's loader in Lienry's own logo, colours and code: on the
+paper, three drones fly in on guide curves and trace the letters of LIENRY in the accent, two each, while
+each letter fills behind its drone, DRONES draws in under them, and one drone leaves along a flight arc;
+the logo turns ink and fades as the paper fades into the hero film, which starts again from its first
+frame. About four seconds, never past five, all CSS
 (`src/components/home/Intro.tsx`; the head script in `src/lib/intro.ts` sets `data-intro` before the
 first paint). Once per session (sessionStorage), never on another entry page, a reload, a visit from
 another page of the site (a home tab opened from inside it), an address with a hash, or under reduced
 motion. Any key, press, wheel, touch or scroll ends it at once (a text-fragment link scrolls the page, so
 it ends at once too), and a press that ends it while the paper still covers the page never clicks or
 hovers what was under it. It is aria-hidden with nothing focusable, and the page renders underneath as normal (never
-hidden or inert), so it never delays the LCP. The header's and the footer's marks echo the build in miniature on
-hover and keyboard focus (CSS, about 700ms, none under reduced motion).
+hidden or inert), so it never delays the LCP. The header's and the footer's logos echo the build in miniature on
+hover and keyboard focus, letter by letter (CSS, about 700ms, none under reduced motion).
 
 Page entrances (28 October 2026): moving to another page of the site brings the new page in, a fade and an 8px
 rise on `<main>` over about a quarter of a second, never past 300ms (`src/components/site/PageTransition.tsx`),
