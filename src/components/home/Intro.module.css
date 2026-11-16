@@ -9,7 +9,7 @@
  *   2.20  DRONES draws in under them, letter by letter, and fills
  *         the E and L drones dock (fade) on their last letters; the R drone leaves from the top of the Y
  *         along the flight arc, drawing it, from 2.39 to 2.89 (the line gone by 3.04)
- *   2.75  the logo turns ink; it fades from 3.15, a little ahead of the paper, which fades from 3.30
+ *   2.75  the logo turns navy; it fades from 3.15, a little ahead of the paper, which fades from 3.30
  *         (the film starts again from its first frame) to 3.95, so the logo is gone before the hero's
  *         headline shows through
  *   4.15  the overlay hides itself (introEnd), and the head script clears data-intro
@@ -145,14 +145,14 @@
     fadeOut 220ms 2820ms forwards;
 }
 
-/* The logo: accent while it is built, ink once whole, then gone just ahead of the paper. Every line here
+/* The logo: accent while it is built, the owner's navy once whole, then gone just ahead of the paper. Every line here
    is dashed 1 on, 2 off with pathLength 1, so an undrawn line (offset 1) sits wholly in the gap even
    where Chromium measures a closed contour a touch longer than 1, which would leave a dot at its start. */
 .mark {
   color: var(--color-accent);
   transform-origin: 50% 50%;
   animation:
-    toInk 350ms 2750ms var(--ease-instrument) forwards,
+    toNavy 350ms 2750ms var(--ease-instrument) forwards,
     markOut 450ms 3150ms var(--ease-instrument) forwards;
 }
 
@@ -435,9 +435,9 @@
     opacity: 0;
   }
 }
-@keyframes toInk {
+@keyframes toNavy {
   to {
-    color: var(--color-ink);
+    color: var(--color-logo);
   }
 }
 @keyframes markOut {

@@ -31,7 +31,7 @@ reasons row (`data-rail="wide"`, so its five resting cards hold their titles); t
 content rail; full-bleed media, band grounds and the strips run edge to edge (the owner, 7 November 2026). Colour is Glass and sky (the owner's palette, 28 October 2026): cool slate neutrals, a white ground, a
 cool mist paper band and a pale glass-blue tint; Lienry's glass blue (`--color-accent` #1f5d8c) is the one
 accent, its lighter step (`--color-accent-on-night`) filling buttons on the dark bands; deep slate night
-(#111a22) for every dark band, the strip and the footer. Every colour comes from that palette: a token in
+(#111a22) for every dark band, the strip and the footer. Every colour comes from that palette (and the logo's own navy, below): a token in
 `globals.css`, or, where a value has to be literal (scrims and shadows, SVG and 3D map colours), the palette's
 own value; nothing warm is left but the honest status tones and the 3D scene's daylight. Status tones are not accents: the debris amber marks
 debris, and with the fit check's soft red (`fit-*` tokens) a Partly or a No and the score's zones; never
@@ -51,10 +51,11 @@ with no label above them (the owner's call, 21 October 2026). The header carries
 Logo (the owner's own, 16 November 2026): the LIENRY wordmark with DRONES under its right-hand end, and
 the round badge that sets it in a ring. Both are traced from the owner's files (`docs/brand`) into
 vectors (`public/brand/lienry-logo.svg`, `public/brand/lienry-badge.svg`); its letterforms are never
-redrawn or re-set in a font. The owner's files are navy (about #0a0a6d), which is not in the palette, so
-the site shows the logo in one colour, like the reference's: the surface's ink (#141e28) on light
-grounds and white on the night bands and the hero film (currentColor). Only the favicons thicken the
-badge's ring, so it holds at tab sizes (`src/app/icon.svg`, `scripts/icons.mjs`). The wordmark is the header's and the footer's link home
+redrawn or re-set in a font. It is the owner's navy (`--color-logo`, #0a0a6d; the owner's call, 16 November
+2026) on light grounds, and white on the night bands and over the hero film, where navy would not read
+(`--s-logo`); the navy is the logo's alone, never an accent or a colour for anything else. The favicons,
+app icons and share image carry it in navy too; only the favicons thicken the badge's ring, so it holds
+at tab sizes (`src/app/icon.svg`, `scripts/icons.mjs`). The wordmark is the header's and the footer's link home
 (`src/components/ui/Wordmark.tsx`; 28px tall in the bar, 48px and 60px in the footer); the badge is the
 favicon, the app icons and the JSON-LD logo (`scripts/icons.mjs`), and the share image carries the
 wordmark (`scripts/og.mjs`). It is artwork, not text, so the type rules above do not reach it.
@@ -87,7 +88,7 @@ Intro (the owner's brief, 28 October 2026): when a browser session starts on the
 intro plays over it, after breakerindustries.com's loader in Lienry's own logo, colours and code: on the
 paper, three drones fly in on guide curves and trace the letters of LIENRY in the accent, two each, while
 each letter fills behind its drone, DRONES draws in under them, and one drone leaves along a flight arc;
-the logo turns ink and fades as the paper fades into the hero film, which starts again from its first
+the logo turns navy and fades as the paper fades into the hero film, which starts again from its first
 frame. About four seconds, never past five, all CSS
 (`src/components/home/Intro.tsx`; the head script in `src/lib/intro.ts` sets `data-intro` before the
 first paint). Once per session (sessionStorage), never on another entry page, a reload, a visit from

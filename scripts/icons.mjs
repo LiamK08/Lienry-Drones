@@ -6,7 +6,8 @@ import { readFileSync, writeFileSync } from "node:fs";
 import sharp from "sharp";
 
 const PLASTER = "#f4f6f8";
-const INK = "#141e28";
+// The owner's navy, the logo's own colour.
+const NAVY = "#0a0a6d";
 const WHITE = "#ffffff";
 
 // The badge's letters, as set in the master: everything but its ring, in the master's 1000 x 1000 box.
@@ -30,7 +31,7 @@ function tile(size, scale, { ground = null, ring = null } = {}) {
   ${ground ? `<rect width="${size}" height="${size}" fill="${ground}"/>` : ""}
   <svg x="${o}" y="${o}" width="${d}" height="${d}" viewBox="0 0 1000 1000">
     <circle cx="500" cy="500" r="${500 - thick / 2}" fill="${WHITE}"/>
-    <g fill="${INK}"><path fill-rule="evenodd" d="${ringPath(thick)}"/>${letters}</g>
+    <g fill="${NAVY}"><path fill-rule="evenodd" d="${ringPath(thick)}"/>${letters}</g>
   </svg>
 </svg>`;
 }
@@ -95,7 +96,7 @@ writeFileSync(
     2,
   ) + "\n",
 );
-// The masters as rasters, ink on transparent.
+// The masters as rasters, navy on transparent.
 await sharp(Buffer.from(badge)).resize({ width: 1024 }).png().toFile("public/brand/lienry-badge-1024.png");
 await sharp(Buffer.from(readFileSync("public/brand/lienry-logo.svg"))).resize({ width: 1024 }).png().toFile("public/brand/lienry-logo-1024.png");
 console.log("wrote favicon-16x16.png, favicon-32x32.png, apple-touch-icon.png, icon-192.png, icon-512.png, favicon.ico, site.webmanifest, brand/lienry-badge-1024.png, brand/lienry-logo-1024.png");

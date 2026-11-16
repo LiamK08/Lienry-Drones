@@ -2,8 +2,8 @@ import type { CSSProperties } from "react";
 
 // The Lienry Drones logo, the owner's own (16 November 2026): LIENRY with DRONES set under its right-hand
 // end. Traced from the owner's file (docs/brand/lienry-logo-source.png) into a vector, one path a letter,
-// in a 4895 x 1039 box, and filled with currentColor so it follows light and dark surfaces: ink on the
-// light ground, white on the night bands and over the hero film. The master is public/brand/lienry-logo.svg;
+// in a 4895 x 1039 box. It is the owner's navy on light grounds and white on the night bands and over the
+// hero film (globals.css, .logo-tone and --s-logo). The master is public/brand/lienry-logo.svg;
 // the round badge (public/brand/lienry-badge.svg) is the favicon and app icon.
 export const LOGO_VIEWBOX = "0 0 4895 1039";
 export const LOGO_LETTERS = [
@@ -45,7 +45,7 @@ export function Wordmark({
 }) {
   return (
     <svg
-      className={`${className} ${build ? "mark-build" : ""}`}
+      className={`logo-tone ${className} ${build ? "mark-build" : ""}`}
       viewBox={LOGO_VIEWBOX}
       fill="currentColor"
       overflow="visible"

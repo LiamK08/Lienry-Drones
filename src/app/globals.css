@@ -19,6 +19,8 @@
   --color-accent-on-night: #2c71a5;
   --color-sunken: #e3e9ef;
   --color-ink: #141e28;
+  /* The owner's navy, the logo's own colour (16 November 2026): the logo on light grounds and nothing else. */
+  --color-logo: #0a0a6d;
   --color-ink-raised: #1d2834;
   /* Primary hover on light: white label 10.45:1. */
   --color-ink-hover: #33414f;
@@ -196,6 +198,7 @@
     --s-line: var(--color-line);
     --s-error: var(--color-debris-text);     /* 6.37 plaster, 5.88 raised */
     --s-media: var(--color-sunken);
+    --s-logo: var(--color-logo);             /* 16.44 plaster */
   }
   .surface-raised { --s-bg: var(--color-raised); background-color: var(--color-raised); color: var(--s-fg); }
   .surface-sunken { --s-bg: var(--color-sunken); --s-media: var(--color-plaster); background-color: var(--color-sunken); color: var(--s-fg); }
@@ -221,6 +224,7 @@
     --s-line: rgb(255 255 255 / 0.12);
     --s-error: var(--color-debris-on-dark);  /* 5.92 / 5.25 */
     --s-media: var(--color-ink-raised);
+    --s-logo: currentColor;                  /* the logo is white on dark grounds and over film */
   }
   .surface-ink-raised { --s-bg: var(--color-ink-raised); background-color: var(--color-ink-raised); color: var(--s-fg); }
 
@@ -587,6 +591,16 @@
 
   .no-scrollbar::-webkit-scrollbar {
     display: none;
+  }
+
+  /* The logo's colour (Wordmark.tsx): the owner's navy on light grounds, the surface's white on dark ones
+     and over the hero film (--s-logo), following the header's own colour change as it scrolls. */
+  .logo-tone {
+    color: var(--s-logo);
+    transition: color 200ms var(--ease-instrument);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .logo-tone { transition: none; }
   }
 
   /* The logo builds (Wordmark.tsx, build): hovering or focusing the header's or the footer's home link

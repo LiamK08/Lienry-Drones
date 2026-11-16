@@ -8,17 +8,17 @@ try { ({ chromium } = require("playwright")); } catch { ({ chromium } = require(
 const root = path.resolve(".");
 // The fonts as data URLs: a page set from a string cannot load file:// fonts, and would fall back to Times.
 const font = (file) => `data:font/woff2;base64,${readFileSync(path.join(root, "src/fonts", file)).toString("base64")}`;
-// The wordmark, inlined and filled with the current colour, and the badge's ring alone, faint at the right.
+// The wordmark in the owner's navy, inlined, and the badge's ring alone, faint at the right.
 const inline = (file, cls) =>
   readFileSync(path.join(root, "public/brand", file), "utf8")
     .replace(/<svg ([^>]*)role="img" aria-label="[^"]*"/, `<svg class="${cls}" $1aria-hidden="true"`)
-    .replace(/fill="#141e28"/, 'fill="currentColor"');
+    .replace(/fill="#0a0a6d"/, 'fill="currentColor"');
 const html = `<!doctype html><html><head><meta charset="utf-8"><style>
 @font-face{font-family:"PT Serif";src:url("${font("pt-serif-latin-400-normal.woff2")}") format("woff2");font-weight:400}
 @font-face{font-family:"Inter";src:url("${font("inter-latin-opsz-normal.woff2")}") format("woff2-variations");font-weight:100 900}
 html,body{margin:0}body{width:1200px;height:630px;background:#f4f6f8;color:#141e28;font-family:Inter,sans-serif;font-optical-sizing:auto;position:relative;overflow:hidden}
-.logo{position:absolute;left:72px;top:64px;height:44px;width:auto;display:block}
-.ring{position:absolute;right:-210px;top:40px;width:720px;height:720px;border:20px solid #141e28;border-radius:50%;box-sizing:border-box;opacity:.05}
+.logo{position:absolute;left:72px;top:64px;height:44px;width:auto;display:block;color:#0a0a6d}
+.ring{position:absolute;right:-210px;top:40px;width:720px;height:720px;border:20px solid #0a0a6d;border-radius:50%;box-sizing:border-box;opacity:.05}
 .line{position:absolute;left:72px;right:72px;top:236px;height:1px;background:#d5dde5}
 .label{position:absolute;left:72px;top:258px;font-size:15px;font-weight:500;color:#52606e}
 h1{position:absolute;left:72px;top:290px;margin:0;font-family:"PT Serif";font-weight:400;font-size:92px;line-height:1.05;letter-spacing:-.025em;width:960px}

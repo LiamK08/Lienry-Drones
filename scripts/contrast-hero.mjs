@@ -26,6 +26,8 @@ const VH = Number(process.argv[4] ?? 900);
 const INK = [0x14, 0x1e, 0x28];
 const PLASTER = [0xff, 0xff, 0xff];
 const MUTED = [0x52, 0x60, 0x6e];
+// The owner's navy, the logo's colour on the white bar (--color-logo).
+const NAVY = [0x0a, 0x0a, 0x6d];
 const VEIL = 0.3;
 const scrimAt = (y) =>
   y <= 56 ? 0.5 : y <= 140 ? 0.5 + (0.26 - 0.5) * ((y - 56) / 84) : y <= 220 ? 0.26 * (1 - (y - 140) / 80) : 0;
@@ -113,6 +115,7 @@ console.log("\nSolid bar, used on every other route and on the home page past 80
 console.table([
   { pair: "ink link on white", ratio: `${ratio(INK, PLASTER).toFixed(2)}:1`, target: "4.5:1", result: ratio(INK, PLASTER) >= 4.5 ? "PASS" : "FAIL" },
   { pair: "muted text on white", ratio: `${ratio(MUTED, PLASTER).toFixed(2)}:1`, target: "4.5:1", result: ratio(MUTED, PLASTER) >= 4.5 ? "PASS" : "FAIL" },
+  { pair: "navy logo on white", ratio: `${ratio(NAVY, PLASTER).toFixed(2)}:1`, target: "3:1", result: ratio(NAVY, PLASTER) >= 3 ? "PASS" : "FAIL" },
 ]);
 
 // Gate 3: the header switches its surface and ink together. Any interpolation can

@@ -40,7 +40,7 @@ function Drone({ className }: { className: string }) {
  * The first-visit intro, after the owner's brief of 28 October 2026, drawn in the owner's logo (16 November
  * 2026): the paper with fine corner ticks, three drones flying in on faint guide curves, each tracing two
  * letters of LIENRY in the accent while each letter fills behind it (E and N, R and Y, L and I), DRONES
- * drawing in under them, the right-hand drone leaving along the flight arc; the logo turns ink and fades as
+ * drawing in under them, the right-hand drone leaving along the flight arc; the logo turns navy and fades as
  * the paper fades into the hero film, which starts again from its first frame. About four seconds, all CSS.
  *
  * It is server-rendered on the home page and hidden until the head script (src/lib/intro.ts) sets

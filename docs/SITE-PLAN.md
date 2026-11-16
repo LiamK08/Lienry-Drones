@@ -35,7 +35,7 @@ Original identity, not derived from Legora's palette, typeface or button languag
 
 ### Logo
 
-The logo is the owner's (16 November 2026): the LIENRY wordmark with DRONES set under its right-hand end, and a round badge that sets it in a ring. Both are traced into vectors (`public/brand/lienry-logo.svg`, `public/brand/lienry-badge.svg`) from the owner's files in `docs/brand`. The wordmark is inlined as an SVG that fills with the current text colour: ink on the light ground, white over the hero film and on the night footer. It is the header's link home, 28px tall at the left of the bar, and the footer's, 48px and 60px. The badge is the favicon and the app icons. (Until then the mark was three building silhouettes with a flight arc; its source stays in `docs/brand/lienry-mark-source.png`.)
+The logo is the owner's (16 November 2026): the LIENRY wordmark with DRONES set under its right-hand end, and a round badge that sets it in a ring. Both are traced into vectors (`public/brand/lienry-logo.svg`, `public/brand/lienry-badge.svg`) from the owner's files in `docs/brand`. The wordmark is inlined as an SVG in the owner's navy (#0a0a6d) on the light ground, and white over the hero film and on the night footer, where navy would not read. It is the header's link home, 28px tall at the left of the bar, and the footer's, 48px and 60px. The badge is the favicon and the app icons. (Until then the mark was three building silhouettes with a flight arc; its source stays in `docs/brand/lienry-mark-source.png`.)
 
 ### Palette
 
