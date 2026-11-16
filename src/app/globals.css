@@ -757,3 +757,108 @@
     box-shadow: 0 1px 3px rgb(17 26 34 / 0.25);
   }
 }
+
+/* ── Hover and ambient motion (the refresh update, November 2026) ─────────────────────────────────────
+   One block: the pill's flood, the linked cards' answer, the card grids' reveal, the footer pictures'
+   entrance, the pane texture, the paired tiles' rings and the link inside body copy. Each is off, or an
+   instant change of state, under reduced motion (the base rule above zeroes every transition and delay). */
+@layer components {
+  /* The pill's flood (Button.tsx). A pill that leads with the round arrow badge (md and lg) carries
+     [data-flood] and one aria-hidden layer under its label (.pill-flood). At rest the layer is clipped to
+     the badge's circle: it is the badge's disc. Under the pointer, on keyboard focus, or when the card
+     that carries the pill is hovered or focused (a ButtonFace in a `group/card` link), the pill is lit
+     (--lit: 1) and the circle grows from the badge's centre until it covers the pill, 450ms in on the
+     settle curve and 300ms back; the label's second copy and the second arrow read --lit too. The pill's
+     own fill, edge and colour take the end state as the flood lands (a step after 450ms; at once on the
+     way back, under the layer), so its computed colours are the ones on screen.
+       --flood-r, --flood-x  the badge's radius, and its centre from the pill's padding edge
+       --pill-bg, -edge, -fg  the pill at rest;  --pill-edge-on, --pill-fg-on  once flooded
+       --flood, --flood-on   the layer's colour at rest (the badge's) and once it covers the pill
+       --pill-arrow          the arrows' colour */
+  [data-flood] {
+    --lit: 0;
+    --flood-r: 1.0625rem;
+    --flood-x: 1.3125rem;
+    position: relative;
+    isolation: isolate;
+    background-color: var(--pill-bg);
+    border-color: var(--pill-edge);
+    color: var(--pill-fg);
+    transition: translate 200ms var(--ease-instrument);
+  }
+  [data-flood="lg"] {
+    --flood-r: 1.125rem;
+    --flood-x: 1.5rem;
+  }
+  /* The primary: the white badge floods the accent pill white; the label and the arrow are the accent
+     (6.99:1 on white) and the pill keeps its accent edge. */
+  [data-flood][data-button="primary"] {
+    --pill-bg: var(--s-action);
+    --pill-edge: var(--s-action-edge);
+    --pill-fg: var(--s-action-fg);
+    --pill-edge-on: var(--s-action);
+    --pill-fg-on: var(--color-accent);
+    --pill-arrow: var(--color-accent);
+    --flood: var(--color-white);
+    --flood-on: var(--color-white);
+  }
+  /* A white pill (the secondary, a card's face): the surface's accent fill floods it; the label lands
+     white (6.99:1 on the accent, 5.23:1 on its lighter step on the night). */
+  [data-flood][data-button="secondary"] {
+    --pill-bg: var(--color-white);
+    --pill-edge: var(--s-line);
+    --pill-fg: var(--color-ink);
+    --pill-edge-on: var(--s-action);
+    --pill-fg-on: var(--color-white);
+    --pill-arrow: var(--color-white);
+    --flood: var(--s-action);
+    --flood-on: var(--s-action);
+  }
+  /* Glass, on the accent closing panel: the badge's accent deepens to its hover step as it floods (a
+     white label 10.05:1), inside the pill's white edge, so the pill never sinks into the panel. */
+  [data-flood][data-button="glass"] {
+    --pill-bg: var(--color-white);
+    --pill-edge: var(--color-white);
+    --pill-fg: var(--color-ink);
+    --pill-edge-on: var(--color-white);
+    --pill-fg-on: var(--color-white);
+    --pill-arrow: var(--color-white);
+    --flood: var(--color-accent);
+    --flood-on: var(--color-accent-hover);
+  }
+  .pill-flood {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background-color: var(--flood);
+    /* 141.5% of the circle's reference (the box's diagonal over root 2) is the pill's width, so the
+       grown circle ends on the pill's far end and the whole 450ms is seen. */
+    clip-path: circle(calc(var(--flood-r) + var(--lit) * (141.5% - var(--flood-x) - var(--flood-r))) at var(--flood-x) 50%);
+    transition: clip-path 300ms var(--ease-settle), background-color 300ms var(--ease-settle);
+  }
+  /* Lit: the two rules say the same thing, the first only where a pointer can hover. */
+  @media (hover: hover) {
+    [data-flood]:hover:not([aria-disabled="true"], :disabled),
+    .group\/card:hover [data-flood] {
+      --lit: 1;
+      --flood: var(--flood-on);
+      background-color: var(--flood-on);
+      border-color: var(--pill-edge-on);
+      color: var(--pill-fg-on);
+      transition: translate 200ms var(--ease-instrument), background-color 0s 450ms, border-color 0s 450ms, color 0s 450ms;
+    }
+  }
+  [data-flood]:focus-visible:not([aria-disabled="true"], :disabled),
+  .group\/card:focus-visible [data-flood] {
+    --lit: 1;
+    --flood: var(--flood-on);
+    background-color: var(--flood-on);
+    border-color: var(--pill-edge-on);
+    color: var(--pill-fg-on);
+    transition: translate 200ms var(--ease-instrument), background-color 0s 450ms, border-color 0s 450ms, color 0s 450ms;
+  }
+  :is([data-flood]:hover, [data-flood]:focus-visible, .group\/card:hover [data-flood], .group\/card:focus-visible [data-flood]) > .pill-flood {
+    transition-duration: 450ms;
+  }
+}
