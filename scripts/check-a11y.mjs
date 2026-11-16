@@ -31,15 +31,18 @@
 //     target is the card its ::after covers; a field's includes its label.
 // 36  axe-core (node_modules/axe-core) with the wcag2a, wcag2aa, wcag21a, wcag21aa and wcag22aa tags, on
 //     the page at load and on each region an interaction changed. Violations fail. Colour-contrast
-//     results axe cannot decide (text over media) are listed for npm run contrast.
+//     results axe cannot decide (text over media) are listed for npm run contrast. A flood pill's label
+//     is one of those (its flood layer sits inside the pill, under the label), so each [data-flood] is
+//     measured here instead: the resting label against the pill's ground, and the flooded label (the
+//     second copy, in --pill-fg-on) against the flood's colour (--flood-on), each at least 4.5:1.
 // 37  States (1440, fine pointer, CDP CSS.forcePseudoState, header excluded): [data-button],
-//     [data-icon-button], .link, .link-list, [data-card] a, input, select, textarea, [role=tab] and
+//     [data-icon-button], .link, .link-copy, .link-list, [data-card] a, input, select, textarea, [role=tab] and
 //     [data-accordion] summary. Hover (forced on the element and its ancestors, as a real pointer
 //     would) changes the background, colour, border colour, underline thickness or underline colour
 //     of the element, of its label (a radio card) or of the spans inside it (a summary's question),
-//     and on a card scales its [data-zoom] layer to 1.03; pressed moves a button 1px down
+//     and on a card scales its [data-zoom] layer to 1.04; pressed moves a button 1px down
 //     (translate 0px 1px); focus-visible draws a 2px solid outline in the surface's --s-focus, offset
-//     2px; every transition runs 160 to 240ms ([data-zoom]: 600ms); a primary button's fill or edge
+//     2px; every transition runs 160 to 240ms ([data-zoom]: 500ms); a primary button's fill or edge
 //     is at least 3:1 against its band, and its hover fill is at least 1.3:1 from its rest fill.
 //     Selected tabs, expanded-and-unavailable and unavailable controls skip the hover assertion. The
 //     coded UI ([data-ui], and the window and app panel before they carry it) keeps its own controls
@@ -510,9 +513,37 @@ function pageLib() {
       tick();
     });
 
+  // Check 36, flood pills: axe cannot decide a label that sits over the pill's own flood layer, so the
+  // two states are measured from the pill's colours. At rest: the first label copy against the pill's
+  // ground. Flooded: the second copy (or, where it is not rendered, --pill-fg-on) against --flood-on.
+  A.floodPills = () => {
+    const out = [];
+    for (const pill of document.querySelectorAll("[data-flood]")) {
+      if (!visible(pill)) continue;
+      const cs = getComputedStyle(pill);
+      const copies = [...pill.querySelectorAll(":scope > span:not(.pill-flood) > span")].filter((c) => (c.textContent || "").trim());
+      const restCopy = copies.find((c) => c.getAttribute("aria-hidden") !== "true");
+      const onCopy = copies.find((c) => c.getAttribute("aria-hidden") === "true" && getComputedStyle(c).display !== "none");
+      if (!restCopy) {
+        out.push({ what: describe(pill), error: "no label copy found inside the pill" });
+        continue;
+      }
+      const floodOn = cs.getPropertyValue("--flood-on").trim();
+      const fgOn = onCopy ? getComputedStyle(onCopy).color : cs.getPropertyValue("--pill-fg-on").trim();
+      if (!floodOn || !fgOn) {
+        out.push({ what: describe(pill), error: "no --flood-on or flooded label colour on the pill" });
+        continue;
+      }
+      const ground = A.backgroundOf(pill);
+      const restFg = getComputedStyle(restCopy).color;
+      out.push({ what: describe(pill), variant: pill.getAttribute("data-button"), restFg, ground, rest: A.contrast(restFg, ground), fgOn, floodOn, flooded: A.contrast(fgOn, floodOn) });
+    }
+    return out;
+  };
+
   // Check 37: the elements whose states are asserted, sampled by tag, classes and surface.
   A.stateTargets = (perSignature) => {
-    const sel = "[data-button], [data-icon-button], .link, .link-list, [data-card] a, input, select, textarea, [role='tab'], [data-accordion] summary";
+    const sel = "[data-button], [data-icon-button], .link, .link-copy, .link-list, [data-card] a, input, select, textarea, [role='tab'], [data-accordion] summary";
     const seen = new Map();
     const out = [];
     document.querySelectorAll("[data-a11y-s]").forEach((e) => e.removeAttribute("data-a11y-s"));
@@ -526,7 +557,7 @@ function pageLib() {
       if (n >= perSignature) continue;
       seen.set(sig, n + 1);
       el.setAttribute("data-a11y-s", String(out.length));
-      const kind = el.matches("[data-button]") ? `[data-button="${el.getAttribute("data-button")}"]` : el.matches("[data-icon-button]") ? "[data-icon-button]" : el.matches("[data-card] a") ? "[data-card] a" : el.matches(".link-list") ? ".link-list" : el.matches(".link") ? ".link" : el.matches("[role='tab']") ? "[role=tab]" : el.matches("summary") ? "summary" : el.tagName.toLowerCase();
+      const kind = el.matches("[data-button]") ? `[data-button="${el.getAttribute("data-button")}"]` : el.matches("[data-icon-button]") ? "[data-icon-button]" : el.matches("[data-card] a") ? "[data-card] a" : el.matches(".link-list") ? ".link-list" : el.matches(".link-copy") ? ".link-copy" : el.matches(".link") ? ".link" : el.matches("[role='tab']") ? "[role=tab]" : el.matches("summary") ? "summary" : el.tagName.toLowerCase();
       out.push({ i: out.length, kind, what: describe(el), surface, skipHover: el.matches("[aria-selected='true'], [aria-disabled='true']"), pressable: el.matches("[data-button], [data-icon-button]") && !el.matches("[aria-disabled='true'], :disabled") });
     }
     return out;
@@ -708,6 +739,20 @@ for (const route of opts.routes) {
       for (const v of res.incomplete) for (const n of v.nodes) contrastToReview.add(n.target);
     };
     judgeAxe(await axe(page), "");
+    // Flood pills: the label contrast axe leaves undecided, measured at rest and flooded.
+    const pills = await A(page, "floodPills");
+    for (const p of pills) {
+      if (p.error) add(36, `a flood pill cannot be measured: ${p.error}`, p.what);
+      else {
+        if (p.rest < 4.5) add(36, "a flood pill's resting label is under 4.5:1 on the pill", `${p.what} (${p.restFg} on ${p.ground}: ${p.rest.toFixed(2)}:1)`);
+        if (p.flooded < 4.5) add(36, "a flood pill's flooded label is under 4.5:1 on the flood", `${p.what} (${p.fgOn} on ${p.floodOn}: ${p.flooded.toFixed(2)}:1)`);
+      }
+    }
+    if (pills.length) {
+      const measured = pills.filter((p) => !p.error);
+      const low = (k) => Math.min(...measured.map((p) => p[k])).toFixed(2);
+      if (measured.length) notes.push(`36: ${measured.length} flood pill${measured.length === 1 ? "" : "s"} measured (lowest ${low("rest")}:1 at rest, ${low("flooded")}:1 flooded)`);
+    }
 
     // Check 34: the Tab walk from the top of the page.
     const expected = await A(page, "expected");
@@ -1004,7 +1049,7 @@ async function statesPass(route, add, notes) {
       });
       if (live.zoomTransition) {
         const zd = live.zoomTransition.duration.split(",").map((s) => parseFloat(s));
-        if (!zd.some((d) => Math.abs(d - 0.6) < 0.001)) add(37, "a card's [data-zoom] layer does not transition over 600ms", `${t.what} (${live.zoomTransition.property} ${live.zoomTransition.duration})`);
+        if (!zd.some((d) => Math.abs(d - 0.5) < 0.001)) add(37, "a card's [data-zoom] layer does not transition over 500ms", `${t.what} (${live.zoomTransition.property} ${live.zoomTransition.duration})`);
       }
       // States, read with transitions off so each value is the state's own.
       const freeze = await page.addStyleTag({ content: "*, *::before, *::after { transition: none !important; }" });
@@ -1019,7 +1064,7 @@ async function statesPass(route, add, notes) {
         const changed = rest.bg !== hover.bg || rest.color !== hover.color || rest.border !== hover.border || rest.thickness !== hover.thickness || rest.decoColor !== hover.decoColor || (rest.labelLook !== null && rest.labelLook !== hover.labelLook) || rest.innerLook !== hover.innerLook;
         if (t.kind === "[data-card] a") {
           if (hover.zoom === null) add(37, "a card link without a [data-zoom] media layer", t.what);
-          else if (Math.abs(parseFloat(hover.zoom) - 1.03) > 0.001) add(37, "hovering a card does not scale its media to 1.03", `${t.what} (scale ${hover.zoom})`);
+          else if (Math.abs(parseFloat(hover.zoom) - 1.04) > 0.001) add(37, "hovering a card does not scale its media to 1.04", `${t.what} (scale ${hover.zoom})`);
         }
         if (!changed) add(37, "hover changes none of background, colour, border colour, underline thickness or underline colour", `${t.what} (${t.kind})`);
         if (t.kind === '[data-button="primary"]') {

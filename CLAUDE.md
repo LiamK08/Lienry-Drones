@@ -61,13 +61,27 @@ favicon, the app icons and the JSON-LD logo (`scripts/icons.mjs`), and the share
 wordmark (`scripts/og.mjs`). It is artwork, not text, so the type rules above do not reach it.
 
 Shape: buttons are pills (`rounded-pill`, optional round arrow badge) in one system: `md` for a page's calls
-to action, `lg` only for form submits, `sm` only inside app UI; icon buttons are round. Cards are `rounded-card`
+to action, `lg` only for form submits, `sm` only inside app UI; icon buttons are round. A pill with the arrow
+badge (`md`, `lg`) floods on hover, keyboard focus or its card's hover (`[data-flood]`): the badge's colour grows
+from the badge to cover the pill (450ms in, 300ms back), the label lands in the inverted colour and a second
+arrow follows the first; the primary ends white with an accent label inside its accent edge, a white pill ends
+in the accent, glass ends in the accent's hover step inside its white edge. Under reduced motion the colours
+switch at once. Cards are `rounded-card`
 (16px), panels `rounded-panel` (20px); feature and story images follow the reference's softer
 corners (`Picture rounded="image"`, 12px, 8px from 1024; `rounded="media"`, 10px); small tags and form
 fields keep `--radius-hard` (4px). The closing ask is a compact accent panel (about 1000px on the rail)
 with one white pill and a white text link; the footer is a night sheet with the panel radius on its top corners. The header bar is 56px (`--nav-h`).
-Soft blurred accent glows are allowed behind heroes and accent panels. No text shadows or
-gradient text.
+Soft blurred accent glows are allowed behind heroes and accent panels. So is the pane field (`PaneField`): a
+fine grid of small panes in a palette colour at low alpha with a slow drifting light, on the night panels, the
+accent closing panel and a product hero's flanks; text over it sits in a positioned box, and the field covers a
+block of text wholly or not at all. No text shadows or gradient text.
+
+Links and card motion (the refresh update, 16 November 2026): `.link-copy` is the link inside body copy (a 35%
+underline that fills on hover and focus); `.link` stays the stand-alone text link. Linked cards (`LinkCard`, a
+MediaCard with a link) rise 3px on hover and focus (300ms), with a soft slate shadow on light bands or a one-step
+lighter ground on night bands, and their picture grows to 1.04 (500ms). Grids of cards rise in once as they
+scroll into view (`RevealList animate`: 16px, 450ms, 40ms apart); headings and body text never do. The strip runs
+at about 20px a second, and the footer's pictures arrive once. None of it moves under reduced motion.
 
 Checks: `check:a11y`, `perf:vitals`, `check:layout` and `check:rules` gate every route. Since
 20 October 2026 the last two encode this system: the radius set and pills, PT Serif over Inter at
@@ -79,10 +93,15 @@ visitor in a session that has seen the intro (its key seeded); `perf:vitals` and
 a first visit, intro and all; check 45 (in `check:rules`) proves the intro's own rules, and check 46 the page entrances. Change a check only together with the rule here that it encodes. Hero headings hold
 their fallback-font line count on phones (`holdLines`), or the web font arriving shifts the page.
 
-Sticky: only the header, a column under it (a nav, or a block holding a heading, nav or form), and,
-below 1024, the fit check's score strip (`data-fit-strip`), which sticks to the bottom of the screen inside
-its card's question column (the owner's brief, 26 October 2026). Check 21 encodes it. Nothing is fixed but
+Sticky: only the header and a column under it (a nav, or a block holding a heading, nav or form). Check 21
+encodes it. Nothing is fixed but
 the header (with its dim page scrim while a desktop menu is open), the skip link and, while it plays, the intro's overlay.
+
+Fit check (the refresh update, 16 November 2026): one statement at a time, with the live result sheet beside it
+from 1024, where the card keeps one height through every step and the result; below 1024 the steps share one
+height and the result opens downward. The score, and the calculator's totals when an input changes, count to
+the new value over about 450ms (a first figure arrives at once, and the live region reads only the final
+values; check 33); under reduced motion steps swap at once and nothing counts.
 
 Intro (the owner's brief, 28 October 2026): when a browser session starts on the home page, a first-visit
 intro plays over it, after breakerindustries.com's loader in Lienry's own logo, colours and code: on the
@@ -104,9 +123,13 @@ rise on `<main>` over about a quarter of a second, never past 300ms (`src/compon
 while the header holds still; a page reached at an anchor only fades, so the anchor lands where a hard load puts it. Never on the first page of a visit, an anchor or a new query, never under reduced
 motion, and it never holds the navigation back (no View Transitions). Check 46 encodes it.
 
-Header contrast: `npm run contrast -- <frame>` proves the bar stays legible over the hero
-film (the one hero the bar is clear over; every other page opens light, under the white bar). Run it
-after touching the header, the hero scrim or the primary button.
+Header contrast: over the home film the bar is clear, in white, until the film has left it (the hero's foot
+reaching the bar's foot), on its own scrim (`.bar-scrim`, which travels with the bar), with no blur; every other
+page opens light, under the white bar. A bar link takes a ground on hover and keyboard focus (ink at 6% on the
+white bar, a near-white chip with an ink label over the film). `npm run contrast -- <frame> [width] [height]`
+proves the bar stays legible for as long as it is clear: at every scroll depth, over a real frame and against
+pure white, which covers the hero's headline passing under it (the script reads the scrim's stops from
+`globals.css`). Run it after touching the header, `.bar-scrim`, the hero's veil or the hero's height.
 
 Legora and refresh.tech are references for quality and structure only. No Legora or ReFresh
 code, text, imagery, icons, logos or assets enter this repository, and the site never loads

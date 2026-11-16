@@ -357,9 +357,6 @@
 }
 
 @layer components {
-  /* Text and surface switch together: no low-contrast intermediate frame. */
-  .nav-bar { transition: none; }
-
   .page-x {
     padding-left: var(--page-margin);
     padding-right: var(--page-margin);
@@ -418,14 +415,6 @@
   @keyframes gap-in {
     from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: none; }
-  }
-
-  /* Below 1024, while the fit check's score strip shows at the foot of the screen, keyboard focus
-     scrolls clear of it (WCAG 2.4.11): the strip's band is reserved as scroll padding. */
-  @media (width < 64rem) {
-    html:has([data-fit-strip]:not([aria-hidden])) {
-      scroll-padding-bottom: 6rem;
-    }
   }
 
   /* The FAQ rows: where the browser can animate a details element's content, the answer's height
