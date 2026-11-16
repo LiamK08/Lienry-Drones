@@ -332,13 +332,15 @@ const SoftwareScene = memo(function SoftwareScene({ model = "building", controlR
       }}
       style={{ background: "transparent" }}
     >
-      <group key={epoch}>{ENVIRONMENT}</group>
+      {/* Both remount when the context is restored; siblings need keys of their own (two at `0` is a
+          duplicate key to React). */}
+      <group key={`environment-${epoch}`}>{ENVIRONMENT}</group>
       <ambientLight intensity={0.22} />
       <directionalLight position={[45, 70, 35]} intensity={1.7} color="#fff3e2" />
       <directionalLight position={[-40, 25, -20]} intensity={0.45} color="#dcedf0" />
       <directionalLight position={[-25, 35, 70]} intensity={0.55} color="#ffffff" />
       <Content controlRef={controlRef} clockRef={clockRef} fadeRef={fadeRef} />
-      <ContactShadows key={epoch} {...shadows} resolution={1024} frames={1} color="#141e28" />
+      <ContactShadows key={`shadows-${epoch}`} {...shadows} resolution={1024} frames={1} color="#141e28" />
       <Rig model={model} controlRef={controlRef} clockRef={clockRef} flyingRef={flyingRef} />
       <Driver controlRef={controlRef} clockRef={clockRef} fadeRef={fadeRef} flyingRef={flyingRef} />
       {onFirstFrame ? <FirstFrame onFirstFrame={onFirstFrame} /> : null}
