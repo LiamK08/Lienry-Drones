@@ -458,6 +458,48 @@
     }
   }
 
+  /* ---- The header bar and its menus (Nav.tsx) ---- */
+  /* The bar's scrim over the home film: black at 56% behind the bar's own 56px, so white text clears
+     4.5:1 over anything that passes under it (the film, the hero's white headline), easing out in the
+     64px below. Shorter than the strip under the hero (74px), so it never reaches the light band below
+     before the bar turns white. scripts/contrast-hero.mjs reads these stops. */
+  .bar-scrim {
+    height: 7.5rem;
+    background-image: linear-gradient(to bottom, rgb(0 0 0 / 0.56) 0rem, rgb(0 0 0 / 0.56) 3.5rem, rgb(0 0 0 / 0.3) 4.75rem, rgb(0 0 0 / 0.1) 6.25rem, rgb(0 0 0 / 0) 7.5rem);
+  }
+  /* The phone menu's sections: a closed section's body is not drawn. Where the browser can ease to a
+     keyword height, it opens over 300ms and closes a little faster, as the FAQ rows do; elsewhere, and
+     under reduced motion, at once. */
+  [data-menu-group] {
+    display: none;
+  }
+  [data-menu-group][data-open] {
+    display: block;
+  }
+  @supports (interpolate-size: allow-keywords) {
+    [data-menu-group] {
+      interpolate-size: allow-keywords;
+      block-size: 0;
+      overflow-y: clip;
+      transition: block-size 275ms var(--ease-instrument), display 275ms allow-discrete;
+    }
+    [data-menu-group][data-open] {
+      block-size: auto;
+      transition-duration: 300ms;
+    }
+    @starting-style {
+      [data-menu-group][data-open] {
+        block-size: 0;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      [data-menu-group] {
+        transition: none;
+      }
+    }
+  }
+  /* ---- End of the header bar and its menus ---- */
+
   /* The footer is a sheet with the panel's corners on top (Footer.tsx). Behind them, its ground strip
      takes the tone of the band the page ends on, so a corner never shows a white notch against a
      coloured last band; white (plaster) unless that band says otherwise. */
