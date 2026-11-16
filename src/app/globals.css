@@ -832,6 +832,16 @@
     --flood-r: 1.125rem;
     --flood-x: 1.5rem;
   }
+  /* In a pill wider than its content (full width on a phone) the badge keeps the left end and the label
+     centres on the pill, not on the room beside the badge: an empty item after the label takes up to the
+     badge's share of the spare room (its margin undoes the pill's gap). A pill that hugs its label has no
+     spare room, so the item has no width. */
+  [data-flood]::after {
+    content: "";
+    flex: 1 1 0;
+    max-width: 2.375rem;
+    margin-left: -0.5rem;
+  }
   /* The primary: the white badge floods the accent pill white; the label and the arrow are the accent
      (6.99:1 on white) and the pill keeps its accent edge. */
   [data-flood][data-button="primary"] {

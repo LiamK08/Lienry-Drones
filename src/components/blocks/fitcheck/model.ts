@@ -53,7 +53,7 @@ export const gapsOf = (answers: Answers) => {
 // The chosen pill also takes a solid edge in its own tone (6:1 or more on white) and the heavier weight,
 // so the choice never rests on colour alone. `soft` is the pale edge a pill shows under the pointer.
 export const tone: Record<Answer, { edge: string; fill: string; text: string; soft: string }> = {
-  yes: { edge: "border-accent", fill: "bg-tint", text: "text-accent", soft: "hover:border-map-half hover:bg-tint" },
+  yes: { edge: "border-accent", fill: "bg-tint", text: "text-accent", soft: "hover:border-accent/35 hover:bg-tint" },
   partly: { edge: "border-debris-text", fill: "bg-fit-partly-soft", text: "text-debris-text", soft: "hover:border-fit-partly-edge hover:bg-fit-partly-soft" },
   no: { edge: "border-fit-no", fill: "bg-fit-no-soft", text: "text-fit-no", soft: "hover:border-fit-no-edge hover:bg-fit-no-soft" },
 };

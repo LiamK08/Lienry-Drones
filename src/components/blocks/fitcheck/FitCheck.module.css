@@ -1,0 +1,98 @@
+/* The fit check's own motion (FitCheck.tsx and its parts; the calculator's chips share `.give`).
+   Everything here is off under reduced motion: steps swap at once, nothing rises and nothing gives. */
+
+/* An answer pill or an option chip gives by 3% while it is pressed, over 100ms; its colours answer the
+   pointer over 150ms. The scale never moves its neighbours. */
+.give {
+  transition:
+    background-color 150ms var(--ease-instrument),
+    border-color 150ms var(--ease-instrument),
+    color 150ms var(--ease-instrument),
+    box-shadow 150ms var(--ease-instrument),
+    scale 100ms var(--ease-instrument);
+}
+.give:active {
+  scale: 0.97;
+}
+
+/* A new statement and its answers slide in 16px with a fade over 280ms: from the right going on, from
+   the left going back. */
+.stepIn {
+  animation: step-in 280ms var(--ease-instrument) both;
+}
+.stepIn[data-dir="back"] {
+  --step-from: -16px;
+}
+@keyframes step-in {
+  from {
+    opacity: 0;
+    translate: var(--step-from, 16px) 0;
+  }
+}
+
+/* The result takes the questions' place, and the sent line the form's: a 10px rise and a fade. */
+.riseIn {
+  animation: rise-in 300ms var(--ease-instrument) both;
+}
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    translate: 0 10px;
+  }
+}
+
+/* A row's tag on the result sheet pops in as its question is answered. */
+.tagIn {
+  animation: tag-in 220ms var(--ease-settle) both;
+}
+@keyframes tag-in {
+  from {
+    opacity: 0;
+    scale: 0.8;
+  }
+}
+
+/* The result sheets, fanned: each rests at its own tilt (--tilt) about the foot of the stack. They
+   arrive once, the back one first and 120ms apart: each rises 24px, turns its last 6 degrees and fades
+   in over 500ms. `data-fan="wait"` holds them out of sight while the card is still below the fold. */
+.sheet {
+  rotate: var(--tilt, 0deg);
+  transform-origin: 50% 100%;
+}
+.fan[data-fan="wait"] .sheet {
+  opacity: 0;
+}
+.fan[data-fan="in"] .sheet {
+  animation: sheet-in 500ms var(--ease-instrument) both;
+  animation-delay: calc(var(--i, 0) * 120ms);
+}
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    translate: 0 24px;
+    rotate: calc(var(--tilt, 0deg) - 6deg);
+  }
+}
+
+/* A blank sheet's rules: hairlines every 28px, inside its margins. Decorative, with no text on it. */
+.ruled {
+  background-image: repeating-linear-gradient(to bottom, transparent 0 27px, var(--color-line) 27px 28px);
+  background-origin: content-box;
+  background-clip: content-box;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .give {
+    transition: none;
+  }
+  .give:active {
+    scale: none;
+  }
+  .stepIn,
+  .riseIn,
+  .tagIn,
+  .fan[data-fan] .sheet {
+    animation: none;
+    opacity: 1;
+  }
+}
