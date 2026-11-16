@@ -50,9 +50,11 @@ with no label above them (the owner's call, 21 October 2026). The header carries
 
 Logo (the owner's own, 16 November 2026): the LIENRY wordmark with DRONES under its right-hand end, and
 the round badge that sets it in a ring. Both are traced from the owner's files (`docs/brand`) into
-vectors (`public/brand/lienry-logo.svg`, `public/brand/lienry-badge.svg`) and never redrawn, re-set in a
-font or recoloured: the wordmark fills with the surface's ink or white (currentColor), so it stays
-monochrome like the reference's. The wordmark is the header's and the footer's link home
+vectors (`public/brand/lienry-logo.svg`, `public/brand/lienry-badge.svg`); its letterforms are never
+redrawn or re-set in a font. The owner's files are navy (about #0a0a6d), which is not in the palette, so
+the site shows the logo in one colour, like the reference's: the surface's ink (#141e28) on light
+grounds and white on the night bands and the hero film (currentColor). Only the favicons thicken the
+badge's ring, so it holds at tab sizes (`src/app/icon.svg`, `scripts/icons.mjs`). The wordmark is the header's and the footer's link home
 (`src/components/ui/Wordmark.tsx`; 28px tall in the bar, 48px and 60px in the footer); the badge is the
 favicon, the app icons and the JSON-LD logo (`scripts/icons.mjs`), and the share image carries the
 wordmark (`scripts/og.mjs`). It is artwork, not text, so the type rules above do not reach it.

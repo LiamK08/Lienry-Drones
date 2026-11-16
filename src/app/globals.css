@@ -600,7 +600,7 @@
     stroke: var(--s-accent);
     stroke-width: calc(var(--mark-stroke, 44px) * var(--mark-k, 1));
     stroke-linejoin: round;
-    stroke-dasharray: 1 1;
+    stroke-dasharray: 1 2;
     stroke-dashoffset: 1;
     opacity: 0;
   }
