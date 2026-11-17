@@ -357,9 +357,6 @@
 }
 
 @layer components {
-  /* Text and surface switch together: no low-contrast intermediate frame. */
-  .nav-bar { transition: none; }
-
   .page-x {
     padding-left: var(--page-margin);
     padding-right: var(--page-margin);
@@ -413,27 +410,11 @@
     .why-row .why-text { transition: none; }
   }
 
-  /* The fit check: a point it raises rises 8px into place as it joins the list; the empty panel's
-     arrow nudges toward the questions (left beside them, up when they sit below on a phone). */
+  /* The fit check: a point it raises rises 8px into place as it joins the list. (Its other motion is in
+     src/components/blocks/fitcheck/FitCheck.module.css.) */
   @keyframes gap-in {
     from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: none; }
-  }
-  @keyframes nudge-x {
-    0%, 100% { translate: 0 0; }
-    50% { translate: -4px 0; }
-  }
-  @keyframes nudge-y {
-    0%, 100% { translate: 0 0; }
-    50% { translate: 0 4px; }
-  }
-
-  /* Below 1024, while the fit check's score strip shows at the foot of the screen, keyboard focus
-     scrolls clear of it (WCAG 2.4.11): the strip's band is reserved as scroll padding. */
-  @media (width < 64rem) {
-    html:has([data-fit-strip]:not([aria-hidden])) {
-      scroll-padding-bottom: 6rem;
-    }
   }
 
   /* The FAQ rows: where the browser can animate a details element's content, the answer's height
@@ -457,6 +438,48 @@
       }
     }
   }
+
+  /* ---- The header bar and its menus (Nav.tsx) ---- */
+  /* The bar's scrim over the home film: black at 56% behind the bar's own 56px, so white text clears
+     4.5:1 over anything that passes under it (the film, the hero's white headline), easing out in the
+     64px below. Shorter than the strip under the hero (74px), so it never reaches the light band below
+     before the bar turns white. scripts/contrast-hero.mjs reads these stops. */
+  .bar-scrim {
+    height: 7.5rem;
+    background-image: linear-gradient(to bottom, rgb(0 0 0 / 0.56) 0rem, rgb(0 0 0 / 0.56) 3.5rem, rgb(0 0 0 / 0.3) 4.75rem, rgb(0 0 0 / 0.1) 6.25rem, rgb(0 0 0 / 0) 7.5rem);
+  }
+  /* The phone menu's sections: a closed section's body is not drawn. Where the browser can ease to a
+     keyword height, it opens over 300ms and closes a little faster, as the FAQ rows do; elsewhere, and
+     under reduced motion, at once. */
+  [data-menu-group] {
+    display: none;
+  }
+  [data-menu-group][data-open] {
+    display: block;
+  }
+  @supports (interpolate-size: allow-keywords) {
+    [data-menu-group] {
+      interpolate-size: allow-keywords;
+      block-size: 0;
+      overflow-y: clip;
+      transition: block-size 275ms var(--ease-instrument), display 275ms allow-discrete;
+    }
+    [data-menu-group][data-open] {
+      block-size: auto;
+      transition-duration: 300ms;
+    }
+    @starting-style {
+      [data-menu-group][data-open] {
+        block-size: 0;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      [data-menu-group] {
+        transition: none;
+      }
+    }
+  }
+  /* ---- End of the header bar and its menus ---- */
 
   /* The footer is a sheet with the panel's corners on top (Footer.tsx). Behind them, its ground strip
      takes the tone of the band the page ends on, so a corner never shows a white notch against a
@@ -755,5 +778,252 @@
     border: 2px solid var(--color-glass);
     border-radius: 50%;
     box-shadow: 0 1px 3px rgb(17 26 34 / 0.25);
+  }
+}
+
+/* ── Hover and ambient motion (the refresh update, November 2026) ─────────────────────────────────────
+   One block: the pill's flood, the linked cards' answer, the footer pictures' entrance and the link
+   inside body copy. (Their neighbours live with their components: the card grids' reveal in Reveal.tsx,
+   the pane texture in PaneField.module.css, the paired tiles' rings in PanelPair.tsx.) Each is off, or an
+   instant change of state, under reduced motion (the base rule above zeroes every transition and delay). */
+@layer components {
+  /* The pill's flood (Button.tsx). A pill that leads with the round arrow badge (md and lg) carries
+     [data-flood] and one aria-hidden layer under its label (.pill-flood). At rest the layer is clipped to
+     the badge's circle: it is the badge's disc. Under the pointer, on keyboard focus, or when the card
+     that carries the pill is hovered or focused (a ButtonFace in a `group/card` link), the pill is lit
+     (--lit: 1) and the circle grows from the badge's centre until it covers the pill, 450ms in on the
+     settle curve and 300ms back; the label's second copy and the second arrow read --lit too. The pill's
+     own fill, edge and colour take the end state as the flood lands (a step after 450ms; at once on the
+     way back, under the layer), so its computed colours are the ones on screen.
+       --flood-r, --flood-x  the badge's radius, and its centre from the pill's padding edge
+       --pill-bg, -edge, -fg  the pill at rest;  --pill-edge-on, --pill-fg-on  once flooded
+       --flood, --flood-on   the layer's colour at rest (the badge's) and once it covers the pill
+       --pill-arrow          the arrows' colour */
+  [data-flood] {
+    --lit: 0;
+    --flood-r: 1.0625rem;
+    --flood-x: 1.3125rem;
+    position: relative;
+    isolation: isolate;
+    background-color: var(--pill-bg);
+    border-color: var(--pill-edge);
+    color: var(--pill-fg);
+    transition: translate 200ms var(--ease-instrument);
+  }
+  [data-flood="lg"] {
+    --flood-r: 1.125rem;
+    --flood-x: 1.5rem;
+  }
+  /* In a pill wider than its content (full width on a phone) the badge keeps the left end and the label
+     centres on the pill, not on the room beside the badge: an empty item after the label shares the spare
+     room with it, up to the width that evens the two ends (badge, gap and padding on the left; this and
+     the padding on the right; its margin undoes the pill's gap). A pill that hugs its label has no spare
+     room, so the item has no width and the label keeps its own. */
+  [data-flood]::after {
+    content: "";
+    flex: 1 1 0;
+    max-width: 1.875rem;
+    margin-left: -0.5rem;
+  }
+  [data-flood="lg"]::after {
+    max-width: 1.625rem;
+  }
+  /* The primary: the white badge floods the accent pill white; the label and the arrow are the accent
+     (6.99:1 on white) and the pill keeps its accent edge. */
+  [data-flood][data-button="primary"] {
+    --pill-bg: var(--s-action);
+    --pill-edge: var(--s-action-edge);
+    --pill-fg: var(--s-action-fg);
+    --pill-edge-on: var(--s-action);
+    --pill-fg-on: var(--color-accent);
+    --pill-arrow: var(--color-accent);
+    --flood: var(--color-white);
+    --flood-on: var(--color-white);
+  }
+  /* A white pill (the secondary, a card's face): the surface's accent fill floods it; the label lands
+     white (6.99:1 on the accent, 5.23:1 on its lighter step on the night). */
+  [data-flood][data-button="secondary"] {
+    --pill-bg: var(--color-white);
+    --pill-edge: var(--s-line);
+    --pill-fg: var(--color-ink);
+    --pill-edge-on: var(--s-action);
+    --pill-fg-on: var(--color-white);
+    --pill-arrow: var(--color-white);
+    --flood: var(--s-action);
+    --flood-on: var(--s-action);
+  }
+  /* Glass, on the accent closing panel: the badge's accent deepens to its hover step as it floods (a
+     white label 10.05:1), inside the pill's white edge, so the pill never sinks into the panel. */
+  [data-flood][data-button="glass"] {
+    --pill-bg: var(--color-white);
+    --pill-edge: var(--color-white);
+    --pill-fg: var(--color-ink);
+    --pill-edge-on: var(--color-white);
+    --pill-fg-on: var(--color-white);
+    --pill-arrow: var(--color-white);
+    --flood: var(--color-accent);
+    --flood-on: var(--color-accent-hover);
+  }
+  .pill-flood {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background-color: var(--flood);
+    /* 141.5% of the circle's reference (the box's diagonal over root 2) is the pill's width, so the
+       grown circle ends on the pill's far end and the whole 450ms is seen. */
+    clip-path: circle(calc(var(--flood-r) + var(--lit) * (141.5% - var(--flood-x) - var(--flood-r))) at var(--flood-x) 50%);
+    transition: clip-path 300ms var(--ease-settle), background-color 300ms var(--ease-settle);
+  }
+  /* Lit: the two rules say the same thing, the first only where a pointer can hover. */
+  @media (hover: hover) {
+    [data-flood]:hover:not([aria-disabled="true"], :disabled),
+    .group\/card:hover [data-flood] {
+      --lit: 1;
+      --flood: var(--flood-on);
+      background-color: var(--flood-on);
+      border-color: var(--pill-edge-on);
+      color: var(--pill-fg-on);
+      transition: translate 200ms var(--ease-instrument), background-color 0s 450ms, border-color 0s 450ms, color 0s 450ms;
+    }
+  }
+  [data-flood]:focus-visible:not([aria-disabled="true"], :disabled),
+  .group\/card:focus-visible [data-flood] {
+    --lit: 1;
+    --flood: var(--flood-on);
+    background-color: var(--flood-on);
+    border-color: var(--pill-edge-on);
+    color: var(--pill-fg-on);
+    transition: translate 200ms var(--ease-instrument), background-color 0s 450ms, border-color 0s 450ms, color 0s 450ms;
+  }
+  :is([data-flood]:hover, [data-flood]:focus-visible, .group\/card:hover [data-flood], .group\/card:focus-visible [data-flood]) > .pill-flood {
+    transition-duration: 450ms;
+  }
+
+  /* The linked card (LinkCard.tsx, and MediaCard with `href`). A card that is one link answers the
+     pointer and keyboard focus as one object: it rises 3px over 300ms on the settle curve, with a soft
+     slate shadow on a light band, or its ground one step lighter on a night band (where a shadow would
+     not show); its picture grows to 1.04 inside its frame over 500ms (Picture's zoom), so it trails the
+     card. Hover only where a pointer can hover. Under reduced motion nothing moves: the shadow and the
+     ground answer at once.
+       --card-lift                the shadow a lifted card casts on this surface (none on the night)
+       --card-bg, --card-bg-lit   a LinkCard's ground at rest and lifted (per ground and surface) */
+  :root, .on-light, .surface-raised, .surface-sunken {
+    --card-lift: 0 12px 28px rgb(17 26 34 / 0.12);
+    --card-tint-lit: var(--color-tint);
+    --card-white-lit: var(--color-white);
+  }
+  .on-dark, .surface-ink-raised {
+    --card-lift: none;
+    --card-tint-lit: var(--color-white);
+    --card-white-lit: var(--color-tint);
+  }
+  .link-card {
+    --card-bg: var(--color-tint);
+    --card-bg-lit: var(--card-tint-lit);
+    background-color: var(--card-bg);
+    transition: translate 300ms var(--ease-settle), box-shadow 300ms var(--ease-settle), background-color 300ms var(--ease-settle);
+  }
+  .link-card[data-link-card="white"] {
+    --card-bg: var(--color-white);
+    --card-bg-lit: var(--card-white-lit);
+  }
+  /* A stand in place of a picture: a quiet panel a step off the card's ground. */
+  .link-card [data-link-card-stand] {
+    background-color: color-mix(in srgb, var(--color-white) 60%, transparent);
+  }
+  .link-card[data-link-card="white"] [data-link-card-stand] {
+    background-color: var(--color-mist);
+  }
+  /* MediaCard has no box: the card rises and its picture's frame casts the shadow. */
+  [data-card-link] {
+    transition: translate 300ms var(--ease-settle);
+  }
+  [data-card-link] > figure > div {
+    transition: box-shadow 300ms var(--ease-settle);
+  }
+  @media (hover: hover) {
+    .link-card:hover {
+      translate: 0 -3px;
+      box-shadow: var(--card-lift);
+      background-color: var(--card-bg-lit);
+    }
+    [data-card-link]:hover {
+      translate: 0 -3px;
+    }
+    [data-card-link]:hover > figure > div {
+      box-shadow: var(--card-lift);
+    }
+  }
+  .link-card:focus-visible {
+    translate: 0 -3px;
+    box-shadow: var(--card-lift);
+    background-color: var(--card-bg-lit);
+  }
+  /* Picture's zoom answers a hover and a focus inside its group; the card itself is the focused link. */
+  .link-card:focus-visible [data-zoom] {
+    scale: 1.04;
+  }
+  [data-card-link]:has(:focus-visible) {
+    translate: 0 -3px;
+  }
+  [data-card-link]:has(:focus-visible) > figure > div {
+    box-shadow: var(--card-lift);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .link-card, .link-card:hover, .link-card:focus-visible,
+    [data-card-link], [data-card-link]:hover, [data-card-link]:has(:focus-visible) {
+      translate: none;
+    }
+  }
+
+  /* The footer's round pictures (Footer.tsx): the first time their row scrolls into view each one
+     arrives with a fade and a small growth (0.85 to 1, 400ms on the settle curve, 70ms apart), then
+     the row drifts on as before. The row carries its reveal phase (RevealGate): a row on screen at
+     hydration, a page without JavaScript and reduced motion all leave the pictures simply shown. The
+     growth is on each picture and the drift on their wrapper, so the two never share a property. */
+  @keyframes circle-arrive {
+    from { opacity: 0; scale: 0.85; }
+    to { opacity: 1; scale: 1; }
+  }
+  [data-arrive="hidden"] .foot-circle {
+    opacity: 0;
+  }
+  [data-arrive="visible"] .foot-circle {
+    animation: circle-arrive 400ms var(--ease-settle) calc(var(--i, 0) * 70ms) both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-arrive] .foot-circle {
+      opacity: 1;
+      animation: none;
+    }
+  }
+
+  /* A link inside a line of body copy (a paragraph in a feature row, a note, an answer). The surface's
+     link colour with a 1px underline at 35% of it at rest, so the link is never told apart by colour
+     alone; the underline takes the full colour on hover and keyboard focus, over 200ms. Put
+     `className="link-copy"` on the `<a>` or `<Link>`; the site's focus ring applies as everywhere.
+     (.link, further up, is the stand-alone text link: a full underline that thickens.) */
+  .link-copy {
+    color: var(--s-link);
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+    text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
+    transition: text-decoration-color 200ms var(--ease-instrument);
+  }
+  @media (hover: hover) {
+    .link-copy:hover {
+      text-decoration-color: currentColor;
+    }
+  }
+  .link-copy:focus-visible,
+  .link-copy:active {
+    text-decoration-color: currentColor;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .link-copy {
+      transition: none;
+    }
   }
 }

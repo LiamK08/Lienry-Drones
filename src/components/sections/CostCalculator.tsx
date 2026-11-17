@@ -5,6 +5,8 @@ import { calculatorCopy as copy } from "@/content/calculator";
 import { LIMITS, formatAud, formatPerArea, formatWhole, inRange, parsePercent, parseWhole, perSquareMetre, totalOver } from "@/lib/calculator";
 import { propertyTypes } from "@/lib/enquiry-schema";
 import { raisedShadow } from "@/components/blocks/FitCheck";
+import give from "@/components/blocks/fitcheck/FitCheck.module.css";
+import { useCountUp } from "@/components/blocks/fitcheck/useCountUp";
 import { Button } from "@/components/ui/Button";
 import { Field, SelectField, describedBy, fieldControl } from "@/components/ui/Field";
 
@@ -121,24 +123,28 @@ function WholeInput({ id, value, onValue, onBlur, invalid, describedBy: describe
 // tint with a 2px accent edge (the border and an inset ring, so the pill never changes size) and the
 // accent label, so the choice never rests on the colour of the text alone; in forced colours it is
 // HighlightText on Highlight, hovered or not. The label text is the type's name and nothing else: it is
-// the radio's accessible name.
+// the radio's accessible name. As the fit check's answers do, a chip gives by 3% while it is pressed and
+// answers the pointer over 150ms (`give`, FitCheck.module.css: none under reduced motion); one not yet
+// chosen also takes half the tint under the pointer (`chipHover`).
 const chip =
-  "relative inline-flex h-9 cursor-pointer select-none items-center rounded-pill border px-4 text-small font-medium " +
-  "transition-[background-color,border-color,color,box-shadow] duration-200 ease-instrument motion-reduce:transition-none " +
+  `${give.give} relative inline-flex h-9 cursor-pointer select-none items-center rounded-pill border px-4 text-small font-medium ` +
   "border-line bg-white text-fg-muted hover:border-ink hover:text-ink " +
   "has-[:checked]:border-accent has-[:checked]:bg-tint has-[:checked]:text-accent has-[:checked]:shadow-[inset_0_0_0_1px_var(--color-accent)] not-forced-colors:has-[:checked]:hover:border-accent not-forced-colors:has-[:checked]:hover:text-accent " +
   "forced-colors:has-[:checked]:forced-color-adjust-none forced-colors:has-[:checked]:border-[Highlight] forced-colors:has-[:checked]:bg-[Highlight] forced-colors:has-[:checked]:text-[HighlightText] " +
   "has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-solid has-[:focus-visible]:outline-focus";
+
+const chipHover = "hover:bg-[color-mix(in_srgb,var(--color-tint)_50%,var(--color-white))]";
 
 /**
  * The cost calculator: what outsourced exterior cleaning costs the visitor over 5 and 10 years, and
  * per square metre, from their own figures only. No Lienry price, saving, ROI or comparison, and
  * nothing leaves the browser (no fetch, no storage).
  *
- * The values update on every keystroke with no tween; until a value can be worked out, its place says
- * what it still needs (the empty state). The area and the spend keep thousands commas as they are
+ * The values follow every keystroke: a figure already on screen counts to its new value over about
+ * 450ms (useCountUp; at once under reduced motion, and a first figure arrives at once), ending on the
+ * exact sum. Until a value can be worked out, its place says what it still needs (the empty state). The area and the spend keep thousands commas as they are
  * typed; errors show on blur only (a non-empty, invalid field). One polite status region reads the
- * totals 600ms after the last change while the spend is valid. The building type changes only the
+ * final totals 600ms after the last change while the spend is valid, never a figure mid-count. The building type changes only the
  * area label and the follow-on link. Neither the form nor the panel ever reveals.
  *
  * Listing layout: one raised white panel (the fit check's shadow, no hairline) on the tool hero's tint.
@@ -175,6 +181,13 @@ export function CostCalculator({ headingId, heading, noteId, defaultType = "", l
   const five = totals ? formatAud(totals.five) : null;
   const ten = totals ? formatAud(totals.ten) : null;
   const perArea = rate !== null ? formatPerArea(rate, copy.outputs.underOne) : null;
+  // The figures as shown: each counts from the one on screen to the new sum. The status line reads the sums themselves.
+  const fiveAt = useCountUp(totals ? totals.five : null);
+  const tenAt = useCountUp(totals ? totals.ten : null);
+  const rateAt = useCountUp(rate, { whole: false });
+  const fiveShown = totals && fiveAt !== null ? formatAud(fiveAt) : five;
+  const tenShown = totals && tenAt !== null ? formatAud(tenAt) : ten;
+  const perAreaShown = rate !== null && rateAt !== null ? formatPerArea(rateAt, copy.outputs.underOne) : perArea;
 
   // The status line follows the figures 600ms after the last change, and only while the spend is valid.
   useEffect(() => {
@@ -212,9 +225,9 @@ export function CostCalculator({ headingId, heading, noteId, defaultType = "", l
   const needsTotal = !spendOk ? copy.needs.spend : copy.needs.rise;
   const needsRate = !spendOk && !areaOk ? copy.needs.both : !areaOk ? (solar ? copy.needs.areaSolar : copy.needs.area) : copy.needs.spend;
   const rows = [
-    { key: "five", id: "cost-five", label: copy.outputs.five, value: five, needs: needsTotal, line: copy.listing.results.five },
-    { key: "ten", id: "cost-ten", label: copy.outputs.ten, value: ten, needs: needsTotal, line: copy.listing.results.ten },
-    { key: "perArea", id: "cost-area-rate", label: copy.outputs.perArea, value: perArea, needs: needsRate, line: solar ? copy.listing.results.perAreaSolar : copy.listing.results.perArea },
+    { key: "five", id: "cost-five", label: copy.outputs.five, value: fiveShown, needs: needsTotal, line: copy.listing.results.five },
+    { key: "ten", id: "cost-ten", label: copy.outputs.ten, value: tenShown, needs: needsTotal, line: copy.listing.results.ten },
+    { key: "perArea", id: "cost-area-rate", label: copy.outputs.perArea, value: perAreaShown, needs: needsRate, line: solar ? copy.listing.results.perAreaSolar : copy.listing.results.perArea },
   ];
 
   /** An output's text: the figure, or what it still needs, in the small muted text. */
@@ -275,7 +288,7 @@ export function CostCalculator({ headingId, heading, noteId, defaultType = "", l
                 .map((first, i) => (
                   <div key={first} className="flex flex-wrap gap-2 md:contents">
                     {propertyTypes.slice(i * 2, i * 2 + 2).map((t) => (
-                      <label key={t} className={chip}>
+                      <label key={t} className={type === t ? chip : `${chip} ${chipHover}`}>
                         <input type="radio" name="cost-type" value={t} checked={type === t} onChange={() => setType(t)} className="sr-only" />
                         {t}
                       </label>
@@ -294,9 +307,9 @@ export function CostCalculator({ headingId, heading, noteId, defaultType = "", l
                 appear; then the link down to the summary. */}
             <div className="-mt-3 flex flex-col items-start md:hidden">
               <p aria-hidden="true" className="min-h-[1lh] text-small leading-[1.5] text-fg-muted tabular-nums">
-                {copy.listing.phone.five} <span className={five ? "font-medium text-fg" : ""}>{five ?? "—"}</span>
+                {copy.listing.phone.five} <span className={five ? "font-medium text-fg" : ""}>{fiveShown ?? "—"}</span>
                 <span className="px-1.5">·</span>
-                {copy.listing.phone.ten} <span className={ten ? "font-medium text-fg" : ""}>{ten ?? "—"}</span>
+                {copy.listing.phone.ten} <span className={ten ? "font-medium text-fg" : ""}>{tenShown ?? "—"}</span>
               </p>
               <Button href={`#${headingId}`} variant="tertiary" arrow>
                 {copy.listing.phone.see}

@@ -11,7 +11,8 @@ export type PairPanel = { title: string; body: string; tiles: readonly PairTile[
  * one line, then four tiles, two by two, and an optional text link. Each tile is a card holding a 40px
  * round icon, a 16px title and a 14px note (plain text, not headings). On the tint the tiles are white;
  * on the night they are a faint white wash with a white hairline edge. Colours are the surface's roles,
- * so the night panel (.on-dark) resolves its own.
+ * so the night panel (.on-dark) resolves its own. Under a pointer a tile's icon ring fills with the
+ * surface's action colour and its icon turns white (200ms); the tiles are not links, so nothing else moves.
  *
  * From 1024 the panel spans the pair's three rows as a subgrid, so both panels' tiles start on one line
  * and the two stand equal height whatever their lines run to.
@@ -27,8 +28,11 @@ function Panel({ id, panel, dark }: { id: string; panel: PairPanel; dark: boolea
       </div>
       <ul className="grid grid-cols-2 gap-2.5 md:gap-3">
         {panel.tiles.map((t) => (
-          <li key={t.title} className={`rounded-card border p-4 ${dark ? "border-white/10 bg-white/5" : "border-white bg-white"}`}>
-            <span aria-hidden="true" className={`flex size-10 items-center justify-center rounded-pill text-dot ${dark ? "bg-white/10" : "bg-tint"}`}>
+          <li key={t.title} className={`group/tile rounded-card border p-4 ${dark ? "border-white/10 bg-white/5" : "border-white bg-white"}`}>
+            <span
+              aria-hidden="true"
+              className={`flex size-10 items-center justify-center rounded-pill text-dot transition-[background-color,color] duration-200 ease-instrument group-hover/tile:bg-action group-hover/tile:text-white motion-reduce:transition-none ${dark ? "bg-white/10" : "bg-tint"}`}
+            >
               <Icon name={t.icon} className="size-5" />
             </span>
             <p className="mt-4 text-body font-medium leading-[1.35] text-fg">{t.title}</p>

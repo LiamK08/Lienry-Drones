@@ -46,8 +46,10 @@ export const why = {
  * question carries the point it raises when it is not a Yes. The three zones split the bar at 40 and 75.
  */
 export const fitCheck = {
+  /** The card's name: its title on the home page (with the line under it), and its label for assistive
+   *  technology everywhere (on /fit-check the page's h1 is the visible title). */
   title: "Is your building a fit?",
-  intro: "Seven questions from the design brief. Mark where you stand.",
+  intro: "Seven questions from the design brief. Your score builds as you answer.",
   groups: [
     {
       label: "The building",
@@ -72,43 +74,52 @@ export const fitCheck = {
     { id: "partly", label: "Partly", score: 0.5 },
     { id: "no", label: "No", score: 0 },
   ],
+  // The steps: the status row's count beside the bar, the two moves under the answers, and what the
+  // live line says as a new statement arrives.
+  steps: {
+    count: "{n} of 7",
+    announce: "Question {n} of 7.",
+    back: "Back",
+    next: "Next",
+    finish: "See my result",
+  },
   panel: {
     label: "Your fit",
     answered: "{n} of 7 answered",
-    empty: "Your result appears here as you answer.",
-    // The empty panel's callout: the questions sit beside it from 1024 and below it on a phone.
-    prompt: { title: { wide: "Start with the seven questions on the left", narrow: "Start with the seven questions below", above: "Start with the seven questions above" }, body: "Your score and the points worth a conversation show up here as you go." },
+    // A score is partial until all seven are answered, and says so.
+    soFar: "so far",
+    outOf: "/ 100",
+    // The sheet's list of the seven statements: a record while answering, then where answers are changed.
+    record: "Your answers",
+    check: "Check your answers",
+    pending: "Not answered yet",
     // The score bar's zones, low to high: each runs from its own `from` to the next zone's.
     zones: [
       { id: "low", from: 0, label: "Worth a conversation" },
       { id: "mid", from: 40, label: "A likely fit" },
       { id: "high", from: 75, label: "A strong fit" },
     ],
-    // The verdict once all seven are answered, by score out of 100; before that, the zone's lead line,
-    // judged on the share of the weight answered so far. A No on a building question caps the verdict at
+    // The verdict once all seven are answered, by score out of 100; before that, the zone is judged on
+    // the share of the weight answered so far. A No on a building question caps the verdict at
     // "Worth a conversation" and a Partly there at "A likely fit": they are the site's hard requirements.
     verdicts: [
-      { min: 75, zone: "high", title: "A strong fit", lead: "Your building matches the design closely so far.", body: "Your building matches the design closely. Tell us about it and we will be in touch about the pilot." },
-      { min: 40, zone: "mid", title: "A likely fit", lead: "Most of it matches so far.", body: "Most of it matches. The points below are worth a conversation before a pilot." },
-      { min: 0, zone: "low", title: "Worth a conversation", lead: "Some of it may not match the design yet.", body: "Some of it may not match the design yet. Tell us about the building and we will say what we can." },
+      { min: 75, zone: "high", title: "A strong fit", body: "Your building matches the design closely. Tell us about it and we will be in touch about the pilot." },
+      { min: 40, zone: "mid", title: "A likely fit", body: "Most of it matches. The points below are worth a conversation before a pilot." },
+      { min: 0, zone: "low", title: "Worth a conversation", body: "Some of it may not match the design yet. Tell us about the building and we will say what we can." },
     ],
     gaps: "Worth talking through:",
-    clear: "No gaps so far. A pilot conversation covers the rest of the site.",
-    primary: { label: "Register interest", href: "/register-interest" },
-    secondary: { label: "Book a pilot conversation", href: "/register-interest?type=commercial" },
-    // The home card's primary: the result sent to Lienry with the visitor's name and email, answered by a person.
+    clear: "No gaps in your answers. A pilot conversation covers the rest of the site.",
+    action: { label: "Book a pilot conversation", href: "/register-interest?type=commercial" },
     restart: "Start again",
-    // The phone strip that keeps the score in view while answering, and scrolls back to the result.
-    strip: { see: "See my result" },
+    // At the foot of the result: the answers and the score sent to Lienry with a name and an email, and
+    // answered by a person. No report is sent, and none is promised.
     send: {
-      open: "Send me my result",
       title: "Send me my result",
       who: "I am a",
       body: "We read every one and reply personally with your result and what a pilot would need.",
       submit: "Send my result",
       sending: "Sending",
-      back: "Back to my result",
-      sent: { title: "Sent. Thank you.", body: "We will reply personally with your result and what a pilot would need." },
+      sent: { title: "Sent. Thank you.", body: "We will reply to {email} personally, with your result and what a pilot would need." },
       failed: "We could not send it just now. Please try again later, or register interest instead.",
     },
     note: "Indicative only, from the design brief. Site requirements are still being finalised.",

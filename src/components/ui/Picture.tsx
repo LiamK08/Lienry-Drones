@@ -32,7 +32,7 @@ export type PictureProps = {
   positionSm?: string;
   /** An art-directed crop served below 768 (manifest `variants`); ignored while the index has none. */
   variant?: string;
-  /** The card hover: the media layer scales to 1.03 over 600ms on the group's hover or keyboard focus. */
+  /** The card hover: the media layer scales to 1.04 over 500ms on the group's hover or keyboard focus. */
   zoom?: boolean;
   /** Drawn over the still, inside the frame (a HoverClip). */
   overlay?: ReactNode;
@@ -194,7 +194,7 @@ export function Picture({
         {zoom ? (
           <div
             data-zoom=""
-            className="absolute inset-0 transition-[scale] duration-600 ease-settle group-hover:scale-103 group-has-[:focus-visible]:scale-103 motion-reduce:transition-none"
+            className="absolute inset-0 transition-[scale] duration-500 ease-settle group-hover:scale-104 group-has-[:focus-visible]:scale-104 motion-reduce:transition-none"
           >
             {picture}
             {overlay}

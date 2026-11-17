@@ -73,8 +73,6 @@
 //     scroll (what an infinite animation moves, by transform, translate, offset, inset or margin, is
 //     not sampled) and no figure counts up. The form clause is wider than the spec's "holds a heading
 //     or is a nav": the home FAQ's sticky block is its enquiry card (FaqForm.tsx), which has no heading.
-//     Below 1024 the fit check's score strip ([data-fit-strip], FitCheck.tsx) may stick to the bottom of
-//     the screen inside its card's question column, as the reference's does (CLAUDE.md, 26 Oct 2026).
 //     Every pass sees a page as a visitor in a session that has already seen the first-visit intro
 //     (SPEC.introKey is seeded), so the intro's overlay never shows here; check 45 judges it.
 // 22  Titles and links: every route's <title> is its own, "What the page is | Lienry Drones", exactly as
@@ -90,7 +88,9 @@
 // 29  Labels: a .label is legal only inside [data-ui] or the header (body > header).
 // 33  Calculator (any route with [data-calculator], at 390, 768 and 1440): labelled fields, one live
 //     region (the sr-only p), the worked figures computed here with totalOver, no decimals, no overflow,
-//     the status within 1s, no tween, no network request while typing, no saving or comparison words.
+//     the status within 1s, a first figure with no tween and a changed one settled on its value within
+//     1.2s (it counts there over about 450ms; CLAUDE.md "Fit check", 16 Nov 2026), no network
+//     request while typing, no saving or comparison words.
 // 41  Hover clips (with the motion passes): nothing requested at load; hovering a card plays its clip
 //     alone within 1.2s and leaving pauses it within 400ms; focusing its link plays it and pauses it by
 //     5.2s; the card keeps its height; at 390 (touch) and under reduced motion there is no clip at all.
@@ -1122,9 +1122,7 @@ function pageLib() {
     for (const el of document.body.querySelectorAll("*")) {
       const cs = getComputedStyle(el);
       if ((cs.position === "sticky" || cs.position === "fixed") && !rendered(el)) continue;
-      // The fit check's score strip, bottom-sticky inside its card's question column below 1024.
-      const fitStrip = el.matches("[data-fit-strip]") && innerWidth < 1024 && !!el.closest("main") && !el.querySelector("[data-band], section");
-      if (cs.position === "sticky" && !(header && header.contains(el)) && !fitStrip) {
+      if (cs.position === "sticky" && !(header && header.contains(el))) {
         const below = parseFloat(cs.top) >= navH - 0.5;
         const holds = el.matches("nav") || !!el.querySelector("h1, h2, h3, h4, h5, h6, nav, form");
         const isBand = el.matches("[data-band], section, main") || mainBlocks.has(el) || !!el.querySelector("[data-band], section");
@@ -1652,7 +1650,8 @@ function pageLib() {
 
   // The header's menus: every rendered button in body > header that opens a panel (the three desktop
   // panels from 1024, the phone menu's button below it), and inside an open panel each button that
-  // opens a list of its own (the phone menu's sections, which mount only when expanded).
+  // opens a list of its own (the phone menu's sections, [data-menu-group]: they stay mounted, and while
+  // closed are not drawn and inert, so rendered() leaves them out).
   R.menuButtons = () => {
     const header = document.querySelector("body > header");
     R.menuEls = header ? [...header.querySelectorAll("button[aria-controls][aria-expanded]")].filter(rendered) : [];
@@ -2415,6 +2414,18 @@ async function calcPass(route, width) {
         if (v.overflow) add(`#${id} overflows its box (scrollWidth ${v.scrollWidth} > clientWidth ${v.clientWidth})`, label);
       }
     };
+    // A changed figure counts to its new value over about 450ms (CostCalculator.tsx), so the two later
+    // cases read the outputs once they have settled on the expected text, or after 1.2s whatever they
+    // show: the judgement below is on that reading, so a count that never lands still fails.
+    const settled = async (want) => {
+      const t0 = Date.now();
+      let values = await R(page, "calcRead", CALC_OUT);
+      while (Date.now() - t0 <= 1200 && CALC_OUT.some((id) => values[id] && values[id].text !== want[id])) {
+        await page.waitForTimeout(60);
+        values = await R(page, "calcRead", CALC_OUT);
+      }
+      return values;
+    };
     const statusWithin = async (want, ms) => {
       const t0 = Date.now();
       let status = "";
@@ -2444,13 +2455,13 @@ async function calcPass(route, width) {
     // 3% a year.
     await page.fill(`#${CALC_IDS.rise}`, "3");
     await frames();
-    await judgeValues("2,000 m2, $30,000, 3%", expectFor(2000, 30000, 3), await R(page, "calcRead", CALC_OUT));
+    await judgeValues("2,000 m2, $30,000, 3%", expectFor(2000, 30000, 3), await settled(expectFor(2000, 30000, 3)));
     // The maximum.
     await page.fill(`#${CALC_IDS.area}`, "1000000");
     await page.fill(`#${CALC_IDS.spend}`, "10000000");
     await page.fill(`#${CALC_IDS.rise}`, "20");
     await frames();
-    await judgeValues("the maximum: 1,000,000 m2, $10,000,000, 20%", expectFor(1000000, 10000000, 20), await R(page, "calcRead", CALC_OUT));
+    await judgeValues("the maximum: 1,000,000 m2, $10,000,000, 20%", expectFor(1000000, 10000000, 20), await settled(expectFor(1000000, 10000000, 20)));
     // Blur the last field, so the reformatting on blur is measured too.
     await call(page, () => document.activeElement?.blur?.());
     await page.waitForTimeout(700);

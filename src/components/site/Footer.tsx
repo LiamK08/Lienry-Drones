@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import Link from "next/link";
 import { footer } from "@/lib/site";
 import { Picture } from "@/components/ui/Picture";
+import { RevealGate } from "@/components/ui/Reveal";
 import { Wordmark } from "@/components/ui/Wordmark";
 import { HomeLink } from "@/components/site/HomeLink";
 
@@ -22,11 +23,13 @@ const CIRCLES: readonly { id: string; d: number; y: number; pos?: string }[] = [
 function Circles({ hidden }: { hidden?: boolean }) {
   return (
     <ul aria-hidden={hidden || undefined} className="flex shrink-0 items-start gap-[1.625rem] pr-[1.625rem] md:gap-14 md:pr-14">
-      {CIRCLES.map((c) => (
+      {CIRCLES.map((c, i) => (
         <li
           key={c.id}
-          style={{ "--d": `${c.d}rem`, "--y": `${c.y}rem` } as CSSProperties}
-          className="mt-[calc(var(--y)*0.4)] size-[calc(var(--d)*0.4)] shrink-0 overflow-hidden rounded-pill md:mt-[calc(var(--y)*0.8)] md:size-[calc(var(--d)*0.8)]"
+          style={{ "--d": `${c.d}rem`, "--y": `${c.y}rem`, "--i": i } as CSSProperties}
+          // The first set arrives one by one (globals.css, the footer's round pictures); the copy that
+          // follows it in from the right is simply there.
+          className={`mt-[calc(var(--y)*0.4)] size-[calc(var(--d)*0.4)] shrink-0 overflow-hidden rounded-pill md:mt-[calc(var(--y)*0.8)] md:size-[calc(var(--d)*0.8)] ${hidden ? "" : "foot-circle"}`}
         >
           <Picture id={c.id} alt="" aspect="1/1" rounded="none" position={c.pos} sizes="(min-width: 768px) 240px, 120px" />
         </li>
@@ -42,7 +45,8 @@ const head = "text-caption font-medium leading-[1.2] text-muted-on-dark";
  * The footer, a sheet of flat near-black with the panel's corners on top (20px): the page ends on a
  * finished edge. Behind the corners, a 20px ground strip (aria-hidden, no flow height) takes the tone of
  * the band the page ends on (globals.css), so a corner never shows a white notch against paper. In the
- * sheet: a row of round pictures drifting slowly across the top over a faint accent glow, then, on the
+ * sheet: a row of round pictures drifting slowly across the top over a faint accent glow (they arrive
+ * one by one, once, when the row first scrolls into view), then, on the
  * page's rail, the logo (the link home, whose mark builds on hover or focus as in the intro) with the
  * tagline in Inter italic and, at the right, one row of "Ask AI about Lienry" pills (names, never the
  * assistants' marks), four link columns under small grey headings (two by two on phones), a hairline, and
@@ -62,12 +66,12 @@ function FooterSheet() {
   return (
     <footer data-tone="ink" className="on-dark relative isolate overflow-hidden rounded-t-panel bg-night pb-16 text-white md:pb-8">
       <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-12 -z-10 size-[26rem] -translate-x-1/2 rounded-pill bg-accent/[0.12] blur-[110px] md:top-16 md:size-[38rem]" />
-      <div aria-hidden="true" className="flex overflow-hidden pt-16 md:pt-[4.5rem]">
+      <RevealGate aria-hidden="true" className="flex overflow-hidden pt-16 md:pt-[4.5rem]">
         <div className="marquee flex w-max [animation-duration:30s] md:[animation-duration:60s]">
           <Circles />
           <Circles hidden />
         </div>
-      </div>
+      </RevealGate>
 
       {/* The content rail: the Container's 75rem inside the page margin, the left edge of every band above
           (the reference's footer follows its content, not its wider header bar). */}

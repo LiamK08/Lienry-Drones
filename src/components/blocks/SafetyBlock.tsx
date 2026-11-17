@@ -3,6 +3,7 @@ import type { Stat } from "@/content/stats";
 import type { Action, ImageRef } from "@/lib/types";
 import { Icon } from "@/components/blocks/Icon";
 import { Band, Container } from "@/components/ui/Band";
+import { PaneField } from "@/components/ui/PaneField";
 import { Button } from "@/components/ui/Button";
 import { Headline } from "@/components/ui/SectionHead";
 import { TextLink } from "@/components/ui/TextLink";
@@ -58,13 +59,20 @@ function NightPanel({ id, pad = "section", headline, emphasis, aside, head, chil
   return (
     <Band id={id} tone="plaster" pad={pad} labelledBy={`${id}-heading`}>
       <Container>
-        <div className="on-dark grid gap-8 rounded-panel bg-night p-5 md:gap-10 md:p-10 min-[75rem]:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] min-[75rem]:items-center min-[75rem]:gap-16 min-[75rem]:p-14">
-          <div className="flex flex-col items-start">
-            <h2 id={`${id}-heading`} className={emphasis ? "em-accent text-h2s text-white" : "text-h2s text-white"}>
-              <Headline text={headline} emphasis={emphasis} />
-            </h2>
-            <p className="mt-4 text-lead leading-[1.55] text-fg-muted">{aside}</p>
-            {head}
+        <div className="on-dark isolate grid gap-8 overflow-hidden rounded-panel bg-night p-5 md:gap-10 md:p-10 min-[75rem]:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] min-[75rem]:items-center min-[75rem]:gap-16 min-[75rem]:p-14">
+          <div className="relative">
+            {/* The pane texture, behind the head only: its box is the head's own plus the panel's padding,
+                so it runs out to the panel's edge, covers every line of the head alike and stops short of
+                the tiles (they carry their own wash, and the two together would dim their notes). The
+                head sits above it in a positioned box, which is how contrast tools tell the two apart. */}
+            <PaneField tone="night" at={[0, 50]} drift={[55, -12]} className="-inset-5 md:-inset-10 min-[75rem]:-inset-14" />
+            <div className="relative flex flex-col items-start">
+              <h2 id={`${id}-heading`} className={emphasis ? "em-accent text-h2s text-white" : "text-h2s text-white"}>
+                <Headline text={headline} emphasis={emphasis} />
+              </h2>
+              <p className="mt-4 text-lead leading-[1.55] text-fg-muted">{aside}</p>
+              {head}
+            </div>
           </div>
           {children}
         </div>

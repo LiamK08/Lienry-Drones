@@ -2,8 +2,8 @@ import { strip } from "@/content/home";
 import { Icon } from "@/components/blocks/Icon";
 
 /**
- * The strip under the hero: a 74px dark band with its label on the rail's left edge and a slow loop of
- * marks (an icon and a name, quieter than the hero's support line) for what the system is designed for.
+ * The strip under the hero: a 74px dark band with its label on the rail's left edge and a slow loop
+ * (about 20px a second) of marks (an icon and a name, quieter than the hero's support line) for what the system is designed for.
  * These are not customers or partners. The loop fades in beside the label and out at the far edge, so no
  * mark is ever cut hard. The list is in the DOM once for screen readers; the moving copy is aria-hidden.
  */
@@ -22,7 +22,8 @@ export function Strip() {
     <section aria-label={strip.label} data-band="strip" data-tone="ink" className="on-dark relative flex h-[4.625rem] items-center overflow-hidden bg-night text-white">
       <p className="flex h-full shrink-0 items-center pl-(--bleed) pr-4 text-caption text-white/70 md:pr-6 md:text-small">{strip.label}</p>
       <div className="flex min-w-0 flex-1 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_4rem,black_calc(100%-4rem),transparent)] md:[mask-image:linear-gradient(to_right,transparent,black_7rem,black_calc(100%-7rem),transparent)]">
-        <div className="marquee flex w-max">
+        {/* About 20px a second: one set of marks is about 1660px wide from 768 and 1520px below. */}
+        <div className="marquee flex w-max [animation-duration:76s] md:[animation-duration:83s]">
           {row(false)}
           {row(true)}
         </div>

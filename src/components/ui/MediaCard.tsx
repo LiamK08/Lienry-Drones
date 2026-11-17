@@ -53,7 +53,9 @@ function TitleArrow() {
  * the card's foot so the links of a row line up. Colours come from the surface.
  *
  * With `href` the whole card is one link (the title's ::after covers it, and its focus ring is drawn
- * on the card): hover scales the media to 1.03 over 600ms and underlines the title. A `clip` plays
+ * on the card): hover and keyboard focus raise the card 3px with a soft shadow under its picture on a
+ * light band (globals.css, the linked card), scale the media to 1.04 over 500ms and, on hover, underline
+ * the title. A `clip` plays
  * over the still on hover or focus (HoverClip). The root is a `div` that fills its parent's height:
  * wrap it in the `li` of a list or track.
  */
@@ -66,7 +68,7 @@ export function MediaCard({ id, media, clip, index, eyebrow, title, body, facts,
     : "group relative flex h-full flex-col text-fg";
 
   return (
-    <div data-card="" data-hover-target="" data-hover-clip={clip ? "" : undefined} className={cls}>
+    <div data-card="" data-card-link={href ? "" : undefined} data-hover-target="" data-hover-clip={clip ? "" : undefined} className={cls}>
       {media.kind === "image" ? (
         <Picture
           id={media.id}

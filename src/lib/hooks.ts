@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 const noop = () => () => {};
 
@@ -25,6 +25,51 @@ function subscribeScroll(cb: () => void) {
 /** True once the page has scrolled past `px`. Reads scrollY only when the browser fires a scroll event. */
 export function useScrolledPast(px: number): boolean {
   return useSyncExternalStore(subscribeScroll, () => window.scrollY > px, () => false);
+}
+
+const headerFoot = () => document.querySelector("body > header")?.getBoundingClientRect().bottom ?? 0;
+
+/**
+ * Whether the first element matching `selector` still shows below the header bar: true while any of it
+ * reaches under the bar's foot. An IntersectionObserver reports each crossing, so nothing runs per scroll
+ * event; the answer itself is read from the layout, so it is right from the first client render on a
+ * page restored part-way down. A new page's <main> is picked up from <body>'s child list. `server` is
+ * the answer the server renders (the top of the page).
+ */
+export function useShowsBelowHeader(selector: string, server: boolean): boolean {
+  const subscribe = useCallback(
+    (onChange: () => void) => {
+      let io: IntersectionObserver | null = null;
+      let seen: Element | null = null;
+      const watch = () => {
+        const el = document.querySelector(selector);
+        if (el === seen) return;
+        io?.disconnect();
+        seen = el;
+        io = el ? new IntersectionObserver(onChange, { rootMargin: `-${Math.round(headerFoot())}px 0px 0px 0px` }) : null;
+        if (el) io?.observe(el);
+      };
+      watch();
+      const swapped = new MutationObserver(() => {
+        watch();
+        onChange();
+      });
+      swapped.observe(document.body, { childList: true });
+      return () => {
+        swapped.disconnect();
+        io?.disconnect();
+      };
+    },
+    [selector],
+  );
+  return useSyncExternalStore(
+    subscribe,
+    () => {
+      const el = document.querySelector(selector);
+      return !!el && el.getBoundingClientRect().bottom > headerFoot();
+    },
+    () => server,
+  );
 }
 
 /** Whether an element is on screen, with an optional margin; with `minRatio`, only while at least that

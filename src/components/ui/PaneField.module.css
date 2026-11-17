@@ -1,0 +1,75 @@
+/* The pane field (PaneField.tsx): a fine grid of small square panes, the facade's own motif, as a quiet
+   texture on a panel or beside a hero. Two still layers fill one box, both a flat wash of a palette
+   colour shown through masks, so a layer's strength is one plain number: the colour's own alpha, which
+   contrast tools read as a wash (the worst case), never as an image or a cover they cannot judge:
+     .base  the whole grid, faint, strongest at the anchor (--pane-ax, --pane-ay, as percentages of
+            the box) and gone by the box's far sides;
+     .lit   a second copy of the grid, a little stronger, seen only through a soft round window that
+            drifts slowly from the anchor into the box and back (18s, the glow drift's timing), so a
+            patch of panes seems to catch the light.
+   Only the window's place in the mask moves: no box moves or changes size, so every line of text over
+   the field sits over the same layers the whole time. Under reduced motion the window rests where it
+   starts. */
+.field {
+  /* One 4px pane on an 18px pitch. */
+  --grid: conic-gradient(from 270deg at 4px 4px, #000 90deg, transparent 0);
+  --pitch: 18px 18px;
+  /* The window's width, at most the box's own. */
+  --window: min(26rem, 100%);
+  position: absolute;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* The colour and the two strengths, by the ground the field sits on. Each pair keeps the surface's
+   muted text above 4.5:1 even where a lit pane sits right behind it. */
+.field[data-pane-field="night"] {
+  --pane-colour: var(--color-accent-on-dark);
+  --pane-base: 6%;
+  --pane-lit: 11%;
+}
+.field[data-pane-field="accent"] {
+  --pane-colour: var(--color-white);
+  --pane-base: 7%;
+  --pane-lit: 8%;
+}
+.field[data-pane-field="light"] {
+  --pane-colour: var(--color-accent);
+  --pane-base: 10%;
+  --pane-lit: 14%;
+}
+
+.base,
+.lit {
+  position: absolute;
+  inset: 0;
+  mask-repeat: repeat, no-repeat;
+  mask-composite: intersect;
+}
+
+.base {
+  background-color: color-mix(in srgb, var(--pane-colour) var(--pane-base), transparent);
+  mask-image: var(--grid), radial-gradient(farthest-side at calc(var(--pane-ax) * 1%) calc(var(--pane-ay) * 1%), #000 20%, transparent);
+  mask-size: var(--pitch), 100% 100%;
+}
+
+.lit {
+  background-color: color-mix(in srgb, var(--pane-colour) var(--pane-lit), transparent);
+  mask-image: var(--grid), radial-gradient(closest-side, #000 25%, transparent);
+  mask-size: var(--pitch), var(--window) var(--window);
+  mask-position: 0 0, calc(var(--pane-ax) * 1%) calc(var(--pane-ay) * 1%);
+  animation: pane-light 18s ease-in-out infinite;
+}
+
+@keyframes pane-light {
+  50% {
+    mask-position: 0 0, calc((var(--pane-ax) + var(--pane-dx)) * 1%) calc((var(--pane-ay) + var(--pane-dy)) * 1%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lit {
+    animation: none;
+  }
+}

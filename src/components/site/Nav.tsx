@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
+import { AnimatePresence, motion, useIsPresent, useReducedMotion } from "motion/react";
+import { useEffect, useId, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { featureLink, menus, navAbout } from "@/lib/site";
-import { useScrolledPast } from "@/lib/hooks";
+import { useScrolledPast, useShowsBelowHeader } from "@/lib/hooks";
 import { Wordmark } from "@/components/ui/Wordmark";
 import { HomeLink } from "@/components/site/HomeLink";
 import { MenuPanel } from "@/components/site/MenuPanel";
@@ -57,16 +57,67 @@ function heroGround(): string {
 }
 
 /**
+ * The open panel's frame: it holds the height of the menu inside and eases it (260ms) when another menu
+ * takes its place, so moving between menus reads as one card resizing. The height is set on the node
+ * as the content is measured, outside React; the first one lands on a frame with no height yet, so the
+ * panel opens at its size without easing. At once under reduced motion.
+ */
+function PanelFrame({ children }: { children: ReactNode }) {
+  const frame = useRef<HTMLDivElement>(null);
+  const content = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const box = frame.current;
+    const inside = content.current;
+    if (!box || !inside) return;
+    const fit = new ResizeObserver(() => {
+      box.style.height = `${inside.offsetHeight}px`;
+    });
+    fit.observe(inside);
+    return () => fit.disconnect();
+  }, []);
+  return (
+    <div ref={frame} className="transition-[height] duration-[260ms] ease-settle motion-reduce:transition-none">
+      <div ref={content} className="relative">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * One menu's content inside the frame, under the id its button controls. The menu it replaces lifts out
+ * of the flow and fades over it (120ms) while it fades in, rising 4px (160ms), so the frame takes the
+ * new menu's height from the first frame. A leaving menu gives up its id and takes no pointer.
+ */
+function PanelBody({ id, reduce, children }: { id: MenuId; reduce: boolean; children: ReactNode }) {
+  const present = useIsPresent();
+  return (
+    <motion.div
+      id={present ? `menu-${id}` : undefined}
+      aria-hidden={present ? undefined : true}
+      className={`p-5 ${present ? "" : "pointer-events-none absolute inset-x-0 top-0"}`}
+      initial={reduce ? false : { opacity: 0, y: 4 }}
+      animate={{ opacity: 1, y: 0, transition: { duration: reduce ? 0 : 0.16, delay: reduce ? 0 : 0.06, ease: [0.22, 1, 0.36, 1] } }}
+      exit={{ opacity: 0, transition: { duration: reduce ? 0 : 0.12, ease: [0.4, 0, 1, 1] } }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/**
  * The header: the logo left and the menus centred (Platform, Solutions and Resources open a panel of
  * links on hover or click; About is a plain link). It carries no action pills (the owner's call, 21
  * October): Lienry Desktop sits in Resources, and every page closes on its own Register interest.
- * Over the home film it is clear with white text; anywhere else it is a soft white veil at the top of
- * the page and, once scrolled, a white bar with a hairline. The logo sits on
+ * Over the home film it is clear with white text for as long as the film shows under it, on a scrim of
+ * its own that travels with it (.bar-scrim), and turns white as the film leaves; anywhere else it is a
+ * soft white veil at the top of the page and, once scrolled, a white bar with a hairline. A link takes a
+ * ground on hover and keyboard focus, the one an open menu's button rests on. The logo sits on
  * the bar's own wide rail (87rem: 20px in on phones, 24px from 768, centred past 1440), wider than the
  * content's 75rem rail, as the reference's bar is. An open
- * panel dims the page under it. Below 1024 the bar holds the logo and the burger, which drops a
+ * panel dims the page under it; one panel serves the three menus, resizing between them. Below 1024 the bar holds the logo and the burger, which drops a
  * short white sheet under the bar with the four sections as 56px rows on hairlines (each opens in place on
- * the tint: its groups under their heads, then its panel's feature as a text link) over the dimmed page;
+ * the tint, by height: its groups under their heads, then its panel's feature as a text link) over the dimmed page;
  * a tap outside or Escape closes it. It
  * sits outside <main>, so it holds still while a new page fades in under it (PageTransition.tsx).
  */
@@ -81,7 +132,11 @@ export function Nav() {
   const headerRef = useRef<HTMLElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const closeTimer = useRef<number | undefined>(undefined);
+  const openTimer = useRef<number | undefined>(undefined);
   const ground = useSyncExternalStore(subscribeMain, heroGround, () => CLEAR_TOP[pathname] ?? "");
+  // Over film the bar stays clear until the film has left it: while the first band still shows below
+  // the bar's foot. (A painted dark ground keeps the 40px rule: the bar wears that ground's top colour.)
+  const filmBelow = useShowsBelowHeader("#main [data-tone]", pathname in CLEAR_TOP);
   // A new page closes every menu (a Back press with the phone sheet open included). Adjusted while
   // rendering, as PageTransition marks its <main>, so it lands in the commit that brings the new <main>:
   // the sheet is never left modal over a page it did not make inert.
@@ -114,7 +169,8 @@ export function Nav() {
   // The phone menu: Escape closes it, Tab stays inside, and the page behind is inert and still.
   useEffect(() => {
     if (!open) return;
-    const focusables = () => Array.from(headerRef.current?.querySelectorAll<HTMLElement>("a[href],button:not([disabled])") ?? []).filter((el) => el.getClientRects().length > 0);
+    // A group that is closing is still drawn for a moment, but inert: its links are out of the round.
+    const focusables = () => Array.from(headerRef.current?.querySelectorAll<HTMLElement>("a[href],button:not([disabled])") ?? []).filter((el) => el.getClientRects().length > 0 && !el.closest("[inert]"));
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setOpen(false);
@@ -155,16 +211,21 @@ export function Nav() {
   // keeps off the veil, whose backdrop filter would make the header the scrim's containing block.
   const [dimmed, setDimmed] = useState(false);
   if (menu && !dimmed) setDimmed(true);
-  const overHero = pathname in CLEAR_TOP && ground !== "" && !scrolled && !open && !menu;
+  const overFilm = ground === "transparent";
+  const overHero = pathname in CLEAR_TOP && ground !== "" && (overFilm ? filmBelow : !scrolled) && !open && !menu;
   // Elsewhere, at the top of the page the bar is a soft white veil with no rule; once scrolled, solid.
   const atTop = !scrolled && !open && !menu && !dimmed;
   // A panel the pointer has just opened stays open when its button is then clicked (the click that
   // usually follows the hover, however soon); otherwise a click toggles the panel.
   const hoverOpened = useRef<{ id: MenuId; at: number } | null>(null);
+  // With no panel open the pointer rests 80ms on a button before its panel opens, so a pointer crossing
+  // the bar opens nothing; with one open, the next opens at once.
   const hoverOpen = (id: MenuId, at = 0) => {
     window.clearTimeout(closeTimer.current);
+    window.clearTimeout(openTimer.current);
     if (menuNow.current !== id) hoverOpened.current = { id, at };
-    setMenu(id);
+    if (menuNow.current === null) openTimer.current = window.setTimeout(() => setMenu(id), 80);
+    else setMenu(id);
   };
   const clickMenu = (id: MenuId, at: number) => {
     const opened = hoverOpened.current;
@@ -173,10 +234,18 @@ export function Nav() {
     else setMenu((v) => (v === id ? null : id));
   };
   const hoverClose = () => {
+    window.clearTimeout(openTimer.current);
     window.clearTimeout(closeTimer.current);
     closeTimer.current = window.setTimeout(() => setMenu(null), 160);
   };
   const active = menus.find((m) => m.id === menu);
+  // A bar link's ground on hover and keyboard focus, the one an open menu's button rests on: a wash of
+  // ink on the white bar. Over the film it is a near-white chip with the label in ink, which holds over
+  // whatever passes behind it, the headline included (scripts/contrast-hero.mjs). Only the ground eases:
+  // a label that eased its own colour would trail the bar's when the bar changes.
+  const barLink = `flex h-8 items-center rounded-[0.5rem] px-3 text-small transition-[background-color] duration-200 ease-instrument motion-reduce:transition-none ${
+    overHero ? "hover:bg-white/90 hover:text-ink focus-visible:bg-white/90 focus-visible:text-ink" : "hover:bg-ink/[0.06] focus-visible:bg-ink/[0.06]"
+  }`;
 
   return (
     <header
@@ -189,6 +258,15 @@ export function Nav() {
         overHero ? "on-dark border-transparent text-white" : atTop ? "border-transparent bg-white/70 text-ink backdrop-blur-md" : "border-line bg-white text-ink"
       }`}
     >
+      {/* The bar's scrim over the film: the ground the logo and the links are read on, on the bar itself
+          so it holds while the film scrolls beneath (no blur: see below). It fades with the bar's switch. */}
+      {pathname in CLEAR_TOP ? (
+        <div
+          aria-hidden="true"
+          data-bar-scrim=""
+          className={`bar-scrim pointer-events-none absolute inset-x-0 top-0 transition-opacity duration-200 ease-instrument motion-reduce:transition-none ${overHero && overFilm ? "opacity-100" : "opacity-0"}`}
+        />
+      ) : null}
       {/* From 1024, while a panel is open, the page under the bar dims, so the panel reads as the one layer
           (opacity only: in over 180ms, out over 140ms, at once under reduced motion). No blur: over the
           playing film a backdrop blur halved the frame rate in the software renderer. It exists
@@ -222,15 +300,13 @@ export function Nav() {
         />
         <ul className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 lg:flex">
           {menus.map((m) => (
-            <li key={m.id} onMouseEnter={(e) => hoverOpen(m.id, e.timeStamp)}>
+            <li key={m.id} onMouseEnter={(e) => hoverOpen(m.id, e.timeStamp)} onMouseLeave={() => window.clearTimeout(openTimer.current)}>
               <button
                 type="button"
                 aria-expanded={menu === m.id}
                 aria-controls={`menu-${m.id}`}
                 onClick={(e) => clickMenu(m.id, e.timeStamp)}
-                className={`flex h-8 items-center gap-1.5 rounded-[0.5rem] px-3 text-small transition-[background-color,opacity] duration-200 ${
-                  menu === m.id ? (overHero ? "bg-white/15" : "bg-ink/[0.06]") : "hover:opacity-70"
-                }`}
+                className={`gap-1.5 ${barLink} ${menu === m.id ? "bg-ink/[0.06]" : ""}`}
               >
                 {m.label}
                 <Chevron open={menu === m.id} />
@@ -238,7 +314,7 @@ export function Nav() {
             </li>
           ))}
           <li onMouseEnter={hoverClose}>
-            <Link href={navAbout.href} aria-current={pathname === navAbout.href ? "page" : undefined} className="flex h-8 items-center rounded-pill px-3 text-small transition-opacity duration-200 hover:opacity-70">
+            <Link href={navAbout.href} aria-current={pathname === navAbout.href ? "page" : undefined} className={barLink}>
               {navAbout.label}
             </Link>
           </li>
@@ -259,20 +335,28 @@ export function Nav() {
           </button>
         </div>
 
-        {/* The desktop panel under the bar, one menu at a time: the one floating layer with a shadow. */}
+        {/* The desktop panel under the bar: the one floating layer with a shadow, and one shell for the
+            three menus. It fades in and out as a whole; between menus it stays, its frame easing to the
+            new menu's height while the contents cross-fade (PanelFrame, PanelBody). */}
         <AnimatePresence>
           {active ? (
             <motion.div
-              key={active.id}
-              id={`menu-${active.id}`}
+              key="panel"
+              data-menu-panel=""
               onMouseEnter={() => hoverOpen(active.id)}
-              className="absolute left-1/2 top-[calc(var(--nav-h)-0.5rem)] hidden w-[min(62.5rem,calc(100vw-3rem))] -translate-x-1/2 rounded-panel border border-line bg-white p-5 text-ink shadow-[0_24px_60px_-28px_rgb(17_26_34/0.3)] lg:block"
+              className="absolute left-1/2 top-[calc(var(--nav-h)-0.5rem)] hidden w-[min(62.5rem,calc(100vw-3rem))] -translate-x-1/2 overflow-hidden rounded-panel border border-line bg-white text-ink shadow-[0_24px_60px_-28px_rgb(17_26_34/0.3)] lg:block"
               initial={reduce ? false : { opacity: 0, y: -6 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.18, ease: [0.4, 0, 0.2, 1] }}
             >
-              <MenuPanel groups={active.groups} feature={active.feature} onPick={() => setMenu(null)} />
+              <PanelFrame>
+                <AnimatePresence initial={false}>
+                  <PanelBody key={active.id} id={active.id} reduce={!!reduce}>
+                    <MenuPanel groups={active.groups} feature={active.feature} onPick={() => setMenu(null)} />
+                  </PanelBody>
+                </AnimatePresence>
+              </PanelFrame>
             </motion.div>
           ) : null}
         </AnimatePresence>
@@ -305,7 +389,9 @@ export function Nav() {
             >
               {/* Each section a 56px row on a hairline that runs edge to edge. The open one sits on the
                   tint with its groups under their heads, as the desktop panel has them, and ends on the
-                  panel's feature as a text link. No pills. */}
+                  panel's feature as a text link. No pills. A section's body stays in the sheet and opens
+                  and closes by height ([data-menu-group] in globals.css); closed it is not drawn, and
+                  inert from the moment it starts to close. */}
               <ul>
                 {menus.map((m) => {
                   const expanded = sub === m.id;
@@ -322,8 +408,8 @@ export function Nav() {
                         {m.label}
                         <Chevron open={expanded} />
                       </button>
-                      {expanded ? (
-                        <div id={`m-${m.id}`} className="pb-3">
+                      <div id={`m-${m.id}`} data-menu-group="" data-open={expanded ? "" : undefined} inert={!expanded}>
+                        <div className="pb-3">
                           {m.groups.map((g) => (
                             <div key={g.heading} className="mt-2 first:mt-0">
                               <p className="py-1 text-caption font-medium text-muted">{g.heading}</p>
@@ -346,7 +432,7 @@ export function Nav() {
                             </svg>
                           </Link>
                         </div>
-                      ) : null}
+                      </div>
                     </li>
                   );
                 })}
