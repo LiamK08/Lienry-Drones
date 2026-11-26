@@ -156,7 +156,13 @@ export function Nav() {
   // Close a desktop panel on Escape or a click outside the header.
   useEffect(() => {
     if (!menu) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMenu(null);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      // Focus inside the panel goes back to the button that opened it, or it would be left on nothing.
+      const header = headerRef.current;
+      if (header?.querySelector("[data-menu-panel]")?.contains(document.activeElement)) header.querySelector<HTMLElement>(`[aria-controls="menu-${menu}"]`)?.focus();
+      setMenu(null);
+    };
     const onDown = (e: PointerEvent) => !headerRef.current?.contains(e.target as Node) && setMenu(null);
     document.addEventListener("keydown", onKey);
     document.addEventListener("pointerdown", onDown);
@@ -250,6 +256,10 @@ export function Nav() {
   return (
     <header
       ref={headerRef}
+      onBlur={(e) => {
+        // Keyboard focus that moves on past the header closes a desktop panel behind it.
+        if (menu && e.relatedTarget instanceof Node && !e.currentTarget.contains(e.relatedTarget)) setMenu(null);
+      }}
       role={open ? "dialog" : undefined}
       aria-modal={open ? true : undefined}
       aria-label={open ? "Menu" : undefined}

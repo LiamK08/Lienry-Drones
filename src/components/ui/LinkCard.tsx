@@ -47,8 +47,8 @@ export type LinkCardProps = {
 export function LinkCard({ href, title, action, picture, stand, topic, meta, tall = false, ground = "tint", className = "" }: LinkCardProps) {
   const frame = `relative block h-[11.25rem] shrink-0 overflow-hidden md:h-[12.5rem] ${tall ? "min-[75rem]:h-[18.75rem]" : ""}`;
   return (
-    <Link href={href} data-link-card={ground} className={`group group/card link-card flex w-full flex-col overflow-hidden rounded-card ${className}`}>
-      <span className="on-light flex flex-1 flex-col">
+    <Link href={href} data-link-card={ground} className={`group group/card link-card relative flex w-full flex-col rounded-card ${className}`}>
+      <span className="on-light flex flex-1 flex-col overflow-hidden rounded-card">
         {picture ? (
           <span className={frame}>
             <Picture id={picture.id} alt="" position={picture.position} fit="fill" rounded="none" zoom sizes={picture.sizes ?? "(min-width: 1248px) 384px, (min-width: 768px) 50vw, 100vw"} className="absolute inset-0" />

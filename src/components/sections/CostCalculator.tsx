@@ -189,10 +189,10 @@ export function CostCalculator({ headingId, heading, noteId, defaultType = "", l
   const tenShown = totals && tenAt !== null ? formatAud(tenAt) : ten;
   const perAreaShown = rate !== null && rateAt !== null ? formatPerArea(rateAt, copy.outputs.underOne) : perArea;
 
-  // The status line follows the figures 600ms after the last change, and only while the spend is valid.
+  // The status line follows the figures 600ms after the last change. With no totals to read (the spend
+  // cleared or out of range) it empties, so it never keeps figures the page no longer shows.
   useEffect(() => {
-    if (!five || !ten) return;
-    const next = [fill(copy.status.five, { five }), fill(copy.status.ten, { ten }), perArea ? fill(copy.status.perArea, { perArea }) : ""].filter(Boolean).join(" ");
+    const next = five && ten ? [fill(copy.status.five, { five }), fill(copy.status.ten, { ten }), perArea ? fill(copy.status.perArea, { perArea }) : ""].filter(Boolean).join(" ") : "";
     const t = window.setTimeout(() => setSummary(next), 600);
     return () => window.clearTimeout(t);
   }, [five, ten, perArea]);

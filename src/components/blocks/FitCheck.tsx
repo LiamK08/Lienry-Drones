@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { fitCheck } from "@/content/home";
 import styles from "./fitcheck/FitCheck.module.css";
 import { all, gapsOf, scoreFor, verdictFor, zoneLabel, type Answer, type Answers } from "./fitcheck/model";
@@ -49,11 +49,20 @@ export function FitCheck({ id = "fit", titled = false }: FitCheckProps) {
   const [step, setStep] = useState(0);
   const [dir, setDir] = useState<"next" | "back" | null>(null);
   const [result, setResult] = useState(false);
+  // Counts the restarts: the result's foot is keyed by it, so a sent form never outlives its answers.
+  const [run, setRun] = useState(0);
   const hold = useRef(0);
   // Set by a move, so focus follows the new statement (or the result) once it is on the page.
   const follow = useRef(false);
   const statementRef = useRef<HTMLParagraphElement>(null);
   const resultRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+  // Set by "Start again": below 1024 the result is longer than a step, so the card closes up above the
+  // screen and the first statement has to be brought back into view.
+  const toTop = useRef(false);
+  // The switch an answer was changed with on the result, and where it stood: a changed answer adds or
+  // removes a point above it below 1024, and the page follows so the switch stays under the finger.
+  const anchor = useRef<{ el: Element; top: number } | null>(null);
 
   const answered = all.filter((q) => answers[q.id]).length;
   const pct = scoreFor(answers);
@@ -65,8 +74,31 @@ export function FitCheck({ id = "fit", titled = false }: FitCheckProps) {
   useEffect(() => {
     if (!follow.current) return;
     follow.current = false;
-    (result ? resultRef : statementRef).current?.focus({ preventScroll: true });
+    const target = (result ? resultRef : statementRef).current;
+    if (!target) return;
+    target.focus({ preventScroll: true });
+    if (toTop.current) {
+      toTop.current = false;
+      const box = target.getBoundingClientRect();
+      const bar = document.querySelector("body > header")?.getBoundingClientRect().bottom ?? 0;
+      if (box.top < bar || box.bottom > window.innerHeight) rootRef.current?.scrollIntoView({ block: "start", behavior: "instant" });
+    }
+    if (document.activeElement === target) return;
+    // Under reduced motion every property takes a 0.01ms transition (globals.css), visibility included,
+    // so the result is still hidden for a frame after it is shown and cannot take focus yet: once more,
+    // after that frame.
+    let frame = requestAnimationFrame(() => {
+      frame = requestAnimationFrame(() => target.focus({ preventScroll: true }));
+    });
+    return () => cancelAnimationFrame(frame);
   }, [step, result]);
+  useLayoutEffect(() => {
+    const held = anchor.current;
+    anchor.current = null;
+    if (!held || !held.el.isConnected) return;
+    const moved = held.el.getBoundingClientRect().top - held.top;
+    if (Math.abs(moved) >= 1) window.scrollBy({ top: moved, behavior: "instant" });
+  }, [answers]);
 
   const move = (to: number, way: "next" | "back") => {
     window.clearTimeout(hold.current);
@@ -86,6 +118,8 @@ export function FitCheck({ id = "fit", titled = false }: FitCheckProps) {
   const restart = () => {
     setAnswers({});
     setResult(false);
+    setRun((n) => n + 1);
+    toTop.current = true;
     move(0, "back");
   };
 
@@ -99,7 +133,15 @@ export function FitCheck({ id = "fit", titled = false }: FitCheckProps) {
   const rest = result ? styles.riseIn : "max-lg:hidden lg:invisible";
 
   return (
-    <div role="group" aria-label={fitCheck.title} className={`grid rounded-panel bg-white ${raisedShadow} lg:grid-cols-2 lg:grid-rows-[auto_1fr]`}>
+    <div
+      ref={rootRef}
+      role="group"
+      aria-label={fitCheck.title}
+      onChangeCapture={(e) => {
+        if (result) anchor.current = { el: e.target as Element, top: (e.target as Element).getBoundingClientRect().top };
+      }}
+      className={`grid scroll-mt-[calc(var(--nav-h)+1rem)] rounded-panel bg-white ${raisedShadow} lg:grid-cols-2 lg:grid-rows-[auto_1fr]`}
+    >
       {result ? null : (
         <Steps
           id={id}
@@ -121,7 +163,7 @@ export function FitCheck({ id = "fit", titled = false }: FitCheckProps) {
       </div>
       <Sheet id={id} answers={answers} step={result ? -1 : step} done={result} shown={shown} pct={pct} verdict={verdict} count={count} onPick={pick} titled={titled} className={`lg:col-start-2 lg:row-span-2 lg:row-start-1 ${result ? "max-lg:mt-8" : "max-lg:hidden"}`} />
       <div inert={!result} aria-hidden={!result || undefined} className={`px-5 pb-6 pt-8 md:px-10 md:pb-10 lg:col-start-1 lg:row-start-2 lg:self-end lg:px-10 lg:pb-10 lg:pt-7 ${rest}`}>
-        <ResultFoot pct={pct} count={count} verdict={verdict} answers={answers} onRestart={restart} />
+        <ResultFoot key={run} pct={pct} count={count} verdict={verdict} answers={answers} onRestart={restart} />
       </div>
       <p aria-live="polite" className="sr-only">
         {live}

@@ -954,6 +954,15 @@
     [data-card-link]:hover > figure > div {
       box-shadow: var(--card-lift);
     }
+    /* While a card is raised, an unseen strip of its own keeps the 3px it left: a pointer resting on the
+       card's bottom edge stays on the card, so it does not bob. */
+    .link-card:hover::after,
+    [data-card-link]:hover::after {
+      content: "";
+      position: absolute;
+      inset: 100% 0 auto;
+      height: 3px;
+    }
   }
   .link-card:focus-visible {
     translate: 0 -3px;
@@ -974,6 +983,9 @@
     .link-card, .link-card:hover, .link-card:focus-visible,
     [data-card-link], [data-card-link]:hover, [data-card-link]:has(:focus-visible) {
       translate: none;
+    }
+    .link-card:hover::after, [data-card-link]:hover::after {
+      content: none;
     }
   }
 

@@ -70,6 +70,13 @@
     animation-delay: calc(var(--i, 0) * 120ms);
   }
 }
+/* Without JavaScript nothing can mark the fan as arrived, so the sheets are simply shown. */
+@media (scripting: none) {
+  .fan[data-fan] .sheet {
+    animation: none;
+    opacity: 1;
+  }
+}
 @keyframes sheet-in {
   from {
     opacity: 0;

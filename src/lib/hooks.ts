@@ -66,7 +66,9 @@ export function useShowsBelowHeader(selector: string, server: boolean): boolean 
     subscribe,
     () => {
       const el = document.querySelector(selector);
-      return !!el && el.getBoundingClientRect().bottom > headerFoot();
+      // At or past the foot, as the observer counts it: an element whose foot meets the bar's exactly is
+      // still "intersecting" to it, so no later crossing is reported on the way back up.
+      return !!el && el.getBoundingClientRect().bottom >= headerFoot();
     },
     () => server,
   );
